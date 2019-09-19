@@ -1,0 +1,9 @@
+{
+    "title":"DefaultTitle",
+    
+    "loadedFolders":[
+        "|project_folder|",
+        "|default|"
+    ],
+    "_comment_":"Any folder starting with | is treated as a special case and is not directly loaded"
+}

@@ -20,37 +20,42 @@ public class Project {
 
 	
 	/**
-	 * Create a new Project with a Path object
+	 * Create a new Project from a project folder
 	 * @param folder Project folder
 	 * @return success
 	 */
-	public boolean ProjectFolder(String folder) {
+	public static Project loadProject(String folder) {
 		if (folder == null) {
-			return false;
+			return null;
 		}
 		
 		// Make sure path exists
 		if (Files.notExists(Paths.get(folder))) {
 			System.out.println(folder+" does not exist!");
-			return false;
+			return null;
 		}
 		
 		// Check for gameinfo file
 		if (Files.notExists(Paths.get(folder, Constants.gameinfoFile))) {
 			System.out.println(folder+" does not contain a gameinfo file!");
-			return false;
+			return null;
 		}
+		
+		Project project = new Project();
+		project.projectFolder = Paths.get(folder);
 		
 		// Load the gameinfo
-		gameInfo = GameInfo.fromFile(Paths.get(folder, Constants.gameinfoFile));
+		project.gameInfo = GameInfo.fromFile(Paths.get(folder, Constants.gameinfoFile));
 		
-		if (gameInfo == null) {
+		if (project.gameInfo == null) {
 			System.out.println("Unable to load gameinfo file!");
-			return false;
+			return null;
 		}
 		
-		return true;
+		return project;
 	}
+	
+	
 	
 	
 }

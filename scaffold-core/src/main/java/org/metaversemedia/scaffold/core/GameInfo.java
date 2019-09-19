@@ -1,5 +1,8 @@
 package org.metaversemedia.scaffold.core;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -62,6 +65,46 @@ public class GameInfo {
 		}
 		
 		return gameInfo;
+	}
+	
+	/**
+	 * Save this gameInfo to a json file
+	 * @param saveFile File to save to
+	 */
+	public boolean saveJSON(Path saveFile) {
+		try {
+			BufferedWriter writer = new BufferedWriter(new FileWriter(saveFile.toString()));
+			
+			// Write title
+			writer.write("{");
+			writer.newLine();
+			writer.write("    \"title\":\""+title+"\"");
+			writer.newLine();
+			writer.newLine();
+			
+			// Write loaded folders
+			writer.write("    \"loadedFolders\":[");
+			writer.newLine();
+			for (int i = 0; i < loadedPaths.size(); i++) {
+				writer.write("        \""+loadedPaths.get(i)+"\"");
+				if (i != loadedPaths.size() - 1) {
+					writer.write(",");
+				}
+			}
+			writer.write(    "]");
+			
+			writer.newLine();
+			writer.write("}");
+			
+			writer.flush();
+			writer.close();
+			
+			return true;
+		} catch (IOException e) {
+			System.out.println("Unable to save gameinfo.json!");
+			e.printStackTrace();
+			return false;
+		}
 	}
 	
 	private static JSONObject loadJSON(Path inputPath) throws IOException, JSONException {
