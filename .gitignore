@@ -128,3 +128,6 @@ gradle-app.setting
 
 # This is the folder to put test projects in and not have them commited
 testProject/
+
+#MacOS
+.DS_Store
