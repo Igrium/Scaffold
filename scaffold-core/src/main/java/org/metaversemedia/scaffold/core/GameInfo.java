@@ -16,7 +16,7 @@ import org.json.JSONObject;
 
 /**
  * This class is responsible for loading and parsing the gameinfo file.
- * Use |project_folder| and |default| to represent special case references.
+ * Use _projectfolder_ and _default_ to represent special case references.
  * @author Sam54123
  *
  */
@@ -69,7 +69,7 @@ public class GameInfo {
 		this.title = title;
 	}
 	
-	public void loadFolder(String folder) {
+	public void addPath(String folder) {
 		loadedPaths.add(folder);
 		unpure();
 	}
@@ -107,7 +107,7 @@ public class GameInfo {
 		
 		for (int i = 0; i < pathsArray.length(); i++) {
 			String element = pathsArray.getString(i);
-			if (element != null && Files.exists(Paths.get(element))) {
+			if (element != null) {
 				gameInfo.loadedPaths.add(element);
 			}
 		}
@@ -165,7 +165,6 @@ public class GameInfo {
 		List<String> jsonFile = Files.readAllLines(inputPath);
 		
 		JSONObject jsonObject = new JSONObject(String.join("", jsonFile));
-		System.out.println(jsonObject);
 		
 		return jsonObject;
 	}

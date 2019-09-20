@@ -1,5 +1,7 @@
 package org.metaversemedia.scaffold.core;
 
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -61,6 +63,46 @@ public class Project {
 		}
 		
 		return project;
+	}
+	
+	/**
+	 * Create a new project in a selected folder
+	 * @param folder Folder to create project in
+	 * @param title Pretty title for the project (used as map name)
+	 * @return Newly created project (or null if creation failed)
+	 */
+	public static Project init(String folder, String title) {
+		// Check if file already exists
+		if (new File(folder,Constants.gameinfoFile).exists()) {
+			System.out.println("Project already exists in "+folder+"!");
+			return loadProject(folder);
+		}
+		
+		// Create project object
+		Project project = new Project(Paths.get(folder));
+		
+		// Setup gameinfo
+		project.gameInfo().setTitle(title);
+		project.gameInfo().addPath("_projectfolder_");
+		project.gameInfo().addPath("_default_");
+		
+		if (!project.gameInfo().saveJSON(Paths.get(folder,Constants.gameinfoFile))) {
+			return null;
+		}
+		
+		
+		// Create subfolders
+		try {
+			Files.createDirectories(Paths.get(folder,"assets"));
+			Files.createDirectories(Paths.get(folder,"data"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.out.println("Unable to create folder structure!");
+		}
+		
+		return project;
+		
 	}
 	
 	/**

@@ -13,14 +13,13 @@ public class LibraryTest {
 	@Test
 	public void test() {
 		System.out.println("Testing!");
-		Project project = Project.loadProject("C:\\Users\\Sam54123\\Documents\\Minecraft\\MapdevUtils\\Scaffold\\testProject");
+		Project project = Project.init("C:\\Users\\Sam54123\\Documents\\Minecraft\\MapdevUtils\\Scaffold\\testProject", "Test Project");
+		//Project project = Project.loadProject("C:\\Users\\Sam54123\\Documents\\Minecraft\\MapdevUtils\\Scaffold\\testProject");
 		System.out.println(project.getProjectFolder());
-		System.out.println(project.gameInfo().getTitle());
+		//System.out.println(project.gameInfo().getTitle());
 		ArrayList<String> loadedPaths = project.gameInfo().getLoadedPaths();
 		
-		for (int i = 1; i < loadedPaths.size(); i++) {
-			System.out.println(loadedPaths.get(i));
-		}
+		System.out.println(loadedPaths);
 	}
 
 }
