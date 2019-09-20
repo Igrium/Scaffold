@@ -1,12 +1,10 @@
 package org.metaversemedia.scaffold.core;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,7 +43,7 @@ public class GameInfo {
 	}
 	
 	/**
-	 * Does this GameInfo object match the gameinfo file?s
+	 * Does this GameInfo object match the gameinfo file?
 	 * @return Is pure?
 	 */
 	public boolean isPure() {
@@ -54,28 +52,36 @@ public class GameInfo {
 	
 	
 	/**
-	 * Set this GameInfo to be unpure
+	 * Set this gameinfo to be unpure
 	 */
 	public void unpure() {
 		isPure = false;
 	}
 	
 	/**
-	 * Set the project title
-	 * @param title
+	 * Set the pretty title of the project
+	 * @param title Title
 	 */
 	public void setTitle(String title) {
 		unpure();
 		this.title = title;
 	}
 	
+	/**
+	 * Add a folder to the project's list of loaded paths (may require restart)
+	 * @param folder Path to folder to add
+	 */
 	public void addPath(String folder) {
 		loadedPaths.add(folder);
 		unpure();
 	}
 
 	
-	/* Load gameinfo from a gameinfo file */
+	/**
+	 * Load gameinfo from a gameinfo file
+	 * @param file File to load from
+	 * @return Loaded GameInfo
+	 */
 	public static GameInfo fromFile(Path file) {
 		
 		
@@ -120,6 +126,7 @@ public class GameInfo {
 	/**
 	 * Save this gameInfo to a json file
 	 * @param saveFile File to save to
+	 * @return Success
 	 */
 	public boolean saveJSON(Path saveFile) {
 		

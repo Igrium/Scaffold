@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 
 /**
  * A Project is an object that defines all the main attributes of a project
@@ -33,7 +32,7 @@ public class Project {
 	/**
 	 * Create a new Project from a project folder
 	 * @param folder Project folder
-	 * @return success
+	 * @return Loaded project (or null of load failed)
 	 */
 	public static Project loadProject(String folder) {
 		if (folder == null) {
