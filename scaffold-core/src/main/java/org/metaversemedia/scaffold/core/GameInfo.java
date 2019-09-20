@@ -16,16 +16,64 @@ import org.json.JSONObject;
 
 /**
  * This class is responsible for loading and parsing the gameinfo file.
+ * Use |project_folder| and |default| to represent special case references.
  * @author Sam54123
  *
  */
 public class GameInfo {
 	
 	/* All the loaded folders of this project */
-	private ArrayList<String> loadedPaths;
+	private ArrayList<String> loadedPaths = new ArrayList<String>();
 	
 	/* The title of the project */
-	private String title = "DefaultTitle";
+	private String title = "Default Title";
+	
+	/* Does this gameinfo object match the file in the directory? */
+	private boolean isPure = false;
+	
+	/* Get the project's title */
+	public String getTitle() {
+		return title;
+	}
+	
+	/**
+	 * Get the loaded asset paths
+	 * @return Loaded paths (mutable)
+	 */
+	public ArrayList<String> getLoadedPaths() {
+		return loadedPaths;
+	}
+	
+	/**
+	 * Does this GameInfo object match the gameinfo file?s
+	 * @return Is pure?
+	 */
+	public boolean isPure() {
+		return isPure;
+	}
+	
+	
+	/**
+	 * Set this GameInfo to be unpure
+	 */
+	public void unpure() {
+		isPure = false;
+	}
+	
+	/**
+	 * Set the project title
+	 * @param title
+	 */
+	public void setTitle(String title) {
+		unpure();
+		this.title = title;
+	}
+	
+	public void loadFolder(String folder) {
+		loadedPaths.add(folder);
+		unpure();
+	}
+
 	
 	/* Load gameinfo from a gameinfo file */
 	public static GameInfo fromFile(Path file) {
@@ -54,7 +102,7 @@ public class GameInfo {
 		}
 		
 		// Load paths
-		JSONArray pathsArray = jsonObject.getJSONArray("paths");
+		JSONArray pathsArray = jsonObject.getJSONArray("loadedFolders");
 		gameInfo.loadedPaths = new ArrayList<String>();
 		
 		for (int i = 0; i < pathsArray.length(); i++) {
@@ -64,6 +112,8 @@ public class GameInfo {
 			}
 		}
 		
+		gameInfo.isPure = true;
+		
 		return gameInfo;
 	}
 	
@@ -72,14 +122,15 @@ public class GameInfo {
 	 * @param saveFile File to save to
 	 */
 	public boolean saveJSON(Path saveFile) {
+		
+		/* Use a custom write script for nice formatting */
 		try {
 			BufferedWriter writer = new BufferedWriter(new FileWriter(saveFile.toString()));
 			
 			// Write title
 			writer.write("{");
 			writer.newLine();
-			writer.write("    \"title\":\""+title+"\"");
-			writer.newLine();
+			writer.write("    \"title\":\""+title+"\",");
 			writer.newLine();
 			
 			// Write loaded folders
@@ -90,8 +141,9 @@ public class GameInfo {
 				if (i != loadedPaths.size() - 1) {
 					writer.write(",");
 				}
+				writer.newLine();
 			}
-			writer.write(    "]");
+			writer.write("    ]");
 			
 			writer.newLine();
 			writer.write("}");
@@ -99,6 +151,7 @@ public class GameInfo {
 			writer.flush();
 			writer.close();
 			
+			isPure = true;
 			return true;
 		} catch (IOException e) {
 			System.out.println("Unable to save gameinfo.json!");
@@ -110,8 +163,10 @@ public class GameInfo {
 	private static JSONObject loadJSON(Path inputPath) throws IOException, JSONException {
 		
 		List<String> jsonFile = Files.readAllLines(inputPath);
-		JSONObject animation = new JSONObject(String.join("", jsonFile));
 		
-		return animation;
+		JSONObject jsonObject = new JSONObject(String.join("", jsonFile));
+		System.out.println(jsonObject);
+		
+		return jsonObject;
 	}
 }

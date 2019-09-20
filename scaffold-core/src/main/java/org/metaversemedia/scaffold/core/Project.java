@@ -17,6 +17,15 @@ public class Project {
 	
 	/* The GameInfo object associated with this project */
 	private GameInfo gameInfo;
+	
+	/**
+	 * Create an empty project wckith an empty gameinfo
+	 * @param projectFolder Folder to initialize the project in
+	 */
+	public Project(Path projectFolder) {
+		this.projectFolder = projectFolder;
+		gameInfo = new GameInfo();
+	}
 
 	
 	/**
@@ -41,8 +50,7 @@ public class Project {
 			return null;
 		}
 		
-		Project project = new Project();
-		project.projectFolder = Paths.get(folder);
+		Project project = new Project(Paths.get(folder));
 		
 		// Load the gameinfo
 		project.gameInfo = GameInfo.fromFile(Paths.get(folder, Constants.gameinfoFile));
@@ -55,7 +63,21 @@ public class Project {
 		return project;
 	}
 	
+	/**
+	 * Get the project's project folder
+	 * @return Project folder
+	 */
+	public Path getProjectFolder() {
+		return projectFolder;
+	}
 	
+	/**
+	 * Get the project's gameinfo
+	 * @return gameInfo
+	 */
+	public GameInfo gameInfo() {
+		return gameInfo;
+	}
 	
 	
 }

@@ -10,3 +10,4 @@
 rootProject.name = 'Scaffold'
 
 include 'scaffold-core'
+
