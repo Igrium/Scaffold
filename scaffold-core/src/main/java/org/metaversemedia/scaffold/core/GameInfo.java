@@ -14,7 +14,7 @@ import org.json.JSONObject;
 
 /**
  * This class is responsible for loading and parsing the gameinfo file.
- * Use _projectfolder_ and _default_ to represent special case references.
+ * Use _projectfolder_ to represent project folder dir.
  * @author Sam54123
  *
  */
@@ -35,7 +35,7 @@ public class GameInfo {
 	}
 	
 	/**
-	 * Get the loaded asset paths
+	 * Get the absolute loaded asset paths
 	 * @return Loaded paths (mutable)
 	 */
 	public ArrayList<String> getLoadedPaths() {
@@ -57,6 +57,7 @@ public class GameInfo {
 	public void unpure() {
 		isPure = false;
 	}
+	
 	
 	/**
 	 * Set the pretty title of the project

@@ -15,11 +15,7 @@ public class LibraryTest {
 		System.out.println("Testing!");
 		Project project = Project.init("C:\\Users\\Sam54123\\Documents\\Minecraft\\MapdevUtils\\Scaffold\\testProject", "Test Project");
 		//Project project = Project.loadProject("C:\\Users\\Sam54123\\Documents\\Minecraft\\MapdevUtils\\Scaffold\\testProject");
-		System.out.println(project.getProjectFolder());
-		//System.out.println(project.gameInfo().getTitle());
-		ArrayList<String> loadedPaths = project.gameInfo().getLoadedPaths();
-		
-		System.out.println(loadedPaths);
+		System.out.println(project.assetManager().findAsset("assets/test.txt"));
 	}
 
 }

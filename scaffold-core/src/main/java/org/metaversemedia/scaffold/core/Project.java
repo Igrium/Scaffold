@@ -19,6 +19,9 @@ public class Project {
 	/* The GameInfo object associated with this project */
 	private GameInfo gameInfo;
 	
+	/* The AssetManager associated with this project */
+	private AssetManager assetManager;
+	
 	/**
 	 * Create an empty project wckith an empty gameinfo
 	 * @param projectFolder Folder to initialize the project in
@@ -26,6 +29,7 @@ public class Project {
 	public Project(Path projectFolder) {
 		this.projectFolder = projectFolder;
 		gameInfo = new GameInfo();
+		assetManager = new AssetManager(this);
 	}
 
 	
@@ -83,7 +87,6 @@ public class Project {
 		// Setup gameinfo
 		project.gameInfo().setTitle(title);
 		project.gameInfo().addPath("_projectfolder_");
-		project.gameInfo().addPath("_default_");
 		
 		if (!project.gameInfo().saveJSON(Paths.get(folder,Constants.gameinfoFile))) {
 			return null;
@@ -114,10 +117,18 @@ public class Project {
 	
 	/**
 	 * Get the project's gameinfo
-	 * @return gameInfo
+	 * @return gameInfo GameInfo
 	 */
 	public GameInfo gameInfo() {
 		return gameInfo;
+	}
+	
+	/**
+	 * Get the project's AssetManager
+	 * @return AssetManager
+	 */
+	public AssetManager assetManager() {
+		return assetManager;
 	}
 	
 	
