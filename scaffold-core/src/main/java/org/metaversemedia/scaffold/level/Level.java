@@ -78,7 +78,7 @@ public class Level {
 	 * @param position Position of entity
 	 * @return Newly created entity
 	 */
-	public Entity newEntity(Class<Entity> entityType, String name, Vector position) {
+	public Entity newEntity(Class<? extends Entity> entityType, String name, Vector position) {
 		// Make sure entity with name doesn't already exist
 		while (entities.get(name) != null) {
 			// Attempt to increment number
