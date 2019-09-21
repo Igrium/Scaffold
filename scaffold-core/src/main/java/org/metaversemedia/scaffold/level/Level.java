@@ -1,15 +1,12 @@
 package org.metaversemedia.scaffold.level;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +15,7 @@ import org.json.JSONObject;
 import org.metaversemedia.scaffold.core.Constants;
 import org.metaversemedia.scaffold.core.Project;
 import org.metaversemedia.scaffold.level.entity.Entity;
+import org.metaversemedia.scaffold.logic.MCFunction;
 import org.metaversemedia.scaffold.math.Vector;
 
 /**
@@ -32,6 +30,12 @@ public class Level {
 	
 	/* All the entities in the map */
 	private Map<String, Entity> entities = new HashMap<String, Entity>();
+	
+	/* Game functions. ONLY EXIST DURING COMPILATION */
+	private MCFunction initFunction;
+	private MCFunction tickFunction;
+	
+	private String name = "level";
 	
 	/**
 	 * Create a new level
@@ -55,6 +59,42 @@ public class Level {
 	 */
 	public Map<String, Entity> getEntities() {
 		return entities;
+	}
+	
+	/**
+	 * Get this map's name.
+	 * @return Map name
+	 */
+	public String getName() {
+		return name;
+	}
+	
+	/**
+	 * Set this map's name.
+	 * Removes all spaces.
+	 * @param name New name.
+	 */
+	public void setName(String name) {
+		// Remove spaces
+		this.name = name.replaceAll("\\s+","");
+	}
+	
+	/**
+	 * Get this map's init function
+	 * ONLY EXISTS DURING COMPILATION
+	 * @return Init function
+	 */
+	public MCFunction initFunction() {
+		return initFunction;
+	}
+	
+	/**
+	 * Get this map's init function
+	 * ONLY EXISTS DURING COMPILATION
+	 * @return Tick function
+	 */
+	public MCFunction tick() {
+		return tickFunction;
 	}
 	
 	/**

@@ -1,5 +1,7 @@
 package org.metaversemedia.scaffold.level.entity;
 
+import java.nio.file.Path;
+
 import org.json.JSONObject;
 import org.metaversemedia.scaffold.level.Level;
 import org.metaversemedia.scaffold.math.Vector;
@@ -92,6 +94,15 @@ public class Entity {
 		Entity entity = new Entity(level, name);
 		entity.setPosition(Vector.fromJSONArray(object.getJSONArray("position")));
 		return entity;
+	}
+	
+	/**
+	 * Compile this entity's logic.
+	 * @param logicPath Folder comtaining level's function files.
+	 * @return Success. ENTITY WILL BE DELETED IF FALSE!
+	 */
+	public boolean compileLogic(Path logicPath) {
+		return true;
 	}
 	
 	
