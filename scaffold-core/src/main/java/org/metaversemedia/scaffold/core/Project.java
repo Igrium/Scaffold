@@ -50,7 +50,7 @@ public class Project {
 		}
 		
 		// Check for gameinfo file
-		if (Files.notExists(Paths.get(folder, Constants.gameinfoFile))) {
+		if (Files.notExists(Paths.get(folder, Constants.GAMEINFONAME))) {
 			System.out.println(folder+" does not contain a gameinfo file!");
 			return null;
 		}
@@ -58,7 +58,7 @@ public class Project {
 		Project project = new Project(Paths.get(folder));
 		
 		// Load the gameinfo
-		project.gameInfo = GameInfo.fromFile(Paths.get(folder, Constants.gameinfoFile));
+		project.gameInfo = GameInfo.fromFile(Paths.get(folder, Constants.GAMEINFONAME));
 		
 		if (project.gameInfo == null) {
 			System.out.println("Unable to load gameinfo file!");
@@ -76,7 +76,7 @@ public class Project {
 	 */
 	public static Project init(String folder, String title) {
 		// Check if file already exists
-		if (new File(folder,Constants.gameinfoFile).exists()) {
+		if (new File(folder,Constants.GAMEINFONAME).exists()) {
 			System.out.println("Project already exists in "+folder+"!");
 			return loadProject(folder);
 		}
@@ -88,7 +88,7 @@ public class Project {
 		project.gameInfo().setTitle(title);
 		project.gameInfo().addPath("_projectfolder_");
 		
-		if (!project.gameInfo().saveJSON(Paths.get(folder,Constants.gameinfoFile))) {
+		if (!project.gameInfo().saveJSON(Paths.get(folder,Constants.GAMEINFONAME))) {
 			return null;
 		}
 		
@@ -97,6 +97,7 @@ public class Project {
 		try {
 			Files.createDirectories(Paths.get(folder,"assets"));
 			Files.createDirectories(Paths.get(folder,"data"));
+			Files.createDirectories(Paths.get(folder,"maps"));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

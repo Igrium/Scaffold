@@ -1,5 +1,10 @@
 package org.metaversemedia.scaffold.level;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -22,12 +27,6 @@ public class Level {
 	
 	/* The project this level belongs to */
 	private Project project;
-	
-	/* Relative path to level file */
-	private Path path;
-	
-	/* Has this level been saved? */
-	private boolean isSaved = false;
 	
 	/* All the entities in the map */
 	private Map<String, Entity> entities = new HashMap<String, Entity>();
@@ -54,21 +53,6 @@ public class Level {
 	 */
 	public Map<String, Entity> getEntities() {
 		return entities;
-	}
-	
-	/**
-	 * Has this level been saved?
-	 * @return Is saved?
-	 */
-	public boolean isSaved() {
-		return isSaved;
-	}
-	
-	/**
-	 * Mark the level as unsaved
-	 */
-	public void markUnsaved() {
-		isSaved = false;
 	}
 	
 	/**
@@ -152,6 +136,37 @@ public class Level {
 		}
 		
 		return level;
+	}
+	
+	/**
+	 * Save this level to a file
+	 * @param file File to save to
+	 * @return Success
+	 */
+	public boolean saveFile(File file) {
+		JSONObject serialized = serialize();
+		
+		FileWriter writer;
+		try {
+			writer = new FileWriter(file);
+			serialized.write(writer, 4, 0);
+			writer.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			System.out.println("Unable to write to file "+file);
+			return false;
+		}
+		
+		return true;
+	}
+	
+	/**
+	 * Save this level to a file
+	 * @param file File to save to
+	 * @return Success
+	 */
+	public boolean saveFile(String file) {
+		return saveFile(project.assetManager().getAbsolutePath(file).toFile());
 	}
 	
 }

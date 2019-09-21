@@ -24,15 +24,7 @@ public class LibraryTest {
 		Entity entity1 = level.newEntity(Entity.class, "Entity", new Vector(0,0,0));
 		Entity entity2 = level.newEntity(Entity.class, "Entity", new Vector(0,0,0));
 		
-		JSONObject serialized =  level.serialize();
-		
-		System.out.println(serialized);
-		
-		Level level2 = Level.unserialize(project, serialized);
-		
-		for (String key : level2.getEntities().keySet()) {
-			System.out.println(key);
-		}
+		level.saveFile("maps/leveltest.mcmap");
 	}
 
 }
