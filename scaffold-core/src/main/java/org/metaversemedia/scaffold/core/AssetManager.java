@@ -68,15 +68,14 @@ public class AssetManager {
 	 */
 	public Path findAsset(String assetPath) {
 		
-		ArrayList<String> loadedPaths = project.gameInfo().getLoadedPaths();
+		ArrayList<Path> loadedPaths = getLoadedPaths();
 		
 		// Look in order from first to last in list
 		for (int i = 0; i < loadedPaths.size(); i++) {
-			if (new File(loadedPaths.get(i),assetPath).exists()) {
-				return Paths.get(normalize(loadedPaths.get(i)), assetPath);
+			if (new File(loadedPaths.get(i).toString(),assetPath).exists()) { 
+				return Paths.get(loadedPaths.get(i).toString(), assetPath);
 			}
 		}
-		
 		
 		System.out.println("Unable to find asset "+assetPath);
 		return null;
