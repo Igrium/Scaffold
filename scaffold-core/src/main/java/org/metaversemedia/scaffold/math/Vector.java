@@ -1,5 +1,8 @@
 package org.metaversemedia.scaffold.math;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
 /**
  * 3D Vector implementation
  */
@@ -55,4 +58,35 @@ public class Vector {
 	public static Vector divide(Vector vec, float num) {
 		return new Vector(vec.X()/num, vec.Y()/num, vec.Z()/num);
 	}
+	
+	
+	/**
+	 * Serialize this vector into a JSONArray (for map saving)
+	 * @return Serialized JSONArray
+	 */
+	public JSONArray toJSONArray() {
+		return new JSONArray(new float[]{x,y,z});
+	}
+	
+	/**
+	 * Load vector from JSONArray
+	 * @param array JSONArray to load from
+	 * @return Vector
+	 */
+	public static Vector fromJSONArray(JSONArray array) {
+		// JSONArray might not be formatted properly.
+		try {
+			float x = array.getFloat(0);
+			float y = array.getFloat(1);
+			float z = array.getFloat(2);
+			
+			return new Vector(x,y,z);
+			
+		} catch (JSONException e) {
+			System.out.println("Unable to load Vector from JSONArray "+array);
+			return null;
+		}
+
+	}
+
 }

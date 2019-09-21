@@ -7,22 +7,26 @@ import java.util.ArrayList;
 
 import org.junit.Test;
 import org.metaversemedia.scaffold.core.Project;
+import org.metaversemedia.scaffold.level.Level;
+import org.metaversemedia.scaffold.level.entity.Entity;
 import org.metaversemedia.scaffold.math.Vector;
 
 public class LibraryTest {
 
 	@Test
 	public void test() {
-//		Vector vector = new Vector(1,2,3);
-//		System.out.println(vector.toString());
-//		
-//		System.out.println(Vector.add(new Vector(1,2,3), new Vector(3,2,1)));
-//		System.out.println(Vector.subtract(new Vector(1,2,3), new Vector(3,2,1)));
-//		System.out.println(Vector.multiply(vector, 2));
-//		System.out.println(Vector.divide(vector, 2));
-//		
-//		System.out.println(vector.lengthSquared());
-//		System.out.println(vector.length());
+		Project project = Project.init("C:\\Users\\Sam54123\\Documents\\Minecraft\\MapdevUtils\\Scaffold\\testProject", "Test Project");
+		
+		Level level = new Level(project);
+		
+		Entity entity = level.newEntity(Entity.class, "Entity", new Vector(0,0,0));
+		Entity entity1 = level.newEntity(Entity.class, "Entity", new Vector(0,0,0));
+		Entity entity2 = level.newEntity(Entity.class, "Entity", new Vector(0,0,0));
+		
+		System.out.println(entity.serialize());
+		System.out.println(entity.getName());
+		System.out.println(entity1.getName());
+		System.out.println(entity2.getName());
 	}
 
 }
