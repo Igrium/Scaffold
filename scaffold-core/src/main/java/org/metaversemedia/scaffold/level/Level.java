@@ -6,9 +6,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.json.JSONException;
@@ -126,7 +128,28 @@ public class Level {
 			JSONObject entities = object.getJSONObject("entities");
 			
 			for (String key : entities.keySet()) {
-				level.entities.put(key, Entity.unserialize(level, key, entities.getJSONObject(key)));
+				// Find entity class
+				String className = entities.getJSONObject(key).getString("type");
+				
+				try {
+					@SuppressWarnings("unchecked")
+					Class<? extends Entity> entityClass = (Class<? extends Entity>) Class.forName(className);
+					
+					// Involk unserialize method
+					level.entities.put(key, (Entity) entityClass.getMethod("unserialize",
+							new Class[] {Level.class, String.class, JSONObject.class})
+							.invoke(null, level, key, entities.getJSONObject(key)));
+					
+				} catch (ClassNotFoundException 
+						| IllegalAccessException 
+						| IllegalArgumentException 
+						| InvocationTargetException 
+						| NoSuchMethodException 
+						| SecurityException e) {
+					System.out.println("Unable to instantiate class "+className);
+				}
+				
+				
 			}
 			
 			
@@ -167,6 +190,45 @@ public class Level {
 	 */
 	public boolean saveFile(String file) {
 		return saveFile(project.assetManager().getAbsolutePath(file).toFile());
+	}
+	
+	/**
+	 * Load a level from a file.
+	 * @param project Project to load into
+	 * @param file File to load
+	 * @return Loaded level
+	 */
+	public static Level loadFile(Project project, Path file) {
+		
+		JSONObject serialized;
+		try {
+			serialized = loadJSON(file);
+		} catch (JSONException e) {
+			System.out.println("Improperly formatted file: "+file.toString());
+			return null;
+		} catch (IOException e) {
+			System.out.println("Unable to read file "+file.toString());
+			return null;
+		}
+		
+		return unserialize(project, serialized);
+	}
+	
+	/**
+	 * Load a level from a file.
+	 * @param project Project to load into
+	 * @param file File to load
+	 * @return Loaded level
+	 */
+	public static Level loadFile(Project project, String file) {
+		return loadFile(project, project.assetManager().getAbsolutePath(file));
+	}
+	
+	/* Load a JSONObject from a file */
+	private static JSONObject loadJSON(Path inputPath) throws IOException, JSONException {
+		List<String> jsonFile = Files.readAllLines(inputPath);
+		JSONObject jsonObject = new JSONObject(String.join("", jsonFile));
+		return jsonObject;
 	}
 	
 }

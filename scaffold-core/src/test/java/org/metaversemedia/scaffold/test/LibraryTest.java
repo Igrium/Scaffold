@@ -22,9 +22,16 @@ public class LibraryTest {
 		
 		Entity entity = level.newEntity(Entity.class, "Entity", new Vector(0,0,0));
 		Entity entity1 = level.newEntity(Entity.class, "Entity", new Vector(0,0,0));
-		Entity entity2 = level.newEntity(Entity.class, "Entity", new Vector(0,0,0));
+		Entity entity2 = level.newEntity(TestEntity.class, "Entity", new Vector(0,0,0));
 		
 		level.saveFile("maps/leveltest.mcmap");
+		
+		Level level2 = Level.loadFile(project, "maps/leveltest.mcmap");
+		
+		for (String name : level2.getEntities().keySet()) {
+			System.out.println(name);
+		}
+		
 	}
 
 }
