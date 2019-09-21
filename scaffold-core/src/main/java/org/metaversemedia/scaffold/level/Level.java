@@ -3,9 +3,12 @@ package org.metaversemedia.scaffold.level;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
+import org.json.JSONException;
 import org.json.JSONObject;
+import org.metaversemedia.scaffold.core.Constants;
 import org.metaversemedia.scaffold.core.Project;
 import org.metaversemedia.scaffold.level.entity.Entity;
 import org.metaversemedia.scaffold.math.Vector;
@@ -27,7 +30,7 @@ public class Level {
 	private boolean isSaved = false;
 	
 	/* All the entities in the map */
-	private Map<String, Entity> entities = new HashMap();
+	private Map<String, Entity> entities = new HashMap<String, Entity>();
 	
 	/**
 	 * Create a new level
@@ -43,6 +46,14 @@ public class Level {
 	 */
 	public Project getProject() {
 		return project;
+	}
+	
+	/**
+	 * Returns a Map with all this level's entities
+	 * @return Map Entities
+	 */
+	public Map<String, Entity> getEntities() {
+		return entities;
 	}
 	
 	/**
@@ -94,6 +105,53 @@ public class Level {
 		entities.put(name, entity);
 		
 		return entity;
+	}
+	
+	/**
+	 * Serialize this level into a JSONObject.
+	 * @return Serialized level
+	 */
+	public JSONObject serialize() {
+		JSONObject object = new JSONObject();
+		
+		object.put("editorVersion", Constants.VERSION);
+		
+		// Add all maps
+		JSONObject entities = new JSONObject();
+		
+		for (String key : this.entities.keySet()) {
+			entities.put(key, this.entities.get(key).serialize());
+		}
+		
+		object.put("entities", entities);
+		
+		return object;
+	}
+	
+	/**
+	 * Unserialize a level from a JSONObject.
+	 * @param project Project the level should belong to.
+	 * @param object Serialized level.
+	 * @return Unserlailized level.
+	 */
+	public static Level unserialize(Project project, JSONObject object) {
+		Level level = new Level(project);
+		
+		// Unserialize entities
+		try {
+			JSONObject entities = object.getJSONObject("entities");
+			
+			for (String key : entities.keySet()) {
+				level.entities.put(key, Entity.unserialize(level, key, entities.getJSONObject(key)));
+			}
+			
+			
+		} catch (JSONException e) {
+			System.out.println("Improperly formatted level!");
+			return null;
+		}
+		
+		return level;
 	}
 	
 }

@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
+import org.json.JSONObject;
 import org.junit.Test;
 import org.metaversemedia.scaffold.core.Project;
 import org.metaversemedia.scaffold.level.Level;
@@ -23,10 +24,15 @@ public class LibraryTest {
 		Entity entity1 = level.newEntity(Entity.class, "Entity", new Vector(0,0,0));
 		Entity entity2 = level.newEntity(Entity.class, "Entity", new Vector(0,0,0));
 		
-		System.out.println(entity.serialize());
-		System.out.println(entity.getName());
-		System.out.println(entity1.getName());
-		System.out.println(entity2.getName());
+		JSONObject serialized =  level.serialize();
+		
+		System.out.println(serialized);
+		
+		Level level2 = Level.unserialize(project, serialized);
+		
+		for (String key : level2.getEntities().keySet()) {
+			System.out.println(key);
+		}
 	}
 
 }

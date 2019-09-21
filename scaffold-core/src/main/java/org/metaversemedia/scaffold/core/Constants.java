@@ -7,4 +7,7 @@ public class Constants {
 	
 	/** Zip file containing Minecraft's default assets (as of 1.14) */
 	public static final String defaultAssetZip = "defaultAssets.zip";
+	
+	/* The current editor version */
+	public static final String VERSION = "0.1.0";
 }
