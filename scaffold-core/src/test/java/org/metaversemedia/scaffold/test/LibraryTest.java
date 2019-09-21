@@ -7,15 +7,22 @@ import java.util.ArrayList;
 
 import org.junit.Test;
 import org.metaversemedia.scaffold.core.Project;
+import org.metaversemedia.scaffold.math.Vector;
 
 public class LibraryTest {
 
 	@Test
 	public void test() {
-		System.out.println("Testing!");
-		Project project = Project.init("C:\\Users\\Sam54123\\Documents\\Minecraft\\MapdevUtils\\Scaffold\\testProject", "Test Project");
-		//Project project = Project.loadProject("C:\\Users\\Sam54123\\Documents\\Minecraft\\MapdevUtils\\Scaffold\\testProject");
-		System.out.println(project.assetManager().findAsset("assets/test.txt"));
+//		Vector vector = new Vector(1,2,3);
+//		System.out.println(vector.toString());
+//		
+//		System.out.println(Vector.add(new Vector(1,2,3), new Vector(3,2,1)));
+//		System.out.println(Vector.subtract(new Vector(1,2,3), new Vector(3,2,1)));
+//		System.out.println(Vector.multiply(vector, 2));
+//		System.out.println(Vector.divide(vector, 2));
+//		
+//		System.out.println(vector.lengthSquared());
+//		System.out.println(vector.length());
 	}
 
 }
