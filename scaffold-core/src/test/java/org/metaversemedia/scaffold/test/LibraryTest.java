@@ -20,21 +20,14 @@ public class LibraryTest {
 	public void test() {
 		Project project = Project.init("C:\\Users\\Sam54123\\Documents\\Minecraft\\MapdevUtils\\Scaffold\\testProject", "Test Project");
 		
-		MCFunction function = new MCFunction();
+		Level level = new Level(project);
 		
-		function.variables().put("testVariable", "Test_Variable");
+		Entity entity1 = level.newEntity(TestEntity.class, "Entity", new Vector(0,0,0));
+		level.newEntity(TestEntity.class, "Test", new Vector(0,0,0));
+			
+		level.compileLogic("logicTest/level1");
 		
-		function.commands().add("say this is a function!");
-		function.commands().add("say Variable: $testVariable");
-		
-		try {
-			function.compile(project.assetManager().getAbsolutePath("function.mcfunction").toFile());
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			assert(false);
-		}
-		
+		level.saveFile("maps/level1.mcmap");
 	}
 
 }
