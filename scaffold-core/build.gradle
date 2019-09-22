@@ -18,6 +18,7 @@ dependencies {
     // This dependency is used internally, and not exposed to consumers on their own compile classpath.
     implementation 'com.google.guava:guava:23.0'
     implementation 'org.json:json:20190722'
+    implementation 'com.flowpowered:flow-nbt:1.0.0'
 
     // Use JUnit test framework
     testImplementation 'junit:junit:4.12'

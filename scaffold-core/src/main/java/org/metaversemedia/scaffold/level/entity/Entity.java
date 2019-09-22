@@ -156,6 +156,7 @@ public class Entity {
 				entity.attributes().put(key, attribute);
 			}
 			
+			entity.onUnserialized(object);
 			return entity;
 		} catch (JSONException e) {
 			System.out.println("Improperly formatted entity: "+name);
@@ -163,6 +164,12 @@ public class Entity {
 		}
 		
 	}
+	
+	/**
+	 * Called when entity is unserialized for subclasses to act on.
+	 * @param object JSONObject serialized from.
+	 */
+	public void onUnserialized(JSONObject object) {}
 	
 	/**
 	 * Compile this entity's logic.

@@ -4,7 +4,7 @@ import org.junit.Test;
 import org.metaversemedia.scaffold.core.Project;
 import org.metaversemedia.scaffold.level.Level;
 import org.metaversemedia.scaffold.level.entity.Entity;
-import org.metaversemedia.scaffold.level.entity.Rotatable;
+import org.metaversemedia.scaffold.level.entity.GameEntity;
 import org.metaversemedia.scaffold.math.Vector;
 
 public class LibraryTest {
@@ -15,7 +15,8 @@ public class LibraryTest {
 		
 		Level level = new Level(project);
 		
-		Entity ent1 = level.newEntity(Rotatable.class, "ent1", new Vector(0,0,0));
+		GameEntity ent1 = (GameEntity) level.newEntity(GameEntity.class, "ent1", new Vector(0,0,0));
+		ent1.setEntityType("minecraft:armor_stand");
 		
 		level.compileLogic("logicTest/level1");
 		
