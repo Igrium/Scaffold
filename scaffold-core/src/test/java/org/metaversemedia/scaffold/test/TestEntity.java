@@ -3,7 +3,6 @@ package org.metaversemedia.scaffold.test;
 import java.nio.file.Path;
 
 import org.json.JSONObject;
-import org.metaversemedia.scaffold.level.Attribute;
 import org.metaversemedia.scaffold.level.Level;
 import org.metaversemedia.scaffold.level.entity.Entity;
 
@@ -11,7 +10,7 @@ public class TestEntity extends Entity {
 
 	public TestEntity(Level level, String name) {
 		super(level, name);
-		addAttribute("number", Attribute.Type.INTEGER);
+		addAttribute("number", 23);
 		System.out.println("test entity: "+name);
 	}
 	

@@ -4,10 +4,8 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.metaversemedia.scaffold.level.Attribute;
 import org.metaversemedia.scaffold.level.Level;
 import org.metaversemedia.scaffold.math.Vector;
 
@@ -26,7 +24,7 @@ public class Entity {
 	/* The level this entity belongs to */
 	private Level level;
 	
-	private Map<String, Attribute> attributes = new HashMap<String, Attribute>();
+	private Map<String, Object> attributes = new HashMap<String, Object>();
 
 	
 	/**
@@ -84,18 +82,10 @@ public class Entity {
 	 * Get a map of this entity's attributes.
 	 * @return Attributes
 	 */
-	public Map<String, Attribute> attributes() {
+	public Map<String, Object> attributes() {
 		return attributes;
 	}
 	
-	/**
-	 * Create a new attribute and add it.
-	 * @param name Attribute name.
-	 * @param type Attribute type.
-	 */
-	public void addAttribute(String name, Attribute.Type type) {
-		attributes.put(name, new Attribute(type));
-	}
 	
 	/**
 	 * Create a new attribute and add it.
@@ -103,7 +93,16 @@ public class Entity {
 	 * @param value Attribute value.
 	 */
 	public void addAttribute(String name, Object value) {
-		attributes.put(name, new Attribute(value));
+		attributes.put(name, value);
+	}
+	
+	
+	/**
+	 * Get an attribute by name
+	 * @param name Attribute
+	 */
+	public Object getAttribute(String name) {
+		return attributes.get(name);
 	}
 	
 	
@@ -123,8 +122,8 @@ public class Entity {
 		JSONObject attributeObject = new JSONObject();
 		
 		for (String key : attributes.keySet()) {
-			if (attributes.get(key).getValue() != null) {
-				attributeObject.put(key, attributes.get(key).serialize());
+			if (attributes.get(key) != null) {
+				attributeObject.put(key, attributes.get(key));
 			}
 		}
 		
@@ -153,7 +152,7 @@ public class Entity {
 			JSONObject attributes = object.getJSONObject("attributes");
 			
 			for (String key : attributes.keySet()) {
-				Attribute attribute = Attribute.unserialize(attributes.getJSONObject(key));
+				Object attribute = attributes.get(key);
 				entity.attributes().put(key, attribute);
 			}
 			
