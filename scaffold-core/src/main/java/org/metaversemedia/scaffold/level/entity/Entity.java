@@ -88,11 +88,11 @@ public class Entity {
 	
 	
 	/**
-	 * Create a new attribute and add it.
+	 * Set an attribute by name
 	 * @param name Attribute name.
 	 * @param value Attribute value.
 	 */
-	public void addAttribute(String name, Object value) {
+	public void setAttribute(String name, Object value) {
 		attributes.put(name, value);
 	}
 	

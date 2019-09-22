@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.metaversemedia.scaffold.core.Project;
 import org.metaversemedia.scaffold.level.Level;
 import org.metaversemedia.scaffold.level.entity.Entity;
+import org.metaversemedia.scaffold.level.entity.Rotatable;
 import org.metaversemedia.scaffold.math.Vector;
 
 public class LibraryTest {
@@ -14,10 +15,7 @@ public class LibraryTest {
 		
 		Level level = new Level(project);
 		
-		Entity entity1 = level.newEntity(TestEntity.class, "Entity", new Vector(0,0,0));
-		level.newEntity(TestEntity.class, "Test", new Vector(0,0,0));
-		
-		entity1.addAttribute("vector", new Vector(0,0,0));
+		Entity ent1 = level.newEntity(Rotatable.class, "ent1", new Vector(0,0,0));
 		
 		level.compileLogic("logicTest/level1");
 		

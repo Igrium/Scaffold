@@ -10,7 +10,7 @@ public class TestEntity extends Entity {
 
 	public TestEntity(Level level, String name) {
 		super(level, name);
-		addAttribute("number", 23);
+		setAttribute("number", 23);
 		System.out.println("test entity: "+name);
 	}
 	
