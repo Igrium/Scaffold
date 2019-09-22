@@ -98,10 +98,10 @@ public class Entity {
 	
 	/**
 	 * Compile this entity's logic.
-	 * @param logicPath Folder comtaining level's function files.
-	 * @return Success. ENTITY WILL BE DELETED IF FALSE!
+	 * @param logicFolder Folder comtaining level's function files.
+	 * @return Success
 	 */
-	public boolean compileLogic(Path logicPath) {
+	public boolean compileLogic(Path logicFolder) {
 		return true;
 	}
 	

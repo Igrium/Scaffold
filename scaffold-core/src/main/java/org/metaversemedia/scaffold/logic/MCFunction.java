@@ -4,7 +4,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -48,7 +50,12 @@ public class MCFunction {
 	 */
 	public void compile(File compilePath) throws IOException {
 		
-		//Bake all variables
+		// Make sure file exists
+		if (!compilePath.exists()) {
+			compilePath.getParentFile().mkdirs();
+		}
+		
+		// Bake all variables
 		List<String> compileCommands = new ArrayList<String>(commands);
 		for (int c = 0; c < compileCommands.size(); c++) {
 			for (String variable : variables.keySet()) {

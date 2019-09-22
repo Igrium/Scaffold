@@ -93,7 +93,7 @@ public class Level {
 	 * ONLY EXISTS DURING COMPILATION
 	 * @return Tick function
 	 */
-	public MCFunction tick() {
+	public MCFunction tickFunction() {
 		return tickFunction;
 	}
 	
@@ -264,11 +264,49 @@ public class Level {
 		return loadFile(project, project.assetManager().getAbsolutePath(file));
 	}
 	
+	/**
+	 * Compile level logic
+	 * @param logicFolder Folder to put level mcfunction files
+	 * @return success
+	 */
+	public boolean compileLogic(Path logicFolder) {
+		// Create tick and init functions
+		initFunction = new MCFunction();
+		tickFunction = new MCFunction();
+		
+		// Compile entities
+		for (String key : entities.keySet()) {
+			entities.get(key).compileLogic(logicFolder);
+		}
+		
+		// Save functions
+		try {
+			initFunction.compile(new File(logicFolder.toString(),"init.mcfunction"));
+			tickFunction.compile(new File(logicFolder.toString(),"tick.mcfunction"));
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.out.println("Unable to write map functions!");
+			return false;
+		}
+		
+		return true;
+	}
+	
+	/**
+	 * Compile level logic
+	 * @param logicFolder Folder to put level mcfunction files
+	 * @return success
+	 */
+	public boolean compileLogic(String logicFolder) {
+		return compileLogic(project.assetManager().getAbsolutePath(logicFolder));
+	}
+	
 	/* Load a JSONObject from a file */
 	private static JSONObject loadJSON(Path inputPath) throws IOException, JSONException {
 		List<String> jsonFile = Files.readAllLines(inputPath);
 		JSONObject jsonObject = new JSONObject(String.join("", jsonFile));
 		return jsonObject;
 	}
+	
 	
 }
