@@ -29,9 +29,23 @@ public class GameInfo {
 	/* Does this gameinfo object match the file in the directory? */
 	private boolean isPure = false;
 	
-	/* Get the project's title */
-	public String getTitle() {
+	
+	/**
+	 * Set the title of the project.
+	 * @param title Title
+	 */
+	public void setTitle(String title) {
+		unpure();
+		this.title = title;
+	}
+	
+	/**
+	 * Get the project's name (deturmined by name of project folder).
+	 * @return Name
+	 */
+	public String getName() {
 		return title;
+		
 	}
 	
 	/**
@@ -56,16 +70,6 @@ public class GameInfo {
 	 */
 	public void unpure() {
 		isPure = false;
-	}
-	
-	
-	/**
-	 * Set the pretty title of the project
-	 * @param title Title
-	 */
-	public void setTitle(String title) {
-		unpure();
-		this.title = title;
 	}
 	
 	/**

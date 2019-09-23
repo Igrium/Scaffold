@@ -1,10 +1,14 @@
 package org.metaversemedia.scaffold.test;
 
+import java.io.IOException;
+
 import org.junit.Test;
 import org.metaversemedia.scaffold.core.Project;
 import org.metaversemedia.scaffold.level.Level;
 import org.metaversemedia.scaffold.level.entity.Entity;
 import org.metaversemedia.scaffold.level.entity.GameEntity;
+import org.metaversemedia.scaffold.logic.Datapack;
+import org.metaversemedia.scaffold.logic.MCFunction;
 import org.metaversemedia.scaffold.math.Vector;
 
 public class LibraryTest {
@@ -16,11 +20,22 @@ public class LibraryTest {
 		Level level = new Level(project);
 		
 		GameEntity ent1 = (GameEntity) level.newEntity(GameEntity.class, "ent1", new Vector(0,0,0));
-		ent1.setEntityType("minecraft:armor_stand");
+
+		Datapack datapack = new Datapack(project);
+		datapack.setDescription("This is a test datapack!");
 		
-		level.compileLogic("logicTest/level1");
+		MCFunction function = new MCFunction("test function");
+		function.commands().add("say This function's name is $functionname");
+		function.commands().add("say This function's namespace is $namespace");
 		
-		level.saveFile("maps/level1.mcmap");
+		datapack.functions.add(function);
+		
+		try {
+			datapack.compile(project.assetManager().getAbsolutePath("logicTest/datapacks/packTest"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }

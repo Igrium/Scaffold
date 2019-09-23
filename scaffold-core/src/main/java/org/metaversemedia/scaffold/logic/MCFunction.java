@@ -23,6 +23,13 @@ public class MCFunction {
 	 */
 	private Map<String, String> variables = new HashMap<String, String>();
 	
+	/* This function's name. */
+	private String name;
+	
+	public MCFunction(String name) {
+		setName(name);
+	}
+	
 	/**
 	 * Retrieves the list of commands, which is mutable
 	 * @return Command list
@@ -37,6 +44,50 @@ public class MCFunction {
 	 */
 	public Map<String, String> variables() {
 		return variables;
+	}
+	
+	/**
+	 * Get's this function's name.
+	 * @return Name
+	 */
+	public String getName() {
+		return name;
+	}
+	
+	/**
+	 * Set this function's name.
+	 * @param name New name
+	 */
+	public void setName(String name) {
+		this.name = name.replaceAll("\\s+","").toLowerCase();
+		variables.put("functionname", this.name);
+	}
+	
+	/**
+	 * Add a command to the function.
+	 * @param command Command
+	 */
+	public void addCommand(String command) {
+		commands.add(command);
+	}
+	
+	
+	/**
+	 * Add or set a variable in the function
+	 * @param name Variable name
+	 * @param value Variable value
+	 */
+	public void setVariable(String name, String value) {
+		variables.put(name, value);
+	}
+	
+	/**
+	 * Get a variable by name
+	 * @param name Variable name
+	 * @return Variable value (null if nonexistant.)
+	 */
+	public String getVariable(String name) {
+		return variables.get(name);
 	}
 	
 	/**

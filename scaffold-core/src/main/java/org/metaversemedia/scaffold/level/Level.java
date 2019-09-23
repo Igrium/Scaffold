@@ -251,7 +251,9 @@ public class Level {
 			return null;
 		}
 		
-		return unserialize(project, serialized);
+		Level level = unserialize(project, serialized);
+		level.setName(file.getFileName().toString()); // Set level name
+		return level;
 	}
 	
 	/**
@@ -271,8 +273,8 @@ public class Level {
 	 */
 	public boolean compileLogic(Path logicFolder) {
 		// Create tick and init functions
-		initFunction = new MCFunction();
-		tickFunction = new MCFunction();
+		initFunction = new MCFunction("init");
+		tickFunction = new MCFunction("tick");
 		
 		// Compile entities
 		for (String key : entities.keySet()) {

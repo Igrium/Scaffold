@@ -132,5 +132,13 @@ public class Project {
 		return assetManager;
 	}
 	
+	/**
+	 * Get the project's name. (defined by the project folder's name).
+	 * @return Name
+	 */
+	public String getName() {
+		return getProjectFolder().getFileName().toString();
+	}
+	
 	
 }
