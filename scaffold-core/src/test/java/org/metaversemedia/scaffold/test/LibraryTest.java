@@ -16,7 +16,7 @@ public class LibraryTest {
 		
 		GameEntity ent1 = (GameEntity) level.newEntity(GameEntity.class, "ent1", new Vector(0,0,0));
 
-	
+		level.saveFile("maps/testLevel.mclevel");
 		level.compile(project.assetManager().getAbsolutePath("game/saves/world"));
 	}
 

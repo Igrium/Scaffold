@@ -3,6 +3,7 @@ package org.metaversemedia.scaffold.logic;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -14,6 +15,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.metaversemedia.scaffold.core.Project;
+import org.python.util.PythonInterpreter;
 
 /**
  * Represents the main game datapack
@@ -47,12 +49,18 @@ public class Datapack {
 	private String description = "Map Datapack";
 	
 	/**
+	 * Project this datapack is associated with
+	 */
+	private Project project;
+	
+	/**
 	 * Create a new datapack object.
 	 * @param project Project to associate with.
 	 * @param dataFolder Datapack's main data folder.
 	 * @param defaultNamespace Namespace to put defined function objects in.
 	 */
 	public Datapack(Project project, Path dataFolder, String defaultNamespace) {
+		
 		this.dataFolder = dataFolder;
 		setDefaultNamespace(defaultNamespace);
 	}
@@ -63,6 +71,7 @@ public class Datapack {
 	 * @param defaultNamespace Namespace to put defined function objects in.
 	 */
 	public Datapack(Project project, String defaultNamespace) {
+		this.project = project;
 		this.dataFolder = project.assetManager().getAbsolutePath("data");
 		setDefaultNamespace(defaultNamespace);
 	}
@@ -73,6 +82,7 @@ public class Datapack {
 	 * @param dataFolder Datapack's main data folder
 	 */
 	public Datapack(Project project, Path dataFolder) {
+		this.project = project;
 		this.dataFolder = dataFolder;
 		setDefaultNamespace(project.getName());
 	}
@@ -82,6 +92,7 @@ public class Datapack {
 	 * @param project Project to associate with
 	 */
 	public Datapack(Project project) {
+		this.project = project;
 		this.dataFolder = project.assetManager().getAbsolutePath("data");
 		setDefaultNamespace(project.getName());
 	}
@@ -119,6 +130,14 @@ public class Datapack {
 	}
 	
 	/**
+	 * Get the project this datapack is associated with
+	 * @return
+	 */
+	public Project getProject() {
+		return project;
+	}
+	
+	/**
 	 * Format a function name as if it were in the default namespace.
 	 * @param function Function to format
 	 * @return Formatted name
@@ -134,6 +153,9 @@ public class Datapack {
 	 * @throws IOException 
 	 */
 	public boolean compile(Path compilePath) throws IOException {
+		// Run pre-compile script
+		preCompileScript();
+		
 		// Reset folder
 		if (compilePath.toFile().exists()) {
 			FileUtils.deleteDirectory(compilePath.toFile());
@@ -223,6 +245,41 @@ public class Datapack {
 		tickWriter.close();
 		
 		return true;
+	}
+	
+	/**
+	 * Run pre-compile scipt
+	 */
+	private void preCompileScript() {
+		try {
+			if (dataFolder.resolve("compile.json").toFile().exists()) {
+				JSONObject compile = loadJSON(dataFolder.resolve("compile.json"));
+				if (!compile.has("preCompileScript")) { // May not have a pre-compile script
+					return;
+				}
+				String scriptName = compile.getString("preCompileScript");
+				String absName = project.assetManager().getAbsolutePath(scriptName).toString();
+				
+				if (!new File(absName).exists()) {
+					System.out.println("Unable to find pre-compile script "+absName);
+					return;
+				}
+				
+				// Setup and run script
+				System.setProperty("python.console.encoding", "UTF-8");
+				System.setProperty("python.import.site", "false");
+				String[] arguments = {dataFolder.toString()};
+				PythonInterpreter.initialize(System.getProperties(), System.getProperties(), arguments);
+				PythonInterpreter python = new PythonInterpreter();
+				python.setOut(System.out);
+				
+				System.out.println("Running python script: "+absName);
+				python.execfile(absName);
+			}
+		} catch (IOException e) {
+			System.out.println("Unable to run pre-compile script!");
+		}
+		
 	}
 	
 	/**
