@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.metaversemedia.scaffold.core.Constants;
@@ -309,6 +310,37 @@ public class Level {
 		}
 		
 		return true;
+	}
+	
+	/**
+	 * Compile this level into a playable Minecraft world (UNFINISHED).
+	 * @param compileTarget Folder to compile into (saves/name).
+	 * @return Success
+	 */
+	public boolean compile(Path compileTarget) {
+		try {
+			// Delete folder if exists
+			if (compileTarget.toFile().exists()) {
+				FileUtils.deleteDirectory(compileTarget.toFile());
+			}
+			
+			// Make world folder
+			compileTarget.toFile().mkdir();
+			
+			// Setup and compile logic
+			Path datapackFolder = compileTarget.resolve("datapacks");
+			datapackFolder.toFile().mkdir();
+			if (!compileLogic(datapackFolder)) {
+				return false;
+			}
+			
+			return true;
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.out.println("Unable to compile level!");
+			return false;
+		}
+		
 	}
 	
 	/**
