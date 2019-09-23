@@ -15,6 +15,7 @@ import org.json.JSONObject;
 import org.metaversemedia.scaffold.core.Constants;
 import org.metaversemedia.scaffold.core.Project;
 import org.metaversemedia.scaffold.level.entity.Entity;
+import org.metaversemedia.scaffold.logic.Datapack;
 import org.metaversemedia.scaffold.logic.MCFunction;
 import org.metaversemedia.scaffold.math.Vector;
 
@@ -43,6 +44,16 @@ public class Level {
 	 */
 	public Level(Project project) {
 		this.project = project;
+	}
+	
+	/**
+	 * Create a new level
+	 * @param project Project to create level in
+	 * @param name Level name.
+	 */
+	public Level(Project project, String name) {
+		this.project = project;
+		setName(name);
 	}
 	
 	/**
@@ -268,27 +279,33 @@ public class Level {
 	
 	/**
 	 * Compile level logic
-	 * @param logicFolder Folder to put level mcfunction files
+	 * @param dataPath Path to datapack folder
 	 * @return success
 	 */
-	public boolean compileLogic(Path logicFolder) {
+	public boolean compileLogic(Path dataPath) {
 		// Create tick and init functions
 		initFunction = new MCFunction("init");
 		tickFunction = new MCFunction("tick");
 		
+		// Create datapack
+		Datapack datapack = new Datapack(project, name);
+		datapack.functions.add(initFunction);
+		datapack.functions.add(tickFunction);
+		
+		datapack.loadFunctions.add(datapack.formatFunctionCall(initFunction));
+		datapack.tickFunctions.add(datapack.formatFunctionCall(tickFunction));
+		
 		// Compile entities
 		for (String key : entities.keySet()) {
-			entities.get(key).compileLogic(logicFolder);
+			entities.get(key).compileLogic(datapack);
 		}
 		
-		// Save functions
+		// Compile datapack
 		try {
-			initFunction.compile(new File(logicFolder.toString(),"init.mcfunction"));
-			tickFunction.compile(new File(logicFolder.toString(),"tick.mcfunction"));
+			datapack.compile(dataPath.resolve(project.getName()));
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
-			System.out.println("Unable to write map functions!");
-			return false;
 		}
 		
 		return true;
@@ -296,11 +313,11 @@ public class Level {
 	
 	/**
 	 * Compile level logic
-	 * @param logicFolder Folder to put level mcfunction files
+	 * @param dataPath Path to datapack folder
 	 * @return success
 	 */
-	public boolean compileLogic(String logicFolder) {
-		return compileLogic(project.assetManager().getAbsolutePath(logicFolder));
+	public boolean compileLogic(String dataPath) {
+		return compileLogic(project.assetManager().getAbsolutePath(dataPath));
 	}
 	
 	/* Load a JSONObject from a file */

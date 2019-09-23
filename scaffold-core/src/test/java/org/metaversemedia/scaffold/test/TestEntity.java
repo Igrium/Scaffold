@@ -1,10 +1,9 @@
 package org.metaversemedia.scaffold.test;
 
-import java.nio.file.Path;
-
 import org.json.JSONObject;
 import org.metaversemedia.scaffold.level.Level;
 import org.metaversemedia.scaffold.level.entity.Entity;
+import org.metaversemedia.scaffold.logic.Datapack;
 
 public class TestEntity extends Entity { 
 
@@ -22,8 +21,8 @@ public class TestEntity extends Entity {
 	}
 	
 	@Override
-	public boolean compileLogic(Path logicFolder) {
-		super.compileLogic(logicFolder);
+	public boolean compileLogic(Datapack datapack) {
+		super.compileLogic(datapack);
 		
 		getLevel().initFunction().commands().add("/say This test entity is called "+getName()+"!");
 		

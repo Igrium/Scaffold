@@ -1,9 +1,8 @@
 package org.metaversemedia.scaffold.level.entity;
 
-import java.nio.file.Path;
-
 import org.json.JSONObject;
 import org.metaversemedia.scaffold.level.Level;
+import org.metaversemedia.scaffold.logic.Datapack;
 import org.metaversemedia.scaffold.math.Vector;
 
 import com.flowpowered.nbt.CompoundMap;
@@ -71,8 +70,8 @@ public class GameEntity extends Rotatable {
 	}
 	
 	@Override
-	public boolean compileLogic(Path logicFolder) {
-		super.compileLogic(logicFolder);
+	public boolean compileLogic(Datapack datapack) {
+		super.compileLogic(datapack);
 		
 		if (spawnOnInit()) {
 			getLevel().initFunction().commands().add(getSpawnCommand());

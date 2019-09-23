@@ -1,12 +1,12 @@
 package org.metaversemedia.scaffold.level.entity;
 
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.metaversemedia.scaffold.level.Level;
+import org.metaversemedia.scaffold.logic.Datapack;
 import org.metaversemedia.scaffold.math.Vector;
 
 /**
@@ -173,10 +173,10 @@ public class Entity {
 	
 	/**
 	 * Compile this entity's logic.
-	 * @param logicFolder Folder comtaining level's function files.
+	 * @param dataoack Datapack to compile entity into
 	 * @return Success
 	 */
-	public boolean compileLogic(Path logicFolder) {
+	public boolean compileLogic(Datapack datapack) {
 		return true;
 	}
 }

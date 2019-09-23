@@ -3,12 +3,15 @@ package org.metaversemedia.scaffold.logic;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.metaversemedia.scaffold.core.Project;
 
@@ -20,9 +23,6 @@ import org.metaversemedia.scaffold.core.Project;
 public class Datapack {
 	/* The datapack's main data folder */
 	private Path dataFolder;
-	
-	/* Project this datapack belongs to */
-	private Project project;
 	
 	private String defaultNamespace;
 	
@@ -53,8 +53,17 @@ public class Datapack {
 	 * @param defaultNamespace Namespace to put defined function objects in.
 	 */
 	public Datapack(Project project, Path dataFolder, String defaultNamespace) {
-		this.project = project;
 		this.dataFolder = dataFolder;
+		setDefaultNamespace(defaultNamespace);
+	}
+	
+	/**
+	 * Create a new datapack object.
+	 * @param project Project to associate with.
+	 * @param defaultNamespace Namespace to put defined function objects in.
+	 */
+	public Datapack(Project project, String defaultNamespace) {
+		this.dataFolder = project.assetManager().getAbsolutePath("data");
 		setDefaultNamespace(defaultNamespace);
 	}
 	
@@ -64,7 +73,6 @@ public class Datapack {
 	 * @param dataFolder Datapack's main data folder
 	 */
 	public Datapack(Project project, Path dataFolder) {
-		this.project = project;
 		this.dataFolder = dataFolder;
 		setDefaultNamespace(project.getName());
 	}
@@ -74,7 +82,6 @@ public class Datapack {
 	 * @param project Project to associate with
 	 */
 	public Datapack(Project project) {
-		this.project = project;
 		this.dataFolder = project.assetManager().getAbsolutePath("data");
 		setDefaultNamespace(project.getName());
 	}
@@ -109,6 +116,15 @@ public class Datapack {
 	 */
 	public String getDefaultNamespace() {
 		return defaultNamespace;
+	}
+	
+	/**
+	 * Format a function name as if it were in the default namespace.
+	 * @param function Function to format
+	 * @return Formatted name
+	 */
+	public String formatFunctionCall(MCFunction function) {
+		return getDefaultNamespace()+":"+function.getName();
 	}
 	
 	/**
@@ -151,7 +167,62 @@ public class Datapack {
 			func.variables().remove("namespace");
 		}
 		
-		return false;
+		/* SET LOAD FUNCTIONS */
+		Path functionTags = compilePath.resolve(Paths.get("data","minecraft","tags","functions"));
+		if (!functionTags.toFile().exists()) {
+			functionTags.toFile().mkdirs();
+		}
+		
+		JSONObject load;
+		JSONArray loadValues;
+		
+		// JSON file may already exist. Load if it does.
+		if (functionTags.resolve("load.json").toFile().exists()) {
+			load = loadJSON(functionTags.resolve("load.json"));
+		} else {
+			load = new JSONObject();
+			loadValues = new JSONArray();
+			load.put("values",loadValues);
+		}
+		
+		// Redundency if values never got assigned due to deserialization
+		loadValues = load.getJSONArray("values");
+		for (String f : loadFunctions) {
+			loadValues.put(f);
+		}
+		
+		// Save JSON object
+		FileWriter loadWriter = new FileWriter(functionTags.resolve("load.json").toFile());
+		load.write(loadWriter, 4, 0);
+		loadWriter.close();
+		
+		
+		/* SET TICK FUNCTIONS */
+		JSONObject tick;
+		JSONArray tickValues;
+		
+		// JSON file may already exist. Load if it does.
+		if (functionTags.resolve("tick.json").toFile().exists()) {
+			tick = loadJSON(functionTags.resolve("tick.json"));
+		} else {
+			tick = new JSONObject();
+			tickValues = new JSONArray();
+			tick.put("values",tickValues);
+		}
+				
+		// Redundency if values never got assigned due to deserialization
+		tickValues = tick.getJSONArray("values");
+		for (String f : tickFunctions) {
+			tickValues.put(f);
+		}
+		
+		
+		// Save JSON object
+		FileWriter tickWriter = new FileWriter(functionTags.resolve("tick.json").toFile());
+		tick.write(tickWriter, 4, 0);
+		tickWriter.close();
+		
+		return true;
 	}
 	
 	/**
@@ -171,6 +242,13 @@ public class Datapack {
 		FileWriter writer = new FileWriter(new File(compilePath.toString(), "pack.mcmeta"));
 		root.write(writer, 4, 0);
 		writer.close();
+	}
+	
+	/* Load a JSONObject from a file */
+	private static JSONObject loadJSON(Path inputPath) throws IOException, JSONException {
+		List<String> jsonFile = Files.readAllLines(inputPath);
+		JSONObject jsonObject = new JSONObject(String.join("", jsonFile));
+		return jsonObject;
 	}
 
 }
