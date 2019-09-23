@@ -97,7 +97,9 @@ public class Project {
 		try {
 			Files.createDirectories(Paths.get(folder,"assets"));
 			Files.createDirectories(Paths.get(folder,"data"));
+			Files.createDirectories(Paths.get(folder,"game"));
 			Files.createDirectories(Paths.get(folder,"maps"));
+
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
