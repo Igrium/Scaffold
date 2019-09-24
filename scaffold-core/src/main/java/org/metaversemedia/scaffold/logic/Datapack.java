@@ -237,11 +237,12 @@ public class Datapack {
 			tickValues.put(f);
 		}
 		
-		
 		// Save JSON object
 		FileWriter tickWriter = new FileWriter(functionTags.resolve("tick.json").toFile());
 		tick.write(tickWriter, 4, 0);
 		tickWriter.close();
+		
+		postCompileScript(compilePath);
 		
 		return true;
 	}
@@ -260,7 +261,7 @@ public class Datapack {
 				String absName = project.assetManager().getAbsolutePath(scriptName).toString();
 				
 				if (!new File(absName).exists()) {
-					System.out.println("Unable to find pre-compile script "+absName);
+					System.out.println("Unable to find pre-compile script: "+absName);
 					return;
 				}
 				
@@ -274,6 +275,35 @@ public class Datapack {
 			System.out.println("Unable to run pre-compile script!");
 		}
 		
+	}
+	
+	/**
+	 * Run post-compile script
+	 */
+	private void postCompileScript(Path compilePath) {
+		try {
+			if (dataFolder.resolve("compile.json").toFile().exists()) {
+				JSONObject compile = loadJSON(dataFolder.resolve("compile.json"));
+				if (!compile.has("postCompileScript")) { // May not have a post-compile script
+					return;
+				}
+				String scriptName = compile.getString("postCompileScript");
+				String absName = project.assetManager().getAbsolutePath(scriptName).toString();
+				
+				if (!new File(absName).exists()) {
+					System.out.println("Unable to find post-compile script: "+absName);
+					return;
+				}
+				
+				// Setup and run script
+				PythonUtils.setArgs(new String[] {compilePath.toString()});
+				
+				System.out.println("Running python script: "+absName);
+				PythonUtils.getInterpreter().execfile(absName);
+			}
+		} catch (IOException e) {
+			System.out.println("Unable to run pre-compile script!");
+		}
 	}
 	
 	/**
