@@ -10,4 +10,5 @@
 rootProject.name = 'Scaffold'
 
 include 'scaffold-core'
+include 'scaffold-nbt'
 

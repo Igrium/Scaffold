@@ -18,9 +18,7 @@ dependencies {
     // This dependency is used internally, and not exposed to consumers on their own compile classpath.
     compile group: 'commons-io', name: 'commons-io', version: '2.6'
 
-    implementation 'org.json:json:20190722'
     implementation 'com.flowpowered:flow-nbt:1.0.0'
-    implementation 'org.python:jython:2.7.1b3'
 
     // Use JUnit test framework
     testImplementation 'junit:junit:4.12'
@@ -31,7 +29,6 @@ test {
 	testLogging {
 		showStandardStreams = true
 	}
-	exclude 'org.metaversemedia.scaffold.test.LibraryTest.class'
 }
 
 // In this section you declare where to find the dependencies of your project
