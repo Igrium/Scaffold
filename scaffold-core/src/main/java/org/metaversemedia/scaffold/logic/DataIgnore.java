@@ -31,6 +31,7 @@ public final class DataIgnore {
 	
 	public DataIgnore() {
 		ignoredFiles.add(Paths.get("dataignore.txt"));
+		ignoredFiles.add(Paths.get("compile.json"));
 	}
 	
 	
