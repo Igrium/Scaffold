@@ -41,3 +41,6 @@ repositories {
     jcenter()
     mavenCentral()
 }
+
+test.onlyIf { false }
+
