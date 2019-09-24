@@ -3,7 +3,6 @@ package org.metaversemedia.scaffold.logic;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -15,7 +14,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.metaversemedia.scaffold.core.Project;
-import org.python.util.PythonInterpreter;
+import org.metaversemedia.scaffold.core.PythonUtils;
 
 /**
  * Represents the main game datapack
@@ -266,15 +265,10 @@ public class Datapack {
 				}
 				
 				// Setup and run script
-				System.setProperty("python.console.encoding", "UTF-8");
-				System.setProperty("python.import.site", "false");
-				String[] arguments = {dataFolder.toString()};
-				PythonInterpreter.initialize(System.getProperties(), System.getProperties(), arguments);
-				PythonInterpreter python = new PythonInterpreter();
-				python.setOut(System.out);
+				PythonUtils.setArgs(new String[] {dataFolder.toString()});
 				
 				System.out.println("Running python script: "+absName);
-				python.execfile(absName);
+				PythonUtils.getInterpreter().execfile(absName);
 			}
 		} catch (IOException e) {
 			System.out.println("Unable to run pre-compile script!");
