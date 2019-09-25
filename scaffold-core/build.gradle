@@ -31,7 +31,7 @@ test {
 	testLogging {
 		showStandardStreams = true
 	}
-	exclude 'org.metaversemedia.scaffold.test.LibraryTest.class'
+//	exclude 'org.metaversemedia.scaffold.test.LibraryTest.class'
 }
 
 // In this section you declare where to find the dependencies of your project
@@ -42,5 +42,5 @@ repositories {
     mavenCentral()
 }
 
-test.onlyIf { false }
+// test.onlyIf { false }
 
