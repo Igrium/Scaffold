@@ -9,10 +9,12 @@ import org.metaversemedia.scaffold.core.Project;
 import org.metaversemedia.scaffold.level.Level;
 import org.metaversemedia.scaffold.level.entity.GameEntity;
 import org.metaversemedia.scaffold.math.Vector;
+import org.metaversemedia.scaffold.nbt.Schematic;
 
 import com.flowpowered.nbt.CompoundMap;
 import com.flowpowered.nbt.CompoundTag;
 import com.flowpowered.nbt.ListTag;
+import com.flowpowered.nbt.ShortTag;
 import com.flowpowered.nbt.stream.NBTInputStream;
 
 public class LibraryTest {
@@ -30,7 +32,7 @@ public class LibraryTest {
 		
 		NBTInputStream input = null;
 		try {
-			input = new NBTInputStream(new FileInputStream("C:\\Users\\Sam54123\\Documents\\Minecraft\\MapdevUtils\\Scaffold\\testProject\\the-small-yacht.schematic"));
+			input = new NBTInputStream(new FileInputStream("/Users/h205p1/Documents/ProgramingProjects/Scaffold/testProject/jewel-of-the-sea.schematic"));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -38,15 +40,15 @@ public class LibraryTest {
 		}
 		
 		try {
-			CompoundMap map = (CompoundMap) input.readTag().getValue();
-			ListTag<CompoundTag> tileEntities = (ListTag<CompoundTag>) map.get("TileEntities");
-			System.out.println(map.get("Width").getValue());
+			CompoundTag tag = (CompoundTag) input.readTag();
+//			System.out.println(tag);
+			CompoundMap map1 = (CompoundMap) tag.getValue();
+			System.out.println(map1.keySet());
 			
-			//System.out.println(tileEntities.getValue());
+			ShortTag widthTag = (ShortTag) map1.get("Width");
+			System.out.println(widthTag.getValue());
 			
-			List<CompoundTag> entities = tileEntities.getValue();
-			
-			System.out.println(entities.get(1).getValue());
+			Schematic schematic = Schematic.fromCompoundMap(map1);
 					
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

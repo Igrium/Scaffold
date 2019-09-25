@@ -10,6 +10,7 @@ import com.flowpowered.nbt.ByteArrayTag;
 import com.flowpowered.nbt.CompoundMap;
 import com.flowpowered.nbt.CompoundTag;
 import com.flowpowered.nbt.ListTag;
+import com.flowpowered.nbt.ShortTag;
 import com.flowpowered.nbt.StringTag;
 
 /**
@@ -109,15 +110,21 @@ public class Schematic {
 	 */
 	public static Schematic fromCompoundMap(CompoundMap map) {
 		if (map == null) {
+			System.out.println("Fed null");
 			return null;
 		}
 		
 		Schematic schematic = new Schematic();
 		
 		// Get width and height
-		schematic.width = (short) map.get("Width").getValue();
-		schematic.height = (short) map.get("Height").getValue();
-		schematic.length = (short) map.get("Length").getValue();
+		ShortTag widthTag = (ShortTag) map.get("Width");
+		schematic.width = widthTag.getValue();
+		
+		ShortTag heightTag = (ShortTag) map.get("Height");
+		schematic.height = heightTag.getValue();
+		
+		ShortTag lengthTag = (ShortTag) map.get("Length");
+		schematic.length = lengthTag.getValue();
 		
 		// Schematic may have not had proper tags
 		if (schematic.width == 0 || schematic.height == 0 || schematic.length == 0) {

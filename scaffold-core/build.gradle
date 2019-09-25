@@ -21,7 +21,9 @@ dependencies {
     implementation 'org.json:json:20190722'
     implementation 'com.flowpowered:flow-nbt:1.0.0'
     implementation 'org.python:jython:2.7.1b3'
-
+    
+    compile project(':scaffold-nbt')
+    
     // Use JUnit test framework
     testImplementation 'junit:junit:4.12'
 }
