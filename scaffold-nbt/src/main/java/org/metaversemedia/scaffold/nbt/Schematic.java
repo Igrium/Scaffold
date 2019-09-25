@@ -115,6 +115,7 @@ public class Schematic {
 		}
 		
 		Schematic schematic = new Schematic();
+
 		
 		// Get width and height
 		ShortTag widthTag = (ShortTag) map.get("Width");
@@ -134,17 +135,21 @@ public class Schematic {
 		
 		// Get materials
 		StringTag materialTag = (StringTag) map.get("Materials");
-		String materialName = materialTag.getValue();
-		
-		if (materialName.equals("Alpha")) {
+		if (materialTag == null) {
 			schematic.materials = MaterialType.ALPHA;
-		} else if (materialName.equals("Pocket")) {
-			schematic.materials = MaterialType.POCKET;
-		} else if (materialName.equals("Classic")) {
-			schematic.materials = MaterialType.CLASSIC;
 		} else {
-			System.out.println("Schematic materials tag is improperly formatted!");
-			return null;
+			String materialName = materialTag.getValue();
+			
+			if (materialName.equals("Alpha")) {
+				schematic.materials = MaterialType.ALPHA;
+			} else if (materialName.equals("Pocket")) {
+				schematic.materials = MaterialType.POCKET;
+			} else if (materialName.equals("Classic")) {
+				schematic.materials = MaterialType.CLASSIC;
+			} else {
+				System.out.println("Schematic materials tag is improperly formatted!");
+				return null;
+			}
 		}
 		
 		// Get blocks and data
@@ -167,7 +172,6 @@ public class Schematic {
 		schematic.tileEntities = tileEntities.getValue();
 		
 		// Entites are optional, so we don't check for success.
-		
 		
 		return schematic;
 	}
