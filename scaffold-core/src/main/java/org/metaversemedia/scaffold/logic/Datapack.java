@@ -152,6 +152,8 @@ public class Datapack {
 	 * @throws IOException 
 	 */
 	public boolean compile(Path compilePath) throws IOException {
+		System.out.println("Starting datapack compile.");
+		
 		// Run pre-compile script
 		preCompileScript();
 		
@@ -161,7 +163,7 @@ public class Datapack {
 		}
 		
 		// Load dataignore
-		DataIgnore dataignore = DataIgnore.load(Paths.get(compilePath.toString(), "dataignore.txt"));
+		DataIgnore dataignore = DataIgnore.load(Paths.get(dataFolder.toString(), "dataignore.txt"));
 		
 		
 		// Copy the directory
