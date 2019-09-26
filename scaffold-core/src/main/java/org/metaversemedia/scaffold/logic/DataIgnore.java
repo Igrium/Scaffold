@@ -85,18 +85,22 @@ public final class DataIgnore {
 		
 		DataIgnore ignoreFile = new DataIgnore();
 		
+		System.out.println("Loading dataignore: "+file);
+		
 		// If file doesn't exist, return empty file
 		if (!Files.exists(file)) {
 			return ignoreFile;
 		}
-		
+						
 		// Read all lines
 		List<String> lines = Files.readAllLines(file);
+		
 
 		for (String line : lines) {
 			ignoreFile.ingestLine(line);
 		}
 		
+		System.out.println(ignoreFile.ignoredFiles);
 		return ignoreFile;
 		
 	}
@@ -107,6 +111,7 @@ public final class DataIgnore {
 			return;
 		}
 		
+		
 		// Remove trailing whitespace
 		line = line.trim();
 		
@@ -115,8 +120,9 @@ public final class DataIgnore {
 			ingestLine(line.substring(line.indexOf('#'+1)));
 			return;
 		}
-		
+				
 		int firstChar = firstNonWhitespace(line);
+		
 		
 		// File types
 		if (line.charAt(firstChar) == '*') {
@@ -128,14 +134,16 @@ public final class DataIgnore {
 		ignoredFiles.add(Paths.get(line));
 	}
 	
-	/* Get the index of the first non-whitespace character in a string *
-	 * Adapted from https://stackoverflow.com/a/46246041/5676620 */
+	/* Get the index of the first non-whitespace character in a string */
 	private int firstNonWhitespace(String input) {
-		Pattern p = Pattern.compile("([^\\s]+)?(\\s)+");
-		final Matcher matcher = p.matcher(input);
+		char[] characters = input.toCharArray();
 		
-		matcher.find();
+		for (int i = 0; i < characters.length; i++) {
+			if (!Character.isWhitespace(characters[i])) {
+				return i;
+			}
+		}
 		
-		return matcher.end();
+		return 0;
 	}
 }

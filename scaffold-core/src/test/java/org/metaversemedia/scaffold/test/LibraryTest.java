@@ -21,22 +21,22 @@ public class LibraryTest {
 
 	@Test
 	public void test() {
-		Project project = Project.init("C:\\Users\\Sam54123\\Documents\\Minecraft\\MapdevUtils\\Scaffold\\testProject", "Test Project");
-//		
-//		Level level = new Level(project);
-//		
-//		GameEntity ent1 = (GameEntity) level.newEntity(GameEntity.class, "ent1", new Vector(0,0,0));
-//
-//		level.saveFile("maps/testLevel.mclevel");
-//		level.compile(project.assetManager().getAbsolutePath("game/saves/world"));
+		Project project = Project.init("/Users/h205p1/Documents/ProgramingProjects/Scaffold/testProject", "Test Project");
 		
-		try {
-			Schematic schematic = Schematic.fromFile(project.assetManager().findAsset("schematics/fort_concord.schematic").toFile());
-			System.out.println(Short.valueOf(schematic.dataAtIndex(950)));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		Level level = new Level(project);
+		
+		GameEntity ent1 = (GameEntity) level.newEntity(GameEntity.class, "ent1", new Vector(0,0,0));
+
+		level.saveFile("maps/testLevel.mclevel");
+		level.compile(project.assetManager().getAbsolutePath("game/saves/world"));
+		
+//		try {
+//			Schematic schematic = Schematic.fromFile(project.assetManager().findAsset("schematics/fort_concord.schematic").toFile());
+//			System.out.println(Short.valueOf(schematic.dataAtIndex(950)));
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 	}
 
 }
