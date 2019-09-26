@@ -107,6 +107,10 @@ public class Schematic {
 		return data[(y*length + z)*width + x];
 	}
 	
+	public byte dataAtIndex(int index) {
+		return data[index];
+	}
+	
 	
 	/**
 	 * Create a Schematic from a Compound Map (nbt)

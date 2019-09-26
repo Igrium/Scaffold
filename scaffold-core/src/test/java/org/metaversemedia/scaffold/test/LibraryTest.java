@@ -31,8 +31,8 @@ public class LibraryTest {
 //		level.compile(project.assetManager().getAbsolutePath("game/saves/world"));
 		
 		try {
-			Schematic schematic = Schematic.fromFile(project.assetManager().findAsset("schematics/the-small-yacht.schematic").toFile());
-			System.out.println(schematic.blockAt(1, 1, 1));
+			Schematic schematic = Schematic.fromFile(project.assetManager().findAsset("schematics/fort_concord.schematic").toFile());
+			System.out.println(Short.valueOf(schematic.dataAtIndex(950)));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
