@@ -21,7 +21,7 @@ public class LibraryTest {
 
 	@Test
 	public void test() {
-//		Project project = Project.init("C:\\Users\\Sam54123\\Documents\\Minecraft\\MapdevUtils\\Scaffold\\testProject", "Test Project");
+		Project project = Project.init("C:\\Users\\Sam54123\\Documents\\Minecraft\\MapdevUtils\\Scaffold\\testProject", "Test Project");
 //		
 //		Level level = new Level(project);
 //		
@@ -30,34 +30,9 @@ public class LibraryTest {
 //		level.saveFile("maps/testLevel.mclevel");
 //		level.compile(project.assetManager().getAbsolutePath("game/saves/world"));
 		
-		NBTInputStream input = null;
 		try {
-			input = new NBTInputStream(new FileInputStream("/Users/h205p1/Documents/ProgramingProjects/Scaffold/testProject/jewel-of-the-sea.schematic"));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return;
-		}
-		
-		try {
-			CompoundTag tag = (CompoundTag) input.readTag();
-//			System.out.println(tag);
-			CompoundMap map1 = (CompoundMap) tag.getValue();
-			System.out.println(map1.keySet());
-			
-			ShortTag widthTag = (ShortTag) map1.get("Width");
-			System.out.println(widthTag.getValue());
-			
-			Schematic schematic = Schematic.fromCompoundMap(map1);
-					
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		
-		try {
-			input.close();
+			Schematic schematic = Schematic.fromFile(project.assetManager().findAsset("schematics/the-small-yacht.schematic").toFile());
+			System.out.println(schematic.blockAt(1, 1, 1));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

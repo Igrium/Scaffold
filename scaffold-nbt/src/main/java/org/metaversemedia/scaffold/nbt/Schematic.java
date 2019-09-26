@@ -4,6 +4,10 @@
 
 package org.metaversemedia.scaffold.nbt;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 
 import com.flowpowered.nbt.ByteArrayTag;
@@ -12,6 +16,7 @@ import com.flowpowered.nbt.CompoundTag;
 import com.flowpowered.nbt.ListTag;
 import com.flowpowered.nbt.ShortTag;
 import com.flowpowered.nbt.StringTag;
+import com.flowpowered.nbt.stream.NBTInputStream;
 
 /**
  * Class responsible for loading and managing Minecraft schematics
@@ -87,7 +92,7 @@ public class Schematic {
 	 * @param z Z coordinate.
 	 * @return Bytes representing block
 	 */
-	public byte blockAt(int x, int y, int z) {
+	public byte blockAt(int x, int y, int z) { 
 		return blocks[(y*length + z)*width + x];
 	}
 	
@@ -165,9 +170,11 @@ public class Schematic {
 		}
 		
 		// Get entities
+		@SuppressWarnings("unchecked")
 		ListTag<CompoundTag> entities = (ListTag<CompoundTag>) map.get("Entities");
 		schematic.entities = entities.getValue();
 		
+		@SuppressWarnings("unchecked")
 		ListTag<CompoundTag> tileEntities = (ListTag<CompoundTag>) map.get("TileEntities");
 		schematic.tileEntities = tileEntities.getValue();
 		
@@ -175,4 +182,25 @@ public class Schematic {
 		
 		return schematic;
 	}
+	
+	/**
+	 * Load a schematic from a file
+	 * @param file File to load
+	 * @return Loaded file
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
+	public static Schematic fromFile(File file) throws FileNotFoundException, IOException {
+		NBTInputStream input = new NBTInputStream(new FileInputStream(file));
+		
+		CompoundTag tag = (CompoundTag) input.readTag();
+		CompoundMap map = (CompoundMap) tag.getValue();
+		
+		Schematic schematic = Schematic.fromCompoundMap(map);
+		
+		input.close();
+		
+		return schematic;
+	}
+	
 }
