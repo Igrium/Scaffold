@@ -29,9 +29,17 @@ public final class DataIgnore {
 	 */
 	public final List<String> ignoredFileTypes = new ArrayList<String>();
 	
-	public DataIgnore() {
+	private Path dataPath;
+	
+	/**
+	 * Create a new DataIgnore.
+	 * @param dataPath The folder this DataIgnore is acting on.
+	 */
+	public DataIgnore(Path dataPath) {
 		ignoredFiles.add(Paths.get("dataignore.txt"));
 		ignoredFiles.add(Paths.get("compile.json"));
+		
+		this.dataPath = dataPath;
 	}
 	
 	
@@ -44,16 +52,18 @@ public final class DataIgnore {
 
 		@Override
 		public boolean accept(File file) {
-			// Check file type
+			// Check file type	
 			if (listContainsString(ignoredFileTypes, FilenameUtils.getExtension(file.toString()))) {
 				return false;
 			}
 			
-			// Check for ignored file
-			String fileStr = file.toString();
+			// Name check matching requires relative path
+			Path relativePath = dataPath.relativize(file.toPath());
+			
+//			System.out.println(relativePath);
 			
 			for (Path path : ignoredFiles) {
-				if (fileStr.contains(path.toString())) {
+				if (stringStartsWith(relativePath.toString(), path.toString())) {
 					return false;
 				}
 			}
@@ -71,6 +81,24 @@ public final class DataIgnore {
 			return false;
 		}
 		
+		/* Gets whether string 1 starts with string 2 */
+		private boolean stringStartsWith(String str1, String str2) {
+			char[] chars1 = str1.toCharArray();
+			char[] chars2 = str2.toCharArray();
+			
+			if (chars1.length < chars2.length) {
+				return false;
+			}	
+			
+			for (int i = 0; i < chars2.length; i++) {
+				if (chars2[i] != chars1[i])  {
+					return false;
+				}
+			}
+			
+			return true;
+		}
+		
 	}
 	
 	
@@ -83,7 +111,7 @@ public final class DataIgnore {
 	 */
 	public static DataIgnore load(Path file) throws IOException {
 		
-		DataIgnore ignoreFile = new DataIgnore();
+		DataIgnore ignoreFile = new DataIgnore(file.getParent());
 		
 		System.out.println("Loading dataignore: "+file);
 		
@@ -100,7 +128,7 @@ public final class DataIgnore {
 			ignoreFile.ingestLine(line);
 		}
 		
-		System.out.println(ignoreFile.ignoredFiles);
+		System.out.println(ignoreFile.ignoredFileTypes);
 		return ignoreFile;
 		
 	}

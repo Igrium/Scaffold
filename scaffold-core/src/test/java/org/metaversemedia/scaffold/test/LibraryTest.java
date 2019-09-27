@@ -21,7 +21,9 @@ public class LibraryTest {
 
 	@Test
 	public void test() {
-		Project project = Project.init("/Users/h205p1/Documents/ProgramingProjects/Scaffold/testProject", "Test Project");
+//		Project project = Project.init("/Users/h205p1/Documents/ProgramingProjects/Scaffold/testProject", "Test Project");
+		Project project = Project.init("C:\\Users\\Sam54123\\Documents\\Minecraft\\MapdevUtils\\Scaffold\\testProject", "Test Project");
+
 		
 		Level level = new Level(project);
 		
