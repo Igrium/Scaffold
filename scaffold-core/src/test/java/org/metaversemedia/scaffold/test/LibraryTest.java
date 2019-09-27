@@ -9,7 +9,7 @@ import org.metaversemedia.scaffold.core.Project;
 import org.metaversemedia.scaffold.level.Level;
 import org.metaversemedia.scaffold.level.entity.GameEntity;
 import org.metaversemedia.scaffold.math.Vector;
-import org.metaversemedia.scaffold.nbt.Schematic;
+import org.metaversemedia.scaffold.nbt.schematic.Schematic;
 
 import com.flowpowered.nbt.CompoundMap;
 import com.flowpowered.nbt.CompoundTag;

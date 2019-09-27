@@ -2,7 +2,7 @@
  * Adapted from definition at https://minecraft.gamepedia.com/Schematic_file_format
  */
 
-package org.metaversemedia.scaffold.nbt;
+package org.metaversemedia.scaffold.nbt.schematic;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,6 +23,7 @@ import com.flowpowered.nbt.stream.NBTInputStream;
  * @author Sam54123
  *
  */
+@SuppressWarnings("unused")
 public class Schematic {
 	/* Actual storage of blocks */
 	private byte[] blocks;
