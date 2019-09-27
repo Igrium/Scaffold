@@ -15,6 +15,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.metaversemedia.scaffold.core.Project;
 import org.metaversemedia.scaffold.core.PythonUtils;
+import org.python.core.PyException;
 
 /**
  * Represents the main game datapack
@@ -153,6 +154,7 @@ public class Datapack {
 	 */
 	public boolean compile(Path compilePath) throws IOException {
 		System.out.println("Starting datapack compile.");
+		System.out.println();
 		
 		// Run pre-compile script
 		preCompileScript();
@@ -271,7 +273,18 @@ public class Datapack {
 				PythonUtils.setArgs(new String[] {dataFolder.toString()});
 				
 				System.out.println("Running python script: "+absName);
-				PythonUtils.getInterpreter().execfile(absName);
+				
+				try {
+					PythonUtils.getInterpreter().execfile(absName);
+				} catch (PyException e) { // User may write python file incorrectly
+					if (e.traceback == null) {
+						System.out.println("Improperly formatted Python file: "+absName);
+					} else {
+						System.out.println(e.traceback.dumpStack());
+					}
+				}
+				System.out.println();
+				
 			}
 		} catch (IOException e) {
 			System.out.println("Unable to run pre-compile script!");
@@ -301,7 +314,17 @@ public class Datapack {
 				PythonUtils.setArgs(new String[] {compilePath.toString()});
 				
 				System.out.println("Running python script: "+absName);
-				PythonUtils.getInterpreter().execfile(absName);
+				
+				try {
+					PythonUtils.getInterpreter().execfile(absName);
+				} catch (PyException e) { // User may write python file incorrectly
+					if (e.traceback == null) {
+						System.out.println("Improperly formatted Python file: "+absName);
+					} else {
+						System.out.println(e.traceback.dumpStack());
+					}
+				}
+				System.out.println();
 			}
 		} catch (IOException e) {
 			System.out.println("Unable to run pre-compile script!");
