@@ -8,10 +8,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.apache.commons.io.FilenameUtils;
 
 /**
  * This class represents the dataignore.txt file used when compiling datapack
@@ -25,9 +21,9 @@ public final class DataIgnore {
 	public final List<Path> ignoredFiles = new ArrayList<Path>();
 	
 	/**
-	 * List of all filetypes to ignore
+	 * List of strings that cause any files containing them to be ignored
 	 */
-	public final List<String> ignoredFileTypes = new ArrayList<String>();
+	public final List<String> ignoredStrings = new ArrayList<String>();
 	
 	private Path dataPath;
 	
@@ -52,18 +48,22 @@ public final class DataIgnore {
 
 		@Override
 		public boolean accept(File file) {
-			// Check file type	
-			if (listContainsString(ignoredFileTypes, FilenameUtils.getExtension(file.toString()))) {
-				return false;
-			}
-			
-			// Name check matching requires relative path
+			// Name matching requires relative path
 			Path relativePath = dataPath.relativize(file.toPath());
 			
 //			System.out.println(relativePath);
 			
+			// Check for ignored strings
+			String pathString = relativePath.toString();
+			for (String str : ignoredStrings) {
+				if (pathString.contains(str)) {
+					return false;
+				}
+			}
+			
+			
 			for (Path path : ignoredFiles) {
-				if (stringStartsWith(relativePath.toString(), path.toString())) {
+				if (stringStartsWith(pathString, path.toString())) {
 					return false;
 				}
 			}
@@ -71,15 +71,7 @@ public final class DataIgnore {
 			return true;
 		}
 		
-		/* Does a string list contain a string? */
-		private boolean listContainsString(List<String> list, String string) {
-			for (String str : list) {
-				if (str.matches(string)) {
-					return true;
-				}
-			}
-			return false;
-		}
+
 		
 		/* Gets whether string 1 starts with string 2 */
 		private boolean stringStartsWith(String str1, String str2) {
@@ -113,7 +105,7 @@ public final class DataIgnore {
 		
 		DataIgnore ignoreFile = new DataIgnore(file.getParent());
 		
-		System.out.println("Loading dataignore: "+file);
+//		System.out.println("Loading dataignore: "+file);
 		
 		// If file doesn't exist, return empty file
 		if (!Files.exists(file)) {
@@ -128,7 +120,7 @@ public final class DataIgnore {
 			ignoreFile.ingestLine(line);
 		}
 		
-		System.out.println(ignoreFile.ignoredFileTypes);
+//		System.out.println(ignoreFile.ignoredStrings);
 		return ignoreFile;
 		
 	}
@@ -152,9 +144,9 @@ public final class DataIgnore {
 		int firstChar = firstNonWhitespace(line);
 		
 		
-		// File types
+		// Ignored strings
 		if (line.charAt(firstChar) == '*') {
-			ignoredFileTypes.add(line.substring(firstChar+1));
+			ignoredStrings.add(line.substring(firstChar+1));
 			return;
 		}
 		
