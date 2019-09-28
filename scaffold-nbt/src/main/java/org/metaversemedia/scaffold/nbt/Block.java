@@ -28,4 +28,8 @@ public class Block {
 	public CompoundMap getProperties() {
 		return properties;
 	}
+	
+	public String toString() {
+		return "Block: "+name+" with properties: "+properties.toString();
+	}
 }

@@ -10,6 +10,7 @@ import org.metaversemedia.scaffold.level.Level;
 import org.metaversemedia.scaffold.level.entity.GameEntity;
 import org.metaversemedia.scaffold.math.Vector;
 import org.metaversemedia.scaffold.nbt.schematic.Schematic;
+import org.metaversemedia.scaffold.nbt.schematic.Structure;
 
 import com.flowpowered.nbt.CompoundMap;
 import com.flowpowered.nbt.CompoundTag;
@@ -25,20 +26,23 @@ public class LibraryTest {
 		Project project = Project.init("C:\\Users\\Sam54123\\Documents\\Minecraft\\MapdevUtils\\Scaffold\\testProject", "Test Project");
 
 		
-		Level level = new Level(project);
+//		Level level = new Level(project);
+//		
+//		GameEntity ent1 = (GameEntity) level.newEntity(GameEntity.class, "ent1", new Vector(0,0,0));
+//
+//		level.saveFile("maps/testLevel.mclevel");
+//		level.compile(project.assetManager().getAbsolutePath("game/saves/world"));
 		
-		GameEntity ent1 = (GameEntity) level.newEntity(GameEntity.class, "ent1", new Vector(0,0,0));
+		try {
+			Structure structure = Structure.fromFile(project.assetManager().getAbsolutePath("schematics/house.nbt").toFile());
+			System.out.println(structure);
+			System.out.println(structure.blockAt(5, 3, 4));
+//			System.out.println(structure.blockAt(1, 1, 1));
 
-		level.saveFile("maps/testLevel.mclevel");
-		level.compile(project.assetManager().getAbsolutePath("game/saves/world"));
-		
-//		try {
-//			Schematic schematic = Schematic.fromFile(project.assetManager().findAsset("schematics/fort_concord.schematic").toFile());
-//			System.out.println(Short.valueOf(schematic.dataAtIndex(950)));
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }
