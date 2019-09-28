@@ -5,7 +5,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.metaversemedia.scaffold.nbt.Block;
 import org.metaversemedia.scaffold.nbt.BlockCollection;
@@ -29,6 +32,9 @@ public class Structure implements BlockCollection {
 	private int sizeX;
 	private int sizeY;
 	private int sizeZ;
+	
+	/* A value from 0-3 that represents structure's rotation */
+	private int rotation;
 	
 	private Structure() {};
 	
@@ -94,27 +100,79 @@ public class Structure implements BlockCollection {
 		return null;
 	}
 	
+	/**
+	 * Set the structure's rotation
+	 * @param amount An integer from 0-3 that represents new rotation
+	 */
+	public void setRotation(int amount) {
+		if (amount < 0 || amount > 3) {
+			throw new IllegalArgumentException("Rotation amount must be an int between 0 and 3.");
+		}
+		
+		// Make backup of blocks to reference from
+		List<CompoundMap> oldBlocks = new ArrayList<CompoundMap>();
+		Collections.copy(oldBlocks, blocks);
+		
+		// Translate all blocks to new location
+		for (CompoundMap block : blocks) {
+			@SuppressWarnings("unchecked")
+			ListTag<IntTag> coordTag = (ListTag<IntTag>) block.get("pos");
+			List<IntTag> coords = coordTag.getValue();
+			
+			// Rotate around Y axis, affecting x and z coordinates
+			int[] newCoords = rotatePoint(coords.get(0).getValue(), coords.get(2).getValue(),
+					sizeX/2, sizeZ/2, amount);
+			
+			coords.set(0, new IntTag("", newCoords[0]));
+			coords.set(2, new IntTag("", newCoords[2]));
+		}
+		
+		// Rotate all applicable blocks in palette
+		Map<Integer, String> rotations = new HashMap<Integer, String>();
+		rotations.put(0, "north");
+		rotations.put(1, "west");
+		rotations.put(2, "south");
+		rotations.put(3, "east");
+		
+		for (CompoundMap paletteBlock : palette) {
+			if (paletteBlock.containsKey("Properties")) {
+				CompoundTag propertiesTag = (CompoundTag) paletteBlock.get("Properties");
+				CompoundMap properties = propertiesTag.getValue();
+				
+				
+			}
+		}
+	}
+	
 	
 	/* Utility function to rotate a point incriments of 90 degrees around anotner
 	 * Rotation amount is determined by amount*90
 	 */
-	private int[] rotatePoint(int pointX, int pointY, int centerX, int centerY, int amount) {
+	private static int[] rotatePoint(int pointX, int pointY, int centerX, int centerY, int amount) {
+		// Translate point so center is in origin
+		pointX -= centerX;
+		pointY -= centerY;
+		
+		int[] newPoint = null;
 		if (amount == 0) {
-			return new int[] {pointX, pointY};
+			newPoint = new int[] {pointX, pointY};
 		} else if (amount == 1) {
-			return new int[] {pointY*-1, pointX};
+			newPoint = new int[] {pointY*-1, pointX};
 		}  else if (amount == 2) {
-			return new int[] {pointX*-1, pointY*-1};
+			newPoint = new int[] {pointX*-1, pointY*-1};
 		} else if (amount == 3) {
-			return new int[] {pointY, pointX*-1};
+			newPoint = new int[] {pointY, pointX*-1};
 		} else {
 			throw new IllegalArgumentException("Rotation amount must be an int between 0 and 3.");
 		}
+		
+		// Translate back
+		return new int[] {newPoint[0]+centerX, newPoint[1]+centerY};
 	}
 	
 	/**
 	 * Set a block state at a certian location
-	 * (private because Structure must be immutable)
+	 * (private because it relies on the state)
 	 * @param x X coordinate
 	 * @param y Y coordinate
 	 * @param z Z coordinate
