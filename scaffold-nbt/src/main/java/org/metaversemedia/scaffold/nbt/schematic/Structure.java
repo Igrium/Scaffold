@@ -67,24 +67,20 @@ public class Structure implements BlockCollection {
 							(CompoundMap) palleteBlock.get("Properties").getValue()
 						);
 				}
-				
 			}
 		}
 		return null;
 	}
 
-	@Override
 	public int sizeX() {
 		return sizeX;
 	}
 
-	@Override
 	public int sizeY() {
 		// TODO Auto-generated method stub
 		return sizeY;
 	}
 
-	@Override
 	public int sizeZ() {
 		// TODO Auto-generated method stub
 		return sizeZ;
