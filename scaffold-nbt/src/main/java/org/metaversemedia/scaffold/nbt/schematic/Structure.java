@@ -94,13 +94,22 @@ public class Structure implements BlockCollection {
 		return null;
 	}
 	
-	/**
-	 * Get this structure rotated by the given amount
-	 * @param amount A number from 0-3 that determines how many 90 degree incriments this structure will rotate.
-	 * @return Rotated structure
+	
+	/* Utility function to rotate a point incriments of 90 degrees around anotner
+	 * Rotation amount is determined by amount*90
 	 */
-	public Structure rotate(int amount) {
-		return null;
+	private int[] rotatePoint(int pointX, int pointY, int centerX, int centerY, int amount) {
+		if (amount == 0) {
+			return new int[] {pointX, pointY};
+		} else if (amount == 1) {
+			return new int[] {pointY*-1, pointX};
+		}  else if (amount == 2) {
+			return new int[] {pointX*-1, pointY*-1};
+		} else if (amount == 3) {
+			return new int[] {pointY, pointX*-1};
+		} else {
+			throw new IllegalArgumentException("Rotation amount must be an int between 0 and 3.");
+		}
 	}
 	
 	/**
