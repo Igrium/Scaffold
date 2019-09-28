@@ -27,7 +27,6 @@ public class Faceable extends Entity {
 	/* Make sure Direction is an enum, and not a string */
 	@Override
 	public void onUnserialized(JSONObject object) {
-		System.out.println(getAttribute("direction").getClass());
 		if (getAttribute("direction").equals("SOUTH")) {
 			setAttribute("direction", Direction.SOUTH);
 		} else if (getAttribute("direction").equals("WEST")) {
@@ -38,7 +37,6 @@ public class Faceable extends Entity {
 			setAttribute("direction", Direction.NORTH); // North is default
 		}
 		
-		System.out.println(getAttribute("direction").getClass());
 	}
 
 }

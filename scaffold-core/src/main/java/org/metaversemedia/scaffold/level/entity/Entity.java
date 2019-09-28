@@ -1,5 +1,6 @@
 package org.metaversemedia.scaffold.level.entity;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -142,8 +143,19 @@ public class Entity {
 	 */
 	public static Entity unserialize(Level level, String name, JSONObject object) {
 		try {
-			// Create object
-			Entity entity = new Entity(level, name);
+			// Create object	
+			Class<?> entityType = Class.forName(object.getString("type"));
+			Entity entity;
+			
+			if (!Entity.class.isAssignableFrom(entityType)) {
+				System.out.println(entityType+
+						" is not a subclass of org.metaversemedia.scaffold.level.entity.Entity!");
+				return null;
+			}
+			
+			entity = (Entity)
+						entityType.getDeclaredConstructor(new Class[] {Level.class,String.class}).newInstance(level, name);
+			
 			
 			// Basic info
 			entity.setPosition(Vector.fromJSONArray(object.getJSONArray("position")));
@@ -160,6 +172,16 @@ public class Entity {
 			return entity;
 		} catch (JSONException e) {
 			System.out.println("Improperly formatted entity: "+name);
+			return null;
+			
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			System.out.println("Unknown class: "+object.getString("type"));
+			return null;
+			
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+				| InvocationTargetException | NoSuchMethodException | SecurityException e) {
+			e.printStackTrace();
 			return null;
 		}
 		
