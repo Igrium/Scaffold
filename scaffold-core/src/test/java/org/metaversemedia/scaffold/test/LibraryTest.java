@@ -46,16 +46,16 @@ public class LibraryTest {
 		
 //		level.compile(project.assetManager().getAbsolutePath("game/saves/world"));
 		
-//		try {
-//			Structure structure = Structure.fromFile(project.assetManager().getAbsolutePath("schematics/house.nbt").toFile());
-//			System.out.println(structure);
-//			System.out.println(structure.blockAt(5, 3, 4));
-////			System.out.println(structure.blockAt(1, 1, 1));
-//
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+		try {
+			Structure structure = Structure.fromFile(project.assetManager().getAbsolutePath("schematics/house.nbt").toFile());
+			System.out.println(structure);
+			System.out.println(structure.blockAt(5, 3, 4));
+//			System.out.println(structure.blockAt(1, 1, 1));
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }

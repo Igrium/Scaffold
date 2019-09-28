@@ -39,37 +39,48 @@ public class Structure implements BlockCollection {
 	 * @param z Z coordinate
 	 * @return Block
 	 */
-	@SuppressWarnings("unchecked")
 	@Override
 	public Block blockAt(int x, int y, int z) {
+
+		int state = stateAt(x,y,z);
 		
-		// Look for block with matching coords
+		// Get block from palette
+		CompoundMap palleteBlock = palette[state];
+		
+		if (state == -1) {
+			return null;
+		}
+		
+		if (palleteBlock.get("Properties") == null) { // Properties may be null
+			return new Block((String) palleteBlock.get("Name").getValue(), new CompoundMap());
+		} else {
+			return new Block((String) palleteBlock.get("Name").getValue(),
+					(CompoundMap) palleteBlock.get("Properties").getValue());
+		}
+	}
+	
+	/**
+	 * Get the index in the palette of the block at a location
+	 * @param x X coordinate
+	 * @param y Y coordinate
+	 * @param z Z coordinate
+	 * @return Palette index (-1 if non existant)
+	 */
+	private Integer stateAt(int x, int y, int z) {
+		// Look for block with matching coord
 		for (CompoundMap block : blocks) {
+			@SuppressWarnings("unchecked")
 			ListTag<IntTag> coordTag = (ListTag<IntTag>) block.get("pos");
 			List<IntTag> coords = coordTag.getValue();
 			
 			if (coords.get(0).getValue().equals(x) &&
 					coords.get(1).getValue().equals(y) &&
 					coords.get(2).getValue().equals(z)) {
-				
-				System.out.println(block.get("state"));
-				
-				// Get block from palette
-				CompoundMap palleteBlock = palette[(Integer) block.get("state").getValue()];
-				if (palleteBlock.get("Properties") == null) { // Properties may be null
-					return new Block(
-							(String) palleteBlock.get("Name").getValue(),
-							new CompoundMap()
-						);
-				} else {
-					return new Block(
-							(String) palleteBlock.get("Name").getValue(),
-							(CompoundMap) palleteBlock.get("Properties").getValue()
-						);
-				}
+				return (Integer) block.get("state").getValue();
 			}
 		}
-		return null;
+		
+		return -1;
 	}
 
 	public int sizeX() {
