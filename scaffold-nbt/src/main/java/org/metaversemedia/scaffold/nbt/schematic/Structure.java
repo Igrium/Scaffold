@@ -23,7 +23,7 @@ import com.flowpowered.nbt.stream.NBTInputStream;
 public class Structure implements BlockCollection {
 	
 	private CompoundMap[] palette;
-	private CompoundMap[] blocks;
+	private List<CompoundMap> blocks;
 	private List<CompoundMap> entities;
 	
 	private int sizeX;
@@ -42,14 +42,14 @@ public class Structure implements BlockCollection {
 	@Override
 	public Block blockAt(int x, int y, int z) {
 
-		int state = stateAt(x,y,z);
-		
-		// Get block from palette
-		CompoundMap palleteBlock = palette[state];
+		int state = getState(blockMapAt(x,y,z));
 		
 		if (state == -1) {
 			return null;
 		}
+		
+		// Get block from palette
+		CompoundMap palleteBlock = palette[state];
 		
 		if (palleteBlock.get("Properties") == null) { // Properties may be null
 			return new Block((String) palleteBlock.get("Name").getValue(), new CompoundMap());
@@ -60,14 +60,26 @@ public class Structure implements BlockCollection {
 	}
 	
 	/**
-	 * Get the index in the palette of the block at a location
+	 * Get the index in the pallete of a block map
+	 * @param block Block to check
+	 * @return Palette index (-1 if non existant)
+	 */
+	private int getState(CompoundMap block) {
+		if (block == null) {
+			return -1;
+		}
+		
+		return (Integer) block.get("state").getValue();
+	}
+	
+	/**
+	 * Get the compound map of the block at a set of coordinates
 	 * @param x X coordinate
 	 * @param y Y coordinate
 	 * @param z Z coordinate
-	 * @return Palette index (-1 if non existant)
+	 * @return Block map
 	 */
-	private Integer stateAt(int x, int y, int z) {
-		// Look for block with matching coord
+	private CompoundMap blockMapAt(int x, int y, int z) {
 		for (CompoundMap block : blocks) {
 			@SuppressWarnings("unchecked")
 			ListTag<IntTag> coordTag = (ListTag<IntTag>) block.get("pos");
@@ -76,24 +88,66 @@ public class Structure implements BlockCollection {
 			if (coords.get(0).getValue().equals(x) &&
 					coords.get(1).getValue().equals(y) &&
 					coords.get(2).getValue().equals(z)) {
-				return (Integer) block.get("state").getValue();
+				return block;
 			}
 		}
-		
-		return -1;
+		return null;
 	}
+	
+	/**
+	 * Get this structure rotated by the given amount
+	 * @param amount A number from 0-3 that determines how many 90 degree incriments this structure will rotate.
+	 * @return Rotated structure
+	 */
+	public Structure rotate(int amount) {
+		return null;
+	}
+	
+	/**
+	 * Set a block state at a certian location
+	 * (private because Structure must be immutable)
+	 * @param x X coordinate
+	 * @param y Y coordinate
+	 * @param z Z coordinate
+	 * @param state Index in palette of new block (-1 for deleting block)
+	 */
+	private void setBlockAt(int x, int y, int z, int state) {
+		CompoundMap blockMap = blockMapAt(x,y,z);
+		
+		// If block  doesn't already exist
+		if (blockMap == null) {
+			if (state == -1) {
+				return;
+			}
+			// Create new block
+			blockMap = new CompoundMap();
+			
+			List<IntTag> coords = new ArrayList<IntTag>();
+			coords.add(new IntTag("", x));
+			coords.add(new IntTag("", y));
+			coords.add(new IntTag("", z));
+			blockMap.put(new ListTag<IntTag>("pos", IntTag.class, coords));
+			
+			blockMap.put(new IntTag("state", state));
+			blocks.add(blockMap);
+			
+			
+		} else { // Block already exists
+			blockMap.remove("state");
+			blockMap.put(new IntTag("state", state));
+		}
+	}
+	
 
 	public int sizeX() {
 		return sizeX;
 	}
 
 	public int sizeY() {
-		// TODO Auto-generated method stub
 		return sizeY;
 	}
 
 	public int sizeZ() {
-		// TODO Auto-generated method stub
 		return sizeZ;
 	}
 	
@@ -150,8 +204,7 @@ public class Structure implements BlockCollection {
 			System.out.println("Structure missing blocks tag!");
 			return null;
 		}
-		List<CompoundMap> blockList = getValues(paletteTag);
-		structure.blocks = (CompoundMap[]) getValues(blocksTag).toArray(new CompoundMap[blockList.size()]);
+		structure.blocks = getValues(paletteTag);
 		
 		// Load entities
 		ListTag<CompoundTag> entitiesTag = (ListTag<CompoundTag>) map.get("entities");
