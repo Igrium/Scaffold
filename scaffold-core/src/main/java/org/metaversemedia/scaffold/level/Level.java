@@ -39,6 +39,9 @@ public class Level {
 	
 	private String name = "level";
 	
+	/* The name that shows up in the Minecraft world menu */
+	private String prettyName = "Level";
+	
 	/**
 	 * Create a new level
 	 * @param project Project to create level in
@@ -46,15 +49,15 @@ public class Level {
 	public Level(Project project) {
 		this.project = project;
 	}
-	
+
 	/**
 	 * Create a new level
 	 * @param project Project to create level in
 	 * @param name Level name.
 	 */
-	public Level(Project project, String name) {
+	public Level(Project project, String prettyName) {
 		this.project = project;
-		setName(name);
+		setPrettyName(prettyName);
 	}
 	
 	/**
@@ -98,6 +101,22 @@ public class Level {
 	public void setName(String name) {
 		// Remove spaces
 		this.name = name.replaceAll("\\s+","");
+	}
+	
+	/**
+	 * Set the name that this level shows up as in the world browser.
+	 * @param name New name
+	 */
+	public void setPrettyName(String name) {
+		prettyName = name;
+	}
+	
+	/**
+	 * Get the name that this level shows up as in the world browser.
+	 * @return Pretty name
+	 */
+	public String getPrettyName() {
+		return prettyName;
 	}
 	
 	/**
@@ -162,6 +181,7 @@ public class Level {
 		JSONObject object = new JSONObject();
 		
 		object.put("editorVersion", Constants.VERSION);
+		object.put("prettyName", getPrettyName());
 		
 		// Add all maps
 		JSONObject entities = new JSONObject();
@@ -184,8 +204,10 @@ public class Level {
 	public static Level unserialize(Project project, JSONObject object) {
 		Level level = new Level(project);
 		
-		// Unserialize entities
-		try {
+		// Unserialize JSON
+		try {		
+			level.setPrettyName(object.optString("prettyName"));
+			
 			JSONObject entities = object.getJSONObject("entities");
 			
 			for (String key : entities.keySet()) {
@@ -209,10 +231,7 @@ public class Level {
 						| SecurityException e) {
 					System.out.println("Unable to instantiate class "+className);
 				}
-				
-				
 			}
-			
 			
 		} catch (JSONException e) {
 			System.out.println("Improperly formatted level!");
@@ -274,6 +293,11 @@ public class Level {
 		
 		Level level = unserialize(project, serialized);
 		level.setName(file.getFileName().toString()); // Set level name
+		
+		if (level.getPrettyName() == null) {
+			level.setPrettyName(level.getName());
+		}
+		
 		return level;
 	}
 	
