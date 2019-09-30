@@ -77,7 +77,7 @@ public class LevelData {
 		data.put(new IntTag("clearWeatherTime", 0));
 		data.put(new IntTag("DataVersion", 1976));
 		data.put(new IntTag("DayTime", values.getInt("DayTime")));
-		data.put(new ByteTag("Difficulty", values.getInt("Difficulty")));
+		data.put(new ByteTag("Difficulty", (byte) values.getInt("Difficulty")));
 		data.put(new ByteTag("DifficultyLocked", boolToByte(values.getBoolean("DifficultyLocked"))));
 		data.put(new IntTag("GameType", values.getInt("GameType")));
 		data.put(new StringTag("generatorName", "flat"));
