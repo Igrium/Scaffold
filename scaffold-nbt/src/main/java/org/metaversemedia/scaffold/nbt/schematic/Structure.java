@@ -232,6 +232,7 @@ public class Structure implements BlockCollection {
 	 * @param z Z coordinate
 	 * @param state Index in palette of new block (-1 for deleting block)
 	 */
+	@SuppressWarnings("unused")
 	private void setBlockAt(int x, int y, int z, int state) {
 		CompoundMap blockMap = blockMapAt(x,y,z);
 		
