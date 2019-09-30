@@ -2,6 +2,7 @@ package org.metaversemedia.scaffold.level;
 
 import org.json.JSONObject;
 
+import com.flowpowered.nbt.ByteTag;
 import com.flowpowered.nbt.CompoundMap;
 import com.flowpowered.nbt.DoubleTag;
 import com.flowpowered.nbt.IntTag;
@@ -63,7 +64,7 @@ public class LevelData {
 	public CompoundMap compile(boolean cheats) {
 		CompoundMap data = new CompoundMap();
 		
-		data.put(new IntTag("allowCommands", boolToInt(cheats)));
+		data.put(new ByteTag("allowCommands", boolToByte(cheats)));
 		data.put(new DoubleTag("BorderCenterX", values.getDouble("BorderCenterX")));
 		data.put(new DoubleTag("BorderCenterY", values.getDouble("BorderCenterY")));
 		data.put(new DoubleTag("BorderDamagePerBlock", values.getDouble("BorderDamagePerBlock")));
@@ -76,18 +77,19 @@ public class LevelData {
 		data.put(new IntTag("clearWeatherTime", 0));
 		data.put(new IntTag("DataVersion", 1976));
 		data.put(new IntTag("DayTime", values.getInt("DayTime")));
-		data.put(new IntTag("Difficulty", values.getInt("Difficulty")));
-		data.put(new IntTag("DifficultyLocked", boolToInt(values.getBoolean("DifficultyLocked"))));
+		data.put(new ByteTag("Difficulty", values.getInt("Difficulty")));
+		data.put(new ByteTag("DifficultyLocked", boolToByte(values.getBoolean("DifficultyLocked"))));
 		data.put(new IntTag("GameType", values.getInt("GameType")));
 		data.put(new StringTag("generatorName", "flat"));
 		data.put(new IntTag("generatorVersion", 0));
-		data.put(new IntTag("hardcore", boolToInt(values.getBoolean("hardcore"))));
+		data.put(new ByteTag("hardcore", boolToByte(values.getBoolean("hardcore"))));
+		
 
 		
 		return null;
 	}
 	
-	private int boolToInt(boolean bool) {
+	private byte boolToByte(boolean bool) {
 		if (bool) {
 			return 1;
 		} else {
