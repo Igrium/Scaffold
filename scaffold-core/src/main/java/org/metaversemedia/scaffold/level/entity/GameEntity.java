@@ -16,9 +16,9 @@ public class GameEntity extends Rotatable {
 
 	public GameEntity(Level level, String name) {
 		super(level, name);
-		setAttribute("entityType", "minecraft:area_effect_cloud");
-		setAttribute("nbt", new CompoundMap());
-		setAttribute("spawnOnInit", true);
+		attributes().put("entityType", "minecraft:area_effect_cloud");
+		attributes().put("nbt", new CompoundMap());
+		attributes().put("spawnOnInit", true);
 	}
 	
 	/**

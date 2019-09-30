@@ -11,8 +11,8 @@ public class Rotatable extends Entity {
 
 	public Rotatable(Level level, String name) {
 		super(level, name);
-		setAttribute("rotX", 0.0f);
-		setAttribute("rotY", 0.0f);
+		attributes().put("rotX", 0.0f);
+		attributes().put("rotY", 0.0f);
 	}
 	
 	/**

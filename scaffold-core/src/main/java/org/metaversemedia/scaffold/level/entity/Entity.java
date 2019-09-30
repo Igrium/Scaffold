@@ -3,6 +3,7 @@ package org.metaversemedia.scaffold.level.entity;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -83,8 +84,16 @@ public class Entity {
 	 * Get a map of this entity's attributes.
 	 * @return Attributes
 	 */
-	public Map<String, Object> attributes() {
+	protected Map<String, Object> attributes() {
 		return attributes;
+	}
+	
+	/**
+	 * Get a set of all this entity's attributes
+	 * @return Attributes;
+	 */
+	public Set<String> getAttributes() {
+		return attributes.keySet();
 	}
 	
 	
