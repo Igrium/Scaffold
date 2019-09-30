@@ -58,14 +58,7 @@ public class Structure implements BlockCollection {
 		}
 		
 		// Get block from palette
-		CompoundMap palleteBlock = palette[state];
-
-		if (palleteBlock.get("Properties") == null) { // Properties may be null
-			return new Block((String) palleteBlock.get("Name").getValue(), new CompoundMap());
-		} else {
-			return new Block((String) palleteBlock.get("Name").getValue(),
-					(CompoundMap) palleteBlock.get("Properties").getValue());
-		}
+		return Block.fromBlockPalleteEntry(palette[state]);
 	}
 	
 	/**
@@ -80,6 +73,7 @@ public class Structure implements BlockCollection {
 
 		return (Integer) block.get("state").getValue();
 	}
+
 	
 	/**
 	 * Get the compound map of the block at a set of coordinates

@@ -32,4 +32,18 @@ public class Block {
 	public String toString() {
 		return "Block: "+name;
 	}
+	
+	/**
+	 * Create a block object from a palette entry (as defined in Minecraft structure format)
+	 * @param paletteEntry
+	 * @return
+	 */
+	public static Block fromBlockPalleteEntry(CompoundMap paletteEntry) {
+		if (paletteEntry.get("Properties") == null) { // Properties may be null
+			return new Block((String) paletteEntry.get("Name").getValue(), new CompoundMap());
+		} else {
+			return new Block((String) paletteEntry.get("Name").getValue(),
+					(CompoundMap) paletteEntry.get("Properties").getValue());
+		}
+	}
 }
