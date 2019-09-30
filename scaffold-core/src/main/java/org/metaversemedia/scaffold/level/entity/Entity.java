@@ -95,6 +95,7 @@ public class Entity {
 	 */
 	public void setAttribute(String name, Object value) {
 		attributes.put(name, value);
+		onUpdateAttributes();
 	}
 	
 	
@@ -168,6 +169,7 @@ public class Entity {
 				entity.attributes().put(key, attribute);
 			}
 			
+			entity.onUpdateAttributes();
 			entity.onUnserialized(object);
 			return entity;
 		} catch (JSONException e) {
@@ -191,7 +193,13 @@ public class Entity {
 	 * Called when entity is unserialized for subclasses to act on.
 	 * @param object JSONObject serialized from.
 	 */
-	public void onUnserialized(JSONObject object) {}
+	protected void onUnserialized(JSONObject object) {}
+	
+	/**
+	 * Called whenever any attributes are updated for subclasses to act on.
+	 * This is called once on unserialization, before onUnserialized, and again whenever setAttribute() is called.
+	 */
+	protected void onUpdateAttributes() {}
 	
 	/**
 	 * Compile this entity's logic.

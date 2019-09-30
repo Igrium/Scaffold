@@ -74,6 +74,15 @@ public class Level {
 	}
 	
 	/**
+	 * Get an entity by name.
+	 * @param name Entity name
+	 * @return Entity
+	 */
+	public Entity getEntity(String name) {
+		return entities.get(name);
+	}
+	
+	/**
 	 * Get this map's name.
 	 * @return Map name
 	 */

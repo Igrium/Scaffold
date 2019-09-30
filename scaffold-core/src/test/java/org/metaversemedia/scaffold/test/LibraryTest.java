@@ -7,9 +7,11 @@ import java.util.List;
 import org.junit.Test;
 import org.metaversemedia.scaffold.core.Project;
 import org.metaversemedia.scaffold.level.Level;
+import org.metaversemedia.scaffold.level.entity.BlockCollectionEntity;
 import org.metaversemedia.scaffold.level.entity.Entity;
 import org.metaversemedia.scaffold.level.entity.Faceable;
 import org.metaversemedia.scaffold.level.entity.GameEntity;
+import org.metaversemedia.scaffold.level.entity.StructureEntity;
 import org.metaversemedia.scaffold.math.Vector;
 import org.metaversemedia.scaffold.nbt.schematic.Schematic;
 import org.metaversemedia.scaffold.nbt.schematic.Structure;
@@ -31,32 +33,35 @@ public class LibraryTest {
 		Level level = new Level(project);
 		
 		GameEntity ent1 = (GameEntity) level.newEntity(GameEntity.class, "ent1", new Vector(0,0,0));
-		Faceable faceable = (Faceable) level.newEntity(Faceable.class, "faceable", new Vector(0,0,0));
+		BlockCollectionEntity structureEntity = (BlockCollectionEntity) level.newEntity(StructureEntity.class, "house", new Vector(0,0,0));
+		structureEntity.setAttribute("file", "schematics/house.nbt");
+		
+		System.out.println(structureEntity.getBlockCollection());
 		
 		for (Entity e : level.getEntities().values()) {
 			System.out.println(e.getClass());
 		}
 
 		level.saveFile("maps/testLevel.mclevel");
-		Level level2 = Level.loadFile(project, "maps/testLevel.mclevel");
 		
-		for (Entity e : level2.getEntities().values()) {
-			System.out.println(e.getClass());
-		}
+//		Level level2 = Level.loadFile(project, "maps/testLevel.mclevel");
+//		
+//		BlockCollectionEntity structureEntity2 = (BlockCollectionEntity) level2.getEntity("house");
+//		System.out.println(structureEntity2.getBlockCollection());
 		
-//		level.compile(project.assetManager().getAbsolutePath("game/saves/world"));
+//		level2.compile(project.assetManager().getAbsolutePath("game/saves/world"));
 		
-		try {
-			Structure structure = Structure.fromFile(project.assetManager().getAbsolutePath("schematics/house.nbt").toFile());
-			System.out.println(structure);
-			System.out.println(structure.blockAt(5, 3, 4));
-			System.out.println(structure.blockAt(1, 1, 1));
+//		try {
+//			Structure structure = Structure.fromFile(project.assetManager().getAbsolutePath("schematics/house.nbt").toFile());
+//			System.out.println(structure);
+//			System.out.println(structure.blockAt(5, 3, 4));
+//			System.out.println(structure.blockAt(1, 1, 1));
+//
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
-
 }
 	

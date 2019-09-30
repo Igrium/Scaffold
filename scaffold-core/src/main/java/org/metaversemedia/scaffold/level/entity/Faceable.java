@@ -38,5 +38,5 @@ public class Faceable extends Entity {
 		}
 		
 	}
-
+	
 }
