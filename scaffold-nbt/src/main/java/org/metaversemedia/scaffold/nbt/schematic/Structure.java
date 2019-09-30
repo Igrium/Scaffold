@@ -9,6 +9,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
 
 import org.metaversemedia.scaffold.nbt.Block;
 import org.metaversemedia.scaffold.nbt.BlockCollection;
@@ -17,6 +19,7 @@ import com.flowpowered.nbt.CompoundMap;
 import com.flowpowered.nbt.CompoundTag;
 import com.flowpowered.nbt.IntTag;
 import com.flowpowered.nbt.ListTag;
+import com.flowpowered.nbt.StringTag;
 import com.flowpowered.nbt.stream.NBTInputStream;
 
 /**
@@ -43,20 +46,20 @@ public class Structure implements BlockCollection {
 	 * @param x X coordinate
 	 * @param y Y coordinate
 	 * @param z Z coordinate
-	 * @return Block
+	 * @return Block (NULL IF BLOCK IS VOID)
 	 */
 	@Override
 	public Block blockAt(int x, int y, int z) {
 
 		int state = getState(blockMapAt(x,y,z));
-		
+
 		if (state == -1) {
 			return null;
 		}
 		
 		// Get block from palette
 		CompoundMap palleteBlock = palette[state];
-		
+
 		if (palleteBlock.get("Properties") == null) { // Properties may be null
 			return new Block((String) palleteBlock.get("Name").getValue(), new CompoundMap());
 		} else {
@@ -74,7 +77,7 @@ public class Structure implements BlockCollection {
 		if (block == null) {
 			return -1;
 		}
-		
+
 		return (Integer) block.get("state").getValue();
 	}
 	
@@ -83,14 +86,15 @@ public class Structure implements BlockCollection {
 	 * @param x X coordinate
 	 * @param y Y coordinate
 	 * @param z Z coordinate
-	 * @return Block map
+	 * @return Block map (NULL IF BLOCK IS VOID)
 	 */
 	private CompoundMap blockMapAt(int x, int y, int z) {
 		for (CompoundMap block : blocks) {
 			@SuppressWarnings("unchecked")
 			ListTag<IntTag> coordTag = (ListTag<IntTag>) block.get("pos");
+
 			List<IntTag> coords = coordTag.getValue();
-			
+
 			if (coords.get(0).getValue().equals(x) &&
 					coords.get(1).getValue().equals(y) &&
 					coords.get(2).getValue().equals(z)) {
@@ -101,12 +105,36 @@ public class Structure implements BlockCollection {
 	}
 	
 	/**
+	 * Get the structure's rotation
+	 * @return An integer from 0 - 3 that represents the rotation
+	 */
+	public int getRotation() {
+		return rotation;
+	}
+	
+	/**
 	 * Set the structure's rotation
-	 * @param amount An integer from 0-3 that represents new rotation
+	 * @param amount An integer from 0 - 3 that represents the rotation
 	 */
 	public void setRotation(int amount) {
 		if (amount < 0 || amount > 3) {
 			throw new IllegalArgumentException("Rotation amount must be an int between 0 and 3.");
+		}
+		
+		rotate(amount - rotation);
+	}
+	
+	/**
+	 * Rotate the structure
+	 * @param amount An integer from -3 - 3 that represents the amount to rotate by
+	 */
+	public void rotate(int amount) {
+		if (amount < -3 || amount > 3) {
+			throw new IllegalArgumentException("Rotation amount must be an int between -3 and 3.");
+		}
+		
+		if (amount < 0) {
+			amount = 4 - (amount*-1);
 		}
 		
 		// Make backup of blocks to reference from
@@ -138,12 +166,44 @@ public class Structure implements BlockCollection {
 			if (paletteBlock.containsKey("Properties")) {
 				CompoundTag propertiesTag = (CompoundTag) paletteBlock.get("Properties");
 				CompoundMap properties = propertiesTag.getValue();
-				
-				
+				if (properties.containsKey("facing")) {
+					StringTag facing = (StringTag) properties.get("facing");
+
+					int facingKey = getKeyByValue(rotations, facing.getValue());
+					facingKey += amount;
+					
+					if (facingKey > 3) { // If true, it has gone 360* around.
+						facingKey -= 4;
+					} else if (facingKey < 0) {
+						facingKey += 4;
+					}
+					
+					properties.put(new StringTag("facing", rotations.get(facingKey)));
+				}
 			}
+		}
+		
+		rotation += amount;
+		
+		if (rotation > 3) { // If true, it has gone 360* around.
+			rotation -= 4;
+		} else if (rotation < 0) {
+			rotation += 4;
 		}
 	}
 	
+	/*
+	 * Get a map's key by it's value
+	 * Adapted from: https://stackoverflow.com/a/2904266/5676620
+	 */
+	public static <T, E> T getKeyByValue(Map<T, E> map, E value) {
+	    for (Entry<T, E> entry : map.entrySet()) {
+	        if (Objects.equals(value, entry.getValue())) {
+	            return entry.getKey();
+	        }
+	    }
+	    return null;
+	}
 	
 	/* Utility function to rotate a point incriments of 90 degrees around anotner
 	 * Rotation amount is determined by amount*90
@@ -271,7 +331,7 @@ public class Structure implements BlockCollection {
 			System.out.println("Structure missing blocks tag!");
 			return null;
 		}
-		structure.blocks = getValues(paletteTag);
+		structure.blocks = getValues(blocksTag);
 		
 		// Load entities
 		ListTag<CompoundTag> entitiesTag = (ListTag<CompoundTag>) map.get("entities");
