@@ -19,15 +19,22 @@ ext {
 }
 
 // Define the main class for the application
-mainClassName = 'org.metaversemedia.scaffold.editor.TestApp'
+mainClassName = 'org.metaversemedia.scaffold.editor.Launch'
 
 dependencies {
     // This dependency is found on compile classpath of this component and consumers.
     //compile 'com.google.guava:guava:23.0'
     
+    compile group: 'commons-io', name: 'commons-io', version: '2.6'
+    
     compile "org.jmonkeyengine:jme3-core:$jmonkeyengine_version"
     compile "org.jmonkeyengine:jme3-desktop:$jmonkeyengine_version"
     compile "org.jmonkeyengine:jme3-lwjgl:$jmonkeyengine_version"
+    
+    compile group: 'com.jgoodies', name: 'forms', version: '1.2.1'
+    
+    
+    compile project(':scaffold-core')
 
     // Use JUnit test framework
     testCompile 'junit:junit:4.12'

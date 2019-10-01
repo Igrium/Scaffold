@@ -7,11 +7,6 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.shape.Box;
 
 public class TestApp extends SimpleApplication {
-
-	public static void main(String[] args) {
-		TestApp app = new TestApp();
-		app.start();
-	}
 	
 	@Override
 	public void simpleInitApp() {
