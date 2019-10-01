@@ -33,15 +33,8 @@ public class LibraryTest {
 			System.out.println(e.getClass());
 		}
 		
-		LevelData levelData = new LevelData(level);
-		try {
-			levelData.compileFile(project.assetManager().getAbsolutePath("level.dat").toFile(), true);
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-
 		level.saveFile("maps/testLevel.mclevel");
+		level.compile(project.assetManager().getAbsolutePath("game/saves/testLevel"));
 		
 		
 //		try {

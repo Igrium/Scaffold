@@ -358,19 +358,33 @@ public class Level {
 	}
 	
 	/**
+	 * Setup appropriate folders and files for world compile.
+	 * @param compileTarget Folder to compile into (saves/name).
+	 * @param cheats Should this level compile with cheats enabled?
+	 * @throws IOException If an IO exception occurs
+	 */
+	private void setupCompile(Path compileTarget, boolean cheats) throws IOException {
+		// Delete folder if exists
+		if (compileTarget.toFile().exists()) {
+			FileUtils.deleteDirectory(compileTarget.toFile());
+		}
+
+		// Make world folder
+		compileTarget.toFile().mkdir();
+		
+		// Compile levelData
+		levelData.compileFile(compileTarget.resolve("level.dat").toFile(), cheats);
+	}
+	
+	/**
 	 * Compile this level into a playable Minecraft world (UNFINISHED).
 	 * @param compileTarget Folder to compile into (saves/name).
+	 * @param cheats Should this level compile with cheats enabled?
 	 * @return Success
 	 */
-	public boolean compile(Path compileTarget) {
+	public boolean compile(Path compileTarget, boolean cheats) {
 		try {
-			// Delete folder if exists
-			if (compileTarget.toFile().exists()) {
-				FileUtils.deleteDirectory(compileTarget.toFile());
-			}
-			
-			// Make world folder
-			compileTarget.toFile().mkdir();
+			setupCompile(compileTarget, cheats);
 			
 			// Setup and compile logic
 			Path datapackFolder = compileTarget.resolve("datapacks");
@@ -386,6 +400,10 @@ public class Level {
 			return false;
 		}
 		
+	}
+	
+	public boolean compile(Path compileTarget) {
+		return compile(compileTarget, false);
 	}
 	
 	/**
