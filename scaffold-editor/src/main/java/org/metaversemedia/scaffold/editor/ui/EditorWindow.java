@@ -15,6 +15,7 @@ import org.metaversemedia.scaffold.core.Project;
 import org.metaversemedia.scaffold.level.Level;
 
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -39,6 +40,10 @@ public class EditorWindow extends JFrame {
 	/* Does this level have unsaved changes? */
 	private boolean unsavedChanges;
 	
+	private JMenuItem mntmSave;
+	private JMenuItem mntmSaveAs;
+	private JMenuItem mntmNew;
+	
 	/**
 	 * Get the loaded project.
 	 * @return Project
@@ -53,6 +58,15 @@ public class EditorWindow extends JFrame {
 	 */
 	public Level getLevel() {
 		return level;
+	}
+	
+	/**
+	 * Set the file this level references
+	 * @param file New file
+	 */
+	protected void setLevelFile(File file) {
+		levelFile = file;
+		this.setTitle("Scaffold Editor: "+file.toString());
 	}
 	
 	/**
@@ -82,17 +96,56 @@ public class EditorWindow extends JFrame {
 		JMenu fileMenu = new JMenu("File");
 		menuBar.add(fileMenu);
 		
-		JButton btnOpenLevel = new JButton("Open Level");
-		btnOpenLevel.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				loadLevelDialouge();
+		mntmSave = new JMenuItem("Save");
+		mntmSave.setEnabled(false);
+		mntmSave.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				save();
 			}
 		});
-		fileMenu.add(btnOpenLevel);
+		
+		JMenuItem mntmOpenLevel = new JMenuItem("Open");
+		mntmOpenLevel.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				loadLevelDialog();
+			}
+		});
+		
+		mntmNew = new JMenuItem("New");
+		mntmNew.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				newLevelDialog();
+			}
+		});
+		fileMenu.add(mntmNew);
+		fileMenu.add(mntmOpenLevel);
+		fileMenu.add(mntmSave);
+		
+		mntmSaveAs = new JMenuItem("Save As...");
+		mntmSaveAs.setEnabled(false);
+		mntmSaveAs.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				saveAsDialog();
+			}
+		});
+		fileMenu.add(mntmSaveAs);
+		
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.setLayout(new BorderLayout(0, 0));
 		setContentPane(contentPane);
+	}
+	
+	/**
+	 * Open the save as dialog
+	 */
+	public void saveAsDialog() {
+		int returnVal = fileChooser.showSaveDialog(this);
+		
+		if (returnVal == JFileChooser.APPROVE_OPTION) {
+			File levelFile = fileChooser.getSelectedFile();
+			saveAs(levelFile);
+		}
 	}
 	
 	/**
@@ -101,10 +154,16 @@ public class EditorWindow extends JFrame {
 	 * @return Success.
 	 */
 	public boolean saveAs(File file) {
+		if (level == null) {
+			return false;
+		}
+		
 		boolean success = level.saveFile(file);
 		
 		if (success) {
 			unsavedChanges = false;
+			setLevelFile(file);
+			System.out.println("Saved level to: "+file);
 		}
 		
 		return success;
@@ -118,7 +177,10 @@ public class EditorWindow extends JFrame {
 		return saveAs(levelFile);
 	}
 	
-	public void loadLevelDialouge() {
+	/**
+	 * Open the Open dialog
+	 */
+	public void loadLevelDialog() {
 		int returnVal = fileChooser.showOpenDialog(this);
 		
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -139,12 +201,52 @@ public class EditorWindow extends JFrame {
 			return false;
 		}
 		
-		this.levelFile = file.toFile();
+		setLevelFile(file.toFile());
 		this.level = newLevel;
 		
 		System.out.println("Loaded level: "+file);
 		
+		// Enable buttons
+		getMntmSave().setEnabled(true);
+		getMntmSaveAs().setEnabled(true);
+		
 		return true;
 	}
+	
+	/**
+	 * Show the new level dialog
+	 */
+	public void newLevelDialog() {
+		int returnVal = fileChooser.showSaveDialog(this);
+		
+		if (returnVal == JFileChooser.APPROVE_OPTION) {
+			File levelFile = fileChooser.getSelectedFile();
+			newLevel(levelFile);
+		}
+	}
+	
+	/**
+	 * Create a new level
+	 * @param file File to save as
+	 * @return New level
+	 */
+	public Level newLevel(File file) {
+		Level newLevel = new Level(project);
+		
+		if (newLevel == null || !newLevel.saveFile(file)) {
+			return null;
+		}
+		System.out.println("Saved new level to: "+file);
+		
+		loadLevel(file.toPath());
+		
+		return null;
+	}
 
+	protected JMenuItem getMntmSave() {
+		return mntmSave;
+	}
+	protected JMenuItem getMntmSaveAs() {
+		return mntmSaveAs;
+	}
 }

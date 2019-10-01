@@ -25,6 +25,7 @@ public class Launch {
 		
 		if (projectFolder != null && new File(projectFolder).isDirectory()) {
 			Project project = Project.loadProject(projectFolder);
+			launchEditor(project);
 		} else {
 			WelcomePanel welcomePanel = new WelcomePanel();
 			welcomePanel.setVisible(true);
