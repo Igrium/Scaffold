@@ -33,6 +33,8 @@ public class Level {
 	/* All the entities in the map */
 	private Map<String, Entity> entities = new HashMap<String, Entity>();
 	
+	private LevelData levelData = new LevelData(this);
+	
 	/* Game functions. ONLY EXIST DURING COMPILATION */
 	private MCFunction initFunction;
 	private MCFunction tickFunction;
@@ -78,11 +80,19 @@ public class Level {
 	
 	/**
 	 * Get an entity by name.
-	 * @param name Entity name
+	 * @param name Entity name.
 	 * @return Entity
 	 */
 	public Entity getEntity(String name) {
 		return entities.get(name);
+	}
+	
+	/**
+	 * Get this level's LevelData.
+	 * @return LevelData
+	 */
+	public LevelData levelData() {
+		return levelData;
 	}
 	
 	/**
@@ -191,6 +201,7 @@ public class Level {
 		}
 		
 		object.put("entities", entities);
+		object.put("data", levelData.getData());
 		
 		return object;
 	}
@@ -209,6 +220,7 @@ public class Level {
 			level.setPrettyName(object.optString("prettyName"));
 			
 			JSONObject entities = object.getJSONObject("entities");
+			level.levelData = new LevelData(level, object.getJSONObject("data"));
 			
 			for (String key : entities.keySet()) {
 				// Find entity class
