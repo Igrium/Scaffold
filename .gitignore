@@ -109,6 +109,10 @@ nbdist/
 ### Gradle ###
 .gradle
 
+
+### jMonkeyEngine ###
+*.dll
+*.so
 # Ignore Gradle GUI config
 gradle-app.setting
 
