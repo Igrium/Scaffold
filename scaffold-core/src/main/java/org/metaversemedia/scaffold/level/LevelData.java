@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.json.JSONObject;
 
@@ -50,6 +52,36 @@ public class LevelData {
 		values.put("SpawnY", 55);
 		values.put("SpawnZ", 8);
 		values.put("version", 19133);
+		
+		JSONObject gamerules = new JSONObject();
+		
+		gamerules.put("announceAdvancements", "true");
+		gamerules.put("commandBlockOutput", "false");
+		gamerules.put("disableElytraMovementCheck", "false");
+		gamerules.put("disableRaids", "false");
+		gamerules.put("doDaylightCycle", "true");
+		gamerules.put("doEntityDrops", "true");
+		gamerules.put("doFireTick", "false");
+		gamerules.put("doLimitedCrafting", "false");
+		gamerules.put("doMobLoot", "true");
+		gamerules.put("doMobSpawning", "false");
+		gamerules.put("doTileDrops", "true");
+		gamerules.put("doWeatherCycle", "false");
+		gamerules.put("keepInventory", "false");
+		gamerules.put("logAdminCommands", "true");
+		gamerules.put("maxCommandChainLength", "65535");
+		gamerules.put("maxEntityCramming", "24");
+		gamerules.put("mobGriefing", "false");
+		gamerules.put("naturalRegeneration", "true");
+		gamerules.put("randomTickSpeed", "3");
+		gamerules.put("reducedDebugInfo", "false");
+		gamerules.put("sendCommandFeedback", "true");
+		gamerules.put("showDeathMessages", "true");
+		gamerules.put("spawnRadius", "1");
+		gamerules.put("spectatorsGenerateChunks", "false");
+		
+		values.put("gamerules", gamerules);
+		
 		this.level = level;
 	}
 	
@@ -112,6 +144,15 @@ public class LevelData {
 		data.put(new IntTag("version", 19133));
 		data.put(new IntTag("WanderingTraderSpawnChance", 0));
 		data.put(new IntTag("WanderingTraderSpawnDelay", 15600));
+		
+		// Compile gamerules
+		CompoundMap gameruleMap = new CompoundMap();
+		JSONObject gamerules = values.getJSONObject("gamerules");
+		for (String key : gamerules.keySet()) {
+			gameruleMap.put(new StringTag(key, gamerules.getString(key)));	
+		}
+		data.put(new CompoundTag("GameRules", gameruleMap));
+		
 		CompoundMap root = new CompoundMap();
 		root.put(new CompoundTag("Data", data));
 		
