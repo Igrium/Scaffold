@@ -165,8 +165,7 @@ public class Datapack {
 		}
 		
 		// Load dataignore
-		DataIgnore dataignore = DataIgnore.load(Paths.get(dataFolder.toString(), "dataignore.txt"));
-		
+		FileIgnore dataignore = new DataIgnore(Paths.get(dataFolder.toString(), "dataignore.txt"));
 		
 		// Copy the directory
 		FileUtils.copyDirectory(dataFolder.toFile(), compilePath.resolve("data").toFile(), dataignore.new Filter(), true);
