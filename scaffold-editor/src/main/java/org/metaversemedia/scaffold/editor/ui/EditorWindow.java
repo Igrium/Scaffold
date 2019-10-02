@@ -47,6 +47,7 @@ public class EditorWindow extends JFrame {
 	private JMenu editMenu;
 	private JMenuItem projectSettingsButton;
 	private JMenuItem levelInfoButton;
+	private JMenuItem compileButton;
 	
 	/**
 	 * Get the loaded project.
@@ -133,6 +134,15 @@ public class EditorWindow extends JFrame {
 			}
 		});
 		fileMenu.add(mntmSaveAs);
+		
+		compileButton = new JMenuItem("Compile");
+		compileButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				compile();
+			}
+		});
+		compileButton.setEnabled(false);
+		fileMenu.add(compileButton);
 		
 		editMenu = new JMenu("Edit");
 		menuBar.add(editMenu);
@@ -234,6 +244,7 @@ public class EditorWindow extends JFrame {
 		getMntmSave().setEnabled(true);
 		getMntmSaveAs().setEnabled(true);
 		getLevelInfoButton().setEnabled(true);
+		getCompileButton().setEnabled(true);
 		
 		return true;
 	}
@@ -269,6 +280,13 @@ public class EditorWindow extends JFrame {
 		return null;
 	}
 	
+	/**
+	 * Compile the current level
+	 */
+	public void compile() {
+		level.compile(project.assetManager().getAbsolutePath("game/saves/"));
+	}
+	
 	public void showProjectSettings() {
 		ProjectSettings projectSettings = new ProjectSettings(project);
 		projectSettings.setVisible(true);
@@ -287,5 +305,8 @@ public class EditorWindow extends JFrame {
 	}
 	protected JMenuItem getLevelInfoButton() {
 		return levelInfoButton;
+	}
+	public JMenuItem getCompileButton() {
+		return compileButton;
 	}
 }
