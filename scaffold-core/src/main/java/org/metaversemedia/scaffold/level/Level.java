@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.metaversemedia.scaffold.core.Constants;
@@ -304,7 +305,7 @@ public class Level {
 		}
 		
 		Level level = unserialize(project, serialized);
-		level.setName(file.getFileName().toString()); // Set level name
+		level.setName(FilenameUtils.removeExtension(file.getFileName().toString())); // Set level name
 		
 		if (level.getPrettyName() == null) {
 			level.setPrettyName(level.getName());
