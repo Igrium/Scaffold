@@ -295,7 +295,7 @@ public class EditorWindow extends JFrame {
 	 * Compile the current level
 	 */
 	public void compile() {
-		level.compile(project.assetManager().getAbsolutePath("game/saves/"));
+		level.compile(project.assetManager().getAbsolutePath("game/saves/world"));
 	}
 	
 	public void showProjectSettings() {
