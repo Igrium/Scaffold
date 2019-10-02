@@ -40,10 +40,10 @@ public class GameInfo {
 	}
 	
 	/**
-	 * Get the project's name (deturmined by name of project folder).
-	 * @return Name
+	 * Get the project's title.
+	 * @return Title
 	 */
-	public String getName() {
+	public String getTitle() {
 		return title;
 		
 	}

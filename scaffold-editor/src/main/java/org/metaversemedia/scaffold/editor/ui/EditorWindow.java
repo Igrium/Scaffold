@@ -21,6 +21,7 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import javax.swing.SwingConstants;
 
 public class EditorWindow extends JFrame {
 
@@ -43,6 +44,8 @@ public class EditorWindow extends JFrame {
 	private JMenuItem mntmSave;
 	private JMenuItem mntmSaveAs;
 	private JMenuItem mntmNew;
+	private JMenu editMenu;
+	private JMenuItem projectSettingsButton;
 	
 	/**
 	 * Get the loaded project.
@@ -129,6 +132,17 @@ public class EditorWindow extends JFrame {
 			}
 		});
 		fileMenu.add(mntmSaveAs);
+		
+		editMenu = new JMenu("Edit");
+		menuBar.add(editMenu);
+		
+		projectSettingsButton = new JMenuItem("Project Settings");
+		projectSettingsButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				showProjectSettings();
+			}
+		});
+		editMenu.add(projectSettingsButton);
 		
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -241,6 +255,11 @@ public class EditorWindow extends JFrame {
 		loadLevel(file.toPath());
 		
 		return null;
+	}
+	
+	public void showProjectSettings() {
+		ProjectSettings projectSettings = new ProjectSettings(project);
+		projectSettings.setVisible(true);
 	}
 
 	protected JMenuItem getMntmSave() {
