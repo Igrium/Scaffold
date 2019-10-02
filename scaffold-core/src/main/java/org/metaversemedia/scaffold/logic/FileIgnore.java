@@ -52,8 +52,6 @@ public abstract class FileIgnore {
 		public boolean accept(File file) {
 			// Name matching requires relative path
 			Path relativePath = filePath.getParent().relativize(file.toPath());
-			System.out.println(filePath);
-			System.out.println(relativePath);
 			
 			// Check for ignored strings
 			String pathString = relativePath.toString();
