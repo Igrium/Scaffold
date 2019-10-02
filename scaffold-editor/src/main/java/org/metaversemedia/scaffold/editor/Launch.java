@@ -33,17 +33,34 @@ public class Launch {
 		
 	}
 	
-	public static void launchEditor(Project project) {
+	/**
+	 * Launch the level editor.
+	 * @param project Project to launch into.
+	 * @param showProjectProperties Should show project properties on launch?
+	 */
+	public static void launchEditor(Project project, boolean showProjectProperties) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
 					EditorWindow window = new EditorWindow(project);
 					window.setVisible(true);
+					
+					if (showProjectProperties) {
+						window.showProjectSettings();
+					}
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		});
+	}
+	
+	/**
+	 * Launch the level editor.
+	 * @param project Project to launch into.
+	 */
+	public static void launchEditor(Project project) {
+		launchEditor(project, false);
 	}
 	
 }

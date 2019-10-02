@@ -106,7 +106,7 @@ public class WelcomePanel extends JFrame {
 			}
 			
 			Project project = Project.init(projectDir.toString(), projectDir.getName());
-			Launch.launchEditor(project);
+			Launch.launchEditor(project, true);
 			setVisible(false);
 		}
 	}

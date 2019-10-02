@@ -101,6 +101,7 @@ public class ProjectSettings extends JDialog {
 		gameinfo.setTitle(getTitleTextField().getText());
 		
 		gameinfo.saveJSON(project.assetManager().getAbsolutePath("gameinfo.json"));
+		System.out.println("Saved project settings.");
 		
 	}
 	protected JTextField getTitleTextField() {

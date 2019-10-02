@@ -46,6 +46,7 @@ public class EditorWindow extends JFrame {
 	private JMenuItem mntmNew;
 	private JMenu editMenu;
 	private JMenuItem projectSettingsButton;
+	private JMenuItem levelInfoButton;
 	
 	/**
 	 * Get the loaded project.
@@ -142,6 +143,15 @@ public class EditorWindow extends JFrame {
 				showProjectSettings();
 			}
 		});
+		
+		levelInfoButton = new JMenuItem("Level Info");
+		levelInfoButton.setEnabled(false);
+		levelInfoButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				showLevelInfo();
+			}
+		});
+		editMenu.add(levelInfoButton);
 		editMenu.add(projectSettingsButton);
 		
 		contentPane = new JPanel();
@@ -223,6 +233,7 @@ public class EditorWindow extends JFrame {
 		// Enable buttons
 		getMntmSave().setEnabled(true);
 		getMntmSaveAs().setEnabled(true);
+		getLevelInfoButton().setEnabled(true);
 		
 		return true;
 	}
@@ -236,6 +247,7 @@ public class EditorWindow extends JFrame {
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			File levelFile = fileChooser.getSelectedFile();
 			newLevel(levelFile);
+			showLevelInfo();
 		}
 	}
 	
@@ -261,11 +273,19 @@ public class EditorWindow extends JFrame {
 		ProjectSettings projectSettings = new ProjectSettings(project);
 		projectSettings.setVisible(true);
 	}
+	
+	public void showLevelInfo() {
+		LevelInfo levelInfo = new LevelInfo(level);
+		levelInfo.setVisible(true);
+	}
 
 	protected JMenuItem getMntmSave() {
 		return mntmSave;
 	}
 	protected JMenuItem getMntmSaveAs() {
 		return mntmSaveAs;
+	}
+	protected JMenuItem getLevelInfoButton() {
+		return levelInfoButton;
 	}
 }
