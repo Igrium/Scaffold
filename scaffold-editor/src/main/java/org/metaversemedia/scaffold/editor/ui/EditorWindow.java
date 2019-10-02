@@ -22,6 +22,10 @@ import javax.swing.JFileChooser;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.SwingConstants;
+import javax.swing.border.LineBorder;
+import java.awt.Color;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.EtchedBorder;
 
 public class EditorWindow extends JFrame {
 
@@ -48,6 +52,7 @@ public class EditorWindow extends JFrame {
 	private JMenuItem projectSettingsButton;
 	private JMenuItem levelInfoButton;
 	private JMenuItem compileButton;
+	private Outliner outliner;
 	
 	/**
 	 * Get the loaded project.
@@ -168,6 +173,10 @@ public class EditorWindow extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.setLayout(new BorderLayout(0, 0));
 		setContentPane(contentPane);
+		
+		outliner = new Outliner(this);
+		outliner.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		contentPane.add(outliner, BorderLayout.EAST);
 	}
 	
 	/**
@@ -246,6 +255,8 @@ public class EditorWindow extends JFrame {
 		getLevelInfoButton().setEnabled(true);
 		getCompileButton().setEnabled(true);
 		
+		getOutliner().reload();
+		
 		return true;
 	}
 	
@@ -308,5 +319,8 @@ public class EditorWindow extends JFrame {
 	}
 	public JMenuItem getCompileButton() {
 		return compileButton;
+	}
+	protected Outliner getOutliner() {
+		return outliner;
 	}
 }
