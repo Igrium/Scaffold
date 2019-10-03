@@ -23,6 +23,7 @@ import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.ActionEvent;
 import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
@@ -149,15 +150,12 @@ public class EditorWindow extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				save();
 				
-			}};
+			}
+		};
 
 		mntmSave = new JMenuItem("Save");
 		mntmSave.setEnabled(false);
-		mntmSave.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				save();
-			}
-		});
+		mntmSave.setAction(saveAction);
 		
 		JMenuItem mntmOpenLevel = new JMenuItem("Open");
 		mntmOpenLevel.addActionListener(new ActionListener() {
