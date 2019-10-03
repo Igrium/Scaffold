@@ -12,6 +12,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.text.NumberFormatter;
 
 import org.metaversemedia.scaffold.level.entity.Entity;
+import org.metaversemedia.scaffold.math.Vector;
 
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
@@ -134,6 +135,9 @@ public class EntityEditor extends JDialog {
 	
 	private List<AttributeField> attributeFields = new ArrayList<AttributeField>();
 	private JLabel typeLabel;
+	private JTextField positionX;
+	private JTextField positionY;
+	private JTextField positionZ;
 
 	/**
 	 * Get the entity the editor is currently editing.
@@ -194,6 +198,31 @@ public class EntityEditor extends JDialog {
 			}
 		}
 		{
+			JPanel panel = new JPanel();
+			FlowLayout flowLayout = (FlowLayout) panel.getLayout();
+			flowLayout.setAlignment(FlowLayout.LEFT);
+			contentPanel.add(panel);
+			{
+				JLabel lblPosition = new JLabel("Position");
+				panel.add(lblPosition);
+			}
+			{
+				positionX = new JTextField();
+				panel.add(positionX);
+				positionX.setColumns(10);
+			}
+			{
+				positionY = new JTextField();
+				panel.add(positionY);
+				positionY.setColumns(10);
+			}
+			{
+				positionZ = new JTextField();
+				panel.add(positionZ);
+				positionZ.setColumns(10);
+			}
+		}
+		{
 			JPanel buttonPane = new JPanel();
 			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
@@ -235,6 +264,10 @@ public class EntityEditor extends JDialog {
 		typeLabel.setText(entity.getClass().getSimpleName());
 		nameField.setText(entity.getName());
 		
+		positionX.setText(Float.toString(entity.getPosition().X()));
+		positionY.setText(Float.toString(entity.getPosition().Y()));
+		positionZ.setText(Float.toString(entity.getPosition().Z()));
+		
 		for (String attribute : entity.getAttributes()) {
 			Object attributeObj = entity.getAttribute(attribute);
 			
@@ -266,6 +299,18 @@ public class EntityEditor extends JDialog {
 	 * Save info back into entity
 	 */
 	public void save() {
+		// Save position
+		try {
+			entity.setPosition(new Vector(
+					Float.valueOf(positionX.getText()),
+					Float.valueOf(positionY.getText()),
+					Float.valueOf(positionZ.getText())
+					));
+			
+		} catch (NumberFormatException e) {
+			System.out.println("Position must be a series of 3 floats! Not setting!");
+		}
+		
 		entity.setName(nameField.getText());
 		for (AttributeField f : attributeFields) {
 			entity.setAttribute(f.getAttributeName(), f.getAttributeValue());
