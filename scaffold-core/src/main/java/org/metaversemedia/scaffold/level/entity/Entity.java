@@ -116,6 +116,14 @@ public class Entity {
 		return attributes.get(name);
 	}
 	
+	/**
+	 * Remove an attribute from the entity.
+	 * @param name Attribute to remove.
+	 */
+	public void removeAttribute(String name) {
+		attributes.remove(name);
+	}
+	
 	
 	/**
 	 * Serialize this entity into a JSON object.
