@@ -278,6 +278,13 @@ public class EditorWindow extends JFrame {
 	}
 	
 	/**
+	 * Show new entity dialog.
+	 */
+	public void newEntity() {
+		
+	}
+	
+	/**
 	 * Load a level from a file.
 	 * @param level Level to load
 	 * @return success

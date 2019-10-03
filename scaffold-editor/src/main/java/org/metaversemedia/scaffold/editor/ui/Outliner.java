@@ -1,8 +1,9 @@
 package org.metaversemedia.scaffold.editor.ui;
 
 import javax.swing.JPanel;
-
+import javax.swing.JPopupMenu;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 
 import java.awt.Dimension;
 
@@ -20,7 +21,17 @@ import java.util.List;
  */
 public class Outliner extends JPanel {
 	
+	protected class PopUpMenu extends JPopupMenu {
+		JMenuItem newEntity;
+		
+		public PopUpMenu() {
+			newEntity = new JMenuItem("New Entity");
+			this.add(newEntity);
+		}
+	}
+	
 	protected EditorWindow parent;
+	protected PopUpMenu menu;
 	
 	protected List<JComponent> labels = new ArrayList<JComponent>();
 
@@ -29,6 +40,16 @@ public class Outliner extends JPanel {
 	 * @param parent Parent editor window
 	 */
 	public Outliner(EditorWindow parent) {
+		menu = new PopUpMenu();
+		
+		addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (e.isPopupTrigger()) { // Check for right click
+					menu.show(e.getComponent(), e.getX(), e.getY());
+				}
+			}
+		});
 		this.parent = parent;
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		
