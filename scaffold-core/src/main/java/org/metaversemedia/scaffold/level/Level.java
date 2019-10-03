@@ -189,7 +189,7 @@ public class Level {
 	 * Rename an entity in the level.
 	 * @param oldName Entity to rename.
 	 * @param newName New name.
-	 * @return Success.
+	 * @return Success
 	 */
 	public boolean renameEntity(String oldName, String newName) {
 		// Make sure entity exists and name is available
