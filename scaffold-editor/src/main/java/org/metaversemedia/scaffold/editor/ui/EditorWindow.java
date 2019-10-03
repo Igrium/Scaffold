@@ -13,6 +13,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.metaversemedia.scaffold.core.Project;
 import org.metaversemedia.scaffold.level.Level;
+import org.metaversemedia.scaffold.level.entity.Entity;
 
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -53,6 +54,8 @@ public class EditorWindow extends JFrame {
 	private JMenuItem levelInfoButton;
 	private JMenuItem compileButton;
 	private Outliner outliner;
+	
+	private EntityEditor entityEditor;
 	
 	/**
 	 * Get the loaded project.
@@ -177,6 +180,8 @@ public class EditorWindow extends JFrame {
 		outliner = new Outliner(this);
 		outliner.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		contentPane.add(outliner, BorderLayout.EAST);
+		
+		entityEditor = new EntityEditor(this);
 	}
 	
 	/**
@@ -289,6 +294,29 @@ public class EditorWindow extends JFrame {
 		loadLevel(file.toPath());
 		
 		return null;
+	}
+	
+	/**
+	 * Show the edit entity dialog
+	 * @param entity Entity to edit
+	 */
+	public void showEntityEditor(Entity entity) {
+		// Check that entity is part of level
+		if (!level.getEntities().containsKey(entity.getName())) {
+			return;
+		}
+		
+		entityEditor.setEntity(entity);
+		entityEditor.setVisible(true);
+	}
+	
+	/**
+	 * Show edit entity dialog by entity name.
+	 * @param entityName Entity name.
+	 */
+	public void showEntityEditor(String entityName) {
+		if (!level.getEntities().containsKey(entityName)) {return;}
+		showEntityEditor(level.getEntity(entityName));
 	}
 	
 	/**

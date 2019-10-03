@@ -2,13 +2,17 @@ package org.metaversemedia.scaffold.editor.ui;
 
 import javax.swing.JPanel;
 
-import org.metaversemedia.scaffold.level.Level;
-
 import javax.swing.JLabel;
 
 import java.awt.Dimension;
 
 import javax.swing.BoxLayout;
+import javax.swing.JComponent;
+
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Represents the entity outliner
@@ -17,6 +21,8 @@ import javax.swing.BoxLayout;
 public class Outliner extends JPanel {
 	
 	protected EditorWindow parent;
+	
+	protected List<JComponent> labels = new ArrayList<JComponent>();
 
 	/**
 	 * Create the panel.
@@ -34,8 +40,26 @@ public class Outliner extends JPanel {
 	 * Reload the entity list
 	 */
 	public void reload() {
+		// Remove previous labels from list
+		for (JComponent l : labels) {
+			remove(l);
+		}
+		
+		labels.clear();
+		
 		for (String key : parent.getLevel().getEntities().keySet()){
 			JLabel label = new JLabel(key);
+			label.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseClicked(MouseEvent event) {
+					// Check for double click
+					if (event.getClickCount() == 2) {
+						parent.showEntityEditor(key);
+					}
+				}
+			});
+			
+			labels.add(label);
 			this.add(label);
 		}
 		revalidate();
