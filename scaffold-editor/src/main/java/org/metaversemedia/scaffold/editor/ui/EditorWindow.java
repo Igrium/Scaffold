@@ -1,11 +1,8 @@
 package org.metaversemedia.scaffold.editor.ui;
 
 import java.awt.BorderLayout;
-import java.awt.EventQueue;
 import java.io.File;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -20,17 +17,12 @@ import javax.swing.JMenuItem;
 import javax.swing.JMenu;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.awt.event.ActionEvent;
-import javax.swing.SwingConstants;
-import javax.swing.border.LineBorder;
-import java.awt.Color;
-import javax.swing.border.BevelBorder;
 import javax.swing.border.EtchedBorder;
 
+@SuppressWarnings("serial")
 public class EditorWindow extends JFrame {
 
 	private JPanel contentPane;
