@@ -32,15 +32,19 @@ import java.awt.event.ActionEvent;
 public class LevelInfo extends JDialog {
 	private JTextField prettyNameField;
 	private JTextField difficultyField;
-	protected Level level;
 	private JCheckBox hardcoreCheck;
+	
+	protected Level level;
+	protected EditorWindow parent;
+
 
 	/**
 	 * Create the dialog.
 	 * @param level Level to edit.
 	 */
-	public LevelInfo(Level level) {
-		this.level = level;
+	public LevelInfo(EditorWindow parent) {
+		this.parent = parent;
+		level = parent.getLevel();
 		setTitle("Edit Level Settings");
 		setBounds(100, 100, 640, 480);
 		getContentPane().setLayout(new BorderLayout());
@@ -162,7 +166,7 @@ public class LevelInfo extends JDialog {
 		}
 		
 		levelData.getData().put("hardcode", getHardcoreCheck().isSelected());
-		
+		parent.markUnsaved();
 	}
 
 	protected JTextField getPrettyNameField() {

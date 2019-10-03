@@ -18,6 +18,8 @@ import org.metaversemedia.scaffold.level.entity.Entity;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JMenu;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import java.awt.event.ActionListener;
@@ -54,8 +56,12 @@ public class EditorWindow extends JFrame {
 	private JMenuItem levelInfoButton;
 	private JMenuItem compileButton;
 	private Outliner outliner;
+	private Action saveAction;
 	
 	private EntityEditor entityEditor;
+	/* The title this window has before the * if unsaved */
+	
+	private String desiredTitle = "";
 	
 	/**
 	 * Get the loaded project.
@@ -74,12 +80,24 @@ public class EditorWindow extends JFrame {
 	}
 	
 	/**
+	 * Update window title.
+	 */
+	private void updateTitle() {
+		if (hasUnsavedChanges()) {
+			this.setTitle(desiredTitle+"*");
+		} else {
+			this.setTitle(desiredTitle);
+		}
+	}
+	
+	/**
 	 * Set the file this level references
 	 * @param file New file
 	 */
 	protected void setLevelFile(File file) {
 		levelFile = file;
-		this.setTitle("Scaffold Editor: "+file.toString());
+		desiredTitle = "Scaffold Editor: "+file.toString();
+		updateTitle();
 	}
 	
 	/**
@@ -88,6 +106,22 @@ public class EditorWindow extends JFrame {
 	 */
 	public boolean hasUnsavedChanges() {
 		return unsavedChanges;
+	}
+	
+	/**
+	 * Set whether this level has unsaved changes.
+	 * @param unsavedChanges Now has unsaved changes?
+	 */
+	protected void setHasUnsavedChanges(boolean unsavedChanges) {
+		this.unsavedChanges = unsavedChanges;
+		updateTitle();
+	}
+	
+	/**
+	 * Mark this editor as unsavedd
+	 */
+	public void markUnsaved() {
+		setHasUnsavedChanges(true);
 	}
 
 	/**
@@ -109,6 +143,14 @@ public class EditorWindow extends JFrame {
 		JMenu fileMenu = new JMenu("File");
 		menuBar.add(fileMenu);
 		
+		saveAction = new AbstractAction("Save") {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				save();
+				
+			}};
+
 		mntmSave = new JMenuItem("Save");
 		mntmSave.setEnabled(false);
 		mntmSave.addActionListener(new ActionListener() {
@@ -180,7 +222,7 @@ public class EditorWindow extends JFrame {
 		outliner = new Outliner(this);
 		outliner.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		contentPane.add(outliner, BorderLayout.EAST);
-		
+
 		entityEditor = new EntityEditor(this);
 	}
 	
@@ -209,7 +251,7 @@ public class EditorWindow extends JFrame {
 		boolean success = level.saveFile(file);
 		
 		if (success) {
-			unsavedChanges = false;
+			setHasUnsavedChanges(false);
 			setLevelFile(file);
 			System.out.println("Saved level to: "+file);
 		}
@@ -332,7 +374,7 @@ public class EditorWindow extends JFrame {
 	}
 	
 	public void showLevelInfo() {
-		LevelInfo levelInfo = new LevelInfo(level);
+		LevelInfo levelInfo = new LevelInfo(this);
 		levelInfo.setVisible(true);
 	}
 

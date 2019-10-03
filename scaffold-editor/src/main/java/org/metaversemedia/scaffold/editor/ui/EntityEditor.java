@@ -317,6 +317,7 @@ public class EntityEditor extends JDialog {
 		}
 		
 		parent.getOutliner().reload();
+		parent.markUnsaved();
 	}
 
 	protected JLabel getTypeLabel() {
