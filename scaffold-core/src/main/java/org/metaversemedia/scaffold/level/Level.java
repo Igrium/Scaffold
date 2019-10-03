@@ -184,6 +184,27 @@ public class Level {
 		return entity;
 	}
 	
+	
+	/**
+	 * Rename an entity in the level.
+	 * @param oldName Entity to rename.
+	 * @param newName New name.
+	 * @return Success.
+	 */
+	public boolean renameEntity(String oldName, String newName) {
+		// Make sure entity exists and name is available
+		if (entities.get(oldName) == null || entities.get(newName) != null) {
+			return false;
+		}
+		
+		Entity ent = entities.get(oldName);
+		entities.put(newName, ent);
+		entities.remove(oldName);
+		
+		ent.setName(newName);
+		return true;
+	}
+	
 	/**
 	 * Serialize this level into a JSONObject.
 	 * @return Serialized level
