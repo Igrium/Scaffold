@@ -9,6 +9,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.metaversemedia.scaffold.core.Project;
+import org.metaversemedia.scaffold.editor.editor3d.AppPanel;
 import org.metaversemedia.scaffold.level.Level;
 import org.metaversemedia.scaffold.level.entity.Entity;
 
@@ -51,10 +52,13 @@ public class EditorWindow extends JFrame {
 	private Outliner outliner;
 	private Action saveAction;
 	
+	private AppPanel appPanel;
+	
 	private EntityEditor entityEditor;
 	/* The title this window has before the * if unsaved */
 	
 	private String desiredTitle = "";
+	
 	
 	/**
 	 * Get the loaded project.
@@ -111,7 +115,7 @@ public class EditorWindow extends JFrame {
 	}
 	
 	/**
-	 * Mark this editor as unsavedd
+	 * Mark this editor as unsaved
 	 */
 	public void markUnsaved() {
 		setHasUnsavedChanges(true);
@@ -209,6 +213,9 @@ public class EditorWindow extends JFrame {
 		contentPane.setLayout(new BorderLayout(0, 0));
 		setContentPane(contentPane);
 		
+		appPanel = new AppPanel(this);
+		contentPane.add(appPanel, BorderLayout.CENTER);
+		
 		outliner = new Outliner(this);
 		outliner.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		contentPane.add(outliner, BorderLayout.EAST);
@@ -293,15 +300,19 @@ public class EditorWindow extends JFrame {
 		
 		System.out.println("Loaded level: "+file);
 		
-		// Enable buttons
+		reload();
+		
+		return true;
+	}
+	
+	public void reload() {
 		getMntmSave().setEnabled(true);
 		getMntmSaveAs().setEnabled(true);
 		getLevelInfoButton().setEnabled(true);
 		getCompileButton().setEnabled(true);
 		
 		getOutliner().reload();
-		
-		return true;
+		appPanel.start();
 	}
 	
 	/**
