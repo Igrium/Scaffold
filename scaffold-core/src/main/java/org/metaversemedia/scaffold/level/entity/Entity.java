@@ -26,8 +26,14 @@ public class Entity {
 	/* The level this entity belongs to */
 	private Level level;
 	
+	/* All this entity's attributes */
 	private Map<String, Object> attributes = new HashMap<String, Object>();
-
+	
+	/* The path to the sprite this entity will render with in the editor */
+	private String renderSprite;
+	
+	/* The path to the model this entity will render with in the editor */
+	private String renderModel;
 	
 	/**
 	 * Construct a new entity with a name and a level.
@@ -53,6 +59,14 @@ public class Entity {
 	 */
 	public void setName(String name) {
 		this.name = name;
+	}
+	
+	/**
+	 * Get the sprite this entity will use in the editor.
+	 * @return Sprite
+	 */
+	public String getSprite() {
+		return renderSprite;
 	}
 	
 	/**
