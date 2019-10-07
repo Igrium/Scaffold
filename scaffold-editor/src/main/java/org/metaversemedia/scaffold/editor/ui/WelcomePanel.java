@@ -18,6 +18,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.awt.event.ActionEvent;
 
+@SuppressWarnings("serial")
 public class WelcomePanel extends JFrame {
 
 	/**
@@ -40,6 +41,7 @@ public class WelcomePanel extends JFrame {
 	 * Create the frame.
 	 */
 	public WelcomePanel() {
+		setTitle("Scaffold Editor");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 720, 480);
 		getContentPane().setLayout(new BorderLayout(0, 0));
