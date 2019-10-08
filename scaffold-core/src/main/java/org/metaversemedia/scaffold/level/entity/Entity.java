@@ -29,12 +29,6 @@ public class Entity {
 	/* All this entity's attributes */
 	private Map<String, Object> attributes = new HashMap<String, Object>();
 	
-	/* The path to the sprite this entity will render with in the editor */
-	private String renderSprite;
-	
-	/* The path to the model this entity will render with in the editor */
-	private String renderModel;
-	
 	/**
 	 * Construct a new entity with a name and a level.
 	 * @param level	Level entity should belong to.
@@ -63,10 +57,18 @@ public class Entity {
 	
 	/**
 	 * Get the sprite this entity will use in the editor.
-	 * @return Sprite
+	 * @return Sprite path.
 	 */
 	public String getSprite() {
-		return renderSprite;
+		return null;
+	}
+	
+	/**
+	 * Get the model this entity will use in the editor.
+	 * @return Model path.
+	 */
+	public String getRenderModel() {
+		return null;
 	}
 	
 	/**
