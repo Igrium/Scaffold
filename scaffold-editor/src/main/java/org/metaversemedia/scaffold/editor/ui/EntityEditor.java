@@ -12,6 +12,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.text.NumberFormatter;
 
 import org.metaversemedia.scaffold.level.entity.Entity;
+import org.metaversemedia.scaffold.level.entity.Entity.AttributeDeclaration;
 import org.metaversemedia.scaffold.math.Vector;
 
 import javax.swing.BoxLayout;
@@ -44,6 +45,10 @@ public class EntityEditor extends JDialog {
 		private JTextField textField;
 		
 		public StringAttributeField(String attribute, String defaultValue) {
+			if (defaultValue == null) {
+				defaultValue = "";
+			}
+			
 			attributeName = attribute;
 			
 			this.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
@@ -72,6 +77,10 @@ public class EntityEditor extends JDialog {
 		private Integer oldValue;
 		
 		public IntAttributeField(String attribute, Integer defaultValue) {
+			if (defaultValue == null) {
+				defaultValue = 0;
+			}
+			
 			attributeName = attribute;
 			oldValue = defaultValue;
 			
@@ -102,6 +111,10 @@ public class EntityEditor extends JDialog {
 		private Float oldValue;
 		
 		public FloatAttributeField(String attribute, Float defaultValue) {
+			if (defaultValue == null) {
+				defaultValue = 0f;
+			}
+			
 			attributeName = attribute;
 			oldValue = defaultValue;
 			
@@ -268,24 +281,20 @@ public class EntityEditor extends JDialog {
 		positionY.setText(Float.toString(entity.getPosition().Y()));
 		positionZ.setText(Float.toString(entity.getPosition().Z()));
 		
-		for (String attribute : entity.getAttributes()) {
-			Object attributeObj = entity.getAttribute(attribute);
+		for (AttributeDeclaration attribute : entity.getAttributeFields()) {
+			Object attributeObj = entity.getAttribute(attribute.name());
 			
 			// Try to cast to right class
-			if (attributeObj == null || String.class.isAssignableFrom(attributeObj.getClass())) {
-				StringAttributeField field = new StringAttributeField(attribute, (String) attributeObj);
+			if (attributeObj == null || String.class.isAssignableFrom(attribute.type())) {
+				StringAttributeField field = new StringAttributeField(attribute.name(), (String) attributeObj);
 				attributeFields.add(field);
 				contentPanel.add(field);
-			} else if (Integer.class.isAssignableFrom(attributeObj.getClass())) {
-				IntAttributeField field = new IntAttributeField(attribute, (Integer) attributeObj);
+			} else if (Integer.class.isAssignableFrom(attribute.type())) {
+				IntAttributeField field = new IntAttributeField(attribute.name(), ((Number) attributeObj).intValue());
 				attributeFields.add(field);
 				contentPanel.add(field);
-			} else if (Float.class.isAssignableFrom(attributeObj.getClass())) {
-				FloatAttributeField field = new FloatAttributeField(attribute, (Float) attributeObj);
-				attributeFields.add(field);
-				contentPanel.add(field);
-			} else if (Double.class.isAssignableFrom(attributeObj.getClass())) {
-				FloatAttributeField field = new FloatAttributeField(attribute, ((Double) attributeObj).floatValue());
+			} else if (Number.class.isAssignableFrom(attribute.type())) {
+				FloatAttributeField field = new FloatAttributeField(attribute.name(), ((Number) attributeObj).floatValue());
 				attributeFields.add(field);
 				contentPanel.add(field);
 			}
