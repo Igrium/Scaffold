@@ -1,5 +1,7 @@
 package org.metaversemedia.scaffold.level.entity;
 
+import java.util.List;
+
 import org.metaversemedia.scaffold.level.Level;
 
 /**
@@ -13,6 +15,16 @@ public class Rotatable extends Entity {
 		super(level, name);
 		attributes().put("rotX", 0.0f);
 		attributes().put("rotY", 0.0f);
+	}
+	
+	@Override
+	public List<AttributeDeclaration> getAttributeFields() {
+		List<AttributeDeclaration> attributeFields = super.getAttributeFields();
+		
+		attributeFields.add(new AttributeDeclaration("rotX", Float.class));
+		attributeFields.add(new AttributeDeclaration("rotY", Float.class));
+		
+		return attributeFields;
 	}
 	
 	/**

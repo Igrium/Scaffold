@@ -1,7 +1,10 @@
 package org.metaversemedia.scaffold.level.entity;
 
+import java.util.List;
+
 import org.json.JSONObject;
 import org.metaversemedia.scaffold.level.Level;
+import org.metaversemedia.scaffold.level.entity.Entity.AttributeDeclaration;
 import org.metaversemedia.scaffold.logic.Datapack;
 import org.metaversemedia.scaffold.math.Vector;
 
@@ -19,6 +22,17 @@ public class GameEntity extends Rotatable {
 		attributes().put("entityType", "minecraft:area_effect_cloud");
 		attributes().put("nbt", new CompoundMap());
 		attributes().put("spawnOnInit", true);
+	}
+	
+	@Override
+	public List<AttributeDeclaration> getAttributeFields() {
+		List<AttributeDeclaration> attributeFields = super.getAttributeFields();
+		
+		attributeFields.add(new AttributeDeclaration("entityType", String.class));
+		attributeFields.add(new AttributeDeclaration("nbt", CompoundMap.class));
+		attributeFields.add(new AttributeDeclaration("spawnOnInit", Boolean.class));
+		
+		return attributeFields;
 	}
 	
 	/**
@@ -68,6 +82,7 @@ public class GameEntity extends Rotatable {
 	public void onUnserialized(JSONObject object) {
 		super.onUnserialized(object);
 	}
+	
 	
 	@Override
 	public boolean compileLogic(Datapack datapack) {

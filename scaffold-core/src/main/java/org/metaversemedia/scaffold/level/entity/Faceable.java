@@ -1,5 +1,7 @@
 package org.metaversemedia.scaffold.level.entity;
 
+import java.util.List;
+
 import org.json.JSONObject;
 import org.metaversemedia.scaffold.level.Level;
 /**
@@ -37,6 +39,13 @@ public class Faceable extends Entity {
 			setAttribute("direction", Direction.NORTH); // North is default
 		}
 		
+	}
+	
+	@Override
+	public List<AttributeDeclaration> getAttributeFields() {
+		List<AttributeDeclaration> attributeFields = super.getAttributeFields();
+		attributeFields.add(new AttributeDeclaration("Direction", Direction.class));
+		return attributeFields;
 	}
 	
 }

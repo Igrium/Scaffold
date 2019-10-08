@@ -3,8 +3,10 @@ package org.metaversemedia.scaffold.level.entity;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.List;
 
 import org.metaversemedia.scaffold.level.Level;
+import org.metaversemedia.scaffold.level.entity.Entity.AttributeDeclaration;
 import org.metaversemedia.scaffold.nbt.schematic.Structure;
 
 /**
@@ -13,6 +15,13 @@ import org.metaversemedia.scaffold.nbt.schematic.Structure;
  */
 public class StructureEntity extends BlockCollectionEntity {
 	
+	public class StructureFile extends FileAttribute {
+		@Override
+		public String getFileType() {
+			return "nbt";
+		}
+	}
+	
 	// Keep track of the old file path in case we need to check against it once it's been updated
 	private String oldFile;
 
@@ -20,6 +29,15 @@ public class StructureEntity extends BlockCollectionEntity {
 		super(level, name);
 		// Reference to schematic file to use
 		attributes().put("file", "");
+	}
+	
+	@Override
+	public List<AttributeDeclaration> getAttributeFields() {
+		List<AttributeDeclaration> attributeFields = super.getAttributeFields();
+		
+		attributeFields.add(new AttributeDeclaration("file", StructureFile.class));
+		
+		return attributeFields;
 	}
 
 	@Override

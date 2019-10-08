@@ -1,7 +1,9 @@
 package org.metaversemedia.scaffold.level.entity;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -17,6 +19,37 @@ import org.metaversemedia.scaffold.math.Vector;
  *
  */
 public class Entity {
+	
+	/**
+	 * Used to declare attribute types by name.
+	 */
+	public class AttributeDeclaration {
+		private String name;
+		private Class<? extends Object> type;
+		
+		public AttributeDeclaration(String name, Class<? extends Object> type) {
+			this.name = name;
+			this.type = type;
+		}
+		
+		public String name() {
+			return name;
+		}
+		public Class<? extends Object> type() {
+			return type;
+		}
+	}
+	
+	/**
+	 * Special case used to declare file paths as attributes.
+	 * Editor side only. Represented in entity as String.
+	 */
+	public class FileAttribute {
+		public String getFileType() {
+			return "";
+		}
+	}
+	
 	/* Position of the entity in world space */
 	private Vector position;
 	
@@ -69,6 +102,14 @@ public class Entity {
 	 */
 	public String getRenderModel() {
 		return null;
+	}
+	
+	/**
+	 * Get a list of all the attribute fields.
+	 * @return Attribute Fields.
+	 */
+	public List<AttributeDeclaration> getAttributeFields() {
+		return new ArrayList<AttributeDeclaration>();
 	}
 	
 	/**
