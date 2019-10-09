@@ -11,13 +11,14 @@ public class NBTTest {
 
 	@Test
 	public void test() {
-		System.out.println("test");
-		CompoundMap testMap = new CompoundMap();
-		testMap.put(new StringTag("TestTag","test"));
-		testMap.put(new FloatTag("FloatTag",5.0f));
+//		System.out.println("test");
+//		CompoundMap testMap = new CompoundMap();
+//		testMap.put(new StringTag("TestTag","test"));
+//		testMap.put(new FloatTag("FloatTag",5.0f));
+//		
+//		System.out.println(NBTUtils.nbtToString(testMap));
 		
-		System.out.println(NBTUtils.nbtToString(testMap));
-		
+//		System.out.println(NBTUtils.doubleToString(3.0d));		
 		assert(true);
 	}
 
