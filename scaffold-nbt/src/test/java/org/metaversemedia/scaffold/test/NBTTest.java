@@ -17,8 +17,6 @@ public class NBTTest {
 //		testMap.put(new FloatTag("FloatTag",5.0f));
 //		
 //		System.out.println(NBTUtils.nbtToString(testMap));
-		
-//		System.out.println(NBTUtils.doubleToString(3.0d));		
 		assert(true);
 	}
 

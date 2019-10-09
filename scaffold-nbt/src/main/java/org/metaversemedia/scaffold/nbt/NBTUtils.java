@@ -1,6 +1,7 @@
 package org.metaversemedia.scaffold.nbt;
 
 import java.util.Iterator;
+import java.util.List;
 
 import com.flowpowered.nbt.ByteArrayTag;
 import com.flowpowered.nbt.CompoundMap;
@@ -8,6 +9,10 @@ import com.flowpowered.nbt.CompoundTag;
 import com.flowpowered.nbt.DoubleTag;
 import com.flowpowered.nbt.FloatTag;
 import com.flowpowered.nbt.IntTag;
+import com.flowpowered.nbt.ListTag;
+import com.flowpowered.nbt.LongTag;
+import com.flowpowered.nbt.ShortTag;
+import com.flowpowered.nbt.StringTag;
 import com.flowpowered.nbt.Tag;
 import com.flowpowered.nbt.TagType;
 
@@ -53,13 +58,24 @@ public class NBTUtils {
 			tagString = nbtToString(compoundTag.getValue());
 		} else if (tag.getType() == TagType.TAG_DOUBLE) {
 			DoubleTag doubleTag = (DoubleTag) tag;
-			tagString = doubleToString(3.0d);
+			tagString = doubleToString(doubleTag.getValue());
 		} else if (tag.getType() == TagType.TAG_FLOAT) {
 			FloatTag floatTag = (FloatTag) tag;
 			tagString = floatToString(floatTag.getValue());
 		} else if (tag.getType() == TagType.TAG_INT) {
 			IntTag intTag = (IntTag) tag;
 			tagString = intToString(intTag.getValue());
+		} else if (tag.getType() == TagType.TAG_LIST) {
+			ListTag<?> listTag = (ListTag<?>) tag;
+			tagString = listToString(listTag.getValue());
+		} else if (tag.getType() == TagType.TAG_LONG) {
+			LongTag longTag = (LongTag) tag;
+			tagString = longToString(longTag.getValue());
+		} else if (tag.getType() == TagType.TAG_SHORT) {
+			ShortTag shortTag = (ShortTag) tag;
+			tagString = shortToString(shortTag.getValue());
+		} else if (tag.getType() == TagType.TAG_STRING) {
+			StringTag stringTag = (StringTag) tag;
 		}
 		
 		return tagString;
@@ -79,5 +95,34 @@ public class NBTUtils {
 	
 	private static String intToString(Integer in) {
 		return in.toString();
+	}
+	
+	private static String listToString(List<? extends Tag<?>> in) {
+		String listString = "[";
+		Iterator<? extends Tag<?>> listIterator = in.iterator();
+		
+		// Add all elements of list
+		while (listIterator.hasNext()) {
+			Tag<?> tag = listIterator.next();
+			listString = listString+tagToString(tag);
+			if (listIterator.hasNext())  {
+				listString = listString+',';
+			}
+		}
+
+		listString = listString+']';
+		return listString;
+	}
+	
+	private static String longToString(Long in) {
+		return in.toString()+'l';
+	}
+	
+	private static String shortToString(Short in) {
+		return in.toString();
+	}
+	
+	private static String formatString(String in) {
+		return "\""+in+"\"";
 	}
 }
