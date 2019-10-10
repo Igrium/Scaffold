@@ -1,5 +1,7 @@
 package org.metaversemedia.scaffold.nbt;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -142,5 +144,141 @@ public class NBTStrings {
 		}
 		
 		return "\""+in+"\"";
+	}
+	
+	/**
+	 * Generate a compound map from a string.
+	 * @param inString String to generate from.
+	 * @return Generated CompoundMap.
+	 * @throws IOException If the string is formatted improperly.
+	 */
+	public static CompoundMap nbtFromString(String inString) throws IOException {
+		CompoundMap map = new CompoundMap();
+		
+		// Remove newlines and whitespace
+		inString = inString.trim();
+		inString = inString.replace("\n", "");
+		
+		// Check for brackets
+		if (!(inString.charAt(0) == '{' && inString.charAt(inString.length()) == '}')) {
+			throw new IOException("NBT String is missing brackets! ({})");
+		}
+		
+		// Remove brackets
+		inString = inString.substring(1,inString.length()-1);
+		
+		// Split string into tags
+		String[] stringTags = inString.split(",");
+		
+		for (String s : stringTags) {
+			map.put(parseTag(s));
+		}
+		
+		return map;
+	}
+	
+	
+	/**
+	 * Parse a string formatted tag back into a tag.
+	 * @param in String to parse.
+	 * @return Parsed tag.
+	 * @throws IOException If the string is formatted improperly.
+	 */
+	public static Tag<?> parseTag(String in) throws IOException {
+		// Split string into name and value
+		String name = null;
+		String value = null;
+		in = in.trim();
+		
+		int colonIndex = in.indexOf(':');
+		if (colonIndex == -1) {
+			name = "";
+			value = in;
+		} else {
+			name = in.substring(0,colonIndex);
+			value = in.substring(colonIndex+1);
+		}
+		
+		// Generate tag
+		Tag<?> tag = null;
+		
+		if (value.charAt(0) == '{') {
+			tag = new CompoundTag(name, nbtFromString(value));
+		} else if (isInteger(value)) {
+			tag = new IntTag(name, Integer.parseInt(value));
+		} else if (isNumber(value)) {
+			if (value.charAt(value.length()-1) == 'l') {
+				tag = new LongTag(name, Long.parseLong(value)); // Check for long
+			}
+			else if (value.charAt(value.length()-1) == 'f') { // Check for float
+				tag = new FloatTag(name, Float.parseFloat(value));
+			} else {
+				tag = new DoubleTag(name, Double.parseDouble(value));
+			}
+		} else if (value.charAt(0) == '[') {
+			tag = parseList(name, value);
+		} else if (value.charAt(0) == '"') {
+			tag = new StringTag(name, parseString(value));
+		} else {
+			throw new IOException("Unable to parse nbt string: "+in);
+		}
+		
+		return tag;
+	}
+	
+	private static ListTag<?> parseList(String name, String inString) throws IOException {
+		// Remove newlines and whitespace
+		inString = inString.trim();
+		inString = inString.replace("\n", "");
+		
+		// Check for brackets
+		if (!(inString.charAt(0) == '[' && inString.charAt(inString.length()) == ']')) {
+			throw new IOException("NBT List String is missing brackets! ([])");
+		}
+		
+		// Remove brackets
+		inString = inString.substring(1, inString.length() - 1);
+
+		// Split string into tags
+		String[] stringTags = inString.split(",");
+		
+		List<Tag> tags = new ArrayList<Tag>();
+		for (String s : stringTags) {
+			tags.add(parseTag(s));
+		}
+		
+		return new ListTag(name, Tag.class, tags);
+	}
+	
+	private static String parseString(String in) {
+		return in.substring(1,in.length()-1); // Remove quotes
+	}
+	
+	/**
+	 * Check if a string is parseable as an Integer.
+	 * @param in String to check.
+	 * @return Is parsable.
+	 */
+	private static boolean isInteger(String in) {
+		try {
+			Integer.parseInt(in);
+			return true;
+		} catch (NumberFormatException e) {
+			return false;
+		}
+	}
+	
+	/**
+	 * Check if a string is parseable as a number.
+	 * @param in String to check.
+	 * @return Is parsable.
+	 */
+	private static boolean isNumber(String in) {
+		try {
+			Double.parseDouble(in);
+			return true;
+		} catch (NumberFormatException e) {
+			return false;
+		}
 	}
 }

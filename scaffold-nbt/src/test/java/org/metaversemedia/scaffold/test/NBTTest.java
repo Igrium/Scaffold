@@ -1,5 +1,6 @@
 package org.metaversemedia.scaffold.test;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +31,18 @@ public class NBTTest {
 		
 		System.out.println(NBTStrings.tagToString(listTag));
 				
-		System.out.println(NBTStrings.nbtToString(testMap));
+		String nbtString = NBTStrings.nbtToString(testMap);
+		
+		System.out.println(nbtString);
+		
+		try {
+			System.out.println(NBTStrings.nbtFromString(nbtString));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		System.out.println(Short.parseShort("3s"));
 		assert(true);
 	}
 
