@@ -20,7 +20,7 @@ public class GameEntity extends Rotatable {
 	public GameEntity(Level level, String name) {
 		super(level, name);
 		attributes().put("entityType", "minecraft:area_effect_cloud");
-		attributes().put("nbt", new CompoundMap());
+		attributes().put("nbt", "");
 		attributes().put("spawnOnInit", true);
 	}
 	
@@ -29,7 +29,7 @@ public class GameEntity extends Rotatable {
 		List<AttributeDeclaration> attributeFields = super.getAttributeFields();
 		
 		attributeFields.add(new AttributeDeclaration("entityType", String.class));
-		attributeFields.add(new AttributeDeclaration("nbt", CompoundMap.class));
+		attributeFields.add(new AttributeDeclaration("nbt", String.class));
 		attributeFields.add(new AttributeDeclaration("spawnOnInit", Boolean.class));
 		
 		return attributeFields;
@@ -68,12 +68,20 @@ public class GameEntity extends Rotatable {
 	}
 	
 	/**
+	 * Get the nbt data of the entity in the format {data}.
+	 * @return Nbt data.
+	 */
+	public String getNBTString() {
+		return "{"+getAttribute("nbt")+"}";
+	}
+	
+	/**
 	 * Get the command used for spawning the entity
 	 * @return
 	 */
 	public String getSpawnCommand() {
 		Vector position = getPosition();
-		return "summon "+getEntityType()+" "+position.X()+" "+position.Y()+" "+position.Z();
+		return "summon "+getEntityType()+" "+position.X()+" "+position.Y()+" "+position.Z()+" "+getNBTString();
 		
 	}
 	
