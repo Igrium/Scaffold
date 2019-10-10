@@ -8,7 +8,7 @@ package org.metaversemedia.scaffold.nbt;
 public interface BlockCollection {
 	
 	/**
-	 * Get the name of the block at a particular location.
+	 * Get the the block at a particular location.
 	 * @param x X coordinate
 	 * @param y Y coordinate
 	 * @param z Z coordinate
