@@ -21,7 +21,7 @@ import com.flowpowered.nbt.TagType;
  * @author Sam54123
  *
  */
-public class NBTUtils {
+public class NBTStrings {
 	/**
 	 * Convert nbt to a string.
 	 * @param nbt NBT input.

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
-import org.metaversemedia.scaffold.nbt.NBTUtils;
+import org.metaversemedia.scaffold.nbt.NBTStrings;
 
 import com.flowpowered.nbt.CompoundMap;
 import com.flowpowered.nbt.FloatTag;
@@ -28,9 +28,9 @@ public class NBTTest {
 		ListTag<StringTag> listTag = new ListTag<StringTag>("testList", StringTag.class, list);
 		testMap.put(listTag);
 		
-		System.out.println(NBTUtils.tagToString(listTag));
+		System.out.println(NBTStrings.tagToString(listTag));
 				
-		System.out.println(NBTUtils.nbtToString(testMap));
+		System.out.println(NBTStrings.nbtToString(testMap));
 		assert(true);
 	}
 
