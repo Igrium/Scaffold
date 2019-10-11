@@ -1,6 +1,7 @@
 package org.metaversemedia.scaffold.level;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.metaversemedia.scaffold.math.Vector;
@@ -29,13 +30,24 @@ public class Chunk implements BlockCollection {
 	
 	public Chunk() {
 		blocks = new short[WIDTH][HEIGHT][LENGTH];
+		for (short[][] row : blocks) {
+			for (short[] column : row) {
+				Arrays.fill(column, (short) -1);
+			}
+		}
 	}
 	
 	@Override
 	public Block blockAt(int x, int y, int z) {
 		try {
-			return palette.get(blocks[x][y][z]);
-		} catch (ArrayIndexOutOfBoundsException e) {
+			short paletteIndex = blocks[x][y][z];
+			if (paletteIndex == -1) {
+				return null;
+			} else {
+				return palette.get(paletteIndex);
+			}
+			
+		} catch (IndexOutOfBoundsException e) {
 			System.out.println("Block "+x+" "+y+" "+z+" is out of range!");
 			return null;
 		}
