@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.metaversemedia.scaffold.nbt.Block;
 import org.metaversemedia.scaffold.nbt.BlockCollection;
+import org.metaversemedia.scaffold.nbt.SizedBlockCollection;
 
 /**
  * Represents all the blocks in a world.
@@ -64,7 +65,6 @@ public class BlockWorld implements BlockCollection {
 		if (chunks.containsKey(chunkKey)) {
 			chunk = chunks.get(chunkKey);
 		} else {
-			System.out.println("No chunk!");
 			return null;
 		}
 		
@@ -96,6 +96,47 @@ public class BlockWorld implements BlockCollection {
 		}
 
 		chunk.setBlock(x % Chunk.WIDTH, y, z % Chunk.LENGTH, block);
+	}
+	
+	/**
+	 * Place a block collection in the world.
+	 * Collection origin is the most negitive (coordinate wize) corner.
+	 * @param collection Collection to place.
+	 * @param x X position.
+	 * @param y Y position.
+	 * @param z Z position.
+	 * @param override Should override existing blocks?
+	 */
+	public void addBlockCollection(SizedBlockCollection collection, int x, int y, int z, boolean override) {
+		for (int Y = 0; Y < collection.getWidth(); Y++) {
+			for (int Z = 0; Z < collection.getLength(); Z++) {
+				for (int X = 0; X < collection.getHeight(); X++) {
+					int globalX = x + X;
+					int globalY = y + Y;
+					int globalZ = z + Z;
+					
+					Block oldBlock = blockAt(globalX, globalY, globalZ); // For if override is disabled.
+					Block newBlock = collection.blockAt(X, Y, Z);
+					
+					if (newBlock != null &&
+							(override || oldBlock == null || oldBlock.getName().matches("minecraft:air"))) {
+						setBlock(globalX, globalY, globalZ, newBlock);
+					}
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Place a block collection in the world.
+	 * Collection origin is the most negitive (coordinate wize) corner.
+	 * @param collection Collection to place.
+	 * @param x X position.
+	 * @param y Y position.
+	 * @param z Z position.
+	 */
+	public void addBlockCollection(SizedBlockCollection collection, int x, int y, int z) {
+		addBlockCollection(collection, x, y, z, false);
 	}
 		
 	

@@ -13,7 +13,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 
 import org.metaversemedia.scaffold.nbt.Block;
-import org.metaversemedia.scaffold.nbt.BlockCollection;
+import org.metaversemedia.scaffold.nbt.SizedBlockCollection;
 
 import com.flowpowered.nbt.CompoundMap;
 import com.flowpowered.nbt.CompoundTag;
@@ -26,7 +26,7 @@ import com.flowpowered.nbt.stream.NBTInputStream;
  * Represents a Minecraft structure schematic (.nbt)
  * @author Sam54123
  */
-public class Structure implements BlockCollection {
+public class Structure implements SizedBlockCollection {
 	
 	private CompoundMap[] palette;
 	private List<CompoundMap> blocks;
@@ -260,16 +260,18 @@ public class Structure implements BlockCollection {
 		}
 	}
 	
-
-	public int sizeX() {
+	@Override
+	public int getWidth() {
 		return sizeX;
 	}
 
-	public int sizeY() {
+	@Override
+	public int getHeight() {
 		return sizeY;
 	}
 
-	public int sizeZ() {
+	@Override
+	public int getLength() {
 		return sizeZ;
 	}
 	
