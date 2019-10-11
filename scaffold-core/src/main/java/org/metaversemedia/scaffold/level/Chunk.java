@@ -1,5 +1,6 @@
 package org.metaversemedia.scaffold.level;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.metaversemedia.scaffold.math.Vector;
@@ -19,7 +20,7 @@ public class Chunk implements BlockCollection {
 	/**
 	 * A list of all the block types that are in the chunk.
 	 */
-	private List<Block> palette;
+	private List<Block> palette = new ArrayList<Block>();
 	
 	/**
 	 * All blocks in the chunk, listed by their palette index.
@@ -64,6 +65,28 @@ public class Chunk implements BlockCollection {
 		}
 		
 		blocks[x][y][z] = paletteIndex;
+	}
+	
+	/**
+	 * Get a list of all the blocks the chunk has.
+	 * @return Palette.
+	 */
+	public List<Block> palette() {
+		return palette;
+	}
+	
+	public Block[][][] getBlocks() {
+		Block[][][] blockArray = new Block[WIDTH][HEIGHT][LENGTH];
+		
+		for (int x = 0; x < WIDTH; x++) {
+			for (int y = 0; y < HEIGHT; y++) {
+				for (int z = 0; z < LENGTH; z++) {
+					blockArray[x][y][z] = palette.get(blocks[x][y][z]);
+				}
+			}
+		}
+		
+		return blockArray;
 	}
 
 }

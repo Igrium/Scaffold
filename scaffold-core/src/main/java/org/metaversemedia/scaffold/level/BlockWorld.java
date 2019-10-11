@@ -1,7 +1,10 @@
 package org.metaversemedia.scaffold.level;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.metaversemedia.scaffold.nbt.Block;
 import org.metaversemedia.scaffold.nbt.BlockCollection;
@@ -25,12 +28,11 @@ public class BlockWorld implements BlockCollection {
 		if (y < 0 || y > Chunk.HEIGHT) {
 			throw new IllegalArgumentException("Block Y value must be between 0 and "+Chunk.HEIGHT);
 		}
-		
 		// Get chunk to place in
 		int[] chunkKey = new int[] {
 				(int) Math.floor(x/Chunk.WIDTH),
 				(int) Math.floor(z/Chunk.WIDTH)};
-		
+
 		Chunk chunk = null;
 		if (chunks.containsKey(chunkKey)) {
 			chunk = chunks.get(chunkKey);
@@ -38,7 +40,7 @@ public class BlockWorld implements BlockCollection {
 			chunk = new Chunk();
 			chunks.put(chunkKey, chunk);
 		}
-		
+
 		chunk.setBlock(x % Chunk.WIDTH, y, z % Chunk.LENGTH, block);
 	}
 		
@@ -53,5 +55,12 @@ public class BlockWorld implements BlockCollection {
 	public Chunk chunkAt(int x, int z) {
 		return chunks.get(new int[] {x,z});
 	}
-
+	
+	/**
+	 * Get a collection of all this world's chunks.
+	 * @return Chunks.
+	 */
+	public Collection<Chunk> chunks() {
+		return chunks.values();
+	}
 }
