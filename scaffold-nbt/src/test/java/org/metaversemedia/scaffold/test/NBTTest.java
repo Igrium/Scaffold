@@ -42,7 +42,7 @@ public class NBTTest {
 			e.printStackTrace();
 		}
 		
-		System.out.println(Short.parseShort("3s"));
+//		System.out.println(Short.parseShort("3s"));
 		assert(true);
 	}
 

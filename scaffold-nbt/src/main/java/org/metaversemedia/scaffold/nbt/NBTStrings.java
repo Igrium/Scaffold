@@ -155,25 +155,28 @@ public class NBTStrings {
 	public static CompoundMap nbtFromString(String inString) throws IOException {
 		CompoundMap map = new CompoundMap();
 		
+		if (inString.length() < 2) {
+			return null;
+		}
+		
 		// Remove newlines and whitespace
 		inString = inString.trim();
 		inString = inString.replace("\n", "");
-		
-		// Check for brackets
-		if (!(inString.charAt(0) == '{' && inString.charAt(inString.length()) == '}')) {
+		if (!(inString.charAt(0) == '{' && inString.charAt(inString.length()-1) == '}')) {
 			throw new IOException("NBT String is missing brackets! ({})");
 		}
-		
 		// Remove brackets
 		inString = inString.substring(1,inString.length()-1);
-		
+		System.out.println(inString);
+
 		// Split string into tags
 		String[] stringTags = inString.split(",");
-		
+		System.out.println(stringTags);
 		for (String s : stringTags) {
+			System.out.println(s);
 			map.put(parseTag(s));
 		}
-		
+
 		return map;
 	}
 	
@@ -189,7 +192,7 @@ public class NBTStrings {
 		String name = null;
 		String value = null;
 		in = in.trim();
-		
+
 		int colonIndex = in.indexOf(':');
 		if (colonIndex == -1) {
 			name = "";
@@ -198,7 +201,6 @@ public class NBTStrings {
 			name = in.substring(0,colonIndex);
 			value = in.substring(colonIndex+1);
 		}
-		
 		// Generate tag
 		Tag<?> tag = null;
 		
@@ -232,7 +234,7 @@ public class NBTStrings {
 		inString = inString.replace("\n", "");
 		
 		// Check for brackets
-		if (!(inString.charAt(0) == '[' && inString.charAt(inString.length()) == ']')) {
+		if (!(inString.charAt(0) == '[' && inString.charAt(inString.length()-1) == ']')) {
 			throw new IOException("NBT List String is missing brackets! ([])");
 		}
 		
@@ -242,7 +244,7 @@ public class NBTStrings {
 		// Split string into tags
 		String[] stringTags = inString.split(",");
 		
-		List<Tag> tags = new ArrayList<Tag>();
+		List<Tag<?>> tags = new ArrayList<Tag<?>>();
 		for (String s : stringTags) {
 			tags.add(parseTag(s));
 		}
