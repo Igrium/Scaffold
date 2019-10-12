@@ -167,13 +167,10 @@ public class NBTStrings {
 		}
 		// Remove brackets
 		inString = inString.substring(1,inString.length()-1);
-		System.out.println(inString);
 
 		// Split string into tags
 		String[] stringTags = splitString(inString);
-		System.out.println(stringTags);
 		for (String s : stringTags) {
-			System.out.println(s);
 			map.put(parseTag(s));
 		}
 
@@ -243,6 +240,8 @@ public class NBTStrings {
 
 		// Split string into tags
 		String[] stringTags = splitString(inString);
+		for (String s : stringTags) {
+		}
 		
 		List<Tag<?>> tags = new ArrayList<Tag<?>>();
 		for (String s : stringTags) {
@@ -253,6 +252,7 @@ public class NBTStrings {
 	}
 	
 	private static String parseString(String in) {
+		in = in.replace("\\\"", "\""); // Replace '\"' with '"'
 		return in.substring(1,in.length()-1); // Remove quotes
 	}
 	
@@ -320,16 +320,15 @@ public class NBTStrings {
 		}
 		
 		List<String> finalStrings = new ArrayList<String>();
-		
 		for (int i = 0; i < commas.size(); i++) {
 			if (i == 0) {
 				finalStrings.add(in.substring(0,commas.get(i)));
 			} else {
-				finalStrings.add(in.substring(commas.get(i-1)+1, commas.get(i)));
-				
-				if (i == commas.size()-1) { // Make sure to add last string.
-					finalStrings.add(in.substring(commas.get(i)+1));
-				}
+				finalStrings.add(in.substring(commas.get(i-1)+1, commas.get(i)));	
+			}
+			
+			if (i == commas.size()-1) { // Make sure to add last string.
+				finalStrings.add(in.substring(commas.get(i)+1));
 			}
 		}
 		

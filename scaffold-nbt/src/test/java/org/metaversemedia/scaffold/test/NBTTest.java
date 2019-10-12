@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.metaversemedia.scaffold.nbt.NBTStrings;
 
 import com.flowpowered.nbt.CompoundMap;
+import com.flowpowered.nbt.CompoundTag;
 import com.flowpowered.nbt.FloatTag;
 import com.flowpowered.nbt.ListTag;
 import com.flowpowered.nbt.StringTag;
@@ -36,8 +37,10 @@ public class NBTTest {
 		System.out.println(nbtString);
 		
 		try {
-			System.out.println(NBTStrings.nbtFromString(nbtString));
-		} catch (IOException | ClassCastException e) {
+			CompoundMap map = NBTStrings.nbtFromString(nbtString);
+			CompoundTag tag =  new CompoundTag("test", map);
+			System.out.println(NBTStrings.tagToString(tag));
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
