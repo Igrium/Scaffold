@@ -33,7 +33,7 @@ public class NBTTest {
 		System.out.println(NBTStrings.tagToString(listTag));
 				
 		String nbtString =
-				"{Attributes:[{Name:\"generic.followRange\",Base:22}],ExplosionRadius:4,HandDropChances:[2F,2F],HandItems:[{id:\"minecraft:grass_block\",Count:1},{}],Tags:[\"test creeper\"]}";
+				"{CustomName:\"\\\"Test\\\"\",CustomNameVisible:1,NoAI:1b,ExplosionRadius:4,HandDropChances:[2F,2F],HandItems:[{},{id:\"minecraft:stone\",Count:1}],Tags:[\"test\"]}";
 		
 		System.out.println(nbtString);;
 		
@@ -41,11 +41,11 @@ public class NBTTest {
 			CompoundMap map = NBTStrings.nbtFromString(nbtString);
 			CompoundTag tag =  new CompoundTag("test", map);
 			System.out.println(NBTStrings.tagToString(tag));
-		} catch (IOException | IndexOutOfBoundsException e) {
+		} catch (IOException | NullPointerException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+	
 //		System.out.println(Short.parseShort("3s"));
 		assert(true);
 	}

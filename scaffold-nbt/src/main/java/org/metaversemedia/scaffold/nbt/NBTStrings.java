@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.flowpowered.nbt.ByteArrayTag;
+import com.flowpowered.nbt.ByteTag;
 import com.flowpowered.nbt.CompoundMap;
 import com.flowpowered.nbt.CompoundTag;
 import com.flowpowered.nbt.DoubleTag;
@@ -197,6 +198,7 @@ public class NBTStrings {
 		String[] keyValuePair = splitString(in, ':');
 		
 		for (String s : keyValuePair) {
+			System.out.println(s);
 		}
 		
 		if (keyValuePair.length == 2) {
@@ -229,6 +231,8 @@ public class NBTStrings {
 			tag = parseList(name, value);
 		} else if (value.charAt(0) == '"') {
 			tag = new StringTag(name, parseString(value));
+		} else if (value.charAt(value.length()-1) == 'b') {
+			tag = new ByteTag(name, parseByte(value));
 		} else {
 			throw new IOException("Unable to parse nbt string: "+in);
 		}
@@ -263,6 +267,17 @@ public class NBTStrings {
 	private static String parseString(String in) {
 		in = in.replace("\\\"", "\""); // Replace '\"' with '"'
 		return in.substring(1,in.length()-1); // Remove quotes
+	}
+	
+	public static byte parseByte(String in) throws IOException {
+		if (in.charAt(in.length()-1) != 'b') {
+			throw new IOException("Unable to parse byte: "+in);
+		}
+		
+		in = in.substring(0, in.length()-1); // remove b at the end
+		int i2 = Integer.parseInt(in) & 0xFF;
+		
+		return (byte) i2;
 	}
 	
 	/**
