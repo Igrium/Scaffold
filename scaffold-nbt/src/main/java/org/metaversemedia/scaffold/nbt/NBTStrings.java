@@ -173,7 +173,7 @@ public class NBTStrings {
 		}
 		
 		// Split string into tags
-		String[] stringTags = splitString(inString);
+		String[] stringTags = splitString(inString, ',');
 		for (String s : stringTags) {
 			map.put(parseTag(s));
 		}
@@ -193,15 +193,22 @@ public class NBTStrings {
 		String name = null;
 		String value = null;
 		in = in.trim();
-
-		int colonIndex = in.indexOf(':');
-		if (colonIndex == -1) {
+		
+		String[] keyValuePair = splitString(in, ':');
+		
+		for (String s : keyValuePair) {
+		}
+		
+		if (keyValuePair.length == 2) {
+			name = keyValuePair[0];
+			value = keyValuePair[1];
+		} else {
 			name = "";
 			value = in;
-		} else {
-			name = in.substring(0,colonIndex);
-			value = in.substring(colonIndex+1);
 		}
+		
+		
+
 		// Generate tag
 		Tag<?> tag = null;
 		if (value.charAt(0) == '{') {
@@ -212,7 +219,8 @@ public class NBTStrings {
 			if (value.charAt(value.length()-1) == 'l') {
 				tag = new LongTag(name, Long.parseLong(value)); // Check for long
 			}
-			else if (value.charAt(value.length()-1) == 'f') { // Check for float
+			else if (value.charAt(value.length()-1) == 'f' ||
+					value.charAt(value.length()-1) == 'F') { // Check for float
 				tag = new FloatTag(name, Float.parseFloat(value));
 			} else {
 				tag = new DoubleTag(name, Double.parseDouble(value));
@@ -242,9 +250,7 @@ public class NBTStrings {
 		inString = inString.substring(1, inString.length() - 1);
 
 		// Split string into tags
-		String[] stringTags = splitString(inString);
-		for (String s : stringTags) {
-		}
+		String[] stringTags = splitString(inString, ',');
 		
 		List<Tag<?>> tags = new ArrayList<Tag<?>>();
 		for (String s : stringTags) {
@@ -289,11 +295,12 @@ public class NBTStrings {
 	
 	/**
 	 * Split a string into multiple strings.
-	 * Breaks around comma unless surrounded by [], {}, or "".
+	 * Breaks around seperator unless surrounded by [], {}, or "".
 	 * @param in String to split.
+	 * @parap seperator Character to use as seperator.
 	 * @return Array of substrings.
 	 */
-	private static String[] splitString(String in) {
+	private static String[] splitString(String in, char seperator) {
 		char[] charList = in.toCharArray();
 		List<Integer> commas = new ArrayList<Integer>(); // Indexes to split string on
 		
@@ -313,7 +320,7 @@ public class NBTStrings {
 					i++; // Skip through entire array.
 				}
 			}
-			if (charList[i] == ',') {
+			if (charList[i] == seperator) {
 				commas.add(i);
 			}
 		}
