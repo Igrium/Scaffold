@@ -168,6 +168,10 @@ public class NBTStrings {
 		// Remove brackets
 		inString = inString.substring(1,inString.length()-1);
 
+		if (inString.length() < 1) {
+			return map;
+		}
+		
 		// Split string into tags
 		String[] stringTags = splitString(inString);
 		for (String s : stringTags) {
@@ -200,7 +204,6 @@ public class NBTStrings {
 		}
 		// Generate tag
 		Tag<?> tag = null;
-		
 		if (value.charAt(0) == '{') {
 			tag = new CompoundTag(name, nbtFromString(value));
 		} else if (isInteger(value)) {

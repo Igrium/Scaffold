@@ -32,15 +32,16 @@ public class NBTTest {
 		
 		System.out.println(NBTStrings.tagToString(listTag));
 				
-		String nbtString = NBTStrings.nbtToString(testMap);
+		String nbtString =
+				"{Attributes:[{Name:\"generic.followRange\",Base:22}],ExplosionRadius:4,HandDropChances:[2F,2F],HandItems:[{id:\"minecraft:grass_block\",Count:1},{}],Tags:[\"test creeper\"]}";
 		
-		System.out.println(nbtString);
+		System.out.println(nbtString);;
 		
 		try {
 			CompoundMap map = NBTStrings.nbtFromString(nbtString);
 			CompoundTag tag =  new CompoundTag("test", map);
 			System.out.println(NBTStrings.tagToString(tag));
-		} catch (IOException e) {
+		} catch (IOException | IndexOutOfBoundsException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
