@@ -56,7 +56,10 @@ public class NBTStrings {
 	public static String tagToString(Tag<?> tag) {
 		String tagString = null;
 		
-		if (tag.getType() == TagType.TAG_BYTE_ARRAY) {
+		if (tag.getType() == TagType.TAG_BYTE) {
+			ByteTag byteTag = (ByteTag) tag;
+			tagString = byteToString(byteTag.getValue());
+		} else if (tag.getType() == TagType.TAG_BYTE_ARRAY) {
 			ByteArrayTag byteArray = (ByteArrayTag) tag;
 			tagString = byteArrayToString(byteArray.getValue());
 		} else if (tag.getType() == TagType.TAG_COMPOUND) {
@@ -86,6 +89,10 @@ public class NBTStrings {
 		}
 		
 		return tagString;
+	}
+	
+	private static String byteToString(byte inByte) {
+		return Byte.toUnsignedInt(inByte)+"b";
 	}
 	
 	private static String byteArrayToString(byte[] byteArray) {
