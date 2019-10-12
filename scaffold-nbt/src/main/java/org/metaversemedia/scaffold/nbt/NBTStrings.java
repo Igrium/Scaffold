@@ -132,18 +132,7 @@ public class NBTStrings {
 	
 	private static String formatString(String in) {
 		// Escape quotes
-		for (int i = 1; i < in.length(); i++) {
-			if (in.charAt(i) == '"') {
-				in = in.substring(0,i)+'\\'+in.substring(i); // insert \
-				
-				/* String is now a character longer,
-				 * so we need to skip a character,
-				 * which will be equal to the current char at i.
-				 */
-				i++; 
-			}
-		}
-		
+		in = in.replace("\"", "\\\"");
 		return "\""+in+"\"";
 	}
 	
