@@ -196,10 +196,7 @@ public class NBTStrings {
 		in = in.trim();
 		
 		String[] keyValuePair = splitString(in, ':');
-		
-		for (String s : keyValuePair) {
-			System.out.println(s);
-		}
+
 		
 		if (keyValuePair.length == 2) {
 			name = keyValuePair[0];
@@ -321,6 +318,7 @@ public class NBTStrings {
 		
 		for (int i = 0; i < charList.length; i++) { // Find commas in string
 			if (charList[i] == '"') {
+				i++;
 				while (!(charList[i] == '"' && (i == 0 || charList[i-1] != '\\'))) {
 					i++; // Skip through entire substring.
 				}
