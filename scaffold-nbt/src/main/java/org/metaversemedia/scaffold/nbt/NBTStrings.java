@@ -170,7 +170,7 @@ public class NBTStrings {
 		System.out.println(inString);
 
 		// Split string into tags
-		String[] stringTags = inString.split(",");
+		String[] stringTags = splitString(inString);
 		System.out.println(stringTags);
 		for (String s : stringTags) {
 			System.out.println(s);
@@ -242,7 +242,7 @@ public class NBTStrings {
 		inString = inString.substring(1, inString.length() - 1);
 
 		// Split string into tags
-		String[] stringTags = inString.split(",");
+		String[] stringTags = splitString(inString);
 		
 		List<Tag<?>> tags = new ArrayList<Tag<?>>();
 		for (String s : stringTags) {
@@ -282,5 +282,57 @@ public class NBTStrings {
 		} catch (NumberFormatException e) {
 			return false;
 		}
+	}
+	
+	/**
+	 * Split a string into multiple strings.
+	 * Breaks around comma unless surrounded by [], {}, or "".
+	 * @param in String to split.
+	 * @return Array of substrings.
+	 */
+	private static String[] splitString(String in) {
+		char[] charList = in.toCharArray();
+		List<Integer> commas = new ArrayList<Integer>(); // Indexes to split string on
+		
+		for (int i = 0; i < charList.length; i++) { // Find commas in string
+			if (charList[i] == '"') {
+				while (!(charList[i] == '"' && (i == 0 || charList[i-1] != '\\'))) {
+					i++; // Skip through entire substring.
+				}
+				
+			} else if (charList[i] == '{') {
+				while (charList[i] != '}') {
+					i++; // Skip through entire compound map.
+				}
+				
+			} else if (charList[i] == '[') {
+				while (charList[i] != ']') {
+					i++; // Skip through entire array.
+				}
+			}
+			if (charList[i] == ',') {
+				commas.add(i);
+			}
+		}
+		
+		if (commas.size() == 0) {
+			return new String[] {in};
+		}
+		
+		List<String> finalStrings = new ArrayList<String>();
+		
+		for (int i = 0; i < commas.size(); i++) {
+			if (i == 0) {
+				finalStrings.add(in.substring(0,commas.get(i)));
+			} else {
+				finalStrings.add(in.substring(commas.get(i-1)+1, commas.get(i)));
+				
+				if (i == commas.size()-1) { // Make sure to add last string.
+					finalStrings.add(in.substring(commas.get(i)+1));
+				}
+			}
+		}
+		
+		return finalStrings.toArray(new String[0]);
 	}
 }

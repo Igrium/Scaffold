@@ -37,7 +37,7 @@ public class NBTTest {
 		
 		try {
 			System.out.println(NBTStrings.nbtFromString(nbtString));
-		} catch (IOException e) {
+		} catch (IOException | ClassCastException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
