@@ -233,6 +233,7 @@ public class NBTStrings {
 		return tag;
 	}
 	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private static ListTag<?> parseList(String name, String inString) throws IOException {
 		// Remove newlines and whitespace
 		inString = inString.trim();
