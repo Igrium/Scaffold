@@ -1,35 +1,50 @@
 package org.metaversemedia.scaffold.editor.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-import javax.swing.text.NumberFormatter;
-
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import org.metaversemedia.scaffold.level.entity.Entity;
 import org.metaversemedia.scaffold.level.entity.Entity.AttributeDeclaration;
 import org.metaversemedia.scaffold.math.Vector;
+import org.metaversemedia.scaffold.nbt.NBTStrings;
 
+import com.flowpowered.nbt.CompoundMap;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import java.awt.event.ActionListener;
-import java.text.NumberFormat;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.awt.event.ActionEvent;
-import javax.swing.JFormattedTextField;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 /**
  * Editor window to edit an entity.
  * @author Sam54123
  */
+@SuppressWarnings("serial")
 public class EntityEditor extends JDialog {
+	/**
+	 * The color the editor uses when entries are valid.
+	 */
+	public static final Color VALID_COLOR = Color.WHITE;
+	
+	/**
+	 * The color the editor uses when entries are invalid.
+	 */
+	public static final Color INVALID_COLOR = Color.RED;
 	
 	public abstract class AttributeField extends JPanel {
 		public abstract String getAttributeName();
@@ -139,7 +154,108 @@ public class EntityEditor extends JDialog {
 			}
 			
 		}
-	}	
+	}
+	
+	protected class NBTAttributeField extends AttributeField {
+		private String attributeName;
+		private CompoundMap value;
+		
+		private JTextField textField;
+		private JButton browseButton;
+		
+		// Is the NBT in the text field valid?
+		private boolean nbtValid = true;
+		
+		public NBTAttributeField(String name, CompoundMap defaultValue) {
+			attributeName = name;
+			value = defaultValue;
+			
+			this.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
+			JLabel label = new JLabel(attributeName+": ");
+			this.add(label);
+			
+			textField = new JTextField(NBTStrings.nbtToString(defaultValue));
+			textField.addKeyListener(new KeyAdapter() {
+				@Override
+				public void keyTyped(KeyEvent arg0) {
+					updateNBT();
+				}
+			});
+			textField.addMouseListener(new MouseListener() {
+				
+				@Override
+				public void mouseReleased(MouseEvent e) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+				@Override
+				public void mousePressed(MouseEvent e) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+				@Override
+				public void mouseExited(MouseEvent e) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+				@Override
+				public void mouseEntered(MouseEvent e) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					updateNBT();
+				}
+			});
+			
+			this.add(textField);
+			
+			browseButton = new JButton("Browse NBT");
+			browseButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					showBrowser();
+				}
+			});
+			this.add(browseButton);
+		}
+
+		@Override
+		public String getAttributeName() {
+			return attributeName;
+		}
+
+		@Override
+		public CompoundMap getAttributeValue() {
+			updateNBT();
+			return value;
+		}
+		
+		
+		// Update the nbt object with typed nbt.
+		private void updateNBT() {
+			System.out.println(textField.getText());
+			String nbtString = textField.getText();
+			try {
+				value = NBTStrings.nbtFromString(nbtString);
+				nbtValid = true;
+				textField.setBackground(VALID_COLOR);
+			} catch (IOException | IndexOutOfBoundsException | NumberFormatException e) {
+				nbtValid = false;
+				textField.setBackground(INVALID_COLOR);
+			}
+		}
+		
+		// Show the NBT browser.
+		private void showBrowser() {
+			
+		}
+		
+	}
 	
 	private EditorWindow parent;
 	private Entity entity;
@@ -178,7 +294,7 @@ public class EntityEditor extends JDialog {
 		setTitle("Entity Properties");
 		this.parent = parent;
 		
-		setBounds(100, 100, 450, 300);
+		setBounds(100, 100, 640, 480);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
@@ -296,6 +412,10 @@ public class EntityEditor extends JDialog {
 				contentPanel.add(field);
 			} else if (Number.class.isAssignableFrom(attribute.type())) {
 				FloatAttributeField field = new FloatAttributeField(attribute.name(), ((Number) attributeObj).floatValue());
+				attributeFields.add(field);
+				contentPanel.add(field);
+			} else if (CompoundMap.class.isAssignableFrom(attribute.type())) {
+				NBTAttributeField field = new NBTAttributeField(attribute.name(), (CompoundMap) attributeObj);
 				attributeFields.add(field);
 				contentPanel.add(field);
 			}
