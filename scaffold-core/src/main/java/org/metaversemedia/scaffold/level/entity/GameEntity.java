@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.json.JSONObject;
 import org.metaversemedia.scaffold.level.Level;
-import org.metaversemedia.scaffold.level.entity.Entity.AttributeDeclaration;
 import org.metaversemedia.scaffold.logic.Datapack;
 import org.metaversemedia.scaffold.math.Vector;
 import org.metaversemedia.scaffold.nbt.NBTStrings;
@@ -25,7 +24,7 @@ public class GameEntity extends Rotatable {
 	public GameEntity(Level level, String name) {
 		super(level, name);
 		attributes().put("entityType", "minecraft:area_effect_cloud");
-		attributes().put("nbt", "");
+		attributes().put("nbt", new CompoundMap());
 		attributes().put("spawnOnInit", true);
 	}
 	
@@ -34,7 +33,7 @@ public class GameEntity extends Rotatable {
 		List<AttributeDeclaration> attributeFields = super.getAttributeFields();
 		
 		attributeFields.add(new AttributeDeclaration("entityType", String.class));
-		attributeFields.add(new AttributeDeclaration("nbt", String.class));
+		attributeFields.add(new AttributeDeclaration("nbt", CompoundMap.class));
 		attributeFields.add(new AttributeDeclaration("spawnOnInit", Boolean.class));
 		
 		return attributeFields;
@@ -61,13 +60,7 @@ public class GameEntity extends Rotatable {
 	 * @return NBT.
 	 */
 	public CompoundMap nbt() {
-		System.out.println(getAttribute("nbt").getClass());
-		try {
-			return NBTStrings.nbtFromString((String) getAttribute("nbt"));
-		} catch (IOException e) {
-			System.out.println("Unable to compile entity nbt: " + getAttribute("nbt"));
-			return new CompoundMap();
-		}
+		return (CompoundMap) getAttribute("nbt");
 	}
 	
 	/**
@@ -113,10 +106,28 @@ public class GameEntity extends Rotatable {
 		
 	}
 	
+	@Override
+	public JSONObject serialize() {
+		JSONObject serialized = super.serialize();
+		
+		// Serialize nbt into string.
+		serialized.getJSONObject("attributes").put("nbt", NBTStrings.nbtToString(nbt()));
+		
+		return serialized;
+	}
 	
 	@Override
 	public void onUnserialized(JSONObject object) {
 		super.onUnserialized(object);
+		
+		// Parse NBT data.
+		String nbt = (String) getAttribute("nbt");
+		try {
+			setAttribute("nbt", NBTStrings.nbtFromString(nbt));
+		} catch (IOException e) {
+			System.out.println("Unable to parse NBT: "+nbt);
+			setAttribute("nbt", new CompoundMap());
+		}
 	}
 	
 	

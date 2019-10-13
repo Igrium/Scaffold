@@ -19,9 +19,9 @@ dependencies {
     compile group: 'commons-io', name: 'commons-io', version: '2.6'
 
     implementation 'org.json:json:20190722'
-    implementation 'com.flowpowered:flow-nbt:1.0.0'
     implementation 'org.python:jython:2.7.1b3'
     
+    compile 'com.flowpowered:flow-nbt:1.0.0'
     compile project(':scaffold-nbt')
     
     // Use JUnit test framework
