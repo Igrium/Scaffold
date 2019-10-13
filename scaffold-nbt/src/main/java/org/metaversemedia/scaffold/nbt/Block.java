@@ -34,8 +34,8 @@ public class Block {
 	}
 	
 	/**
-	 * Create a block object from a palette entry (as defined in Minecraft structure format)
-	 * @param paletteEntry
+	 * Create a block object from a palette entry (as defined in Minecraft structure format).
+	 * @param paletteEntry.
 	 * @return
 	 */
 	public static Block fromBlockPalleteEntry(CompoundMap paletteEntry) {
@@ -45,5 +45,17 @@ public class Block {
 			return new Block((String) paletteEntry.get("Name").getValue(),
 					(CompoundMap) paletteEntry.get("Properties").getValue());
 		}
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		Block blockObj = (Block) obj;
+		if (blockObj == null) {
+			return false;
+		}
+		
+		return (blockObj.name.matches(name)
+				&& blockObj.properties.equals(properties));
+
 	}
 }

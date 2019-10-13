@@ -8,6 +8,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import org.apache.commons.io.FilenameUtils;
 import org.metaversemedia.scaffold.core.Project;
 import org.metaversemedia.scaffold.editor.editor3d.AppPanel;
 import org.metaversemedia.scaffold.level.Level;
@@ -323,6 +324,9 @@ public class EditorWindow extends JFrame {
 		
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			File levelFile = fileChooser.getSelectedFile();
+			if (FilenameUtils.getExtension(levelFile.getName()).equalsIgnoreCase(".mclevel")) {
+				levelFile = new File(levelFile.toString()+".mclevel"); // Enforce file extension
+			}
 			newLevel(levelFile);
 			showLevelInfo();
 		}

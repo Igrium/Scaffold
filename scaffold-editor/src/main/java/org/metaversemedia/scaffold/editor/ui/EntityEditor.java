@@ -56,6 +56,7 @@ public class EntityEditor extends JDialog {
 			this.add(label);
 			
 			textField = new JTextField(defaultValue.toString());
+			textField.setPreferredSize(new Dimension(200,textField.getPreferredSize().height));
 			this.add(textField);
 		}
 

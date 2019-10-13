@@ -1,5 +1,6 @@
 package org.metaversemedia.scaffold.level.entity;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,6 +9,7 @@ import org.metaversemedia.scaffold.level.Level;
 import org.metaversemedia.scaffold.level.entity.Entity.AttributeDeclaration;
 import org.metaversemedia.scaffold.logic.Datapack;
 import org.metaversemedia.scaffold.math.Vector;
+import org.metaversemedia.scaffold.nbt.NBTStrings;
 
 import com.flowpowered.nbt.CompoundMap;
 import com.flowpowered.nbt.FloatTag;
@@ -23,7 +25,7 @@ public class GameEntity extends Rotatable {
 	public GameEntity(Level level, String name) {
 		super(level, name);
 		attributes().put("entityType", "minecraft:area_effect_cloud");
-		attributes().put("nbt", new CompoundMap());
+		attributes().put("nbt", "");
 		attributes().put("spawnOnInit", true);
 	}
 	
@@ -32,7 +34,7 @@ public class GameEntity extends Rotatable {
 		List<AttributeDeclaration> attributeFields = super.getAttributeFields();
 		
 		attributeFields.add(new AttributeDeclaration("entityType", String.class));
-		attributeFields.add(new AttributeDeclaration("nbt", CompoundMap.class));
+		attributeFields.add(new AttributeDeclaration("nbt", String.class));
 		attributeFields.add(new AttributeDeclaration("spawnOnInit", Boolean.class));
 		
 		return attributeFields;
@@ -60,7 +62,12 @@ public class GameEntity extends Rotatable {
 	 */
 	public CompoundMap nbt() {
 		System.out.println(getAttribute("nbt").getClass());
-		return (CompoundMap) getAttribute("nbt");
+		try {
+			return NBTStrings.nbtFromString((String) getAttribute("nbt"));
+		} catch (IOException e) {
+			System.out.println("Unable to compile entity nbt: " + getAttribute("nbt"));
+			return new CompoundMap();
+		}
 	}
 	
 	/**
@@ -80,6 +87,14 @@ public class GameEntity extends Rotatable {
 	}
 	
 	/**
+	 * Get the nbt data of the entity in the format {data}.
+	 * @return Nbt data.
+	 */
+	public String getNBTString() {
+		return "{"+getAttribute("nbt")+"}";
+	}
+	
+	/**
 	 * Get the command used for spawning the entity
 	 * @return
 	 */
@@ -93,7 +108,8 @@ public class GameEntity extends Rotatable {
 		
 		nbt().put(new ListTag<FloatTag>("Rotation", FloatTag.class, rotArray));
 		
-		return "summon "+getEntityType()+" "+position.X()+" "+position.Y()+" "+position.Z()+" "+nbt().toString();
+		return "summon "+getEntityType()+" "+position.X()+" "+position.Y()+" "+position.Z()+" "+NBTStrings.nbtToString(nbt());
+
 		
 	}
 	
