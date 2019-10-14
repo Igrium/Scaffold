@@ -27,6 +27,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.GridLayout;
 
 /**
  * Editor window to edit an entity.
@@ -302,7 +303,7 @@ public class EntityEditor extends JDialog {
 		setBounds(100, 100, 640, 480);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
-		getContentPane().add(contentPanel, BorderLayout.CENTER);
+		getContentPane().add(contentPanel, BorderLayout.NORTH);
 		contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
 		{
 			JPanel panel = new JPanel();
@@ -446,7 +447,7 @@ public class EntityEditor extends JDialog {
 			System.out.println("Position must be a series of 3 floats! Not setting!");
 		}
 		
-		entity.setName(nameField.getText());
+		parent.getLevel().renameEntity(entity.getName(), nameField.getText());
 		for (AttributeField f : attributeFields) {
 			entity.setAttribute(f.getAttributeName(), f.getAttributeValue());
 		}
