@@ -8,6 +8,7 @@ import java.awt.FlowLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 import org.metaversemedia.scaffold.level.entity.Entity;
 import org.metaversemedia.scaffold.level.entity.Entity.AttributeDeclaration;
@@ -214,7 +215,9 @@ public class EntityEditor extends JDialog {
 				}
 			});
 			
-			this.add(textField);
+			JScrollPane scrollPane = new JScrollPane(textField);
+			scrollPane.setPreferredSize(new Dimension(400, 50));
+			this.add(scrollPane);
 			
 			browseButton = new JButton("Browse NBT");
 			browseButton.addActionListener(new ActionListener() {
