@@ -39,6 +39,7 @@ public class Level {
 	/* Game functions. ONLY EXIST DURING COMPILATION */
 	private MCFunction initFunction;
 	private MCFunction tickFunction;
+	private Datapack datapack;
 	
 	private String name = "level";
 	
@@ -131,21 +132,30 @@ public class Level {
 	}
 	
 	/**
-	 * Get this map's init function
-	 * ONLY EXISTS DURING COMPILATION
-	 * @return Init function
+	 * Get this map's init function.
+	 * ONLY EXISTS DURING COMPILATION!
+	 * @return Init function.
 	 */
 	public MCFunction initFunction() {
 		return initFunction;
 	}
 	
 	/**
-	 * Get this map's init function
-	 * ONLY EXISTS DURING COMPILATION
-	 * @return Tick function
+	 * Get this map's init function.
+	 * ONLY EXISTS DURING COMPILATION!
+	 * @return Tick function.
 	 */
 	public MCFunction tickFunction() {
 		return tickFunction;
+	}
+	
+	/**
+	 * Get this map's datapack.
+	 * ONLY EXISTS DURING COMPILATION!
+	 * @return Datapack.
+	 */
+	public Datapack getDatapack() {
+		return datapack;
 	}
 	
 	/**
@@ -356,7 +366,7 @@ public class Level {
 		tickFunction = new MCFunction("tick");
 		
 		// Create datapack
-		Datapack datapack = new Datapack(project, name);
+		datapack = new Datapack(project, name);
 		datapack.functions.add(initFunction);
 		datapack.functions.add(tickFunction);
 		

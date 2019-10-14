@@ -139,11 +139,20 @@ public class Datapack {
 	
 	/**
 	 * Format a function name as if it were in the default namespace.
-	 * @param function Function to format
-	 * @return Formatted name
+	 * @param function Function name to format.
+	 * @return Formatted name.
+	 */
+	public String formatFunctionCall(String name) {
+		return getDefaultNamespace()+":"+name;
+	}
+	
+	/**
+	 * Format a function name as if it were in the default namespace.
+	 * @param function Function to format.
+	 * @return Formatted name.
 	 */
 	public String formatFunctionCall(MCFunction function) {
-		return getDefaultNamespace()+":"+function.getName();
+		return formatFunctionCall(function.getName());
 	}
 	
 	/**
