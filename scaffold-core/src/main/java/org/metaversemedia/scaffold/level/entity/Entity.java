@@ -10,6 +10,8 @@ import java.util.Set;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.metaversemedia.scaffold.level.Level;
+import org.metaversemedia.scaffold.level.io.Input;
+import org.metaversemedia.scaffold.level.io.Output;
 import org.metaversemedia.scaffold.logic.Datapack;
 import org.metaversemedia.scaffold.math.Vector;
 
@@ -181,6 +183,46 @@ public class Entity {
 		attributes.remove(name);
 	}
 	
+	/* All entitiy's outputs */
+	private List<Output> outputs = new ArrayList<Output>();
+	
+	/**
+	 * Get a list of all this entity's output connections.
+	 * @return Outputs.
+	 */
+	public List<Output> outputConnections() {
+		return outputs;
+	}
+	
+	/**
+	 * Create a new output.
+	 * @param name Name of the output to trigger on.
+	 * @return New output.
+	 */
+	public Output newOutputConnection(String name) {
+		Output output = new Output(this);
+		output.name = name;
+		outputs.add(output);
+		return output;
+	}
+	
+	private Set<Input> inputs;
+	
+	/**
+	 * Register a new input.
+	 * @param input Input to register.
+	 */
+	protected void registerInput(Input input) {
+		inputs.add(input);
+	}
+	
+	/**
+	 * Get a set of all this entity's inputs.
+	 * @return Inputs.
+	 */
+	public Set<Input> getInputs() {
+		return inputs;
+	}
 	
 	/**
 	 * Serialize this entity into a JSON object.
@@ -282,5 +324,29 @@ public class Entity {
 	 */
 	public boolean compileLogic(Datapack datapack) {
 		return true;
+	}
+	
+	/**
+	 * Compile an entity output into commands.
+	 * @param outputName Output name to compile.
+	 * @param instigator Entity that started the io chain.
+	 * @return Output commands.
+	 */
+	public String[] compileOutput(String outputName, Entity instigator) {
+		// Get all outputs with name
+		List<Output> outputs = new ArrayList<Output>();
+		for (Output o : outputConnections()) {
+			if (o.name.matches(outputName)) {
+				outputs.add(o);
+			}
+		}
+		
+		// Compile outputs
+		String[] commands = new String[outputs.size()];
+		for (int i = 0; i < commands.length; i++) {
+			commands[i] = outputs.get(i).compile(instigator);
+		}
+		
+		return commands;
 	}
 }
