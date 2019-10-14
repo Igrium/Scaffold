@@ -17,6 +17,7 @@ import org.metaversemedia.scaffold.editor.Launch;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.awt.event.ActionEvent;
+import javax.swing.border.EmptyBorder;
 
 @SuppressWarnings("serial")
 public class WelcomePanel extends JFrame {
@@ -47,6 +48,7 @@ public class WelcomePanel extends JFrame {
 		getContentPane().setLayout(new BorderLayout(0, 0));
 		
 		JPanel panel = new JPanel();
+		panel.setBorder(new EmptyBorder(10, 10, 10, 10));
 		getContentPane().add(panel, BorderLayout.CENTER);
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 		
