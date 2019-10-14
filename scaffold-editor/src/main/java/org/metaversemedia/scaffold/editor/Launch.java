@@ -2,6 +2,10 @@ package org.metaversemedia.scaffold.editor;
 
 import java.awt.EventQueue;
 import java.io.File;
+
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+
 import org.metaversemedia.scaffold.core.Project;
 import org.metaversemedia.scaffold.editor.ui.EditorWindow;
 import org.metaversemedia.scaffold.editor.ui.WelcomePanel;
@@ -22,6 +26,14 @@ public class Launch {
 		if (args.length >= 1) {
 			projectFolder = args[0];
 		}
+		
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+				| UnsupportedLookAndFeelException e) {
+			e.printStackTrace();
+		}
+
 		
 		if (projectFolder != null && new File(projectFolder).isDirectory()) {
 			Project project = Project.loadProject(projectFolder);

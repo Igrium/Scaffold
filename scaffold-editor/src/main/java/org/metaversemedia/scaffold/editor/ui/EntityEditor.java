@@ -9,8 +9,6 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import org.metaversemedia.scaffold.level.entity.Entity;
 import org.metaversemedia.scaffold.level.entity.Entity.AttributeDeclaration;
 import org.metaversemedia.scaffold.math.Vector;
@@ -163,6 +161,8 @@ public class EntityEditor extends JDialog {
 		private JTextField textField;
 		private JButton browseButton;
 		
+		NBTBrowser browser = new NBTBrowser();
+		
 		// Is the NBT in the text field valid?
 		private boolean nbtValid = true;
 		
@@ -238,7 +238,6 @@ public class EntityEditor extends JDialog {
 		
 		// Update the nbt object with typed nbt.
 		private void updateNBT() {
-			System.out.println(textField.getText());
 			String nbtString = textField.getText();
 			try {
 				value = NBTStrings.nbtFromString(nbtString);
@@ -252,7 +251,13 @@ public class EntityEditor extends JDialog {
 		
 		// Show the NBT browser.
 		private void showBrowser() {
-			
+			updateNBT();
+			if (nbtValid) {
+				NBTBrowser browser = new NBTBrowser();
+				browser.setNBT(value);
+				browser.setVisible(true);
+			}
+
 		}
 		
 	}
