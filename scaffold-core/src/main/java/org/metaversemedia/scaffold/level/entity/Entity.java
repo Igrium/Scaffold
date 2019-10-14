@@ -9,6 +9,7 @@ import java.util.Set;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.metaversemedia.scaffold.level.BlockWorld;
 import org.metaversemedia.scaffold.level.Level;
 import org.metaversemedia.scaffold.logic.Datapack;
 import org.metaversemedia.scaffold.math.Vector;
@@ -277,10 +278,29 @@ public class Entity {
 	
 	/**
 	 * Compile this entity's logic.
-	 * @param dataoack Datapack to compile entity into
+	 * @param datapack Datapack to compile entity into
 	 * @return Success
 	 */
 	public boolean compileLogic(Datapack datapack) {
 		return true;
+	}
+	
+	/**
+	 * Compile this entity into the physical world.
+	 * @param blockWorld BlockWorld to compile into.
+	 * @param full Is this a full compile? May run more complex algorithms if true.
+	 * @return Success.
+	 */
+	public boolean compileWorld(BlockWorld blockWorld, boolean full) {
+		return true;
+	}
+	
+	/**
+	 * Get the block pass of this entity.
+	 * Entities with higher block passes will compile over entities with lower block passes.
+	 * @return Block pass.
+	 */
+	public int getBlockPass() {
+		return 0;
 	}
 }

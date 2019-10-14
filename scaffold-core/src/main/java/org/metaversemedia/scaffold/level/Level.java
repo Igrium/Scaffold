@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +46,9 @@ public class Level {
 	
 	/* The name that shows up in the Minecraft world menu */
 	private String prettyName = "Level";
+	
+	/* The BlockWorld that this level uses */
+	private BlockWorld blockWorld = new BlockWorld();
 	
 	/**
 	 * Create a new level
@@ -181,6 +186,7 @@ public class Level {
 		// Add to entities list
 		entities.put(name, entity);
 		
+		compileBlockWorld(false);
 		return entity;
 	}
 	
@@ -272,6 +278,7 @@ public class Level {
 			return null;
 		}
 		
+		level.compileBlockWorld(false); // Initial compile on blockWorld.
 		return level;
 	}
 	
@@ -289,7 +296,6 @@ public class Level {
 			serialized.write(writer, 4, 0);
 			writer.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			System.out.println("Unable to write to file "+file);
 			return false;
 		}
@@ -346,6 +352,48 @@ public class Level {
 	}
 	
 	/**
+	 * Compile the blockworld.
+	 * @param full Should this be a full compile? If true, entities may run more complex algorithems.
+	 * @return Success.
+	 */
+	public boolean compileBlockWorld(boolean full) {
+		blockWorld.clear(); // Clear the blockworld of previous compiles.
+		
+		// Collect used block passes.
+		List<Integer> blockPasses = new ArrayList<Integer>();
+		for (Entity e : entities.values()) {
+			if (!blockPasses.contains(e.getBlockPass())) {
+				blockPasses.add(e.getBlockPass());
+			}
+		}
+		Collections.sort(blockPasses);
+		
+		// Iterate through passes
+		for (int i : blockPasses) {
+			List<Entity> entities = collectBlockPass(i);
+			
+			for (Entity e : entities) {
+				e.compileWorld(blockWorld, full);
+			}
+		}
+		
+		return false;
+	}
+	
+	/* Assemble a list of all entities in a block pass */
+	private List<Entity> collectBlockPass(int pass) {
+		
+		List<Entity> blockPass = new ArrayList<Entity>();
+		for (Entity e : entities.values()) {
+			if (e.getBlockPass() == pass) {
+				blockPass.add(e);
+			}
+		}
+		
+		return blockPass;
+	}
+	
+	/**
 	 * Compile level logic
 	 * @param dataPath Path to datapack folder
 	 * @return success
@@ -372,7 +420,6 @@ public class Level {
 		try {
 			datapack.compile(dataPath.resolve(project.getName()));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
