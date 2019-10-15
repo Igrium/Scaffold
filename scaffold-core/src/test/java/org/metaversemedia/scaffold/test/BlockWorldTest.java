@@ -1,14 +1,8 @@
 package org.metaversemedia.scaffold.test;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.junit.Test;
 import org.metaversemedia.scaffold.level.BlockWorld;
-import org.metaversemedia.scaffold.level.Chunk;
 import org.metaversemedia.scaffold.nbt.Block;
-import org.metaversemedia.scaffold.nbt.schematic.Structure;
-
 import com.flowpowered.nbt.CompoundMap;
 
 public class BlockWorldTest {
@@ -27,14 +21,14 @@ public class BlockWorldTest {
 //			// TODO Auto-generated catch block
 //			e.printStackTrace();
 //		}
-
-		System.out.println(blockworld.blockAt(4, 23, 55));
-		System.out.println(blockworld.blockAt(20, 4, 7));
+//s
+//		System.out.println(blockworld.blockAt(4, 23, 55));
+//		System.out.println(blockworld.blockAt(20, 4, 7));
+//		
+//		for (Chunk c : blockworld.chunks()) {
+//			System.out.println(c);	
+//		}
 		
-		for (Chunk c : blockworld.chunks()) {
-			System.out.println(c);	
-		}
-		assert(true);
-	}
 
+	}
 }

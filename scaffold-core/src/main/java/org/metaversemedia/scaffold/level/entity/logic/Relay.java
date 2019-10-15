@@ -25,6 +25,7 @@ public class Relay extends Entity {
 
 			@Override
 			public String getName() {
+				// TODO Auto-generated method stub
 				return "Trigger";
 			}
 
@@ -35,8 +36,7 @@ public class Relay extends Entity {
 
 			@Override
 			public String getCommand(Entity instigator, Entity caller, String[] args) {
-				
-				if ((float) getAttribute("delay") <= 0) { // if delay < 0, ignore it.
+				if ((int) getAttribute("delay") <= 0) { // if delay < 0, ignore it.
 					return "function "+getLevel().getDatapack().formatFunctionCall(getFunctionName());
 				}  else {
 					return "schedule function "+getLevel().getDatapack().formatFunctionCall(getFunctionName())+" "+getAttribute("delay");
@@ -59,13 +59,14 @@ public class Relay extends Entity {
 
 		// Compile relay function
 		MCFunction function = new MCFunction(getFunctionName());
-		datapack.functions.add(function);
 
 		String[] outputCommands = compileOutput("OnTrigger", this);
 
 		for (String s : outputCommands) {
 			function.addCommand(s);
 		}
+		
+		datapack.functions.add(function);
 
 		return true;
 	}

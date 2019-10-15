@@ -3,10 +3,12 @@ package org.metaversemedia.scaffold.level.entity;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.metaversemedia.scaffold.level.Level;
@@ -206,7 +208,7 @@ public class Entity {
 		return output;
 	}
 	
-	private Set<Input> inputs;
+	private Set<Input> inputs = new HashSet<Input>();
 	
 	/**
 	 * Register a new input.
@@ -222,6 +224,20 @@ public class Entity {
 	 */
 	public Set<Input> getInputs() {
 		return inputs;
+	}
+	
+	/**
+	 * Get an input my name.
+	 * @param name Input name.
+	 * @return Input.
+	 */
+	public Input getInput(String name) {
+		for (Input e : inputs) {
+			if (e.getName().matches(name)) {
+				return e;
+			}
+		}
+		return null;
 	}
 	
 	/**
@@ -246,6 +262,12 @@ public class Entity {
 		}
 		
 		object.put("attributes", attributeObject);
+		
+		JSONArray outputs = new JSONArray();
+		for (Output o : this.outputs) {
+			outputs.put(o.serialize());
+		}
+		object.put("outputs", outputs);
 		
 		return object;
 	}
@@ -283,6 +305,14 @@ public class Entity {
 			for (String key : attributes.keySet()) {
 				Object attribute = attributes.get(key);
 				entity.attributes().put(key, attribute);
+			}
+			
+			// Outputs
+			JSONArray outputs = object.getJSONArray("outputs");
+			for (Object o : outputs) {
+				JSONObject outputJSON = (JSONObject) o;
+				entity.outputs.add(Output.unserialize(outputJSON, entity));
+				
 			}
 			
 			entity.onUpdateAttributes();
@@ -334,19 +364,13 @@ public class Entity {
 	 */
 	public String[] compileOutput(String outputName, Entity instigator) {
 		// Get all outputs with name
-		List<Output> outputs = new ArrayList<Output>();
+		List<String> commands = new ArrayList<String>();
 		for (Output o : outputConnections()) {
 			if (o.name.matches(outputName)) {
-				outputs.add(o);
+				commands.add(o.compile(instigator));
 			}
 		}
 		
-		// Compile outputs
-		String[] commands = new String[outputs.size()];
-		for (int i = 0; i < commands.length; i++) {
-			commands[i] = outputs.get(i).compile(instigator);
-		}
-		
-		return commands;
+		return commands.toArray(new String[0]);
 	}
 }
