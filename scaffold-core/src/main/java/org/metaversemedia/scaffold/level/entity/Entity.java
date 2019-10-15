@@ -3,14 +3,18 @@ package org.metaversemedia.scaffold.level.entity;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.metaversemedia.scaffold.level.BlockWorld;
 import org.metaversemedia.scaffold.level.Level;
+import org.metaversemedia.scaffold.level.io.Input;
+import org.metaversemedia.scaffold.level.io.Output;
 import org.metaversemedia.scaffold.logic.Datapack;
 import org.metaversemedia.scaffold.math.Vector;
 
@@ -182,6 +186,60 @@ public class Entity {
 		attributes.remove(name);
 	}
 	
+	/* All entitiy's outputs */
+	private List<Output> outputs = new ArrayList<Output>();
+	
+	/**
+	 * Get a list of all this entity's output connections.
+	 * @return Outputs.
+	 */
+	public List<Output> outputConnections() {
+		return outputs;
+	}
+	
+	/**
+	 * Create a new output.
+	 * @param name Name of the output to trigger on.
+	 * @return New output.
+	 */
+	public Output newOutputConnection(String name) {
+		Output output = new Output(this);
+		output.name = name;
+		outputs.add(output);
+		return output;
+	}
+	
+	private Set<Input> inputs = new HashSet<Input>();
+	
+	/**
+	 * Register a new input.
+	 * @param input Input to register.
+	 */
+	protected void registerInput(Input input) {
+		inputs.add(input);
+	}
+	
+	/**
+	 * Get a set of all this entity's inputs.
+	 * @return Inputs.
+	 */
+	public Set<Input> getInputs() {
+		return inputs;
+	}
+	
+	/**
+	 * Get an input my name.
+	 * @param name Input name.
+	 * @return Input.
+	 */
+	public Input getInput(String name) {
+		for (Input e : inputs) {
+			if (e.getName().matches(name)) {
+				return e;
+			}
+		}
+		return null;
+	}
 	
 	/**
 	 * Serialize this entity into a JSON object.
@@ -205,6 +263,12 @@ public class Entity {
 		}
 		
 		object.put("attributes", attributeObject);
+		
+		JSONArray outputs = new JSONArray();
+		for (Output o : this.outputs) {
+			outputs.put(o.serialize());
+		}
+		object.put("outputs", outputs);
 		
 		return object;
 	}
@@ -242,6 +306,14 @@ public class Entity {
 			for (String key : attributes.keySet()) {
 				Object attribute = attributes.get(key);
 				entity.attributes().put(key, attribute);
+			}
+			
+			// Outputs
+			JSONArray outputs = object.getJSONArray("outputs");
+			for (Object o : outputs) {
+				JSONObject outputJSON = (JSONObject) o;
+				entity.outputs.add(Output.unserialize(outputJSON, entity));
+				
 			}
 			
 			entity.onUpdateAttributes();
@@ -302,5 +374,24 @@ public class Entity {
 	 */
 	public int getBlockPass() {
 		return 0;
+	}
+	
+	/**
+	 * Compile an entity output into commands.
+	 * 
+	 * @param outputName Output name to compile.
+	 * @param instigator Entity that started the io chain.
+	 * @return Output commands.
+	 */
+	public String[] compileOutput(String outputName, Entity instigator) {
+		// Get all outputs with name
+		List<String> commands = new ArrayList<String>();
+		for (Output o : outputConnections()) {
+			if (o.name.matches(outputName)) {
+				commands.add(o.compile(instigator));
+			}
+		}
+
+		return commands.toArray(new String[0]);
 	}
 }

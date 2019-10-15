@@ -13,13 +13,14 @@ import org.metaversemedia.scaffold.nbt.NBTStrings;
 import com.flowpowered.nbt.CompoundMap;
 import com.flowpowered.nbt.FloatTag;
 import com.flowpowered.nbt.ListTag;
+import com.flowpowered.nbt.StringTag;
 
 /**
  * Represents a Minecraft entity in the editor
  * @author Sam54123
  *
  */
-public class GameEntity extends Rotatable {
+public class GameEntity extends Rotatable implements TargetSelectable {
 
 	public GameEntity(Level level, String name) {
 		super(level, name);
@@ -100,10 +101,14 @@ public class GameEntity extends Rotatable {
 		rotArray.add(new FloatTag("", ((Number) getAttribute("rotY")).floatValue()));
 		
 		nbt().put(new ListTag<FloatTag>("Rotation", FloatTag.class, rotArray));
+		nbt().put(new StringTag("CustomName", "\""+getName()+"\""));
 		
-		return "summon "+getEntityType()+" "+position.X()+" "+position.Y()+" "+position.Z()+" "+NBTStrings.nbtToString(nbt());
+		String command = "summon "+getEntityType()+" "+position.X()+" "+position.Y()+" "+position.Z()+" "+NBTStrings.nbtToString(nbt());
+		
+		nbt().remove("Rotation");
+		nbt().remove("CustomName");
 
-		
+		return command;
 	}
 	
 	@Override
@@ -140,5 +145,11 @@ public class GameEntity extends Rotatable {
 		}
 		
 		return true;
+	}
+
+	@Override
+	public String getTargetSelector() {
+		// TODO Auto-generated method stub
+		return "@e [type="+getEntityType()+",name="+getName()+"]";
 	}
 }
