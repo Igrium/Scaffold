@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.List;
 
 import org.metaversemedia.scaffold.level.Level;
-import org.metaversemedia.scaffold.level.entity.Entity.AttributeDeclaration;
 import org.metaversemedia.scaffold.nbt.schematic.Structure;
 
 /**
@@ -49,7 +48,7 @@ public class StructureEntity extends BlockCollectionEntity {
 			File structureFile = getLevel().getProject().assetManager().findAsset((String) getAttribute("file")).toFile();
 
 			try {
-				blockCollection = Structure.fromFile(structureFile);
+				this.blockCollection = Structure.fromFile(structureFile);
 			} catch (FileNotFoundException e) {
 				System.out.println("Unable to find structure: " + getAttribute("file"));
 			} catch (IOException e) {

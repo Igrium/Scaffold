@@ -158,4 +158,11 @@ public class BlockWorld implements BlockCollection {
 	public Collection<Chunk> chunks() {
 		return chunks.values();
 	}
+	
+	/**
+	 * Clear the BlockWorld of all chunks and blocks.
+	 */
+	public void clear() {
+		chunks.clear();
+	}
 }
