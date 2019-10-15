@@ -17,9 +17,14 @@ import org.json.JSONObject;
 import org.metaversemedia.scaffold.core.Constants;
 import org.metaversemedia.scaffold.core.Project;
 import org.metaversemedia.scaffold.level.entity.Entity;
+import org.metaversemedia.scaffold.level.entity.TargetSelectable;
 import org.metaversemedia.scaffold.logic.Datapack;
 import org.metaversemedia.scaffold.logic.MCFunction;
 import org.metaversemedia.scaffold.math.Vector;
+import org.metaversemedia.scaffold.nbt.NBTStrings;
+
+import com.flowpowered.nbt.CompoundMap;
+import com.flowpowered.nbt.StringTag;
 
 /**
  * Represents a single level file
@@ -27,6 +32,12 @@ import org.metaversemedia.scaffold.math.Vector;
  *
  */
 public class Level {
+	
+	/* The name of the entity that keeps track of level scoreboard objectives */
+	public static final String SCOREBOARDNAME = "worldspawn";
+	
+	/* The type of the entity that keeps track of level scoreboard objectives */
+	public static final String SCOREBOARDTYPE = "minecraft:area_effect_cloud";
 	
 	/* The project this level belongs to */
 	private Project project;
@@ -215,6 +226,33 @@ public class Level {
 		return true;
 	}
 	
+	private TargetSelectable scoreboardEntity;
+	
+	/**
+	 * Get the Minecraft entity used to store the level scoreboard.
+	 * @return Scoreboard entity.
+	 */
+	public TargetSelectable getScoreboardEntity() {
+		if (scoreboardEntity == null) {
+			scoreboardEntity = new TargetSelectable() {
+				@Override
+				public String getTargetSelector() {
+					return "@e [type="+SCOREBOARDTYPE+", name="+SCOREBOARDNAME+"]";
+				}
+			};
+		}
+		
+		return scoreboardEntity;
+	}
+	
+	
+	private String summonScoreboardEntity() {
+		CompoundMap nbt = new CompoundMap();
+		nbt.put(new StringTag("CustomName", "\""+SCOREBOARDNAME+"\""));
+		
+		return "summon "+SCOREBOARDTYPE+" 0 0 0 "+NBTStrings.nbtToString(nbt);
+	}
+	
 	/**
 	 * Serialize this level into a JSONObject.
 	 * @return Serialized level
@@ -377,6 +415,10 @@ public class Level {
 		for (String key : entities.keySet()) {
 			entities.get(key).compileLogic(datapack);
 		}
+		
+		// Respawn scoreboard entity.
+		initFunction.addCommand("kill "+getScoreboardEntity().getTargetSelector());
+		initFunction.addCommand(summonScoreboardEntity());
 		
 		// Compile datapack
 		try {
