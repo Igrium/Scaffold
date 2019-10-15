@@ -5,7 +5,6 @@ import java.util.List;
 import org.metaversemedia.scaffold.level.Level;
 import org.metaversemedia.scaffold.level.entity.Entity;
 import org.metaversemedia.scaffold.level.io.Input;
-import org.metaversemedia.scaffold.level.io.Output;
 import org.metaversemedia.scaffold.logic.Datapack;
 import org.metaversemedia.scaffold.logic.MCFunction;
 
