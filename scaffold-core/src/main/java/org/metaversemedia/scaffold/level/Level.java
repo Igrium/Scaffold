@@ -459,14 +459,14 @@ public class Level {
 		datapack.loadFunctions.add(datapack.formatFunctionCall(initFunction));
 		datapack.tickFunctions.add(datapack.formatFunctionCall(tickFunction));
 		
+		// Respawn scoreboard entity.
+		initFunction.addCommand("kill "+getScoreboardEntity().getTargetSelector());
+		initFunction.addCommand(summonScoreboardEntity());
+		
 		// Compile entities
 		for (String key : entities.keySet()) {
 			entities.get(key).compileLogic(datapack);
 		}
-		
-		// Respawn scoreboard entity.
-		initFunction.addCommand("kill "+getScoreboardEntity().getTargetSelector());
-		initFunction.addCommand(summonScoreboardEntity());
 		
 		// Compile datapack
 		try {
