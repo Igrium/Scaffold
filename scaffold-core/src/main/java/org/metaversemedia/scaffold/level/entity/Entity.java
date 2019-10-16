@@ -55,6 +55,13 @@ public class Entity {
 		}
 	}
 	
+	/**
+	 * Used to tell the editor of this entity should render as a sprite or a model.
+	 */
+	public enum RenderType {
+		SPRITE, MODEL
+	}
+	
 	/* Position of the entity in world space */
 	private Vector position;
 	
@@ -94,19 +101,21 @@ public class Entity {
 	}
 	
 	/**
-	 * Get the sprite this entity will use in the editor.
-	 * @return Sprite path.
+	 * Get the render type this entity should render with in the editor.
+	 * SPRITE will render as a two dimensional sprite, and MODEL will render as a 3D model.
+	 * @return Render type.
 	 */
-	public String getSprite() {
-		return null;
+	public RenderType getRenderType() {
+		return RenderType.SPRITE;
 	}
 	
 	/**
-	 * Get the model this entity will use in the editor.
-	 * @return Model path.
+	 * Get a path to the asset this entity should render with.
+	 * If getRenderType() retruns SPRITE, this should be an image, and if it returns MODEL, this should be a model.
+	 * @return
 	 */
-	public String getRenderModel() {
-		return null;
+	public String getRenderAsset() {
+		return "";
 	}
 	
 	/**
