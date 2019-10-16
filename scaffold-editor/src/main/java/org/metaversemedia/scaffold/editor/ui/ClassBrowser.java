@@ -4,12 +4,12 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EventListener;
 import java.util.List;
 import java.util.Set;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
@@ -18,9 +18,9 @@ import org.reflections.Reflections;
 
 import javax.swing.Box;
 import javax.swing.JTextField;
-import javax.swing.JScrollPane;
 import javax.swing.JList;
 import java.awt.event.ActionListener;
+import java.lang.reflect.Modifier;
 import java.awt.event.ActionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
@@ -32,6 +32,9 @@ import javax.swing.event.ListSelectionEvent;
  */
 public class ClassBrowser<T> extends JDialog {
 
+	public interface ClassSelectListener<T> extends EventListener {
+		public void classSelected(Class<? extends T> selectedClass);
+	}
 	
 	private static final long serialVersionUID = 1L;
 	private final JPanel contentPanel = new JPanel();
@@ -39,8 +42,10 @@ public class ClassBrowser<T> extends JDialog {
 	
 	private Class<T> parentClass;
 	private Reflections reflection;
-	private JList<ClassEntry> classList;
+	private JList<ClassEntry<T>> classList;
 	private JButton okButton;
+	
+	private ClassSelectListener<T> classListener;
 
 	/**
 	 * Launch the application.
@@ -88,7 +93,7 @@ public class ClassBrowser<T> extends JDialog {
 			}
 		}
 		{
-			classList = new JList<ClassEntry>();
+			classList = new JList<ClassEntry<T>>();
 			classList.addListSelectionListener(new ListSelectionListener() {
 				public void valueChanged(ListSelectionEvent e) {
 					okButton.setEnabled(classList.getSelectedValue() != null);
@@ -102,6 +107,12 @@ public class ClassBrowser<T> extends JDialog {
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 			{
 				okButton = new JButton("OK");
+				okButton.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent arg0) {
+						setVisible(false);
+						triggerClassSelect();
+					}
+				});
 				okButton.setEnabled(false);
 				okButton.setActionCommand("OK");
 				buttonPane.add(okButton);
@@ -125,12 +136,15 @@ public class ClassBrowser<T> extends JDialog {
 	/**
 	 * Reload the classes being shown.
 	 */
+	@SuppressWarnings("unchecked")
 	public void reload() {
 		Set<Class<? extends T>> classes = reflection.getSubTypesOf(parentClass);
 		
 		List<ClassEntry<T>> classStrings = new ArrayList<ClassEntry<T>>();
 		for (Class<? extends T> c: classes) {
-			classStrings.add(new ClassEntry<T>(c));
+			if (!Modifier.isAbstract(c.getModifiers())) {
+				classStrings.add(new ClassEntry<T>(c));
+			}
 		}
 		Collections.sort(classStrings);
 		
@@ -149,12 +163,26 @@ public class ClassBrowser<T> extends JDialog {
 		repaint();
 	}
 	
+	/**
+	 * Set the ClassSelectListener to call when a class is selected.
+	 * @param classSelectListener New ClassSelectListener.
+	 */
+	public void setClassSelectListener(ClassSelectListener<T> classSelectListener) {
+		this.classListener = classSelectListener;
+	}
+	
 	@Override
 	public void setVisible(boolean b) {
 		super.setVisible(b);
 	}
+	
+	protected void triggerClassSelect() {
+		if (classListener != null && classList.getSelectedValue() != null) {
+			classListener.classSelected(classList.getSelectedValue().classObj);
+		}
+	}
 
-	protected JList<ClassEntry> getClassList() {
+	protected JList<ClassEntry<T>> getClassList() {
 		return classList;
 	}
 	protected JTextField getSearchBar() {
@@ -165,8 +193,7 @@ public class ClassBrowser<T> extends JDialog {
 	}
 }
 
-class ClassEntry<T> implements Comparable<ClassEntry> {
-	private static final long serialVersionUID = 1L;
+class ClassEntry<T> implements Comparable<ClassEntry<?>> {
 	public final Class<? extends T> classObj;
 	
 	public ClassEntry(Class<? extends T> classObj) {
@@ -178,7 +205,7 @@ class ClassEntry<T> implements Comparable<ClassEntry> {
 	}
 
 	@Override
-	public int compareTo(ClassEntry o) {
+	public int compareTo(ClassEntry<?> o) {
 		return toString().compareTo(o.toString());
 	}
 	

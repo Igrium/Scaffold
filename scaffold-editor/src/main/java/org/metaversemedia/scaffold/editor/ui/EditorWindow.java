@@ -11,8 +11,10 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import org.apache.commons.io.FilenameUtils;
 import org.metaversemedia.scaffold.core.Project;
 import org.metaversemedia.scaffold.editor.editor3d.AppPanel;
+import org.metaversemedia.scaffold.editor.ui.ClassBrowser.ClassSelectListener;
 import org.metaversemedia.scaffold.level.Level;
 import org.metaversemedia.scaffold.level.entity.Entity;
+import org.metaversemedia.scaffold.math.Vector;
 
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -56,9 +58,11 @@ public class EditorWindow extends JFrame {
 	private AppPanel appPanel;
 	
 	private EntityEditor entityEditor;
-	/* The title this window has before the * if unsaved */
+	private ClassBrowser<Entity> entityBrowser;
 	
+	/* The title this window has before the * if unsaved */
 	private String desiredTitle = "";
+	private JMenuItem mntmNewEntity;
 	
 	
 	/**
@@ -209,6 +213,14 @@ public class EditorWindow extends JFrame {
 		editMenu.add(levelInfoButton);
 		editMenu.add(projectSettingsButton);
 		
+		mntmNewEntity = new JMenuItem("New Entity");
+		mntmNewEntity.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				newEntityDialog();
+			}
+		});
+		editMenu.add(mntmNewEntity);
+		
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.setLayout(new BorderLayout(0, 0));
@@ -222,6 +234,17 @@ public class EditorWindow extends JFrame {
 		contentPane.add(outliner, BorderLayout.EAST);
 
 		entityEditor = new EntityEditor(this);
+		
+		entityBrowser = new ClassBrowser<Entity>(Entity.class);
+		entityBrowser.setClassSelectListener(new ClassSelectListener<Entity>() {
+
+			@Override
+			public void classSelected(Class<? extends Entity> selectedClass) {
+				newEntity(selectedClass);
+			}
+			
+		});
+		
 	}
 	
 	/**
@@ -278,10 +301,21 @@ public class EditorWindow extends JFrame {
 	}
 	
 	/**
-	 * Show new entity dialog.
+	 * Show the new entity dialog.
 	 */
-	public void newEntity() {
-		
+	public void newEntityDialog() {
+		entityBrowser.setVisible(true);
+	}
+	
+	/**
+	 * Create a new entity
+	 * @param type Type of entity to create.
+	 */
+	public void newEntity(Class<? extends Entity> type) {
+		Entity entity = level.newEntity(type, type.getSimpleName(), new Vector(0,0,0));
+		markUnsaved();
+		reload();
+		showEntityEditor(entity);
 	}
 	
 	/**
