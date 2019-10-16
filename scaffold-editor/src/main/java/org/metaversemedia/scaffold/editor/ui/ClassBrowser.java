@@ -9,6 +9,7 @@ import java.util.Set;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
@@ -19,6 +20,10 @@ import javax.swing.Box;
 import javax.swing.JTextField;
 import javax.swing.JScrollPane;
 import javax.swing.JList;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.ListSelectionEvent;
 
 /**
  * Browser that can browse classes.
@@ -27,12 +32,15 @@ import javax.swing.JList;
  */
 public class ClassBrowser<T> extends JDialog {
 
+	
+	private static final long serialVersionUID = 1L;
 	private final JPanel contentPanel = new JPanel();
 	private JTextField searchBar;
 	
 	private Class<T> parentClass;
 	private Reflections reflection;
-	private JList<String> classList;
+	private JList<ClassEntry> classList;
+	private JButton okButton;
 
 	/**
 	 * Launch the application.
@@ -56,6 +64,7 @@ public class ClassBrowser<T> extends JDialog {
 		this.parentClass = parentClass;
 		
 		setBounds(100, 100, 450, 300);
+		setTitle("Select Class");
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
@@ -70,11 +79,21 @@ public class ClassBrowser<T> extends JDialog {
 			}
 			{
 				JButton btnSearch = new JButton("Search");
+				btnSearch.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						reload();
+					}
+				});
 				horizontalBox.add(btnSearch);
 			}
 		}
 		{
-			classList = new JList<String>();
+			classList = new JList<ClassEntry>();
+			classList.addListSelectionListener(new ListSelectionListener() {
+				public void valueChanged(ListSelectionEvent e) {
+					okButton.setEnabled(classList.getSelectedValue() != null);
+				}
+			});
 			contentPanel.add(classList, BorderLayout.CENTER);
 		}
 		{
@@ -82,13 +101,19 @@ public class ClassBrowser<T> extends JDialog {
 			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 			{
-				JButton okButton = new JButton("OK");
+				okButton = new JButton("OK");
+				okButton.setEnabled(false);
 				okButton.setActionCommand("OK");
 				buttonPane.add(okButton);
 				getRootPane().setDefaultButton(okButton);
 			}
 			{
 				JButton cancelButton = new JButton("Cancel");
+				cancelButton.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						setVisible(false);
+					}
+				});
 				cancelButton.setActionCommand("Cancel");
 				buttonPane.add(cancelButton);
 			}
@@ -103,18 +128,24 @@ public class ClassBrowser<T> extends JDialog {
 	public void reload() {
 		Set<Class<? extends T>> classes = reflection.getSubTypesOf(parentClass);
 		
-		List<String> classStrings = new ArrayList<String>();
+		List<ClassEntry<T>> classStrings = new ArrayList<ClassEntry<T>>();
 		for (Class<? extends T> c: classes) {
-			classStrings.add(c.getSimpleName());
+			classStrings.add(new ClassEntry<T>(c));
 		}
 		Collections.sort(classStrings);
 		
 		// Narrow down search
 		if (!getSearchBar().getText().matches("")) {
-			
+			for (int i = 0; i < classStrings.size(); i++) {
+				if (!classStrings.get(i).classObj.getSimpleName().toLowerCase()
+						.contains(getSearchBar().getText().toLowerCase())) {
+					classStrings.remove(i);
+					i--;
+				}
+			}
 		}
-		
-		classList.setListData(classStrings.toArray(new String[0]));
+
+		classList.setListData(classStrings.toArray(new ClassEntry[0]));
 		repaint();
 	}
 	
@@ -123,10 +154,32 @@ public class ClassBrowser<T> extends JDialog {
 		super.setVisible(b);
 	}
 
-	protected JList<String> getClassList() {
+	protected JList<ClassEntry> getClassList() {
 		return classList;
 	}
 	protected JTextField getSearchBar() {
 		return searchBar;
 	}
+	protected JButton getOkButton() {
+		return okButton;
+	}
+}
+
+class ClassEntry<T> implements Comparable<ClassEntry> {
+	private static final long serialVersionUID = 1L;
+	public final Class<? extends T> classObj;
+	
+	public ClassEntry(Class<? extends T> classObj) {
+		this.classObj = classObj;
+	}
+	
+	public String toString() {
+		return classObj.getSimpleName();
+	}
+
+	@Override
+	public int compareTo(ClassEntry o) {
+		return toString().compareTo(o.toString());
+	}
+	
 }
