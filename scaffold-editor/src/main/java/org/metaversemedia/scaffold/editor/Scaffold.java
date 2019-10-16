@@ -11,10 +11,12 @@ import org.metaversemedia.scaffold.editor.ui.EditorWindow;
 import org.metaversemedia.scaffold.editor.ui.WelcomePanel;
 
 /**
- * Class that launches the editor
+ * The main class of scaffold. Contains static session variables and launches the editor.
  * @author Sam54123
  */
-public class Launch {
+public class Scaffold {
+	
+	public static Project project;
 
 	/**
 	 * Launch the application.

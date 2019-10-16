@@ -12,7 +12,7 @@ import javax.swing.JFileChooser;
 import javax.swing.SwingConstants;
 
 import org.metaversemedia.scaffold.core.Project;
-import org.metaversemedia.scaffold.editor.Launch;
+import org.metaversemedia.scaffold.editor.Scaffold;
 
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -90,7 +90,7 @@ public class WelcomePanel extends JFrame {
 				return;
 			}
 			System.out.println("Loaded project: "+file.getParent());
-			Launch.launchEditor(project);
+			Scaffold.launchEditor(project);
 			setVisible(false);
 		}
 	}
@@ -110,7 +110,7 @@ public class WelcomePanel extends JFrame {
 			}
 			
 			Project project = Project.init(projectDir.toString(), projectDir.getName());
-			Launch.launchEditor(project, true);
+			Scaffold.launchEditor(project, true);
 			setVisible(false);
 		}
 	}

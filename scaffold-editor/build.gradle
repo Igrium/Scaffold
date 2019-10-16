@@ -19,7 +19,7 @@ ext {
 }
 
 // Define the main class for the application
-mainClassName = 'org.metaversemedia.scaffold.editor.Launch'
+mainClassName = 'org.metaversemedia.scaffold.editor.Scaffold'
 
 dependencies {
     // This dependency is found on compile classpath of this component and consumers.

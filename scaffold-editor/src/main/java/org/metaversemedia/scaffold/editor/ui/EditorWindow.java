@@ -10,6 +10,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.apache.commons.io.FilenameUtils;
 import org.metaversemedia.scaffold.core.Project;
+import org.metaversemedia.scaffold.editor.Scaffold;
 import org.metaversemedia.scaffold.editor.editor3d.AppPanel;
 import org.metaversemedia.scaffold.editor.ui.ClassBrowser.ClassSelectListener;
 import org.metaversemedia.scaffold.level.Level;
@@ -32,9 +33,6 @@ public class EditorWindow extends JFrame {
 	private JPanel contentPane;
 	private JFileChooser fileChooser;
 
-	
-	/* Current project */
-	private Project project;
 	
 	/* Current level */
 	private Level level;
@@ -70,7 +68,7 @@ public class EditorWindow extends JFrame {
 	 * @return Project
 	 */
 	public Project getProject() {
-		return project;
+		return Scaffold.project;
 	}
 	
 	/**
@@ -130,7 +128,7 @@ public class EditorWindow extends JFrame {
 	 * Create the frame.
 	 */
 	public EditorWindow(Project project) {
-		this.project = project;
+		Scaffold.project = project;
 		
 		fileChooser = new JFileChooser(project.getProjectFolder().resolve("maps").toFile());
 		FileNameExtensionFilter fileFilter = new FileNameExtensionFilter("Minecraft Level Files", "mclevel");
@@ -372,7 +370,7 @@ public class EditorWindow extends JFrame {
 	 * @return New level
 	 */
 	public Level newLevel(File file) {
-		Level newLevel = new Level(project);
+		Level newLevel = new Level(getProject());
 		
 		if (newLevel == null || !newLevel.saveFile(file)) {
 			return null;
@@ -411,11 +409,11 @@ public class EditorWindow extends JFrame {
 	 * Compile the current level
 	 */
 	public void compile() {
-		level.compile(project.assetManager().getAbsolutePath("game/saves/world"));
+		level.compile(getProject().assetManager().getAbsolutePath("game/saves/world"));
 	}
 	
 	public void showProjectSettings() {
-		ProjectSettings projectSettings = new ProjectSettings(project);
+		ProjectSettings projectSettings = new ProjectSettings(getProject());
 		projectSettings.setVisible(true);
 	}
 	
