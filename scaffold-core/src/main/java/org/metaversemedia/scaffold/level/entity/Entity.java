@@ -115,7 +115,7 @@ public class Entity {
 	 * @return
 	 */
 	public String getRenderAsset() {
-		return "";
+		return "scaffold/textures/editor/billboard_generic.png";
 	}
 	
 	/**
