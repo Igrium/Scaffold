@@ -1,6 +1,8 @@
 package org.metaversemedia.scaffold.editor.editor3d;
 
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.metaversemedia.scaffold.editor.ui.EditorWindow;
 import org.metaversemedia.scaffold.level.entity.Entity;
@@ -17,6 +19,9 @@ import com.jme3.scene.Spatial;
 public class EditorApp extends SimpleApplication {
 	
 	private EditorWindow parent;
+	
+	// Maps entity3ds to their entity counterparts.
+	private Map<Entity, Entity3D> entities = new HashMap<Entity, Entity3D>();
 	
 	/**
 	 * Get this app's parent window.
@@ -61,6 +66,8 @@ public class EditorApp extends SimpleApplication {
 			n.removeFromParent();
 		}
 		
+		entities.clear();
+		
 //		Box b = new Box(1, 1, 1);
 //		Geometry geom = new Geometry("Box", b);
 //
@@ -72,10 +79,13 @@ public class EditorApp extends SimpleApplication {
 //
 //		rootNode.attachChild(geom);
 		
-		
-		
-		Entity ent = parent.getLevel().getEntity("testEnt");
-		rootNode.attachChild(new Entity3D(ent, this));
+		// Add all entities
+		for (Entity ent : parent.getLevel().getEntities().values()) {
+			Entity3D ent3d = new Entity3D(ent, this);
+			entities.put(ent, ent3d);
+			rootNode.attachChild(ent3d);
+		}
+
 	}
 
 }

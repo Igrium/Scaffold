@@ -24,6 +24,7 @@ public class Entity3D extends Node {
 	public Entity3D(Entity entity, EditorApp app) {
 		this.entity = entity;
 		this.app = app;
+		this.setName(entity.getName());
 		
 		refresh();
 	}
@@ -45,6 +46,8 @@ public class Entity3D extends Node {
 		}
 		
 		if (assetPath != entity.getRenderAsset()) {
+			
+			
 			if (entity.getRenderType() == RenderType.MODEL) {
 				// TODO implement this.
 			} else {		
