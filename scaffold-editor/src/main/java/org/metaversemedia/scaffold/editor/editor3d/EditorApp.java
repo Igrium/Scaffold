@@ -3,18 +3,12 @@ package org.metaversemedia.scaffold.editor.editor3d;
 import java.nio.file.Path;
 
 import org.metaversemedia.scaffold.editor.ui.EditorWindow;
+import org.metaversemedia.scaffold.level.entity.Entity;
 
 import com.jme3.app.SimpleApplication;
 import com.jme3.asset.plugins.ClasspathLocator;
 import com.jme3.asset.plugins.FileLocator;
-import com.jme3.material.Material;
-import com.jme3.math.ColorRGBA;
-import com.jme3.scene.Geometry;
-import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
-import com.jme3.scene.shape.Box;
-import com.jme3.texture.Texture;
-import com.jme3.texture.Texture.MagFilter;
 
 /**
  * The 3d rendered part of the editor.
@@ -67,16 +61,21 @@ public class EditorApp extends SimpleApplication {
 			n.removeFromParent();
 		}
 		
-		Box b = new Box(1, 1, 1);
-		Geometry geom = new Geometry("Box", b);
-
-		Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-		Texture tex = assetManager.loadTexture("minecraft/textures/block/stone.png");
-		tex.setMagFilter(MagFilter.Nearest);
-		mat.setTexture("ColorMap", tex);
-		geom.setMaterial(mat);
-
-		rootNode.attachChild(geom);
+//		Box b = new Box(1, 1, 1);
+//		Geometry geom = new Geometry("Box", b);
+//
+//		Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+//		Texture tex = assetManager.loadTexture("minecraft/textures/block/stone.png");
+//		tex.setMagFilter(MagFilter.Nearest);
+//		mat.setTexture("ColorMap", tex);
+//		geom.setMaterial(mat);
+//
+//		rootNode.attachChild(geom);
+		
+		
+		
+		Entity ent = parent.getLevel().getEntity("testEnt");
+		rootNode.attachChild(new Entity3D(ent, this));
 	}
 
 }
