@@ -35,5 +35,10 @@ public class Auto extends Entity {
 		
 		return true;
 	}
+	
+	@Override
+	public String getRenderAsset() {
+		return "scaffold/textures/editor/auto.png";
+	}
 
 }

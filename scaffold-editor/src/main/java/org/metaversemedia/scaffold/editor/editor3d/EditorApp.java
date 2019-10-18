@@ -1,20 +1,16 @@
 package org.metaversemedia.scaffold.editor.editor3d;
 
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.metaversemedia.scaffold.editor.ui.EditorWindow;
+import org.metaversemedia.scaffold.level.entity.Entity;
 
 import com.jme3.app.SimpleApplication;
 import com.jme3.asset.plugins.ClasspathLocator;
 import com.jme3.asset.plugins.FileLocator;
-import com.jme3.material.Material;
-import com.jme3.math.ColorRGBA;
-import com.jme3.scene.Geometry;
-import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
-import com.jme3.scene.shape.Box;
-import com.jme3.texture.Texture;
-import com.jme3.texture.Texture.MagFilter;
 
 /**
  * The 3d rendered part of the editor.
@@ -23,6 +19,9 @@ import com.jme3.texture.Texture.MagFilter;
 public class EditorApp extends SimpleApplication {
 	
 	private EditorWindow parent;
+	
+	// Maps entity3ds to their entity counterparts.
+	private Map<Entity, Entity3D> entities = new HashMap<Entity, Entity3D>();
 	
 	/**
 	 * Get this app's parent window.
@@ -67,16 +66,37 @@ public class EditorApp extends SimpleApplication {
 			n.removeFromParent();
 		}
 		
-		Box b = new Box(1, 1, 1);
-		Geometry geom = new Geometry("Box", b);
+		entities.clear();
+		
+		
+		// Add all entities
+		for (Entity ent : parent.getLevel().getEntities().values()) {
+			Entity3D ent3d = new Entity3D(ent, this);
+			entities.put(ent, ent3d);
+			rootNode.attachChild(ent3d);
+		}
 
-		Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-		Texture tex = assetManager.loadTexture("minecraft/textures/block/stone.png");
-		tex.setMagFilter(MagFilter.Nearest);
-		mat.setTexture("ColorMap", tex);
-		geom.setMaterial(mat);
-
-		rootNode.attachChild(geom);
+	}
+	
+	/**
+	 * Refresh the visual element of an entity.
+	 * @param ent Entity to refresh
+	 */
+	public void refreshEntity(Entity ent) {
+		Entity3D ent3d = entities.get(ent);
+		if (ent3d == null) {
+			return;
+		}
+		ent3d.refresh();
+	}
+	
+	/**
+	 * Refresh the visual element of all the entities in the scene.
+	 */
+	public void refreshEntities() {
+		for (Entity3D ent3d : entities.values()) {
+			ent3d.refresh();
+		}
 	}
 
 }

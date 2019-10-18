@@ -28,7 +28,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.GridLayout;
 
 /**
  * Editor window to edit an entity.
@@ -456,6 +455,7 @@ public class EntityEditor extends JDialog {
 		}
 		
 		parent.getOutliner().reload();
+		parent.get3dApp().refreshEntity(entity);
 		parent.markUnsaved();
 	}
 
