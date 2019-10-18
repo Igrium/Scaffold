@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
-import org.metaversemedia.scaffold.nbt.NBTStrings;
+import org.scaffoldeditor.nbt.NBTStrings;
 
 import com.flowpowered.nbt.CompoundMap;
 import com.flowpowered.nbt.CompoundTag;
