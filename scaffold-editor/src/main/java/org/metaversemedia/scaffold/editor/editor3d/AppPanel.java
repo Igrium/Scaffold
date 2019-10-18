@@ -30,7 +30,7 @@ public class AppPanel extends JPanel {
 	 * Starts the editor using the parent's level.
 	 * Restarts if already active.
 	 */
-	public void start() {
+	public void reload() {
 		if (app == null) {
 			AppSettings settings = new AppSettings(true);
 			settings.setWidth(getWidth());
@@ -52,6 +52,14 @@ public class AppPanel extends JPanel {
 			app.reload();
 		}
 		
+	}
+	
+	/**
+	 * Get the 3d app this displays.
+	 * @return App.
+	 */
+	public EditorApp getApp() {
+		return app;
 	}
 
 }

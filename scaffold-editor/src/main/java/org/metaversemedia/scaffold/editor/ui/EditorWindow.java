@@ -12,6 +12,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.metaversemedia.scaffold.core.Project;
 import org.metaversemedia.scaffold.editor.Scaffold;
 import org.metaversemedia.scaffold.editor.editor3d.AppPanel;
+import org.metaversemedia.scaffold.editor.editor3d.EditorApp;
 import org.metaversemedia.scaffold.editor.ui.ClassBrowser.ClassSelectListener;
 import org.metaversemedia.scaffold.level.Level;
 import org.metaversemedia.scaffold.level.entity.Entity;
@@ -345,7 +346,7 @@ public class EditorWindow extends JFrame {
 		getCompileButton().setEnabled(true);
 		
 		getOutliner().reload();
-		appPanel.start();
+		appPanel.reload();
 	}
 	
 	/**
@@ -436,5 +437,13 @@ public class EditorWindow extends JFrame {
 	}
 	protected Outliner getOutliner() {
 		return outliner;
+	}
+	
+	/**
+	 * Get the 3d engine app displayed in the editor.
+	 * @return 3d app.
+	 */
+	protected EditorApp get3dApp() {
+		return appPanel.getApp();
 	}
 }

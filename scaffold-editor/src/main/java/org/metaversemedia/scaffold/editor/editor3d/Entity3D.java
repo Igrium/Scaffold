@@ -1,11 +1,15 @@
 package org.metaversemedia.scaffold.editor.editor3d;
 
+import org.metaversemedia.scaffold.editor.editor3d.util.EditorUtils;
 import org.metaversemedia.scaffold.level.entity.Entity;
 import org.metaversemedia.scaffold.level.entity.Entity.RenderType;
 
 import com.jme3.material.Material;
+import com.jme3.material.RenderState.BlendMode;
+import com.jme3.renderer.queue.RenderQueue.Bucket;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
+import com.jme3.scene.control.BillboardControl;
 import com.jme3.scene.shape.Quad;
 import com.jme3.texture.Texture;
 import com.jme3.texture.Texture.MagFilter;
@@ -45,8 +49,9 @@ public class Entity3D extends Node {
 			return;
 		}
 		
+		this.setLocalTranslation(EditorUtils.sVectorToMVector(entity.getPosition()));
+		
 		if (assetPath != entity.getRenderAsset()) {
-			
 			
 			if (entity.getRenderType() == RenderType.MODEL) {
 				// TODO implement this.
@@ -59,7 +64,14 @@ public class Entity3D extends Node {
 				Texture tex = app.getAssetManager().loadTexture(entity.getRenderAsset());
 				tex.setMagFilter(MagFilter.Nearest);
 				mat.setTexture("ColorMap", tex);
+				mat.getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
+				geom.setQueueBucket(Bucket.Transparent);
 				geom.setMaterial(mat);
+				
+				// Setup billboard
+				BillboardControl bc = new BillboardControl();
+				bc.setAlignment(BillboardControl.Alignment.Screen);
+				geom.addControl(bc);
 				
 				this.attachChild(geom);
 			}

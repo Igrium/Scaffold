@@ -68,16 +68,6 @@ public class EditorApp extends SimpleApplication {
 		
 		entities.clear();
 		
-//		Box b = new Box(1, 1, 1);
-//		Geometry geom = new Geometry("Box", b);
-//
-//		Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-//		Texture tex = assetManager.loadTexture("minecraft/textures/block/stone.png");
-//		tex.setMagFilter(MagFilter.Nearest);
-//		mat.setTexture("ColorMap", tex);
-//		geom.setMaterial(mat);
-//
-//		rootNode.attachChild(geom);
 		
 		// Add all entities
 		for (Entity ent : parent.getLevel().getEntities().values()) {
@@ -86,6 +76,27 @@ public class EditorApp extends SimpleApplication {
 			rootNode.attachChild(ent3d);
 		}
 
+	}
+	
+	/**
+	 * Refresh the visual element of an entity.
+	 * @param ent Entity to refresh
+	 */
+	public void refreshEntity(Entity ent) {
+		Entity3D ent3d = entities.get(ent);
+		if (ent3d == null) {
+			return;
+		}
+		ent3d.refresh();
+	}
+	
+	/**
+	 * Refresh the visual element of all the entities in the scene.
+	 */
+	public void refreshEntities() {
+		for (Entity3D ent3d : entities.values()) {
+			ent3d.refresh();
+		}
 	}
 
 }
