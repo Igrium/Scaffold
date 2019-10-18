@@ -77,5 +77,10 @@ public class Relay extends Entity {
 	public String getFunctionName() {
 		return "relay_" + getName();
 	}
+	
+	@Override
+	public String getRenderAsset() {
+		return "scaffold/textures/editor/relay.png";
+	}
 
 }

@@ -43,5 +43,9 @@ public class FunctionEntity extends Entity {
 		return attributes;
 	}
 	
+	@Override
+	public String getRenderAsset() {
+		return "scaffold/textures/editor/function.png";
+	}
 
 }
