@@ -30,7 +30,7 @@ public class PropButton extends SingleBlock {
 	}
 
 	/**
-	 * The Minecraft blocks that each button type corrisponds to.
+	 * The Minecraft blocks that each button type corresponds to.
 	 */
 	private static final Map<ButtonType, String> blockNames = new HashMap<ButtonType, String>();
 
