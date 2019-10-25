@@ -101,7 +101,7 @@ public class PropButton extends SingleBlock {
 	 * 
 	 * @param type New type.
 	 */
-	public void SetButtonType(ButtonType type) {
+	public void setButtonType(ButtonType type) {
 		setAttribute("buttonType", type);
 	}
 
