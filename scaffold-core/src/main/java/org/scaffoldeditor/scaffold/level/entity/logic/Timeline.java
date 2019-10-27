@@ -5,6 +5,7 @@ import org.json.JSONObject;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.MapAttribute;
+import org.scaffoldeditor.scaffold.level.io.Input;
 import org.scaffoldeditor.scaffold.logic.Datapack;
 import org.scaffoldeditor.scaffold.logic.MCFunction;
 
@@ -13,6 +14,73 @@ public class Timeline extends Entity {
 	public Timeline(Level level, String name) {
 		super(level, name);
 		setAttribute("outputs", new MapAttribute());
+		
+		this.registerInput(new Input(this) {
+
+			@Override
+			public String getName() {
+				return "Start";
+			}
+
+			@Override
+			public boolean takesArgs() {
+				return false;
+			}
+
+			@Override
+			public String getCommand(Entity instigator, Entity caller, String[] args) {
+				return "scoreboard players set "+getLevel().getScoreboardEntity().getTargetSelector()+" "
+						+getPlayingObjective()+" 1";
+			}
+		});
+		
+		this.registerInput(new Input(this) {
+
+			@Override
+			public String getName() {
+				return "Stop";
+			}
+
+			@Override
+			public boolean takesArgs() {
+				return false;
+			}
+
+			@Override
+			public String getCommand(Entity instigator, Entity caller, String[] args) {
+				return "scoreboard players set "+getLevel().getScoreboardEntity().getTargetSelector()+" "
+						+getPlayingObjective()+" 0";
+			}
+			
+		});
+		
+		this.registerInput(new Input(this) {
+
+			@Override
+			public String getName() {
+				return "SetFrame";
+			}
+
+			@Override
+			public boolean takesArgs() {
+				return true;
+			}
+
+			@Override
+			public String getCommand(Entity instigator, Entity caller, String[] args) {
+				
+				// Make sure arguements were passed correctly.
+				try {
+					Integer.parseInt(args[0]);
+				} catch (NullPointerException | NumberFormatException e) {
+					return "";
+				}
+				
+				return "scoreboard players set "+getLevel().getScoreboardEntity().getTargetSelector()+" "
+						+getFrameObjective()+" "+args[0];
+			}
+			
+		});
 	}
 	
 	/**
@@ -20,7 +88,14 @@ public class Timeline extends Entity {
 	 * @return Frame objective name.
 	 */
 	public String getFrameObjective() {
-		return (getLevel().getName()+"."+getName()+".frame").toLowerCase();
+		String s = ("s."+getName()+".frame").toLowerCase();
+		
+		// Scoreboard objective must be less than 16 chars.
+		if (s.length() > 16) {
+			return s.substring(s.length()-16);
+		} else {
+			return s;
+		}
 	}
 	
 	/**
@@ -28,7 +103,12 @@ public class Timeline extends Entity {
 	 * @return Playing objective name.
 	 */
 	public String getPlayingObjective() {
-		return (getLevel().getName()+"."+getName()+".playing").toLowerCase();
+		String s = ("s."+getName()+".playing").toLowerCase();
+		if (s.length() > 16) {
+			return s.substring(s.length()-16);
+		} else {
+			return s;
+		}
 	}
 	
 	@Override
@@ -54,7 +134,7 @@ public class Timeline extends Entity {
 		// Make level run function every tick if playing.
 		getLevel().tickFunction()
 				.addCommand("execute as " + getLevel().getScoreboardEntity().getTargetSelector()
-						+ " if score @s "+ getPlayingObjective() + " matches 1 run "
+						+ " if score @s "+ getPlayingObjective() + " matches 1 run function "
 						+ getLevel().getDatapack().formatFunctionCall(timelineTick));
 		
 		return true;

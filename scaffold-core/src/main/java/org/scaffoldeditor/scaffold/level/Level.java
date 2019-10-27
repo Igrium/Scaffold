@@ -26,6 +26,7 @@ import org.scaffoldeditor.scaffold.logic.MCFunction;
 import org.scaffoldeditor.scaffold.math.Vector;
 
 import com.flowpowered.nbt.CompoundMap;
+import com.flowpowered.nbt.IntTag;
 import com.flowpowered.nbt.StringTag;
 
 /**
@@ -255,6 +256,7 @@ public class Level {
 	private String summonScoreboardEntity() {
 		CompoundMap nbt = new CompoundMap();
 		nbt.put(new StringTag("CustomName", "\""+SCOREBOARDNAME+"\""));
+		nbt.put(new IntTag("Duration", 2000000000));
 		
 		return "summon "+SCOREBOARDTYPE+" 0 0 0 "+NBTStrings.nbtToString(nbt);
 	}
