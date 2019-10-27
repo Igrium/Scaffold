@@ -181,4 +181,9 @@ public class Timeline extends Entity {
 		super.onUnserialized(object);
 		setAttribute("outputs", new MapAttribute(object.getJSONObject("attributes").getJSONObject("outputs")));
 	}
+	
+	@Override
+	public String getRenderAsset() {
+		return "scaffold/textures/editor/clock.png";
+	}
 }
