@@ -243,7 +243,7 @@ public class Level {
 			scoreboardEntity = new TargetSelectable() {
 				@Override
 				public String getTargetSelector() {
-					return "@e [type="+SCOREBOARDTYPE+", name="+SCOREBOARDNAME+"]";
+					return "@e[type="+SCOREBOARDTYPE+", name="+SCOREBOARDNAME+"]";
 				}
 			};
 		}
