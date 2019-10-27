@@ -207,6 +207,20 @@ public class Entity {
 	}
 	
 	/**
+	 * Get whether this entity has an output connection of the given name.
+	 * @param name Name to check for.
+	 * @return Has output connection?
+	 */
+	public boolean hasOutput(String name) {
+		for (Output o : outputConnections()) {
+			if (o.name.matches(name)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
 	 * Create a new output.
 	 * @param name Name of the output to trigger on.
 	 * @return New output.
