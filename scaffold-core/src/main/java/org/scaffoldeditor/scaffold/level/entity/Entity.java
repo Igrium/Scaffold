@@ -127,6 +127,14 @@ public class Entity {
 	}
 	
 	/**
+	 * Get the name the entity should have when it is first spawned into the editor.
+	 * @return Default name.
+	 */
+	public String getDefaultName() {
+		return getClass().getSimpleName().toLowerCase();
+	}
+	
+	/**
 	 * Get this entity's world position.
 	 * @return Position
 	 */

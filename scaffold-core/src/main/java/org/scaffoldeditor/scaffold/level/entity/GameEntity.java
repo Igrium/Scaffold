@@ -152,4 +152,9 @@ public class GameEntity extends Rotatable implements TargetSelectable {
 		// TODO Auto-generated method stub
 		return "@e [type="+getEntityType()+",name="+getName()+"]";
 	}
+	
+	@Override
+	public String getDefaultName() {
+		return "entity";
+	}
 }
