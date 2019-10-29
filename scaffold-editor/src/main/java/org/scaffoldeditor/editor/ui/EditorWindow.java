@@ -312,6 +312,7 @@ public class EditorWindow extends JFrame {
 	 */
 	public void newEntity(Class<? extends Entity> type) {
 		Entity entity = level.newEntity(type, type.getSimpleName(), new Vector(0,0,0));
+		level.renameEntity(entity.getName(), entity.getDefaultName());
 		markUnsaved();
 		reload();
 		showEntityEditor(entity);
