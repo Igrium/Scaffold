@@ -2,22 +2,16 @@ package org.scaffoldeditor.editor.ui;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
+import org.scaffoldeditor.scaffold.logic.timeline.Timeline;
 import org.scaffoldeditor.scaffold.logic.timeline.TimelineEvent;
 
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.layout.RowSpec;
-import javax.swing.JLabel;
-import java.awt.GridBagLayout;
-import java.awt.TextField;
-
-import javax.swing.JList;
 import javax.swing.Box;
 import javax.swing.JScrollPane;
 import javax.swing.BoxLayout;
@@ -31,17 +25,23 @@ public class TimelineEditor extends JDialog {
 	/**
 	 * Represents a single row, one event, in the Timeline Editor.
 	 */
-	protected class EventEditor extends JPanel {
-		/**
-		 * 
-		 */
+	protected class EventEditor extends JPanel implements Comparable<EventEditor> {
+
 		private static final long serialVersionUID = 1L;
 		
+		/**
+		 * Keep track of old event in case event was not updated.
+		 */
 		private TimelineEvent oldEvent;
 		
 		JTextField frame;
 		JTextField name;
-
+		
+		/**
+		 * Create an event editor.
+		 * @param frame Default frame.
+		 * @param name Default name.
+		 */
 		public EventEditor(int frame, String name) {
 			this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 			
@@ -52,8 +52,41 @@ public class TimelineEditor extends JDialog {
 			this.add(this.name);
 		};
 		
+		/**
+		 * Create an event editor with an existing event.
+		 * @param defaultEvent Default event.
+		 */
 		public EventEditor(TimelineEvent defaultEvent) {
 			this(defaultEvent.frame, defaultEvent.name);
+		}
+		
+		/**
+		 * Generate a timeline event based on the values in the editor's fields.
+		 * @return
+		 */
+		public TimelineEvent getEvent() {
+			int frame = getFrame();
+			String name = this.name.getText();
+			
+			if (oldEvent != null && frame == oldEvent.frame && name.equals(oldEvent.name)) {
+				return oldEvent;
+			} else {
+				oldEvent = new TimelineEvent(frame, name);
+				return oldEvent;
+			}
+		}
+		
+		public int getFrame() {
+			return Integer.valueOf(this.frame.getText());
+		}
+		
+		public String getName() {
+			return this.name.getText();
+		}
+
+		@Override
+		public int compareTo(EventEditor o) {
+			return getFrame() - o.getFrame();
 		}
 	}
 
@@ -63,6 +96,9 @@ public class TimelineEditor extends JDialog {
 	private static final long serialVersionUID = 1L;
 	private final JPanel contentPanel = new JPanel();
 	private JTextField textField;
+	private Timeline timeline;
+	
+	protected List<EventEditor> eventEditors;
 
 	/**
 	 * Launch the application.
@@ -128,4 +164,22 @@ public class TimelineEditor extends JDialog {
 		}
 	}
 
+	public void setTimeline(Timeline timeline) {
+		this.timeline = timeline;
+		eventEditors.clear();
+		
+		for (TimelineEvent e : timeline) {
+			eventEditors.add(new EventEditor(e));
+		}
+	}
+	
+	/**
+	 * Save the current editor data out to the timeline.
+	 */
+	public void save() {
+		timeline.clear();
+		for (EventEditor e : eventEditors) {
+			timeline.put(e.getEvent());
+		}
+	}
 }
