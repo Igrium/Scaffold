@@ -2,6 +2,8 @@ package org.scaffoldeditor.editor.ui;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -16,6 +18,8 @@ import javax.swing.Box;
 import javax.swing.JScrollPane;
 import javax.swing.BoxLayout;
 import javax.swing.JTextField;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 /**
  * Dialog which can edit a timeline.
@@ -99,6 +103,7 @@ public class TimelineEditor extends JDialog {
 	private Timeline timeline;
 	
 	protected List<EventEditor> eventEditors;
+	private JPanel eventPanel;
 
 	/**
 	 * Launch the application.
@@ -126,7 +131,7 @@ public class TimelineEditor extends JDialog {
 			JScrollPane scrollPane = new JScrollPane();
 			contentPanel.add(scrollPane);
 			{
-				JPanel eventPanel = new JPanel();
+				eventPanel = new JPanel();
 				scrollPane.setViewportView(eventPanel);
 				eventPanel.setLayout(new BoxLayout(eventPanel, BoxLayout.Y_AXIS));
 				{
@@ -152,18 +157,42 @@ public class TimelineEditor extends JDialog {
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 			{
 				JButton okButton = new JButton("OK");
+				okButton.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						save();
+						setVisible(false);
+					}
+				});
 				okButton.setActionCommand("OK");
 				buttonPane.add(okButton);
 				getRootPane().setDefaultButton(okButton);
 			}
 			{
 				JButton cancelButton = new JButton("Cancel");
+				cancelButton.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						setVisible(false);
+					}
+				});
 				cancelButton.setActionCommand("Cancel");
 				buttonPane.add(cancelButton);
 			}
 		}
 	}
-
+	
+	/**
+	 * Opens the timeline editor.
+	 * @param timeline Timeline to edit.
+	 */
+	public void open(Timeline timeline) {
+		setTimeline(timeline);
+		setVisible(true);
+	}
+	
+	/**
+	 * Set the timeline this editor is editing.
+	 * @param timeline New timeline.
+	 */
 	public void setTimeline(Timeline timeline) {
 		this.timeline = timeline;
 		eventEditors.clear();
@@ -171,6 +200,16 @@ public class TimelineEditor extends JDialog {
 		for (TimelineEvent e : timeline) {
 			eventEditors.add(new EventEditor(e));
 		}
+		
+		resort();
+	}
+	
+	/**
+	 * Get the timeline this editor is editing.
+	 * @return Timeline.
+	 */
+	public Timeline getTimeline() {
+		return timeline;
 	}
 	
 	/**
@@ -181,5 +220,27 @@ public class TimelineEditor extends JDialog {
 		for (EventEditor e : eventEditors) {
 			timeline.put(e.getEvent());
 		}
+	}
+	
+	/**
+	 * Reload the event panel.
+	 */
+	private void reloadPanel() {
+		getEventPanel().removeAll();
+		for (EventEditor e : eventEditors) {
+			getEventPanel().add(e);
+		}
+	}
+	
+	/**
+	 * Reorganize the events by frame order
+	 */
+	private void resort() {
+		Collections.sort(eventEditors);
+		reloadPanel();
+	}
+	
+	protected JPanel getEventPanel() {
+		return eventPanel;
 	}
 }
