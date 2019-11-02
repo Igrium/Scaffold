@@ -18,6 +18,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.awt.event.ActionEvent;
 import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 @SuppressWarnings("serial")
 public class WelcomePanel extends JFrame {
@@ -74,10 +75,19 @@ public class WelcomePanel extends JFrame {
 		btnCreateProject.setToolTipText("Create a new project.");
 		panel.add(btnCreateProject);
 		
+		JButton btnEditTimeline = new JButton("Edit Timeline");
+		btnEditTimeline.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				editTimeline();
+			}
+		});
+		btnEditTimeline.setToolTipText("Edit a Timeline.");
+		panel.add(btnEditTimeline);
+		
 	}
 	
 	public void loadProject() {
-		// Show file choosing dialouge
+		// Show file choosing dialoge
 		JFileChooser fileChooser = new JFileChooser();
 		int returnVal = fileChooser.showOpenDialog(this);
 		
@@ -96,7 +106,7 @@ public class WelcomePanel extends JFrame {
 	}
 	
 	public void createProject() {
-		// Show file choosing dialouge
+		// Show file choosing dialoge
 		JFileChooser fileChooser = new JFileChooser();
 		int returnVal = fileChooser.showSaveDialog(this);
 		
@@ -114,5 +124,20 @@ public class WelcomePanel extends JFrame {
 			setVisible(false);
 		}
 	}
-
+	
+	public void editTimeline() {
+		// Show file choosing dialoge.
+		JFileChooser fileChooser = new JFileChooser();
+		FileNameExtensionFilter fileFilter = new FileNameExtensionFilter("JSON Files", "json");
+		fileChooser.setFileFilter(fileFilter);
+		fileChooser.setName("Choose File");
+		int returnVal = fileChooser.showSaveDialog(this);
+		
+		if (returnVal == JFileChooser.APPROVE_OPTION) {
+			File timelineFile = fileChooser.getSelectedFile();
+			
+			TimelineEditor editor = new TimelineEditor();
+			editor.open(timelineFile);
+		}
+	}
 }

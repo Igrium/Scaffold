@@ -11,14 +11,19 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
+import org.json.JSONObject;
 import org.scaffoldeditor.scaffold.logic.timeline.Timeline;
 import org.scaffoldeditor.scaffold.logic.timeline.TimelineEvent;
+import org.scaffoldeditor.scaffold.util.JSONUtils;
 
 import javax.swing.Box;
 import javax.swing.JScrollPane;
 import javax.swing.BoxLayout;
 import javax.swing.JTextField;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.awt.event.ActionEvent;
 
 /**
@@ -47,7 +52,7 @@ public class TimelineEditor extends JDialog {
 		 * @param name Default name.
 		 */
 		public EventEditor(int frame, String name) {
-			this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+			this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 			
 			this.frame = new JTextField(String.valueOf(frame));
 			this.add(this.frame);
@@ -102,8 +107,13 @@ public class TimelineEditor extends JDialog {
 	private JTextField textField;
 	private Timeline timeline;
 	
-	protected List<EventEditor> eventEditors;
+	protected List<EventEditor> eventEditors = new ArrayList<EventEditor>();
 	private JPanel eventPanel;
+	
+	/**
+	 * The file of the timeline.
+	 */
+	protected File sourceFile;
 
 	/**
 	 * Launch the application.
@@ -181,11 +191,21 @@ public class TimelineEditor extends JDialog {
 	}
 	
 	/**
-	 * Opens the timeline editor.
+	 * Open the timeline editor.
 	 * @param timeline Timeline to edit.
 	 */
 	public void open(Timeline timeline) {
 		setTimeline(timeline);
+		setVisible(true);
+	}
+	
+	/**
+	 * Open the timeline editor.
+	 * @param file File to edit.
+	 */
+	public void open(File file) {
+		setSourceFile(file);
+		reload();
 		setVisible(true);
 	}
 	
@@ -220,6 +240,49 @@ public class TimelineEditor extends JDialog {
 		for (EventEditor e : eventEditors) {
 			timeline.put(e.getEvent());
 		}
+		
+		// Save to file
+		if (sourceFile != null) {
+			try {
+				if (!sourceFile.exists()) {
+					sourceFile.createNewFile();
+				}
+				FileWriter writer = new FileWriter(sourceFile);
+				timeline.serialize().write(writer);
+				writer.close();
+				
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	/**
+	 * Reload the timeline from the current source file.
+	 */
+	public void reload() {
+		try {
+			JSONObject timelineObj = JSONUtils.loadJSON(sourceFile.toPath());
+			setTimeline(Timeline.unserialize(timelineObj));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Set the file the editor will save to without reloading the timeline.
+	 * @param file Source file.
+	 */
+	public void setSourceFile(File file) {
+		sourceFile = file;
+	}
+	
+	/**
+	 * Get the file the editor will save to.
+	 * @return Source file.
+	 */
+	public File getSourceFile() {
+		return sourceFile;
 	}
 	
 	/**
