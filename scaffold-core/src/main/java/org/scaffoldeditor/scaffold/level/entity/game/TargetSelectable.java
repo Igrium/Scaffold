@@ -1,4 +1,4 @@
-package org.scaffoldeditor.scaffold.level.entity;
+package org.scaffoldeditor.scaffold.level.entity.game;
 
 /**
  * Represents an entity that has a runtime presence in Minecraft and can be selected with target selectors.

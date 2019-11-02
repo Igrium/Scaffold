@@ -1,4 +1,4 @@
-package org.scaffoldeditor.scaffold.level.entity;
+package org.scaffoldeditor.scaffold.level.entity.game;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -7,6 +7,9 @@ import java.util.List;
 import org.json.JSONObject;
 import org.scaffoldeditor.nbt.NBTStrings;
 import org.scaffoldeditor.scaffold.level.Level;
+import org.scaffoldeditor.scaffold.level.entity.Entity;
+import org.scaffoldeditor.scaffold.level.entity.Rotatable;
+import org.scaffoldeditor.scaffold.level.entity.Entity.AttributeDeclaration;
 import org.scaffoldeditor.scaffold.logic.Datapack;
 import org.scaffoldeditor.scaffold.math.Vector;
 

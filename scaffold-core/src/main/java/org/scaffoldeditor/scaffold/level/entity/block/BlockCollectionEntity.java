@@ -1,8 +1,9 @@
-package org.scaffoldeditor.scaffold.level.entity;
+package org.scaffoldeditor.scaffold.level.entity.block;
 
 import org.scaffoldeditor.nbt.SizedBlockCollection;
 import org.scaffoldeditor.scaffold.level.BlockWorld;
 import org.scaffoldeditor.scaffold.level.Level;
+import org.scaffoldeditor.scaffold.level.entity.Faceable;
 import org.scaffoldeditor.scaffold.math.Vector;
 
 /**

@@ -1,4 +1,4 @@
-package org.scaffoldeditor.scaffold.level.entity;
+package org.scaffoldeditor.scaffold.level.entity.block;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -7,6 +7,9 @@ import java.util.List;
 
 import org.scaffoldeditor.nbt.schematic.Structure;
 import org.scaffoldeditor.scaffold.level.Level;
+import org.scaffoldeditor.scaffold.level.entity.Entity;
+import org.scaffoldeditor.scaffold.level.entity.Entity.AttributeDeclaration;
+import org.scaffoldeditor.scaffold.level.entity.Entity.FileAttribute;
 
 /**
  * Represents a Minecraft structure in the level (.nbt);

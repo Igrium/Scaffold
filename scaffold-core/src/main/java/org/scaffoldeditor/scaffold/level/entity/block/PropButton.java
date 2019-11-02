@@ -7,8 +7,8 @@ import java.util.Map;
 import org.json.JSONObject;
 import org.scaffoldeditor.nbt.Block;
 import org.scaffoldeditor.scaffold.level.Level;
-import org.scaffoldeditor.scaffold.level.entity.TargetSelectable;
 import org.scaffoldeditor.scaffold.level.entity.Faceable.Direction;
+import org.scaffoldeditor.scaffold.level.entity.game.TargetSelectable;
 import org.scaffoldeditor.scaffold.logic.Datapack;
 import org.scaffoldeditor.scaffold.logic.MCFunction;
 

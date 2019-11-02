@@ -1,4 +1,4 @@
-package org.scaffoldeditor.scaffold.level.entity;
+package org.scaffoldeditor.scaffold.level;
 
 import java.util.HashMap;
 
