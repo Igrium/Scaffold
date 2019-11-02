@@ -147,6 +147,13 @@ public class Timeline implements Iterable<TimelineEvent> {
 	}
 	
 	/**
+	 * Clear all events from the timeline.
+	 */
+	public void clear() {
+		events.clear();
+	}
+	
+	/**
 	 * Get the length of the timeline (number AFTER last frame with an event)
 	 * @return Timeline length.
 	 */
