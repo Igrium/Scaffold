@@ -61,7 +61,7 @@ public class AssetManager {
 		if (Paths.get(normalize(path)).isAbsolute()) {
 			return Paths.get(normalize(path));
 		}
-		return Paths.get(project.getProjectFolder().toString(), normalize(path));
+		return project.getProjectFolder().resolve(normalize(path));
 	}
 	
 	/**

@@ -15,20 +15,23 @@ import java.util.List;
  */
 public abstract class FileIgnore {
 	/**
-	 * List of all files to ignore
+	 * List of all files to ignore.
 	 */
 	public final List<Path> ignoredFiles = new ArrayList<Path>();
 	
 	/**
-	 * List of strings that cause any files containing them to be ignored
+	 * List of strings that cause any files containing them to be ignored.
 	 */
 	public final List<String> ignoredStrings = new ArrayList<String>();
 	
+	/**
+	 * Path to ignore file.
+	 */
 	protected Path filePath;
 	
 	/**
 	 * Create a new FileIngnore with a path
-	 * @param path
+	 * @param path Path to ignore file.
 	 */
 	public FileIgnore(Path path) {
 		this.filePath = path;

@@ -144,5 +144,11 @@ public class Project {
 		return getProjectFolder().getFileName().toString();
 	}
 	
-	
+	/**
+	 * Get the project's title.
+	 * @return Title.
+	 */
+	public String getTitle() {
+		return gameInfo.getTitle();
+	}
 }

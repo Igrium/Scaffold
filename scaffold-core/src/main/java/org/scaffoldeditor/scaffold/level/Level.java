@@ -17,12 +17,14 @@ import org.apache.commons.io.FilenameUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.scaffoldeditor.nbt.NBTStrings;
+import org.scaffoldeditor.scaffold.core.AssetManager;
 import org.scaffoldeditor.scaffold.core.Constants;
 import org.scaffoldeditor.scaffold.core.Project;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.game.TargetSelectable;
 import org.scaffoldeditor.scaffold.logic.Datapack;
 import org.scaffoldeditor.scaffold.logic.MCFunction;
+import org.scaffoldeditor.scaffold.logic.Resourcepack;
 import org.scaffoldeditor.scaffold.math.Vector;
 
 import com.flowpowered.nbt.CompoundMap;
@@ -509,12 +511,17 @@ public class Level {
 		try {
 			setupCompile(compileTarget, cheats);
 			
-			// Setup and compile logic
+			// Setup and compile logic.
 			Path datapackFolder = compileTarget.resolve("datapacks");
 			datapackFolder.toFile().mkdir();
 			if (!compileLogic(datapackFolder)) {
 				return false;
 			}
+			
+			// Compile resourcepack.
+			Resourcepack resourcepack = new Resourcepack(getProject().assetManager().getAbsolutePath("assets"));
+			resourcepack.setDescription("Resources for "+project.getTitle());
+			resourcepack.compile(compileTarget.resolve("resources"), true);
 			
 			return true;
 		} catch (IOException e) {
