@@ -112,7 +112,26 @@ public class Chunk implements BlockCollection {
 
 			@Override
 			public boolean hasNext() {
-				return (headX < WIDTH || headY < HEIGHT || headZ < LENGTH);
+				// Backup the heads.
+				int oldHeadX = this.headX;
+				int oldHeadY = this.headY;
+				int oldHeadZ = this.headZ;
+
+				// Search for additional values
+				boolean success = false;
+				while (headX < WIDTH && headY < HEIGHT && headZ < LENGTH) {
+					if (blocks[headX][headY][headZ] != -1) {
+						success = true;
+						break;
+					}
+					iterate();
+				}
+
+				headX = oldHeadX;
+				headY = oldHeadY;
+				headZ = oldHeadZ;
+
+				return success;
 			}
 
 			@Override
@@ -120,7 +139,6 @@ public class Chunk implements BlockCollection {
 				short index = -1;
 				
 				// Iterate until we find a non-void block
-				// Special case for Y is to prevent array exception when reached the end of chunk
 				while (index < 0 && hasNext()) {
 					index = blocks[headX][headY][headZ];
 					iterate();
@@ -140,7 +158,7 @@ public class Chunk implements BlockCollection {
 				} else if (headZ+1 < LENGTH) {
 					headX = 0;
 					headZ++;
-				} else if (headY+1 < HEIGHT) {
+				} else if (headY < HEIGHT) {
 					headX = 0;
 					headZ = 0;
 					headY++;
