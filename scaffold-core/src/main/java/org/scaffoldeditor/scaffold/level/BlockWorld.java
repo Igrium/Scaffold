@@ -2,6 +2,7 @@ package org.scaffoldeditor.scaffold.level;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.scaffoldeditor.nbt.Block;
@@ -165,5 +166,29 @@ public class BlockWorld implements BlockCollection {
 	 */
 	public void clear() {
 		chunks.clear();
+	}
+	
+	// Iterates over all chunks, and all blocks in the chunks.
+	@Override
+	public Iterator<Block> iterator() {
+		return new Iterator<Block>() {
+			
+			private Iterator<Chunk> chunksIterator = chunks().iterator();
+			private Iterator<Block> chunk = null;
+			
+			@Override
+			public boolean hasNext() {
+				return (chunksIterator.hasNext() || (chunk != null && chunk.hasNext()));
+			}
+
+			@Override
+			public Block next() {
+				if (chunk == null || !chunk.hasNext()) {
+					chunk = chunksIterator.next().iterator();
+				}
+				
+				return chunk.next();
+			}
+		};
 	}
 }

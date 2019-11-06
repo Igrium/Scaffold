@@ -5,7 +5,7 @@ package org.scaffoldeditor.nbt;
  * like a schematic or structure file.
  * @author Sam54123
  */
-public interface BlockCollection {
+public interface BlockCollection extends Iterable<Block> {
 	
 	/**
 	 * Get the the block at a particular location.

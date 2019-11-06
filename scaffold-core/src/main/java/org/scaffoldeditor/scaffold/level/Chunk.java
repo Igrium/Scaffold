@@ -2,6 +2,7 @@ package org.scaffoldeditor.scaffold.level;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import org.scaffoldeditor.nbt.Block;
@@ -99,6 +100,54 @@ public class Chunk implements BlockCollection {
 		}
 		
 		return blockArray;
+	}
+
+	@Override
+	public Iterator<Block> iterator() {
+		return new Iterator<Block>() {
+			
+			private int headX = 0;
+			private int headY = 0;
+			private int headZ = 0;
+
+			@Override
+			public boolean hasNext() {
+				return (headX < WIDTH || headY < HEIGHT || headZ < LENGTH);
+			}
+
+			@Override
+			public Block next() {
+				short index = -1;
+				
+				// Iterate until we find a non-void block
+				// Special case for Y is to prevent array exception when reached the end of chunk
+				while (index < 0 && hasNext()) {
+					index = blocks[headX][headY][headZ];
+					iterate();
+				}
+				
+				iterate();
+				return palette.get(index);
+			}
+			
+			/**
+			 * Move the heads to the next available slot.
+			 * Scans in an X -> Z -> Y order
+			 */
+			private void iterate() {
+				if (headX+1 < WIDTH) {
+					headX++;
+				} else if (headZ+1 < LENGTH) {
+					headX = 0;
+					headZ++;
+				} else if (headY+1 < HEIGHT) {
+					headX = 0;
+					headZ = 0;
+					headY++;
+				}
+			}
+			
+		};
 	}
 
 }

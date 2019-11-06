@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -376,4 +377,23 @@ public class Structure implements SizedBlockCollection {
 		return structure;
 	}
 
+	@Override
+	public Iterator<Block> iterator() {
+		return new Iterator<Block>() {
+			
+			private int head = 0;
+			
+			@Override
+			public boolean hasNext() {
+				return head < blocks.size();
+			}
+
+			@Override
+			public Block next() {
+				int state = getState(blocks.get(head));
+				head++;
+				return Block.fromBlockPalleteEntry(palette[state]);
+			}
+		};
+	}
 }

@@ -15,20 +15,14 @@ public class BlockWorldTest {
 		blockworld.setBlock(4, 23, 55, new Block("minecraft:stone", new CompoundMap()));
 		blockworld.setBlock(0,0,0, new Block("minecraft:iron_ore", new CompoundMap()));
 		
-//		try {
-//			Structure house = Structure.fromFile(new File("C:\\Users\\Sam54123\\Documents\\Minecraft\\MapdevUtils\\Scaffold\\testProject\\schematics\\house.nbt"));
-//			blockworld.addBlockCollection(house, 16, 0, 0);
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//s
-//		System.out.println(blockworld.blockAt(4, 23, 55));
-//		System.out.println(blockworld.blockAt(20, 4, 7));
-//		
-//		for (Chunk c : blockworld.chunks()) {
-//			System.out.println(c);	
-//		}
+		System.out.println("Testing blockworld.");
+		try {
+			for (Block block : blockworld) {
+				System.out.println(block);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		
 
 	}
