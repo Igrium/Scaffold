@@ -1,13 +1,9 @@
-package org.scaffoldeditor.scaffold.level;
+package org.scaffoldeditor.nbt.block;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-
-import org.scaffoldeditor.nbt.Block;
-import org.scaffoldeditor.nbt.BlockCollection;
-import org.scaffoldeditor.scaffold.math.Vector;
 
 /**
  * Represents a single chunk in the world.
@@ -53,16 +49,7 @@ public class Chunk implements BlockCollection {
 			return null;
 		}
 	}
-	
-	/**
-	 * Get the block at a particular location.
-	 * @param pos Location.
-	 * @return Block.
-	 */
-	public Block blockAt(Vector pos) {
-		return blockAt((int) pos.X(), (int) pos.Y(), (int) pos.Z());
-	}
-	
+
 	public void setBlock(int x, int y, int z, Block block) {
 		if (!palette.contains(block)) {
 			palette.add(block); // Make sure block is in palette

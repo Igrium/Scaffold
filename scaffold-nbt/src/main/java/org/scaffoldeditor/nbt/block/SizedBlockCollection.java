@@ -1,4 +1,4 @@
-package org.scaffoldeditor.nbt;
+package org.scaffoldeditor.nbt.block;
 
 /**
  * Represents a block collection that has a finite amount of blocks and size

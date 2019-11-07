@@ -1,8 +1,8 @@
 package org.metaversemedia.scaffold.test;
 
 import org.junit.Test;
-import org.scaffoldeditor.nbt.Block;
-import org.scaffoldeditor.scaffold.level.BlockWorld;
+import org.scaffoldeditor.nbt.block.Block;
+import org.scaffoldeditor.nbt.block.BlockWorld;
 
 import com.flowpowered.nbt.CompoundMap;
 

@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.scaffoldeditor.nbt.Block;
-import org.scaffoldeditor.nbt.SizedBlockCollection;
+import org.scaffoldeditor.nbt.block.Block;
+import org.scaffoldeditor.nbt.block.SizedBlockCollection;
 
 import java.util.Objects;
 

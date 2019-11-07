@@ -1,8 +1,8 @@
 package org.scaffoldeditor.scaffold.level.entity.block;
 
 
-import org.scaffoldeditor.nbt.Block;
-import org.scaffoldeditor.scaffold.level.BlockWorld;
+import org.scaffoldeditor.nbt.block.Block;
+import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 

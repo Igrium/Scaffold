@@ -1,4 +1,4 @@
-package org.scaffoldeditor.nbt;
+package org.scaffoldeditor.nbt.block;
 
 /**
  * This represents an immutable group of blocks and tile entities,

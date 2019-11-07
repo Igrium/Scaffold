@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.json.JSONObject;
-import org.scaffoldeditor.nbt.Block;
+import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Faceable.Direction;
 import org.scaffoldeditor.scaffold.level.entity.game.TargetSelectable;

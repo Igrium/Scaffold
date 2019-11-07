@@ -1,13 +1,9 @@
-package org.scaffoldeditor.scaffold.level;
+package org.scaffoldeditor.nbt.block;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
-import org.scaffoldeditor.nbt.Block;
-import org.scaffoldeditor.nbt.BlockCollection;
-import org.scaffoldeditor.nbt.SizedBlockCollection;
 
 /**
  * Represents all the blocks in a world.

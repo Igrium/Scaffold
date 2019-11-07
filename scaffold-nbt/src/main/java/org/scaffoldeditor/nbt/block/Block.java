@@ -1,4 +1,4 @@
-package org.scaffoldeditor.nbt;
+package org.scaffoldeditor.nbt.block;
 
 import com.flowpowered.nbt.CompoundMap;
 

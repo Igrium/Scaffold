@@ -17,6 +17,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.scaffoldeditor.nbt.NBTStrings;
+import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.scaffold.core.AssetManager;
 import org.scaffoldeditor.scaffold.core.Constants;
 import org.scaffoldeditor.scaffold.core.Project;
