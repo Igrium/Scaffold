@@ -1,11 +1,14 @@
 package org.metaversemedia.scaffold.test;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
 import org.scaffoldeditor.nbt.NBTStrings;
+import org.scaffoldeditor.nbt.io.WorldInputStream;
+import org.scaffoldeditor.nbt.io.WorldInputStream.ChunkLocation;
 
 import com.flowpowered.nbt.CompoundMap;
 import com.flowpowered.nbt.CompoundTag;
@@ -18,36 +21,21 @@ public class NBTTest {
 
 	@Test
 	public void test() {
-		System.out.println("test");
-		CompoundMap testMap = new CompoundMap();
-		testMap.put(new StringTag("TestTag","test"));
-		testMap.put(new FloatTag("FloatTag",5.0f));
-		
-		List<StringTag> list = new ArrayList<StringTag>();
-		list.add(new StringTag("", "Test \" Test"));
-		list.add(new StringTag("", "Test2!"));
-		
-		ListTag<StringTag> listTag = new ListTag<StringTag>("testList", StringTag.class, list);
-		testMap.put(listTag);
-		
-		System.out.println(NBTStrings.tagToString(listTag));
-				
-		String nbtString =
-				"{CustomName:\"\\\"Test\\\"\",CustomNameVisible:1,NoAI:1b,ExplosionRadius:4,HandDropChances:[2F,2F],HandItems:[{},{id:\"minecraft:stone\",Count:1}],Tags:[\"test\"]}";
-		
-		System.out.println(nbtString);;
-		
 		try {
-			CompoundMap map = NBTStrings.nbtFromString(nbtString);
-			CompoundTag tag =  new CompoundTag("test", map);
-			System.out.println(NBTStrings.tagToString(tag));
-		} catch (IOException | NullPointerException e) {
+			int count = 0;
+			WorldInputStream is = new WorldInputStream(new FileInputStream("C:\\Users\\Sam54123\\Documents\\Minecraft\\MapdevUtils\\Scaffold\\testProject\\game\\saves\\Test World\\region\\r.0.0.mca"));
+			for (ChunkLocation c : is.chunkLocations) {
+//				System.out.println(c.sectorCount);
+				if (c.sectorCount > 0) {
+					count++;
+				}
+			}
+//			System.out.println(count);
+
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	
-//		System.out.println(Short.parseShort("3s"));
-		assert(true);
 	}
 
 }
