@@ -25,12 +25,11 @@ public class NBTTest {
 			int count = 0;
 			WorldInputStream is = new WorldInputStream(new FileInputStream("C:\\Users\\Sam54123\\Documents\\Minecraft\\MapdevUtils\\Scaffold\\testProject\\game\\saves\\Test World\\region\\r.0.0.mca"));
 			for (ChunkLocation c : is.chunkLocations) {
-//				System.out.println(c.sectorCount);
-				if (c.sectorCount > 0) {
+				System.out.println(c.offset+", "+c.length);
+				if (c.length > 0) {
 					count++;
 				}
 			}
-//			System.out.println(count);
 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

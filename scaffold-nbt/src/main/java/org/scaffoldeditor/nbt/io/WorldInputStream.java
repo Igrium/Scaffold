@@ -21,16 +21,16 @@ public class WorldInputStream implements Closeable {
 		/**
 		 * Chunk offset in 4KiB sectors from the start of the file.
 		 */
-		public final short offset;
+		public final int offset;
 		
 		/**
 		 * The length of the chunk, also in 4KiB sectors.
 		 */
-		public final short sectorCount;
+		public final short length;
 		
-		public ChunkLocation(short offset, short sectorCount) {
+		public ChunkLocation(int offset, short length) {
 			this.offset = offset;
-			this.sectorCount = sectorCount;
+			this.length = length;
 		}
 		
 	}
@@ -60,10 +60,11 @@ public class WorldInputStream implements Closeable {
 			is.read(bytes);
 			System.out.println(Arrays.toString(bytes));
 			
-			byte[] loc = new byte[] {bytes[0],bytes[1],bytes[2]};
+			int loc = (bytes[2] & 0xFF) | ((bytes[1] & 0xFF) << 8) | ((bytes[0] & 0x0F) << 16);
+			
 			short length = bytes[3];
 			
-			chunkLocations.add(new ChunkLocation(ByteBuffer.wrap(loc).getShort(), length));
+			chunkLocations.add(new ChunkLocation(loc, length));
 			head += 4;
 		}
 		
