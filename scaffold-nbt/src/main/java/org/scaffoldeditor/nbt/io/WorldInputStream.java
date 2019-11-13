@@ -52,10 +52,11 @@ public class WorldInputStream implements Closeable {
 		this.is = is;
 		
 		// Load chunk data.
+		int x = 0;
+		int z = 0;
 		
-		int head = 0; // Current head position, in bytes from the start of the file.
-		while (head < 4096) {
-			// Read location
+		// Iterate over chunk array
+		while (x < 32 && z < 32) {
 			byte[] bytes = new byte[4];
 			is.read(bytes);
 			System.out.println(Arrays.toString(bytes));
@@ -65,7 +66,14 @@ public class WorldInputStream implements Closeable {
 			short length = bytes[3];
 			
 			chunkLocations.add(new ChunkLocation(loc, length));
-			head += 4;
+			
+			// Increment chunk heads
+			if (x == 31) {
+				x = 0;
+				z++;
+			} else {
+				x++;
+			}
 		}
 		
 	}
