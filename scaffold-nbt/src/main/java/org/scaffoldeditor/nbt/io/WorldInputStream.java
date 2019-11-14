@@ -3,11 +3,19 @@ package org.scaffoldeditor.nbt.io;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.zip.Inflater;
+import java.util.zip.InflaterInputStream;
 
 import com.flowpowered.nbt.CompoundMap;
+import com.flowpowered.nbt.CompoundTag;
+import com.flowpowered.nbt.Tag;
+import com.flowpowered.nbt.stream.NBTInputStream;
 
 /**
  * This class can read and parse Minecraft Region files,
@@ -18,7 +26,7 @@ public class WorldInputStream implements Closeable {
 	/**
 	 * Contains chunk location information defined in the header of the file.
 	 */
-	public class ChunkLocation  {
+	public class ChunkLocation implements Comparable<ChunkLocation> {
 		/**
 		 * Chunk offset in 4KiB sectors from the start of the file.
 		 */
@@ -39,11 +47,20 @@ public class WorldInputStream implements Closeable {
 		 */
 		public final short z;
 		
+		/**
+		 * For internal use only.
+		 * DO NOT CALL MANUALLY.
+		 */
 		public ChunkLocation(int offset, short length, short x, short z) {
 			this.offset = offset;
 			this.length = length;
 			this.x = x;
 			this.z = z;
+		}
+
+		@Override
+		public int compareTo(ChunkLocation o) {
+			return Integer.compare(offset, o.offset);
 		}
 		
 	}
@@ -56,7 +73,7 @@ public class WorldInputStream implements Closeable {
 		/**
 		 * The chunk's NBT data.
 		 */
-		public final CompoundMap NBT;
+		public final CompoundMap nbt;
 		
 		/**
 		 * How many bytes were read while reading the chunk?
@@ -77,8 +94,8 @@ public class WorldInputStream implements Closeable {
 		 * For internal use only.
 		 * DO NOT CALL MANUALLY.
 		 */
-		public ChunkNBTInfo(CompoundMap NBT, int bytesRead, short x, short z) {
-			this.NBT = NBT;
+		public ChunkNBTInfo(CompoundMap nbt, int bytesRead, short x, short z) {
+			this.nbt = nbt;
 			this.bytesRead = bytesRead;
 			this.x = x;
 			this.z = z;
@@ -96,7 +113,7 @@ public class WorldInputStream implements Closeable {
 	private short headZ;
 	
 	// The head in the chunkLocations array.
-	private int locationHead;
+	private int locationHead = 0;
 	
 	public final List<ChunkLocation> chunkLocations = new ArrayList<ChunkLocation>();
 	
@@ -131,14 +148,66 @@ public class WorldInputStream implements Closeable {
 			}
 		}
 		
+		// Sort the chunk locations list by order in file.
+		Collections.sort(chunkLocations);
+		
 		// Skip past timestamps
 		is.skip(4096);
 	}
 	
-//	// Read the next chunk from the file.
-//	public ChunkNBTInfo readChunkNBT() {
-//		
-//	}
+	/**
+	 * Read a chunk from the file, and advance the head to the next chunk.
+	 * @return Chunk Information
+	 * @throws IOException If an IOException occurs during reading the NBT.
+	 */
+	public ChunkNBTInfo readChunkNBT() throws IOException {
+		ChunkLocation location = chunkLocations.get(locationHead);
+		
+		// Skip if chunk is empty
+		if (location.length == 0) {
+			if (locationHead < chunkLocations.size()) {
+				locationHead++;
+				return readChunkNBT();
+			} else {
+				return null;
+			}
+		}
+		
+		// Read chunk header.
+		byte[] lengthArray = new byte[4];
+		is.read(lengthArray);
+		ByteBuffer lengthBuffer = ByteBuffer.wrap(lengthArray);
+		lengthBuffer.order(ByteOrder.BIG_ENDIAN);
+		int length = lengthBuffer.getInt();
+		
+		int compressionType = is.read();
+		
+		// Decompress chunk.
+		Inflater inflater;
+		if (compressionType == 1) {
+			inflater = new Inflater(true);
+		} else {
+			inflater = new Inflater();
+		}
+		
+		@SuppressWarnings("resource") // Root input stream still needs to be accessed.
+		NBTInputStream nbtIs = new NBTInputStream(new InflaterInputStream(is, inflater, length-1), false);
+		CompoundTag tag = (CompoundTag) nbtIs.readTag();
+		CompoundMap map = tag.getValue();
+		
+		// Skip to the end of the sector.
+		is.skip(location.length*4096 - length+4);
+		
+		if (locationHead < chunkLocations.size()) {
+			locationHead++;
+		}
+		
+		return new ChunkNBTInfo(map, length+4, location.x, location.z);
+	}
+	
+	public boolean hasNext() {
+		return (locationHead < chunkLocations.size());
+	}
 	
 	/**
 	 * Increment the head to the next position.
