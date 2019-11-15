@@ -1,6 +1,10 @@
 package org.scaffoldeditor.nbt.block;
 
-import com.flowpowered.nbt.CompoundMap;
+import java.util.HashMap;
+
+import mryurihi.tbnbt.tag.NBTTag;
+import mryurihi.tbnbt.tag.NBTTagCompound;
+import mryurihi.tbnbt.tag.NBTTagString;
 
 /**
  * Represents a single Minecraft block and its data.
@@ -8,7 +12,7 @@ import com.flowpowered.nbt.CompoundMap;
  */
 public class Block {
 	String name;
-	CompoundMap properties;
+	NBTTagCompound properties;
 	
 	/**
 	 * Create a Block object
@@ -16,7 +20,7 @@ public class Block {
 	 * @param properties Block properties 
 	 * (must be converted for pre-flattening blocks)
 	 */
-	public Block(String name, CompoundMap properties) {
+	public Block(String name, NBTTagCompound properties) {
 		this.name = name;
 		this.properties = properties;
 	}
@@ -25,7 +29,7 @@ public class Block {
 		return name;
 	}
 	
-	public CompoundMap getProperties() {
+	public NBTTagCompound getProperties() {
 		return properties;
 	}
 	
@@ -38,12 +42,12 @@ public class Block {
 	 * @param paletteEntry.
 	 * @return
 	 */
-	public static Block fromBlockPalleteEntry(CompoundMap paletteEntry) {
+	public static Block fromBlockPalleteEntry(NBTTagCompound paletteEntry) {
 		if (paletteEntry.get("Properties") == null) { // Properties may be null
-			return new Block((String) paletteEntry.get("Name").getValue(), new CompoundMap());
+			return new Block(((NBTTagString) paletteEntry.get("Name")).getValue(), new NBTTagCompound(new HashMap<String, NBTTag>()));
 		} else {
-			return new Block((String) paletteEntry.get("Name").getValue(),
-					(CompoundMap) paletteEntry.get("Properties").getValue());
+			return new Block(((NBTTagString) paletteEntry.get("Name")).getValue(),
+					(NBTTagCompound) paletteEntry.get("Properties"));
 		}
 	}
 	

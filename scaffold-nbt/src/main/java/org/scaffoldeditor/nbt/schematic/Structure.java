@@ -15,14 +15,13 @@ import java.util.Map.Entry;
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.SizedBlockCollection;
 
-import java.util.Objects;
+import mryurihi.tbnbt.tag.NBTTag;
+import mryurihi.tbnbt.tag.NBTTagCompound;
+import mryurihi.tbnbt.tag.NBTTagInt;
+import mryurihi.tbnbt.tag.NBTTagList;
+import mryurihi.tbnbt.tag.NBTTagString;
 
-import com.flowpowered.nbt.CompoundMap;
-import com.flowpowered.nbt.CompoundTag;
-import com.flowpowered.nbt.IntTag;
-import com.flowpowered.nbt.ListTag;
-import com.flowpowered.nbt.StringTag;
-import com.flowpowered.nbt.stream.NBTInputStream;
+import java.util.Objects;
 
 /**
  * Represents a Minecraft structure schematic (.nbt)
@@ -30,9 +29,9 @@ import com.flowpowered.nbt.stream.NBTInputStream;
  */
 public class Structure implements SizedBlockCollection {
 	
-	private CompoundMap[] palette;
-	private List<CompoundMap> blocks;
-	private List<CompoundMap> entities;
+	private NBTTagCompound[] palette;
+	private List<NBTTagCompound> blocks;
+	private List<NBTTagCompound> entities;
 	
 	private int sizeX;
 	private int sizeY;
@@ -68,12 +67,12 @@ public class Structure implements SizedBlockCollection {
 	 * @param block Block to check
 	 * @return Palette index (-1 if non existant)
 	 */
-	private int getState(CompoundMap block) {
+	private int getState(NBTTagCompound block) {
 		if (block == null) {
 			return -1;
 		}
 
-		return (Integer) block.get("state").getValue();
+		return ((NBTTagInt) block.get("state")).getValue();
 	}
 
 	
@@ -84,16 +83,19 @@ public class Structure implements SizedBlockCollection {
 	 * @param z Z coordinate
 	 * @return Block map (NULL IF BLOCK IS VOID)
 	 */
-	private CompoundMap blockMapAt(int x, int y, int z) {
-		for (CompoundMap block : blocks) {
+	private NBTTagCompound blockMapAt(int x, int y, int z) {
+		for (NBTTagCompound block : blocks) {
 			@SuppressWarnings("unchecked")
-			ListTag<IntTag> coordTag = (ListTag<IntTag>) block.get("pos");
+			NBTTagList coordTag = (NBTTagList) block.get("pos");
 
-			List<IntTag> coords = coordTag.getValue();
-
-			if (coords.get(0).getValue().equals(x) &&
-					coords.get(1).getValue().equals(y) &&
-					coords.get(2).getValue().equals(z)) {
+			List<NBTTagInt> coords = new ArrayList<NBTTagInt>();
+			for (NBTTag t : coordTag.getValue()) {
+				coords.add((NBTTagInt) t);
+			}
+			
+			if (coords.get(0).getValue() == x &&
+					coords.get(1).getValue() == y &&
+					coords.get(2).getValue() == z) {
 				return block;
 			}
 		}
@@ -134,21 +136,24 @@ public class Structure implements SizedBlockCollection {
 		}
 		
 		// Make backup of blocks to reference from
-		List<CompoundMap> oldBlocks = new ArrayList<CompoundMap>();
+		List<NBTTagCompound> oldBlocks = new ArrayList<NBTTagCompound>();
 		Collections.copy(oldBlocks, blocks);
 		
 		// Translate all blocks to new location
-		for (CompoundMap block : blocks) {
+		for (NBTTagCompound block : blocks) {
 			@SuppressWarnings("unchecked")
-			ListTag<IntTag> coordTag = (ListTag<IntTag>) block.get("pos");
-			List<IntTag> coords = coordTag.getValue();
-			
+			NBTTagList coordTag = (NBTTagList) block.get("pos");
+			List<NBTTagInt> coords = new ArrayList<NBTTagInt>();
+			for (NBTTag t : coordTag.getValue()) {
+				coords.add((NBTTagInt) t);
+			}
+						
 			// Rotate around Y axis, affecting x and z coordinates
 			int[] newCoords = rotatePoint(coords.get(0).getValue(), coords.get(2).getValue(),
 					sizeX/2, sizeZ/2, amount);
 			
-			coords.set(0, new IntTag("", newCoords[0]));
-			coords.set(2, new IntTag("", newCoords[2]));
+			coords.set(0, new NBTTagInt(newCoords[0]));
+			coords.set(2, new NBTTagInt(newCoords[2]));
 		}
 		
 		// Rotate all applicable blocks in palette
@@ -158,12 +163,11 @@ public class Structure implements SizedBlockCollection {
 		rotations.put(2, "south");
 		rotations.put(3, "east");
 		
-		for (CompoundMap paletteBlock : palette) {
+		for (NBTTagCompound paletteBlock : palette) {
 			if (paletteBlock.containsKey("Properties")) {
-				CompoundTag propertiesTag = (CompoundTag) paletteBlock.get("Properties");
-				CompoundMap properties = propertiesTag.getValue();
+				NBTTagCompound properties = (NBTTagCompound) paletteBlock.get("Properties");
 				if (properties.containsKey("facing")) {
-					StringTag facing = (StringTag) properties.get("facing");
+					NBTTagString facing = (NBTTagString) properties.get("facing");
 
 					int facingKey = getKeyByValue(rotations, facing.getValue());
 					facingKey += amount;
@@ -174,7 +178,7 @@ public class Structure implements SizedBlockCollection {
 						facingKey += 4;
 					}
 					
-					properties.put(new StringTag("facing", rotations.get(facingKey)));
+					properties.put("facing", new NBTTagString(rotations.get(facingKey)));
 				}
 			}
 		}
@@ -227,7 +231,7 @@ public class Structure implements SizedBlockCollection {
 	}
 	
 	/**
-	 * Set a block state at a certian location
+	 * Set a block state at a certain location
 	 * (private because it relies on the state)
 	 * @param x X coordinate
 	 * @param y Y coordinate
@@ -236,7 +240,7 @@ public class Structure implements SizedBlockCollection {
 	 */
 	@SuppressWarnings("unused")
 	private void setBlockAt(int x, int y, int z, int state) {
-		CompoundMap blockMap = blockMapAt(x,y,z);
+		NBTTagCompound blockMap = blockMapAt(x,y,z);
 		
 		// If block  doesn't already exist
 		if (blockMap == null) {
@@ -244,12 +248,13 @@ public class Structure implements SizedBlockCollection {
 				return;
 			}
 			// Create new block
-			blockMap = new CompoundMap();
+			blockMap = new NBTTagCompound(new HashMap<String, NBTTag>());
 			
-			List<IntTag> coords = new ArrayList<IntTag>();
-			coords.add(new IntTag("", x));
-			coords.add(new IntTag("", y));
-			coords.add(new IntTag("", z));
+			List<NBTTagInt> coords = new ArrayList<NBTTagInt>();
+			coords.add(new NBTTagInt(x));
+			coords.add(new NBTTagInt(y));
+			coords.add(new NBTTagInt(z));
+			blockMap.put("pos", new NBTTagList(coords));
 			blockMap.put(new ListTag<IntTag>("pos", IntTag.class, coords));
 			
 			blockMap.put(new IntTag("state", state));
