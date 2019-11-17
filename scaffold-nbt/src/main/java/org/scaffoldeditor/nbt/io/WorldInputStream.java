@@ -102,14 +102,6 @@ public class WorldInputStream implements Closeable {
 	
 	private final InputStream is;
 	
-	// The X and Z offsets of the file.
-	private int offsetX;
-	private int offsetz;
-	
-	// The current head location.
-	private short headX;
-	private short headZ;
-	
 	// The head in the chunkLocations array.
 	private int locationHead = 0;
 	
@@ -160,6 +152,7 @@ public class WorldInputStream implements Closeable {
 	 */
 	public ChunkNBTInfo readChunkNBT() throws IOException {
 		ChunkLocation location = chunkLocations.get(locationHead);
+		System.out.println(locationHead+", "+chunkLocations.size());
 		
 		// Skip if chunk is empty
 		if (location.length == 0) {
@@ -193,7 +186,7 @@ public class WorldInputStream implements Closeable {
 		NBTTagCompound map = (NBTTagCompound) nbtIs.readTag();
 		
 		// Skip to the end of the sector.
-		is.skip(location.length*4096 - length+4);
+		is.skip(location.length*4096 - (length+4));
 		
 		if (locationHead < chunkLocations.size()) {
 			locationHead++;
@@ -204,18 +197,6 @@ public class WorldInputStream implements Closeable {
 	
 	public boolean hasNext() {
 		return (locationHead < chunkLocations.size());
-	}
-	
-	/**
-	 * Increment the head to the next position.
-	 */
-	private void increment() {
-		if (headX == 31) {
-			headX = 0;
-			headZ++;
-		} else {
-			headX++;
-		}
 	}
 
 	@Override
