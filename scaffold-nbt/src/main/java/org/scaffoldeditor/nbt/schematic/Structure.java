@@ -15,6 +15,7 @@ import java.util.Map.Entry;
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.SizedBlockCollection;
 
+import mryurihi.tbnbt.stream.NBTInputStream;
 import mryurihi.tbnbt.tag.NBTTag;
 import mryurihi.tbnbt.tag.NBTTagCompound;
 import mryurihi.tbnbt.tag.NBTTagInt;
@@ -250,20 +251,19 @@ public class Structure implements SizedBlockCollection {
 			// Create new block
 			blockMap = new NBTTagCompound(new HashMap<String, NBTTag>());
 			
-			List<NBTTagInt> coords = new ArrayList<NBTTagInt>();
+			List<NBTTag> coords = new ArrayList<NBTTag>();
 			coords.add(new NBTTagInt(x));
 			coords.add(new NBTTagInt(y));
 			coords.add(new NBTTagInt(z));
 			blockMap.put("pos", new NBTTagList(coords));
-			blockMap.put(new ListTag<IntTag>("pos", IntTag.class, coords));
 			
-			blockMap.put(new IntTag("state", state));
+			blockMap.put("state", new NBTTagInt(state));
 			blocks.add(blockMap);
 			
 			
 		} else { // Block already exists
 			blockMap.remove("state");
-			blockMap.put(new IntTag("state", state));
+			blockMap.put("state", new NBTTagInt(state));
 		}
 	}
 	
@@ -286,7 +286,7 @@ public class Structure implements SizedBlockCollection {
 	 * Gets a list of all entities in structure, represented as CompoundMaps
 	 * @return
 	 */
-	public List<CompoundMap> getEntities() {
+	public List<NBTTagCompound> getEntities() {
 		return entities;
 	}
 	
@@ -300,16 +300,19 @@ public class Structure implements SizedBlockCollection {
 	 * @return Structure
 	 */
 	@SuppressWarnings("unchecked")
-	public static Structure fromCompoundMap(CompoundMap map) {
+	public static Structure fromCompoundMap(NBTTagCompound map) {
 		Structure structure = new Structure();
 		
 		// Load size
-		ListTag<IntTag> sizeTag = (ListTag<IntTag>) map.get("size");
+		NBTTagList sizeTag = (NBTTagList) map.get("size");
 		if (sizeTag == null) {
 			System.out.println("Structure missing size tag!");
 			return null;
 		}
-		List<IntTag> sizeList = sizeTag.getValue();
+		List<NBTTagInt> sizeList = new ArrayList<NBTTagInt>();
+		for (NBTTag t : sizeTag.getValue()) {
+			sizeList.add((NBTTagInt) t);
+		}
 		
 		if (sizeList.get(0) == null || sizeList.get(1) == null || sizeList.get(2) == null) {
 			System.out.println("Structure has improperly formatted size tag!");
@@ -321,28 +324,28 @@ public class Structure implements SizedBlockCollection {
 		structure.sizeZ = sizeList.get(2).getValue();
 				
 		// Load palette
-		ListTag<CompoundTag> paletteTag = (ListTag<CompoundTag>) map.get("palette");
+		NBTTagList paletteTag = (NBTTagList) map.get("palette");
 		if (paletteTag == null) {
 			System.out.println("Structure missing palette tag!");
 			return null;
 		}
-		List<CompoundMap> palleteList = getValues(paletteTag);
-		structure.palette = (CompoundMap[]) palleteList.toArray(new CompoundMap[palleteList.size()]);
+		List<NBTTagCompound> palleteList = getCompoundMaps(paletteTag);
+		structure.palette = (NBTTagCompound[]) palleteList.toArray(new NBTTagCompound[palleteList.size()]);
 				
 		// Load blocks
-		ListTag<CompoundTag> blocksTag = (ListTag<CompoundTag>) map.get("blocks");
+		NBTTagList blocksTag = (NBTTagList) map.get("blocks");
 		if (blocksTag == null) {
 			System.out.println("Structure missing blocks tag!");
 			return null;
 		}
-		structure.blocks = getValues(blocksTag);
+		structure.blocks = getCompoundMaps(blocksTag);
 		
 		// Load entities
-		ListTag<CompoundTag> entitiesTag = (ListTag<CompoundTag>) map.get("entities");
+		NBTTagList entitiesTag = (NBTTagList) map.get("entities");
 		if (entitiesTag == null) {
-			structure.entities = new ArrayList<CompoundMap>();
+			structure.entities = new ArrayList<NBTTagCompound>();
 		} else {
-			structure.entities = getValues(entitiesTag);
+			structure.entities = getCompoundMaps(entitiesTag);
 		}
 		
 		return structure;
@@ -351,14 +354,11 @@ public class Structure implements SizedBlockCollection {
 	/*
 	 * Convert a ListTag of CompoundTags to a List of CompoundMaps
 	 */
-	private static List<CompoundMap> getValues(ListTag<CompoundTag> listTag) {
-		List<CompoundMap> mapList = new ArrayList<CompoundMap>();
-		List<CompoundTag> compoundTags = listTag.getValue();
-		
-		for (CompoundTag t : compoundTags) {
-			mapList.add(t.getValue());
+	private static List<NBTTagCompound> getCompoundMaps(NBTTagList listTag) {
+		List<NBTTagCompound> mapList = new ArrayList<NBTTagCompound>();
+		for (NBTTag t : listTag.getValue()) {
+			mapList.add((NBTTagCompound) t);
 		}
-		
 		return mapList;
 	}
 	
@@ -372,9 +372,8 @@ public class Structure implements SizedBlockCollection {
 	public static Structure fromFile(File file) throws FileNotFoundException, IOException {
 		
 		NBTInputStream input = new NBTInputStream(new FileInputStream(file));
-		
-		CompoundTag tag = (CompoundTag) input.readTag();
-		CompoundMap map = (CompoundMap) tag.getValue();
+	
+		NBTTagCompound map = (NBTTagCompound) input.readTag();
 		
 		Structure structure = fromCompoundMap(map);
 		input.close();

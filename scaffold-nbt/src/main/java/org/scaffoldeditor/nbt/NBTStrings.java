@@ -2,22 +2,21 @@ package org.scaffoldeditor.nbt;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
-import com.flowpowered.nbt.ByteArrayTag;
-import com.flowpowered.nbt.ByteTag;
-import com.flowpowered.nbt.CompoundMap;
-import com.flowpowered.nbt.CompoundTag;
-import com.flowpowered.nbt.DoubleTag;
-import com.flowpowered.nbt.FloatTag;
-import com.flowpowered.nbt.IntTag;
-import com.flowpowered.nbt.ListTag;
-import com.flowpowered.nbt.LongTag;
-import com.flowpowered.nbt.ShortTag;
-import com.flowpowered.nbt.StringTag;
-import com.flowpowered.nbt.Tag;
-import com.flowpowered.nbt.TagType;
+import mryurihi.tbnbt.TagType;
+import mryurihi.tbnbt.tag.NBTTag;
+import mryurihi.tbnbt.tag.NBTTagByte;
+import mryurihi.tbnbt.tag.NBTTagCompound;
+import mryurihi.tbnbt.tag.NBTTagDouble;
+import mryurihi.tbnbt.tag.NBTTagFloat;
+import mryurihi.tbnbt.tag.NBTTagInt;
+import mryurihi.tbnbt.tag.NBTTagList;
+import mryurihi.tbnbt.tag.NBTTagLong;
+import mryurihi.tbnbt.tag.NBTTagString;
 
 /**
  * Utility class for common nbt functions
@@ -30,19 +29,22 @@ public class NBTStrings {
 	 * @param nbt NBT input.
 	 * @return Generated string.
 	 */
-	public static String nbtToString(CompoundMap nbt) {
+	public static String nbtToString(NBTTagCompound nbt) {
 		if (nbt == null) {
 			return "";
 		}
 		String finalString = "{";
 		
-		Iterator<Tag<?>> tagIterator = nbt.iterator();
+		Map<String, NBTTag> tags = nbt.getValue();
+		Iterator<String> iterator = tags.keySet().iterator();
 		
-		while (tagIterator.hasNext()) {
-			Tag<?> tag = tagIterator.next();
-			finalString = finalString+tag.getName()+":"+tagToString(tag);
-			if (tagIterator.hasNext()) {
-				finalString = finalString+',';
+		while (iterator.hasNext()) {
+			String name = iterator.next();
+			NBTTag tag = tags.get(name);
+			finalString += name+":"+tagToString(tag);
+			
+			if (iterator.hasNext()) {
+				finalString += ',';
 			}
 		}
 		
@@ -53,39 +55,33 @@ public class NBTStrings {
 	 * Convert a tag to a string.
 	 * @return String tag.
 	 */
-	public static String tagToString(Tag<?> tag) {
+	public static String tagToString(NBTTag tag) {
 		String tagString = null;
 		
-		if (tag.getType() == TagType.TAG_BYTE) {
-			ByteTag byteTag = (ByteTag) tag;
-			tagString = byteToString(byteTag.getValue());
-		} else if (tag.getType() == TagType.TAG_BYTE_ARRAY) {
-			ByteArrayTag byteArray = (ByteArrayTag) tag;
-			tagString = byteArrayToString(byteArray.getValue());
-		} else if (tag.getType() == TagType.TAG_COMPOUND) {
-			CompoundTag compoundTag = (CompoundTag) tag;
-			tagString = nbtToString(compoundTag.getValue());
-		} else if (tag.getType() == TagType.TAG_DOUBLE) {
-			DoubleTag doubleTag = (DoubleTag) tag;
-			tagString = doubleToString(doubleTag.getValue());
-		} else if (tag.getType() == TagType.TAG_FLOAT) {
-			FloatTag floatTag = (FloatTag) tag;
-			tagString = floatToString(floatTag.getValue());
-		} else if (tag.getType() == TagType.TAG_INT) {
-			IntTag intTag = (IntTag) tag;
-			tagString = intToString(intTag.getValue());
-		} else if (tag.getType() == TagType.TAG_LIST) {
-			ListTag<?> listTag = (ListTag<?>) tag;
-			tagString = listToString(listTag.getValue());
-		} else if (tag.getType() == TagType.TAG_LONG) {
-			LongTag longTag = (LongTag) tag;
-			tagString = longToString(longTag.getValue());
-		} else if (tag.getType() == TagType.TAG_SHORT) {
-			ShortTag shortTag = (ShortTag) tag;
-			tagString = shortToString(shortTag.getValue());
-		} else if (tag.getType() == TagType.TAG_STRING) {
-			StringTag stringTag = (StringTag) tag;
-			tagString = formatString(stringTag.getValue());
+		if (tag.getTagType() == TagType.BYTE) {
+			tagString = byteToString(tag.getAsTagByte().getValue());
+		} else if (tag.getTagType() == TagType.BYTE_ARRAY) {
+			tagString = byteArrayToString(tag.getAsTagByteArray().getValue());
+		} else if (tag.getTagType() == TagType.COMPOUND) {
+			tagString = nbtToString(tag.getAsTagCompound());
+		} else if (tag.getTagType() == TagType.DOUBLE) {
+			tagString = doubleToString(tag.getAsTagDouble().getValue());
+		} else if (tag.getTagType() == TagType.FLOAT) {
+			tagString = floatToString(tag.getAsTagFloat().getValue());
+		} else if (tag.getTagType() == TagType.INT) {
+			tagString = intToString(tag.getAsTagInt().getValue());
+		} else if (tag.getTagType() == TagType.INT_ARRAY) {
+			// TODO implement this.
+		} else if (tag.getTagType() == TagType.LIST) {
+			tagString = listToString(tag.getAsTagList().getValue());
+		} else if (tag.getTagType() == TagType.LONG) {
+			tagString = longToString(tag.getAsTagLong().getValue());
+		} else if (tag.getTagType() == TagType.LONG_ARRAY) {
+			// TODO implement this.
+		} else if (tag.getTagType() == TagType.SHORT) {
+			tagString = shortToString(tag.getAsTagShort().getValue());
+		} else if (tag.getTagType() == TagType.STRING) {
+			tagString = formatString(tag.getAsTagString().getValue());
 		}
 		
 		return tagString;
@@ -111,13 +107,13 @@ public class NBTStrings {
 		return in.toString();
 	}
 	
-	private static String listToString(List<? extends Tag<?>> in) {
+	private static String listToString(List<NBTTag> in) {
 		String listString = "[";
-		Iterator<? extends Tag<?>> listIterator = in.iterator();
+		Iterator<? extends NBTTag> listIterator = in.iterator();
 		
 		// Add all elements of list
 		while (listIterator.hasNext()) {
-			Tag<?> tag = listIterator.next();
+			NBTTag tag = listIterator.next();
 			
 			listString = listString+tagToString(tag);
 			if (listIterator.hasNext())  {
@@ -149,8 +145,8 @@ public class NBTStrings {
 	 * @return Generated CompoundMap.
 	 * @throws IOException If the string is formatted improperly.
 	 */
-	public static CompoundMap nbtFromString(String inString) throws IOException {
-		CompoundMap map = new CompoundMap();
+	public static NBTTagCompound nbtFromString(String inString) throws IOException {
+		NBTTagCompound map = new NBTTagCompound(new HashMap<String, NBTTag>());
 		
 		if (inString.length() < 2) {
 			return null;
@@ -172,7 +168,19 @@ public class NBTStrings {
 		// Split string into tags
 		String[] stringTags = splitString(inString, ',');
 		for (String s : stringTags) {
-			map.put(parseTag(s));
+			
+			// Break up into name and value
+			String[] keyValuePair = splitString(s, ':');
+			String name;
+			String value;
+			if (keyValuePair.length == 2) {
+				name = keyValuePair[0];
+				value = keyValuePair[1];
+			} else {
+				name = "";
+				value = s;
+			}
+			map.put(name, parseTag(value));
 		}
 
 		return map;
@@ -185,56 +193,38 @@ public class NBTStrings {
 	 * @return Parsed tag.
 	 * @throws IOException If the string is formatted improperly.
 	 */
-	public static Tag<?> parseTag(String in) throws IOException {
-		// Split string into name and value
-		String name = null;
-		String value = null;
-		in = in.trim();
-		
-		String[] keyValuePair = splitString(in, ':');
-
-		
-		if (keyValuePair.length == 2) {
-			name = keyValuePair[0];
-			value = keyValuePair[1];
-		} else {
-			name = "";
-			value = in;
-		}
-		
-		
+	public static NBTTag parseTag(String value) throws IOException {
 
 		// Generate tag
-		Tag<?> tag = null;
+		NBTTag tag = null;
 		if (value.charAt(0) == '{') {
-			tag = new CompoundTag(name, nbtFromString(value));
+			tag = nbtFromString(value);
 		} else if (isInteger(value)) {
-			tag = new IntTag(name, Integer.parseInt(value));
+			tag = new NBTTagInt(Integer.parseInt(value));
 		} else if (isNumber(value)) {
 			if (value.charAt(value.length()-1) == 'l') {
-				tag = new LongTag(name, Long.parseLong(value)); // Check for long
+				tag = new NBTTagLong(Long.parseLong(value)); // Check for long
 			}
 			else if (value.charAt(value.length()-1) == 'f' ||
 					value.charAt(value.length()-1) == 'F') { // Check for float
-				tag = new FloatTag(name, Float.parseFloat(value));
+				tag = new NBTTagFloat(Float.parseFloat(value));
 			} else {
-				tag = new DoubleTag(name, Double.parseDouble(value));
+				tag = new NBTTagDouble(Double.parseDouble(value));
 			}
 		} else if (value.charAt(0) == '[') {
-			tag = parseList(name, value);
+			tag = parseList(value);
 		} else if (value.charAt(0) == '"') {
-			tag = new StringTag(name, parseString(value));
+			tag = new NBTTagString(parseString(value));
 		} else if (value.charAt(value.length()-1) == 'b') {
-			tag = new ByteTag(name, parseByte(value));
+			tag = new NBTTagByte(parseByte(value));
 		} else {
-			throw new IOException("Unable to parse nbt string: "+in);
+			throw new IOException("Unable to parse nbt string: "+value);
 		}
 		
 		return tag;
 	}
 	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private static ListTag<?> parseList(String name, String inString) throws IOException {
+	private static NBTTagList parseList(String inString) throws IOException {
 		// Remove newlines and whitespace
 		inString = inString.trim();
 		inString = inString.replace("\n", "");
@@ -250,12 +240,12 @@ public class NBTStrings {
 		// Split string into tags
 		String[] stringTags = splitString(inString, ',');
 		
-		List<Tag<?>> tags = new ArrayList<Tag<?>>();
+		List<NBTTag> tags = new ArrayList<NBTTag>();
 		for (String s : stringTags) {
 			tags.add(parseTag(s));
 		}
 		
-		return new ListTag(name, Tag.class, tags);
+		return new NBTTagList(tags);
 	}
 	
 	private static String parseString(String in) {

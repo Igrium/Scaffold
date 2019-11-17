@@ -2,35 +2,36 @@ package org.metaversemedia.scaffold.test;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.junit.Test;
 import org.scaffoldeditor.nbt.NBTStrings;
 
-import com.flowpowered.nbt.CompoundMap;
-import com.flowpowered.nbt.CompoundTag;
-import com.flowpowered.nbt.FloatTag;
-import com.flowpowered.nbt.ListTag;
-import com.flowpowered.nbt.StringTag;
-import com.flowpowered.nbt.Tag;
+import mryurihi.tbnbt.tag.NBTTag;
+import mryurihi.tbnbt.tag.NBTTagCompound;
+import mryurihi.tbnbt.tag.NBTTagFloat;
+import mryurihi.tbnbt.tag.NBTTagList;
+import mryurihi.tbnbt.tag.NBTTagString;
+
 
 public class NBTTest {
 
 	@Test
 	public void test() {
 		System.out.println("test");
-		CompoundMap testMap = new CompoundMap();
-		testMap.put(new StringTag("TestTag","test"));
-		testMap.put(new FloatTag("FloatTag",5.0f));
+		NBTTagCompound testMap = new NBTTagCompound(new HashMap<String, NBTTag>());
+		testMap.put("TestTag", new NBTTagString("test"));
+		testMap.put("FloatTag", new NBTTagFloat(5.0f));
 		
-		List<StringTag> list = new ArrayList<StringTag>();
-		list.add(new StringTag("", "Test \" Test"));
-		list.add(new StringTag("", "Test2!"));
+		List<NBTTag> list = new ArrayList<NBTTag>();
+		list.add(new NBTTagString("Test \" Test"));
+		list.add(new NBTTagString("Test2!"));
 		
-		ListTag<StringTag> listTag = new ListTag<StringTag>("testList", StringTag.class, list);
-		testMap.put(listTag);
+		NBTTagList listTag = new NBTTagList(list);
+		testMap.put("ListTest",listTag);
 		
-		System.out.println(NBTStrings.tagToString(listTag));
+		System.out.println(NBTStrings.tagToString(testMap));
 				
 		String nbtString =
 				"{CustomName:\"\\\"Test\\\"\",CustomNameVisible:1,NoAI:1b,ExplosionRadius:4,HandDropChances:[2F,2F],HandItems:[{},{id:\"minecraft:stone\",Count:1}],Tags:[\"test\"]}";
@@ -38,9 +39,8 @@ public class NBTTest {
 		System.out.println(nbtString);;
 		
 		try {
-			CompoundMap map = NBTStrings.nbtFromString(nbtString);
-			CompoundTag tag =  new CompoundTag("test", map);
-			System.out.println(NBTStrings.tagToString(tag));
+			NBTTagCompound map = NBTStrings.nbtFromString(nbtString);
+			System.out.println(NBTStrings.tagToString(map));
 		} catch (IOException | NullPointerException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
