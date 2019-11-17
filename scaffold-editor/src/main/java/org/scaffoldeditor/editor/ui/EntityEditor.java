@@ -16,7 +16,8 @@ import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.Entity.AttributeDeclaration;
 import org.scaffoldeditor.scaffold.math.Vector;
 
-import com.flowpowered.nbt.CompoundMap;
+import mryurihi.tbnbt.tag.NBTTagCompound;
+
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
@@ -158,7 +159,7 @@ public class EntityEditor extends JDialog {
 	
 	protected class NBTAttributeField extends AttributeField {
 		private String attributeName;
-		private CompoundMap value;
+		private NBTTagCompound value;
 		
 		private JTextField textField;
 		private JButton browseButton;
@@ -168,7 +169,7 @@ public class EntityEditor extends JDialog {
 		// Is the NBT in the text field valid?
 		private boolean nbtValid = true;
 		
-		public NBTAttributeField(String name, CompoundMap defaultValue) {
+		public NBTAttributeField(String name, NBTTagCompound defaultValue) {
 			attributeName = name;
 			value = defaultValue;
 			
@@ -234,7 +235,7 @@ public class EntityEditor extends JDialog {
 		}
 
 		@Override
-		public CompoundMap getAttributeValue() {
+		public NBTTagCompound getAttributeValue() {
 			updateNBT();
 			return value;
 		}
@@ -423,8 +424,8 @@ public class EntityEditor extends JDialog {
 				FloatAttributeField field = new FloatAttributeField(attribute.name(), ((Number) attributeObj).floatValue());
 				attributeFields.add(field);
 				contentPanel.add(field);
-			} else if (CompoundMap.class.isAssignableFrom(attribute.type())) {
-				NBTAttributeField field = new NBTAttributeField(attribute.name(), (CompoundMap) attributeObj);
+			} else if (NBTTagCompound.class.isAssignableFrom(attribute.type())) {
+				NBTAttributeField field = new NBTAttributeField(attribute.name(), (NBTTagCompound) attributeObj);
 				attributeFields.add(field);
 				contentPanel.add(field);
 			}

@@ -2,19 +2,16 @@ package org.scaffoldeditor.editor.ui;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
-import java.util.List;
-
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import com.flowpowered.nbt.CompoundMap;
-import com.flowpowered.nbt.CompoundTag;
-import com.flowpowered.nbt.ListTag;
-import com.flowpowered.nbt.Tag;
-import com.flowpowered.nbt.TagType;
+import mryurihi.tbnbt.TagType;
+import mryurihi.tbnbt.tag.NBTTag;
+import mryurihi.tbnbt.tag.NBTTagCompound;
+import mryurihi.tbnbt.tag.NBTTagList;
 
 import javax.swing.JTree;
 import java.awt.event.ActionListener;
@@ -25,13 +22,13 @@ public class NBTBrowser extends JDialog {
 	private JTree tree;
 	private DefaultMutableTreeNode top;
 	
-	private CompoundMap nbt;
+	private NBTTagCompound nbt;
 	
 	/**
 	 * Get the CompoundMap this browser is currently displaying.
 	 * @return Displayed CompoundMap.
 	 */
-	public CompoundMap getNBT() {
+	public NBTTagCompound getNBT() {
 		return nbt;
 	}
 
@@ -75,7 +72,7 @@ public class NBTBrowser extends JDialog {
 	 * Set the nbt to display.
 	 * @param nbt CompoundMap to display.
 	 */
-	public void setNBT(CompoundMap nbt) {
+	public void setNBT(NBTTagCompound nbt) {
 		this.nbt = nbt;
 		reloadTree();
 	}
@@ -92,24 +89,25 @@ public class NBTBrowser extends JDialog {
 	 * Load a compound map into the passed node.
 	 * @param node Node to load into.
 	 */
-	private static void loadCompoundMap(CompoundMap map, DefaultMutableTreeNode node) {
-		for (Tag<?> tag : map) {
+	private static void loadCompoundMap(NBTTagCompound map, DefaultMutableTreeNode node) {
+		
+		for (String name : map.getValue().keySet()) {
 			DefaultMutableTreeNode tagNode = new DefaultMutableTreeNode();
+			NBTTag tag = map.get(name);
 			
-			if (tag.getType() == TagType.TAG_COMPOUND) {
-				tagNode.setUserObject(tag.getName());
-				CompoundTag compoundTag = (CompoundTag) tag;
-				loadCompoundMap(compoundTag.getValue(), tagNode);
+			if (tag.getTagType() == TagType.COMPOUND) {
+				tagNode.setUserObject(name);
+				NBTTagCompound compoundTag = tag.getAsTagCompound();
+				loadCompoundMap(compoundTag, tagNode);
 				
-			} else if (tag.getType() == TagType.TAG_LIST) {
+			} else if (tag.getTagType() == TagType.LIST) {
 				System.out.println("list");
-				tagNode.setUserObject(tag.getName());
-				@SuppressWarnings("unchecked")
-				ListTag<Tag<?>> listTag = (ListTag<Tag<?>>) tag;
-				loadList(listTag.getValue(), tagNode);
+				tagNode.setUserObject(name);
+				NBTTagList listTag = tag.getAsTagList();
+				loadList(listTag, tagNode);
 				
 			} else {
-				tagNode.setUserObject(tag.getName()+":"+tag.getValue());
+				tagNode.setUserObject(name+":"+tag.toString());
 			}
 			
 			node.add(tagNode);
@@ -120,20 +118,19 @@ public class NBTBrowser extends JDialog {
 	 * Load a list into the passed node.
 	 * @param node Node to load into.
 	 */
-	private static void loadList(List<Tag<?>> list, DefaultMutableTreeNode node) {
-		for (Tag<?> tag : list) {
+	private static void loadList(NBTTagList list, DefaultMutableTreeNode node) {
+		for (NBTTag tag : list.getValue()) {
 			DefaultMutableTreeNode tagNode = new DefaultMutableTreeNode();
-			if (tag.getType() == TagType.TAG_COMPOUND) {
-				CompoundTag compoundTag = (CompoundTag) tag;
-				loadCompoundMap(compoundTag.getValue(), tagNode);
+			if (tag.getTagType() == TagType.COMPOUND) {
+				NBTTagCompound compoundTag = tag.getAsTagCompound();
+				loadCompoundMap(compoundTag, tagNode);
 				
-			} else if (tag.getType() == TagType.TAG_LIST) {
-				@SuppressWarnings("unchecked")
-				ListTag<Tag<?>> listTag = (ListTag<Tag<?>>) tag;
-				loadList(listTag.getValue(), tagNode);
+			} else if (tag.getTagType() == TagType.LIST) {
+				NBTTagList listTag = tag.getAsTagList();
+				loadList(listTag, tagNode);
 				
 			} else {
-				tagNode.setUserObject(tag.getValue().toString());
+				tagNode.setUserObject(tag.toString());
 			}
 			
 			node.add(tagNode);

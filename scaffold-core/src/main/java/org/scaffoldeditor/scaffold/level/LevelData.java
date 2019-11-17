@@ -5,18 +5,16 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Map;
-
 import org.json.JSONObject;
 
-import com.flowpowered.nbt.ByteTag;
-import com.flowpowered.nbt.CompoundMap;
-import com.flowpowered.nbt.CompoundTag;
-import com.flowpowered.nbt.DoubleTag;
-import com.flowpowered.nbt.IntTag;
-import com.flowpowered.nbt.LongTag;
-import com.flowpowered.nbt.StringTag;
-import com.flowpowered.nbt.stream.NBTOutputStream;
+import mryurihi.tbnbt.stream.NBTOutputStream;
+import mryurihi.tbnbt.tag.NBTTag;
+import mryurihi.tbnbt.tag.NBTTagByte;
+import mryurihi.tbnbt.tag.NBTTagCompound;
+import mryurihi.tbnbt.tag.NBTTagDouble;
+import mryurihi.tbnbt.tag.NBTTagInt;
+import mryurihi.tbnbt.tag.NBTTagLong;
+import mryurihi.tbnbt.tag.NBTTagString;
 
 /**
  * This class stores and represents all the (relevent) data that would normally be in level.dat
@@ -108,53 +106,53 @@ public class LevelData {
 	 * @param cheats Should the compiled world have cheats on?
 	 * @return Compiled CompoundMap
 	 */
-	public CompoundMap compile(boolean cheats) {
-		CompoundMap data = new CompoundMap();
-		data.put(new ByteTag("allowCommands", boolToByte(cheats)));
-		data.put(new DoubleTag("BorderCenterX", values.getDouble("BorderCenterX")));
-		data.put(new DoubleTag("BorderCenterY", values.getDouble("BorderCenterZ")));
-		data.put(new DoubleTag("BorderDamagePerBlock", values.getDouble("BorderDamagePerBlock")));
-		data.put(new DoubleTag("BorderSafeZone", values.getDouble("BorderSafeZone")));
-		data.put(new DoubleTag("BorderSize", values.getDouble("BorderSize")));
-		data.put(new DoubleTag("BorderSizeLerpTarget", values.getDouble("BorderSizeLerpTarget")));
-		data.put(new LongTag("BorderSizeLerpTime", values.getLong("BorderSizeLerpTime")));
-		data.put(new DoubleTag("BorderWarningBlocks", values.getDouble("BorderWarningBlocks")));
-		data.put(new DoubleTag("BorderWarningTime", values.getDouble("BorderWarningTime")));
-		data.put(new IntTag("clearWeatherTime", 0));
-		data.put(new IntTag("DataVersion", 1976));
-		data.put(new IntTag("DayTime", values.getInt("DayTime")));
-		data.put(new ByteTag("Difficulty", (byte) values.getInt("Difficulty")));
-		data.put(new ByteTag("DifficultyLocked", boolToByte(values.getBoolean("DifficultyLocked"))));
-		data.put(new IntTag("GameType", values.getInt("GameType")));
-		data.put(new StringTag("generatorName", "flat"));
-		data.put(new IntTag("generatorVersion", 0));
-		data.put(new ByteTag("hardcore", boolToByte(values.getBoolean("hardcore"))));
-		data.put(new ByteTag("intialized", boolToByte(true)));
-		data.put(new StringTag("LevelName", level.getPrettyName()));
-		data.put(new ByteTag("MapFeatures", boolToByte(false)));
-		data.put(new ByteTag("raining", boolToByte(false)));
-		data.put(new IntTag("rainTime", 100000));
-		data.put(new IntTag("RandomSeed", values.getInt("RandomSeed")));
-		data.put(new IntTag("SpawnX", values.getInt("SpawnX")));
-		data.put(new IntTag("SpawnY", values.getInt("SpawnY")));
-		data.put(new IntTag("SpawnZ", values.getInt("SpawnZ")));
-		data.put(new ByteTag("thundering", boolToByte(false)));
-		data.put(new IntTag("thunderTime", 100000));
-		data.put(new LongTag("Time", 0));
-		data.put(new IntTag("version", 19133));
-		data.put(new IntTag("WanderingTraderSpawnChance", 0));
-		data.put(new IntTag("WanderingTraderSpawnDelay", 15600));
+	public NBTTagCompound compile(boolean cheats) {
+		NBTTagCompound data = new NBTTagCompound(new HashMap<String, NBTTag>());
+		data.put("allowCommands", new NBTTagByte(boolToByte(cheats)));
+		data.put("BorderCenterX", new NBTTagDouble(values.getDouble("BorderCenterX")));
+		data.put("BorderCenterY", new NBTTagDouble(values.getDouble("BorderCenterZ")));
+		data.put("BorderDamagePerBlock", new NBTTagDouble(values.getDouble("BorderDamagePerBlock")));
+		data.put("BorderSafeZone", new NBTTagDouble(values.getDouble("BorderSafeZone")));
+		data.put("BorderSize", new NBTTagDouble(values.getDouble("BorderSize")));
+		data.put("BorderSizeLerpTarget", new NBTTagDouble(values.getDouble("BorderSizeLerpTarget")));
+		data.put("BorderSizeLerpTime", new NBTTagLong(values.getLong("BorderSizeLerpTime")));
+		data.put("BorderWarningBlocks", new NBTTagDouble(values.getDouble("BorderWarningBlocks")));
+		data.put("BorderWarningTime", new NBTTagDouble(values.getDouble("BorderWarningTime")));
+		data.put("clearWeatherTime", new NBTTagInt(0));
+		data.put("DataVersion", new NBTTagInt(1976));
+		data.put("DayTime", new NBTTagInt(values.getInt("DayTime")));
+		data.put("Difficulty", new NBTTagByte((byte) values.getInt("Difficulty")));
+		data.put("DifficultyLocked", new NBTTagByte(boolToByte(values.getBoolean("DifficultyLocked"))));
+		data.put("GameType", new NBTTagInt(values.getInt("GameType")));
+		data.put("generatorName", new NBTTagString("flat"));
+		data.put("generatorVersion", new NBTTagInt(0));
+		data.put("hardcore", new NBTTagByte(boolToByte(values.getBoolean("hardcore"))));
+		data.put("intialized", new NBTTagByte(boolToByte(true)));
+		data.put("LevelName", new NBTTagString(level.getPrettyName()));
+		data.put("MapFeatures", new NBTTagByte(boolToByte(false)));
+		data.put("raining", new NBTTagByte(boolToByte(false)));
+		data.put("rainTime", new NBTTagInt(100000));
+		data.put("RandomSeed", new NBTTagInt(values.getInt("RandomSeed")));
+		data.put("SpawnX", new NBTTagInt(values.getInt("SpawnX")));
+		data.put("SpawnY", new NBTTagInt(values.getInt("SpawnY")));
+		data.put("SpawnZ", new NBTTagInt(values.getInt("SpawnZ")));
+		data.put("thundering", new NBTTagInt(boolToByte(false)));
+		data.put("thunderTime", new NBTTagInt(100000));
+		data.put("Time", new NBTTagLong(0));
+		data.put("version", new NBTTagInt(19133));
+		data.put("WanderingTraderSpawnChance", new NBTTagInt(0));
+		data.put("WanderingTraderSpawnDelay", new NBTTagInt(15600));
 		
 		// Compile gamerules
-		CompoundMap gameruleMap = new CompoundMap();
+		NBTTagCompound gameruleMap = new NBTTagCompound(new HashMap<String, NBTTag>());
 		JSONObject gamerules = values.getJSONObject("gamerules");
 		for (String key : gamerules.keySet()) {
-			gameruleMap.put(new StringTag(key, gamerules.getString(key)));	
+			gameruleMap.put(key, new NBTTagString(gamerules.getString(key)));	
 		}
-		data.put(new CompoundTag("GameRules", gameruleMap));
+		data.put("GameRules", gameruleMap);
 		
-		CompoundMap root = new CompoundMap();
-		root.put(new CompoundTag("Data", data));
+		NBTTagCompound root = new NBTTagCompound(new HashMap<String, NBTTag>());
+		root.put("Data", data);
 		
 		return root;
 	}
@@ -169,7 +167,7 @@ public class LevelData {
 	 *  or cannot be opened for any other reason
 	 */
 	public void compileFile(File file, boolean cheats) throws FileNotFoundException, IOException {
-		CompoundMap compiled = compile(cheats);
+		NBTTagCompound compiled = compile(cheats);
 		
 		// Delete file if nessicary.
 		if (file.exists()) {
@@ -178,7 +176,7 @@ public class LevelData {
 		file.createNewFile();
 		
 		NBTOutputStream outputStream = new NBTOutputStream(new FileOutputStream(file));
-		outputStream.writeTag(new CompoundTag("", compiled));
+		outputStream.writeTag(compiled, "");
 		outputStream.close();
 	}
 	

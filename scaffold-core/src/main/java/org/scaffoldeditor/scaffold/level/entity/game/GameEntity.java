@@ -2,21 +2,21 @@ package org.scaffoldeditor.scaffold.level.entity.game;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.json.JSONObject;
 import org.scaffoldeditor.nbt.NBTStrings;
 import org.scaffoldeditor.scaffold.level.Level;
-import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.Rotatable;
-import org.scaffoldeditor.scaffold.level.entity.Entity.AttributeDeclaration;
 import org.scaffoldeditor.scaffold.logic.Datapack;
 import org.scaffoldeditor.scaffold.math.Vector;
 
-import com.flowpowered.nbt.CompoundMap;
-import com.flowpowered.nbt.FloatTag;
-import com.flowpowered.nbt.ListTag;
-import com.flowpowered.nbt.StringTag;
+import mryurihi.tbnbt.tag.NBTTag;
+import mryurihi.tbnbt.tag.NBTTagCompound;
+import mryurihi.tbnbt.tag.NBTTagFloat;
+import mryurihi.tbnbt.tag.NBTTagList;
+import mryurihi.tbnbt.tag.NBTTagString;
 
 /**
  * Represents a Minecraft entity in the editor
@@ -28,7 +28,7 @@ public class GameEntity extends Rotatable implements TargetSelectable {
 	public GameEntity(Level level, String name) {
 		super(level, name);
 		attributes().put("entityType", "minecraft:area_effect_cloud");
-		attributes().put("nbt", new CompoundMap());
+		attributes().put("nbt", new NBTTagCompound(new HashMap<String, NBTTag>()));
 		attributes().put("spawnOnInit", true);
 	}
 	
@@ -37,7 +37,7 @@ public class GameEntity extends Rotatable implements TargetSelectable {
 		List<AttributeDeclaration> attributeFields = super.getAttributeFields();
 		
 		attributeFields.add(new AttributeDeclaration("entityType", String.class));
-		attributeFields.add(new AttributeDeclaration("nbt", CompoundMap.class));
+		attributeFields.add(new AttributeDeclaration("nbt", NBTTagCompound.class));
 		attributeFields.add(new AttributeDeclaration("spawnOnInit", Boolean.class));
 		
 		return attributeFields;
@@ -63,8 +63,8 @@ public class GameEntity extends Rotatable implements TargetSelectable {
 	 * Get the CompoundMap with this entity's NBT.
 	 * @return NBT.
 	 */
-	public CompoundMap nbt() {
-		return (CompoundMap) getAttribute("nbt");
+	public NBTTagCompound nbt() {
+		return (NBTTagCompound) getAttribute("nbt");
 	}
 	
 	/**
@@ -99,12 +99,12 @@ public class GameEntity extends Rotatable implements TargetSelectable {
 		Vector position = getPosition();
 		
 		// Set rotation
-		List<FloatTag> rotArray = new ArrayList<FloatTag>();
-		rotArray.add(new FloatTag("", ((Number) getAttribute("rotX")).floatValue()));
-		rotArray.add(new FloatTag("", ((Number) getAttribute("rotY")).floatValue()));
+		List<NBTTag> rotArray = new ArrayList<NBTTag>();
+		rotArray.add(new NBTTagFloat(((Number) getAttribute("rotX")).floatValue()));
+		rotArray.add(new NBTTagFloat(((Number) getAttribute("rotY")).floatValue()));
 		
-		nbt().put(new ListTag<FloatTag>("Rotation", FloatTag.class, rotArray));
-		nbt().put(new StringTag("CustomName", "\""+getName()+"\""));
+		nbt().put("Rotation", new NBTTagList(rotArray));
+		nbt().put("CustomName", new NBTTagString("\""+getName()+"\""));
 		
 		String command = "summon "+getEntityType()+" "+position.X()+" "+position.Y()+" "+position.Z()+" "+NBTStrings.nbtToString(nbt());
 		
@@ -134,7 +134,7 @@ public class GameEntity extends Rotatable implements TargetSelectable {
 			setAttribute("nbt", NBTStrings.nbtFromString(nbt));
 		} catch (IOException e) {
 			System.out.println("Unable to parse NBT: "+nbt);
-			setAttribute("nbt", new CompoundMap());
+			setAttribute("nbt", new NBTTagCompound(new HashMap<String, NBTTag>()));
 		}
 	}
 	
@@ -152,7 +152,6 @@ public class GameEntity extends Rotatable implements TargetSelectable {
 
 	@Override
 	public String getTargetSelector() {
-		// TODO Auto-generated method stub
 		return "@e [type="+getEntityType()+",name="+getName()+"]";
 	}
 	
