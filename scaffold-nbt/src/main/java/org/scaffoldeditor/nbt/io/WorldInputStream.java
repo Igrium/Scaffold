@@ -12,10 +12,8 @@ import java.util.List;
 import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
 
-import com.flowpowered.nbt.CompoundMap;
-import com.flowpowered.nbt.CompoundTag;
-import com.flowpowered.nbt.Tag;
-import com.flowpowered.nbt.stream.NBTInputStream;
+import mryurihi.tbnbt.stream.NBTInputStream;
+import mryurihi.tbnbt.tag.NBTTagCompound;
 
 /**
  * This class can read and parse Minecraft Region files,
@@ -73,7 +71,7 @@ public class WorldInputStream implements Closeable {
 		/**
 		 * The chunk's NBT data.
 		 */
-		public final CompoundMap nbt;
+		public final NBTTagCompound nbt;
 		
 		/**
 		 * How many bytes were read while reading the chunk?
@@ -94,7 +92,7 @@ public class WorldInputStream implements Closeable {
 		 * For internal use only.
 		 * DO NOT CALL MANUALLY.
 		 */
-		public ChunkNBTInfo(CompoundMap nbt, int bytesRead, short x, short z) {
+		public ChunkNBTInfo(NBTTagCompound nbt, int bytesRead, short x, short z) {
 			this.nbt = nbt;
 			this.bytesRead = bytesRead;
 			this.x = x;
@@ -192,8 +190,7 @@ public class WorldInputStream implements Closeable {
 		
 		@SuppressWarnings("resource") // Root input stream still needs to be accessed.
 		NBTInputStream nbtIs = new NBTInputStream(new InflaterInputStream(is, inflater, length-1), false);
-		CompoundTag tag = (CompoundTag) nbtIs.readTag();
-		CompoundMap map = tag.getValue();
+		NBTTagCompound map = (NBTTagCompound) nbtIs.readTag();
 		
 		// Skip to the end of the sector.
 		is.skip(location.length*4096 - length+4);
