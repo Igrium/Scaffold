@@ -8,15 +8,16 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
-import com.flowpowered.nbt.ByteArrayTag;
-import com.flowpowered.nbt.CompoundMap;
-import com.flowpowered.nbt.CompoundTag;
-import com.flowpowered.nbt.ListTag;
-import com.flowpowered.nbt.ShortTag;
-import com.flowpowered.nbt.StringTag;
-import com.flowpowered.nbt.stream.NBTInputStream;
+import mryurihi.tbnbt.stream.NBTInputStream;
+import mryurihi.tbnbt.tag.NBTTag;
+import mryurihi.tbnbt.tag.NBTTagByteArray;
+import mryurihi.tbnbt.tag.NBTTagCompound;
+import mryurihi.tbnbt.tag.NBTTagList;
+import mryurihi.tbnbt.tag.NBTTagShort;
+import mryurihi.tbnbt.tag.NBTTagString;
 
 /**
  * Class responsible for loading and managing Minecraft schematics
@@ -32,10 +33,10 @@ public class Schematic {
 	private byte[] data;
 	
 	/* All entities in the schematic */
-	private List<CompoundTag> entities;
+	private List<NBTTagCompound> entities;
 	
 	/* All tile entities in the schematic */
-	private List<CompoundTag> tileEntities;
+	private List<NBTTagCompound> tileEntities;
 	
 	/* Size along the X axis. */
 	private short width;
@@ -118,9 +119,9 @@ public class Schematic {
 	 * @param map Compound Map to generate from
 	 * @return Newly created Schematic
 	 */
-	public static Schematic fromCompoundMap(CompoundMap map) {
+	public static Schematic fromCompoundMap(NBTTagCompound map) {
 		if (map == null) {
-			System.out.println("Fed null");
+			System.out.println("Schematic parser was fed null.");
 			return null;
 		}
 		
@@ -128,13 +129,13 @@ public class Schematic {
 
 		
 		// Get width and height
-		ShortTag widthTag = (ShortTag) map.get("Width");
+		NBTTagShort widthTag = (NBTTagShort) map.get("Width");
 		schematic.width = widthTag.getValue();
 		
-		ShortTag heightTag = (ShortTag) map.get("Height");
+		NBTTagShort heightTag = (NBTTagShort) map.get("Height");
 		schematic.height = heightTag.getValue();
 		
-		ShortTag lengthTag = (ShortTag) map.get("Length");
+		NBTTagShort lengthTag = (NBTTagShort) map.get("Length");
 		schematic.length = lengthTag.getValue();
 		
 		// Schematic may have not had proper tags
@@ -144,7 +145,7 @@ public class Schematic {
 		}
 		
 		// Get materials
-		StringTag materialTag = (StringTag) map.get("Materials");
+		NBTTagString materialTag = (NBTTagString) map.get("Materials");
 		if (materialTag == null) {
 			schematic.materials = MaterialType.ALPHA;
 		} else {
@@ -163,10 +164,10 @@ public class Schematic {
 		}
 		
 		// Get blocks and data
-		ByteArrayTag blocksArray = (ByteArrayTag) map.get("Blocks");
+		NBTTagByteArray blocksArray = (NBTTagByteArray) map.get("Blocks");
 		schematic.blocks = blocksArray.getValue();
 		
-		ByteArrayTag dataArray = (ByteArrayTag) map.get("Data");
+		NBTTagByteArray dataArray = (NBTTagByteArray) map.get("Data");
 		schematic.data = dataArray.getValue();
 		
 		if (schematic.blocks == null || schematic.data == null) {
@@ -175,13 +176,17 @@ public class Schematic {
 		}
 		
 		// Get entities
-		@SuppressWarnings("unchecked")
-		ListTag<CompoundTag> entities = (ListTag<CompoundTag>) map.get("Entities");
-		schematic.entities = entities.getValue();
+		NBTTagList entities = (NBTTagList) map.get("Entities");
+		schematic.entities = new ArrayList<NBTTagCompound>();
+		for (NBTTag t : entities.getValue()) {
+			schematic.entities.add((NBTTagCompound) t);
+		}
 		
-		@SuppressWarnings("unchecked")
-		ListTag<CompoundTag> tileEntities = (ListTag<CompoundTag>) map.get("TileEntities");
-		schematic.tileEntities = tileEntities.getValue();
+		NBTTagList tileEntities = (NBTTagList) map.get("TileEntities");
+		schematic.tileEntities = new ArrayList<NBTTagCompound>();
+		for (NBTTag e : tileEntities.getValue()) {
+			schematic.tileEntities.add((NBTTagCompound) e);
+		}
 		
 		// Entites are optional, so we don't check for success.
 		
@@ -198,10 +203,9 @@ public class Schematic {
 	public static Schematic fromFile(File file) throws FileNotFoundException, IOException {
 		NBTInputStream input = new NBTInputStream(new FileInputStream(file));
 		
-		CompoundTag tag = (CompoundTag) input.readTag();
-		CompoundMap map = (CompoundMap) tag.getValue();
+		NBTTagCompound tag = (NBTTagCompound) input.readTag();
 		
-		Schematic schematic = Schematic.fromCompoundMap(map);
+		Schematic schematic = Schematic.fromCompoundMap(tag);
 		
 		input.close();
 		

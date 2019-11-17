@@ -12,8 +12,9 @@ import org.scaffoldeditor.scaffold.level.entity.game.TargetSelectable;
 import org.scaffoldeditor.scaffold.logic.Datapack;
 import org.scaffoldeditor.scaffold.logic.MCFunction;
 
-import com.flowpowered.nbt.CompoundMap;
-import com.flowpowered.nbt.StringTag;
+import mryurihi.tbnbt.tag.NBTTag;
+import mryurihi.tbnbt.tag.NBTTagCompound;
+import mryurihi.tbnbt.tag.NBTTagString;
 
 /**
  * Represents a physical button ingame.
@@ -208,7 +209,7 @@ public class PropButton extends SingleBlock {
 	}
 
 	private void regenerateBlock() {
-		CompoundMap properties = new CompoundMap();
+		NBTTagCompound properties = new NBTTagCompound(new HashMap<String, NBTTag>());
 
 		String faceString = null;
 		if (face == ItemFace.FLOOR) {
@@ -218,7 +219,7 @@ public class PropButton extends SingleBlock {
 		} else {
 			faceString = "ceiling";
 		}
-		properties.put(new StringTag("face", faceString));
+		properties.put("face", new NBTTagString(faceString));
 
 		String facingString = null;
 		if (facing == Direction.NORTH) {
@@ -230,8 +231,8 @@ public class PropButton extends SingleBlock {
 		} else {
 			facingString = "west";
 		}
-		properties.put(new StringTag("facing", facingString));
-		properties.put(new StringTag("powered", "false"));
+		properties.put("facing", new NBTTagString(facingString));
+		properties.put("powered", new NBTTagString("false"));
 
 		block = new Block(blockNames.get(buttonType), properties);
 	}

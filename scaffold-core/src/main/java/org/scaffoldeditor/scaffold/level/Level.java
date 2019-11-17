@@ -18,7 +18,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.scaffoldeditor.nbt.NBTStrings;
 import org.scaffoldeditor.nbt.block.BlockWorld;
-import org.scaffoldeditor.scaffold.core.AssetManager;
 import org.scaffoldeditor.scaffold.core.Constants;
 import org.scaffoldeditor.scaffold.core.Project;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
@@ -28,9 +27,10 @@ import org.scaffoldeditor.scaffold.logic.MCFunction;
 import org.scaffoldeditor.scaffold.logic.Resourcepack;
 import org.scaffoldeditor.scaffold.math.Vector;
 
-import com.flowpowered.nbt.CompoundMap;
-import com.flowpowered.nbt.IntTag;
-import com.flowpowered.nbt.StringTag;
+import mryurihi.tbnbt.tag.NBTTag;
+import mryurihi.tbnbt.tag.NBTTagCompound;
+import mryurihi.tbnbt.tag.NBTTagInt;
+import mryurihi.tbnbt.tag.NBTTagString;
 
 /**
  * Represents a single level file
@@ -257,9 +257,9 @@ public class Level {
 	
 	
 	private String summonScoreboardEntity() {
-		CompoundMap nbt = new CompoundMap();
-		nbt.put(new StringTag("CustomName", "\""+SCOREBOARDNAME+"\""));
-		nbt.put(new IntTag("Duration", 2000000000));
+		NBTTagCompound nbt = new NBTTagCompound(new HashMap<String, NBTTag>());
+		nbt.put("CustomName", new NBTTagString("\""+SCOREBOARDNAME+"\""));
+		nbt.put("Duration", new NBTTagInt(2000000000));
 		
 		return "summon "+SCOREBOARDTYPE+" 0 0 0 "+NBTStrings.nbtToString(nbt);
 	}
