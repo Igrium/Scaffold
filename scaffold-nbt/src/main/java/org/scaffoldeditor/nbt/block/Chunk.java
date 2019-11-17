@@ -5,6 +5,11 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import mryurihi.tbnbt.tag.NBTTag;
+import mryurihi.tbnbt.tag.NBTTagCompound;
+import mryurihi.tbnbt.tag.NBTTagList;
+import mryurihi.tbnbt.tag.NBTTagLongArray;
+
 /**
  * Represents a single chunk in the world.
  *
@@ -87,6 +92,67 @@ public class Chunk implements BlockCollection {
 		}
 		
 		return blockArray;
+	}
+	
+	/**
+	 * Represents a single sub-chunk.
+	 * Used for serialization/unserialization
+	 * @author Sam54123
+	 */
+	protected static class SubChunk {
+		
+		public List<Block> palette;
+		Block[][][] blockArray = new Block[WIDTH][16][LENGTH];
+		public byte y = 0;
+		
+		public SubChunk() {};
+		
+		/**
+		 * Create a SubChunk from NBT data.
+		 */
+		public SubChunk(NBTTagCompound nbt) {
+			if (!nbt.containsKey("Palette")) {
+				return;
+			}
+			System.out.println(nbt);
+			this.y = nbt.get("Y").getAsTagByte().getValue();
+			// Load palette
+			NBTTagList palette = nbt.get("Palette").getAsTagList();
+			for (NBTTag t : palette.getValue()) {
+				NBTTagCompound block = (NBTTagCompound) t;
+				this.palette.add(Block.fromBlockPalleteEntry(block));
+			}
+			
+			// Load blockstates
+			NBTTagLongArray blockstates = nbt.get("BlockStates").getAsTagLongArray();
+			for (long l : blockstates.getValue()) {
+				System.out.println(l);
+			}
+
+		}
+
+		public Block blockAt(int x, int y, int z) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+	}
+	
+	/**
+	 * Read a chunk from <a href="https://minecraft.gamepedia.com/Chunk_format">NBT data</a>
+	 * @param nbt
+	 * @return
+	 */
+	public static Chunk fromNBT(NBTTagCompound nbt) {
+		NBTTagList sections = nbt.get("Sections").getAsTagList();
+		
+		for (NBTTag t : sections.getValue()) {
+			NBTTagCompound section = t.getAsTagCompound();
+			
+			SubChunk subchunk = new SubChunk(section);
+		}
+			
+		return null;
 	}
 
 	@Override

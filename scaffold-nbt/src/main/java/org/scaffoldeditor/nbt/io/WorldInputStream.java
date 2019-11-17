@@ -152,7 +152,6 @@ public class WorldInputStream implements Closeable {
 	 */
 	public ChunkNBTInfo readChunkNBT() throws IOException {
 		ChunkLocation location = chunkLocations.get(locationHead);
-		System.out.println(locationHead+", "+chunkLocations.size());
 		
 		// Skip if chunk is empty
 		if (location.length == 0) {
