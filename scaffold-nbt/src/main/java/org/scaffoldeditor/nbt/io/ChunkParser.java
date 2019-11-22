@@ -26,7 +26,7 @@ public final class ChunkParser {
 	protected static class Section {
 		
 		public List<Block> palette = new ArrayList<Block>();
-		Block[][][] blockArray = new Block[16][16][16]; // Sections are 16 x 16 x 16 blocks.
+		int[][][] blockArray = new int[16][16][16]; // Sections are 16 x 16 x 16 blocks. Stored in YZX order.
 		public byte y = 0;
 		
 		public Section() {};
@@ -53,13 +53,22 @@ public final class ChunkParser {
 			
 			// Load blockstates
 			NBTTagLongArray blockstates = nbt.get("BlockStates").getAsTagLongArray();
-			readBlockStates(blockstates.getValue());
-
+			int[] blockStateArray = readBlockStates(blockstates.getValue());
+			
+			// Insert all blockstates indices into 3d array.
+			int head = 0;
+			for (int[][] y : blockArray) {
+				for (int[] z : y) {
+					for (int x : z) {
+						z[x] = blockStateArray[head];
+						head++;
+					}
+				}
+			}
 		}
 
 		public Block blockAt(int x, int y, int z) {
-			// TODO Auto-generated method stub
-			return null;
+			return palette.get(blockArray[y][z][x]);
 		}
 
 	}
