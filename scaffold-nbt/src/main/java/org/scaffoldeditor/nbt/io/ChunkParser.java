@@ -1,6 +1,8 @@
 package org.scaffoldeditor.nbt.io;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.BitSet;
 import java.util.List;
 
 import org.scaffoldeditor.nbt.block.Block;
@@ -47,6 +49,8 @@ public final class ChunkParser {
 				this.palette.add(Block.fromBlockPalleteEntry(block));
 			}
 			
+			System.out.println("Palette: "+palette.toString());
+			
 			// Load blockstates
 			NBTTagLongArray blockstates = nbt.get("BlockStates").getAsTagLongArray();
 			readBlockStates(blockstates.getValue());
@@ -80,9 +84,9 @@ public final class ChunkParser {
 	/**
 	 * Obtain a list of BlockState indices from the BlockState long array.
 	 * @param longArray Long array to parse.
-	 * @return BlockState indices.
+	 * @return Indices of BlockStates in the palette.
 	 */
-	private static List<Integer> readBlockStates(long[] longArray) {
+	private static int[] readBlockStates(long[] longArray) {
 		
 		/*
 		 * The size of an index in bits.
@@ -96,9 +100,31 @@ public final class ChunkParser {
 		}
 		
 		System.out.println("Index size: "+indexSize); // TESTING ONLY
-		for (long l : longArray) {
-			
+		
+		// Obtain all bits from long array.
+		BitSet bits = BitSet.valueOf(longArray);
+		
+		// Convert into int array.
+		int[] indices = new int[4096];
+		for (int i = 0; i < indices.length; i++) {
+			indices[i] = convert(bits.get(i*indexSize, (i+1)*indexSize-1));
 		}
+		
+		
+		System.out.println("Indices: "+Arrays.toString(indices)); // TESTING ONLY
+		
 		return null;
 	}
+	
+	/*
+	 * Convert a BitSet to a Long.
+	 * Copied from: https://stackoverflow.com/questions/2473597/bitset-to-and-from-integer-long
+	 */
+	private static int convert(BitSet bits) {
+	    int value = 0;
+	    for (int i = 0; i < bits.length(); ++i) {
+	      value += bits.get(i) ? (1L << i) : 0L;
+	    }
+	    return value;
+	  }
 }
