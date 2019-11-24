@@ -1,7 +1,10 @@
 package org.metaversemedia.scaffold.test;
 
+import java.io.File;
 import java.io.FileInputStream;
 import org.junit.Test;
+import org.scaffoldeditor.nbt.block.Block;
+import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.nbt.block.Chunk;
 import org.scaffoldeditor.nbt.io.ChunkParser;
 import org.scaffoldeditor.nbt.io.WorldInputStream;
@@ -13,21 +16,19 @@ public class NBTTest {
 	public void test() {
 		try {
 			int count = 0;
-			WorldInputStream is = new WorldInputStream(new FileInputStream("C:\\Users\\Sam54123\\Documents\\Minecraft\\MapdevUtils\\Scaffold\\testProject\\game\\saves\\Test World\\region\\r.0.0.mca"));
-//			WorldInputStream is = new WorldInputStream(new FileInputStream("/Users/h205p1/Documents/Scaffold-Workspace/testProject/game/saves/TestWorld/region/r.0.0.mca"));
+			BlockWorld world = BlockWorld.deserialize(new File("C:\\Users\\Sam54123\\Documents\\Minecraft\\MapdevUtils\\Scaffold\\testProject\\game\\saves\\Test World\\region"));
+			System.out.println(world.blockAt(-1, 5, -1));
+			System.out.println(world.blockAt(11, 5, 16));
+			System.out.println(world.blockAt(0, 0, 0));
 			
-			ChunkNBTInfo chunkNBT = is.readChunkNBT();
-			Chunk chunk = ChunkParser.fromNBT(chunkNBT.nbt.get("Level").getAsTagCompound());
-			
-			System.out.println(chunk.blockAt(0, 128, 0));
-			is.close();
-			
-			ChunkDebugger debugger = new ChunkDebugger();
-			debugger.characters.put("minecraft:stone",'s');
-			debugger.printLayer(4, chunk);
+//			for (Block b : world) {
+//				if (b != null && b.getName().matches("minecraft:air")) {
+//					System.out.print("{"+b+"}");
+//				}
+//			}
 
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			System.out.println("THERE WAS AN ERROR!");
 			e.printStackTrace();
 		}
 	}

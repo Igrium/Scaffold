@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.zip.Inflater;
@@ -24,7 +23,7 @@ public class WorldInputStream implements Closeable {
 	/**
 	 * Contains chunk location information defined in the header of the file.
 	 */
-	public class ChunkLocation implements Comparable<ChunkLocation> {
+	protected class ChunkLocation implements Comparable<ChunkLocation> {
 		/**
 		 * Chunk offset in 4KiB sectors from the start of the file.
 		 */
@@ -152,12 +151,11 @@ public class WorldInputStream implements Closeable {
 	 */
 	public ChunkNBTInfo readChunkNBT() throws IOException {
 		ChunkLocation location = chunkLocations.get(locationHead);
-		
 		// Skip if chunk is empty
-		if (location.length == 0) {
-			if (locationHead < chunkLocations.size()) {
-				locationHead++;
-				return readChunkNBT();
+		while (location.length == 0) {
+			if (locationHead < chunkLocations.size()-1) { // Make sure we have space to iterate.
+				locationHead++;	
+				location = chunkLocations.get(locationHead);
 			} else {
 				return null;
 			}
@@ -194,8 +192,25 @@ public class WorldInputStream implements Closeable {
 		return new ChunkNBTInfo(map, length+4, location.x, location.z);
 	}
 	
+	// Check if we have more chunks by attempting to iterate to them.
 	public boolean hasNext() {
-		return (locationHead < chunkLocations.size());
+		if (!(locationHead < chunkLocations.size())) {
+			return false;
+		}
+		
+		ChunkLocation location = chunkLocations.get(locationHead);
+		while (location.length == 0) {
+			if (locationHead < chunkLocations.size()-1) { // Make sure we have space to iterate.
+				locationHead++;	
+				location = chunkLocations.get(locationHead);
+			} else {
+				return false;
+			}
+		}
+		
+		// The loop only ends when we've found another location.
+		// If we've found one, we know we have a next location.
+		return true;
 	}
 
 	@Override

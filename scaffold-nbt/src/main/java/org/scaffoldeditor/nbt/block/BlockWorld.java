@@ -1,9 +1,21 @@
 package org.scaffoldeditor.nbt.block;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.io.FilenameUtils;
+import org.scaffoldeditor.nbt.io.ChunkParser;
+import org.scaffoldeditor.nbt.io.WorldInputStream;
+
+import mryurihi.tbnbt.tag.NBTTagCompound;
 
 /**
  * Represents all the blocks in a world.
@@ -186,5 +198,56 @@ public class BlockWorld implements BlockCollection {
 				return chunk.next();
 			}
 		};
+	}
+	
+	/**
+	 * Read a BlockWorld from a Minecraft save file.
+	 * @param regionFolder (Absolute) path to region folder within world folder.
+	 * @return Parsed BlockWorld.
+	 * @throws IOException If an IOException occurs.
+	 * @throws FileNotFoundException If any of the files are not found.
+	 */
+	public static BlockWorld deserialize(File regionFolder) throws FileNotFoundException, IOException {
+		System.out.println("Reading world at "+regionFolder);
+		BlockWorld world = new BlockWorld();
+		
+		File[] regionFiles = regionFolder.listFiles();
+		for (File f : regionFiles) {
+			if (FilenameUtils.getExtension(f.toString()).matches("mca")) {
+				world.parseRegionFile(f);
+			}
+		}
+		
+		System.out.println("World read successfully!");
+		return world;
+	}
+	
+	/**
+	 * Read all the chunks in a region file and add them to this world.
+	 * @param regionFile
+	 * @throws IOException If an IO exception occurs during file parsing.
+	 * @throws FileNotFoundException If the file is not found.
+	 */
+	private void parseRegionFile(File regionFile) throws FileNotFoundException, IOException {
+		System.out.println("Reading "+regionFile);
+		List<NBTTagCompound> chunkMaps = new ArrayList<NBTTagCompound>();
+		WorldInputStream is = new WorldInputStream(new FileInputStream(regionFile));
+		
+		// Read all chunks from file.
+		while (is.hasNext()) {
+			chunkMaps.add(is.readChunkNBT().nbt);
+		}
+		is.close();
+		
+		// Add chunks to world.
+		for (NBTTagCompound c : chunkMaps) {
+			NBTTagCompound level = c.get("Level").getAsTagCompound();
+			ChunkCoordinate coord = new ChunkCoordinate(
+					level.get("xPos").getAsTagInt().getValue(),
+					level.get("zPos").getAsTagInt().getValue());
+			
+			chunks.put(coord, ChunkParser.parseNBT(level));
+			
+		}
 	}
 }

@@ -1,7 +1,6 @@
 package org.scaffoldeditor.nbt.io;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
 
@@ -93,7 +92,7 @@ public final class ChunkParser {
 	 * @param nbt NBT to parse.
 	 * @return Parsed chunk.
 	 */
-	public static Chunk fromNBT(NBTTagCompound nbt) {
+	public static Chunk parseNBT(NBTTagCompound nbt) {
 		Chunk chunk = new Chunk();
 		
 		// Get sections from NBT.
@@ -113,7 +112,7 @@ public final class ChunkParser {
 						Block block = section.blockAt(x, y, z);
 						if (block != null) {
 							chunk.setBlock(x, y+yOffset, z, block);
-						}			
+						}
 					}
 				}
 			}
