@@ -21,6 +21,10 @@ public class NBTTest {
 			
 			System.out.println(chunk.blockAt(0, 128, 0));
 			is.close();
+			
+			ChunkDebugger debugger = new ChunkDebugger();
+			debugger.characters.put("minecraft:stone",'s');
+			debugger.printLayer(4, chunk);
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

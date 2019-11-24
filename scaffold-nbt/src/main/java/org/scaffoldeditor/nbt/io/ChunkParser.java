@@ -1,6 +1,7 @@
 package org.scaffoldeditor.nbt.io;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
 
@@ -49,17 +50,17 @@ public final class ChunkParser {
 				NBTTagCompound block = t.getAsTagCompound();
 				this.palette.add(Block.fromBlockPalleteEntry(block));
 			}
-						
+			
 			// Load blockstates
 			NBTTagLongArray blockstates = nbt.get("BlockStates").getAsTagLongArray();
 			int[] blockStateArray = readBlockStates(blockstates.getValue());
 			
 			// Insert all blockstates indices into 3d array.
 			int head = 0;
-			for (int[][] y : blockArray) {
-				for (int[] z : y) {
-					for (int x : z) {
-						z[x] = blockStateArray[head];
+			for (int y = 0; y < 16; y++) {
+				for (int z = 0; z < 16; z++) {
+					for (int x = 0; x < 16; x++) {
+						blockArray[y][z][x] = blockStateArray[head];
 						head++;
 					}
 				}
@@ -105,23 +106,14 @@ public final class ChunkParser {
 			Section section = new Section(subchunk);
 			int yOffset = section.y*16;
 			
-			System.out.println("--- New Section---");
-			System.out.println(yOffset);
 			// Add section to chunk.
 			for (int y = 0; y < 16; y++) {
-				System.out.print(y+yOffset+" ");
 				for (int z = 0; z < 16; z++) {
 					for (int x = 0; x < 16; x++) {
-//						System.out.print("<"+x+","+(y+yOffset)+","+z+">");
 						Block block = section.blockAt(x, y, z);
 						if (block != null) {
 							chunk.setBlock(x, y+yOffset, z, block);
-						}
-						
-						// TESTING ONLY
-						if (x == 0 && z == 0) {
-							System.out.print(block+" ");
-						}
+						}			
 					}
 				}
 			}
