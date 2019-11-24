@@ -5,10 +5,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import mryurihi.tbnbt.tag.NBTTag;
 import mryurihi.tbnbt.tag.NBTTagCompound;
-import mryurihi.tbnbt.tag.NBTTagList;
-import mryurihi.tbnbt.tag.NBTTagLongArray;
 
 /**
  * Represents a single chunk in the world.
@@ -29,6 +26,13 @@ public class Chunk implements BlockCollection {
 	 * All blocks in the chunk, listed by their palette index.
 	 */
 	private short[][][] blocks;
+	
+	/**
+	 * A list of entities in the chunk, in <a href="https://minecraft.gamepedia.com/Chunk_format#entity_format">NBT format</a>.
+	 * <br>
+	 * Does not do anything natively. Functionallity must be implemented by other classes.
+	 */
+	public final List<NBTTagCompound> entities = new ArrayList<NBTTagCompound>();
 	
 	public Chunk() {
 		blocks = new short[WIDTH][HEIGHT][LENGTH];

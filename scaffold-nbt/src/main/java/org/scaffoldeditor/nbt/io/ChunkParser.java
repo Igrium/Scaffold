@@ -1,7 +1,6 @@
 package org.scaffoldeditor.nbt.io;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
 
@@ -20,6 +19,7 @@ import mryurihi.tbnbt.tag.NBTTagLongArray;
 public final class ChunkParser {
 	/**
 	 * Represents a single sub-chunk.
+	 * <br>
 	 * Used for serialization/unserialization
 	 * @author Sam54123
 	 */
@@ -29,28 +29,27 @@ public final class ChunkParser {
 		int[][][] blockArray = new int[16][16][16]; // Sections are 16 x 16 x 16 blocks. Stored in YZX order.
 		public byte y = 0;
 		
+		// Variable to keep track of if section creation failed.
+		private boolean valid = false;
+		
 		public Section() {};
 		
 		/**
-		 * Create a SubChunk from NBT data.
+		 * Create a Section from NBT data.
 		 */
 		public Section(NBTTagCompound nbt) {
 			if (!nbt.containsKey("Palette")) {
 				return;
 			}
-			System.out.println(nbt);
 			this.y = nbt.get("Y").getAsTagByte().getValue();
 			
 			// Load palette
 			NBTTagList palette = nbt.get("Palette").getAsTagList();
 			for (NBTTag t : palette.getValue()) {
 				NBTTagCompound block = t.getAsTagCompound();
-//				System.out.println("Block: "+t);
 				this.palette.add(Block.fromBlockPalleteEntry(block));
 			}
-			
-			System.out.println("Palette: "+palette.toString());
-			
+						
 			// Load blockstates
 			NBTTagLongArray blockstates = nbt.get("BlockStates").getAsTagLongArray();
 			int[] blockStateArray = readBlockStates(blockstates.getValue());
@@ -65,10 +64,25 @@ public final class ChunkParser {
 					}
 				}
 			}
+			
+			valid = true;
+		}
+		
+		/**
+		 * Was this section initialized properly?
+		 * @return Is valid?
+		 */
+		public boolean isValid() {
+			return valid;
 		}
 
 		public Block blockAt(int x, int y, int z) {
-			return palette.get(blockArray[y][z][x]);
+			if (valid) {
+				return palette.get(blockArray[y][z][x]);
+			} else {
+				return null;
+			}
+			
 		}
 
 	}
@@ -79,15 +93,41 @@ public final class ChunkParser {
 	 * @return Parsed chunk.
 	 */
 	public static Chunk fromNBT(NBTTagCompound nbt) {
-		NBTTagList sections = nbt.get("Sections").getAsTagList();
+		Chunk chunk = new Chunk();
 		
-		for (NBTTag t : sections.getValue()) {
+		// Get sections from NBT.
+		NBTTagList sectionList = nbt.get("Sections").getAsTagList();
+		
+		// Iterate through sections.
+		for (NBTTag t : sectionList.getValue()) {
 			NBTTagCompound subchunk = t.getAsTagCompound();
 			
 			Section section = new Section(subchunk);
+			int yOffset = section.y*16;
+			
+			System.out.println("--- New Section---");
+			System.out.println(yOffset);
+			// Add section to chunk.
+			for (int y = 0; y < 16; y++) {
+				System.out.print(y+yOffset+" ");
+				for (int z = 0; z < 16; z++) {
+					for (int x = 0; x < 16; x++) {
+//						System.out.print("<"+x+","+(y+yOffset)+","+z+">");
+						Block block = section.blockAt(x, y, z);
+						if (block != null) {
+							chunk.setBlock(x, y+yOffset, z, block);
+						}
+						
+						// TESTING ONLY
+						if (x == 0 && z == 0) {
+							System.out.print(block+" ");
+						}
+					}
+				}
+			}
 		}
 			
-		return null;
+		return chunk;
 	}
 	
 	/**
@@ -101,15 +141,13 @@ public final class ChunkParser {
 		 * The size of an index in bits.
 		 * One section always stores 16*16*16 = 4096 blocks,
 		 * therefore the amount of bits per block can be calculated like that: 
-		 * size of BlockStates-Tag * 64 / 4096 (64 = bit of a long value). 
+		 * size of BlockStates-Tahttps://www.youtube.com/watch?v=CKR_1vh5Jw0g * 64 / 4096 (64 = bit of a long value). 
 		 */
 		int indexSize = longArray.length * 64 / 4096;
 		if (indexSize < 4) {
 			indexSize = 4;
 		}
-		
-		System.out.println("Index size: "+indexSize); // TESTING ONLY
-		
+				
 		// Obtain all bits from long array.
 		BitSet bits = BitSet.valueOf(longArray);
 		
@@ -118,11 +156,8 @@ public final class ChunkParser {
 		for (int i = 0; i < indices.length; i++) {
 			indices[i] = convert(bits.get(i*indexSize, (i+1)*indexSize-1));
 		}
-		
-		
-		System.out.println("Indices: "+Arrays.toString(indices)); // TESTING ONLY
-		
-		return null;
+						
+		return indices;
 	}
 	
 	/*
