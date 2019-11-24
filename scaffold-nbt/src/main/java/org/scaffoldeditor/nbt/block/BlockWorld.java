@@ -65,11 +65,11 @@ public class BlockWorld implements BlockCollection {
 		if (y < 0 || y > Chunk.HEIGHT) {
 			throw new IllegalArgumentException("Block Y value must be between 0 and "+Chunk.HEIGHT);
 		}
-				
+		
 		// Find chunk block is in
 		ChunkCoordinate chunkKey = new ChunkCoordinate(
-				(int) Math.floor(x/Chunk.WIDTH),
-				(int) Math.floor(z/Chunk.WIDTH));
+				(int) Math.floor((double) x/Chunk.WIDTH),
+				(int) Math.floor((double) z/Chunk.WIDTH));
 		
 		Chunk chunk = null;
 		if (chunks.containsKey(chunkKey)) {
@@ -78,7 +78,18 @@ public class BlockWorld implements BlockCollection {
 			return null;
 		}
 		
-		return chunk.blockAt(x % Chunk.WIDTH, y, z % Chunk.LENGTH);
+		// Convert into chunk coordinates.
+		int chunkX = x % Chunk.WIDTH;
+		int chunkZ = z % Chunk.LENGTH;
+		
+		if (chunkX < 0) {
+			chunkX = Chunk.WIDTH + chunkX;
+		}
+		if (chunkZ < 0) {
+			chunkZ = Chunk.LENGTH + chunkZ;
+		}
+		
+		return chunk.blockAt(chunkX, y, chunkZ);
 	}
 	
 	/**
