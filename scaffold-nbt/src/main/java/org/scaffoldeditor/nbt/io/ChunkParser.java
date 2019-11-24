@@ -117,7 +117,13 @@ public final class ChunkParser {
 				}
 			}
 		}
-			
+		
+		// Load entities.
+		NBTTagList entities = nbt.get("Entities").getAsTagList();
+		for (NBTTag t : entities.getValue()) {
+			chunk.entities.add(t.getAsTagCompound());
+		}
+		
 		return chunk;
 	}
 	

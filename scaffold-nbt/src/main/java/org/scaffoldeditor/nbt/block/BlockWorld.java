@@ -187,6 +187,18 @@ public class BlockWorld implements BlockCollection {
 		chunks.clear();
 	}
 	
+	/**
+	 * Get a collection of all the entities in the world.
+	 * @return All the entities, represented by compound maps in the <a href="https://minecraft.gamepedia.com/Chunk_format#entity_format">entity format</a>
+	 */
+	public Collection<NBTTagCompound> entities() {
+		Collection<NBTTagCompound> entities = new ArrayList<NBTTagCompound>();
+		for (Chunk c : chunks.values()) {
+			entities.addAll(c.entities);
+		}
+		return entities;
+	}
+	
 	// Iterates over all chunks, and all blocks in the chunks.
 	@Override
 	public Iterator<Block> iterator() {
