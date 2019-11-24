@@ -1,53 +1,36 @@
 package org.metaversemedia.scaffold.test;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
+import java.io.File;
+import java.io.FileInputStream;
 import org.junit.Test;
-import org.scaffoldeditor.nbt.NBTStrings;
-
-import mryurihi.tbnbt.tag.NBTTag;
-import mryurihi.tbnbt.tag.NBTTagCompound;
-import mryurihi.tbnbt.tag.NBTTagFloat;
-import mryurihi.tbnbt.tag.NBTTagList;
-import mryurihi.tbnbt.tag.NBTTagString;
-
+import org.scaffoldeditor.nbt.block.Block;
+import org.scaffoldeditor.nbt.block.BlockWorld;
+import org.scaffoldeditor.nbt.block.Chunk;
+import org.scaffoldeditor.nbt.io.ChunkParser;
+import org.scaffoldeditor.nbt.io.WorldInputStream;
+import org.scaffoldeditor.nbt.io.WorldInputStream.ChunkNBTInfo;
 
 public class NBTTest {
 
 	@Test
 	public void test() {
-		System.out.println("test");
-		NBTTagCompound testMap = new NBTTagCompound(new HashMap<String, NBTTag>());
-		testMap.put("TestTag", new NBTTagString("test"));
-		testMap.put("FloatTag", new NBTTagFloat(5.0f));
-		
-		List<NBTTag> list = new ArrayList<NBTTag>();
-		list.add(new NBTTagString("Test \" Test"));
-		list.add(new NBTTagString("Test2!"));
-		
-		NBTTagList listTag = new NBTTagList(list);
-		testMap.put("ListTest",listTag);
-		
-		System.out.println(NBTStrings.tagToString(testMap));
-				
-		String nbtString =
-				"{CustomName:\"\\\"Test\\\"\",CustomNameVisible:1,NoAI:1b,ExplosionRadius:4,HandDropChances:[2F,2F],HandItems:[{},{id:\"minecraft:stone\",Count:1}],Tags:[\"test\"]}";
-		
-		System.out.println(nbtString);;
-		
 		try {
-			NBTTagCompound map = NBTStrings.nbtFromString(nbtString);
-			System.out.println(NBTStrings.tagToString(map));
-		} catch (IOException | NullPointerException e) {
-			// TODO Auto-generated catch block
+			int count = 0;
+			BlockWorld world = BlockWorld.deserialize(new File("C:\\Users\\Sam54123\\Documents\\Minecraft\\MapdevUtils\\Scaffold\\testProject\\game\\saves\\Test World\\region"));
+			System.out.println(world.blockAt(-1, 5, -1));
+			System.out.println(world.blockAt(11, 5, 16));
+			System.out.println(world.blockAt(0, 0, 0));
+			
+//			for (Block b : world) {
+//				if (b != null && b.getName().matches("minecraft:air")) {
+//					System.out.print("{"+b+"}");
+//				}
+//			}
+
+		} catch (Exception e) {
+			System.out.println("THERE WAS AN ERROR!");
 			e.printStackTrace();
 		}
-	
-//		System.out.println(Short.parseShort("3s"));
-		assert(true);
 	}
 
 }
