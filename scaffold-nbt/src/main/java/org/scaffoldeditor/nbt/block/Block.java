@@ -15,14 +15,22 @@ public class Block {
 	NBTTagCompound properties;
 	
 	/**
-	 * Create a Block object
-	 * @param name Namespaced name
-	 * @param properties Block properties 
+	 * Create a Block object.
+	 * @param name Namespaced name.
+	 * @param properties Block properties.
 	 * (must be converted for pre-flattening blocks)
 	 */
 	public Block(String name, NBTTagCompound properties) {
 		this.name = name;
 		this.properties = properties;
+	}
+	
+	/**
+	 * Create a block object.
+	 * @param name Namespaced name.
+	 */
+	public Block(String name) {
+		this(name, new NBTTagCompound(new HashMap<String, NBTTag>()));
 	}
 	
 	public String getName() {
@@ -49,6 +57,20 @@ public class Block {
 			return new Block(((NBTTagString) paletteEntry.get("Name")).getValue(),
 					(NBTTagCompound) paletteEntry.get("Properties"));
 		}
+	}
+	
+	/**
+	 * Convert this Block into a palette entry.
+	 * @return PaletteEntry.
+	 */
+	public NBTTagCompound toPaletteEntry() {
+		NBTTagCompound paletteEntry = new NBTTagCompound(new HashMap<String, NBTTag>());
+		if (this.properties.getValue().keySet().size() != 0) {
+			paletteEntry.put("Properties", properties);
+		}
+		
+		paletteEntry.put("Name", new NBTTagString(this.name));
+		return paletteEntry;
 	}
 	
 	@Override

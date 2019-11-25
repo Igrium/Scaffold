@@ -41,6 +41,8 @@ public class Chunk implements BlockCollection {
 				Arrays.fill(column, (short) -1);
 			}
 		}
+		
+		palette.add(new Block("minecraft:air")); // 0 in the palette is always air.
 	}
 	
 	@Override
@@ -57,6 +59,17 @@ public class Chunk implements BlockCollection {
 			System.out.println("Block "+x+" "+y+" "+z+" is out of range!");
 			return null;
 		}
+	}
+	
+	/**
+	 * Check for a non-air block at the given chunk coordinates. (More efficiant than blockAt).
+	 * @param x X coordinate.
+	 * @param y Y coordinate.
+	 * @param z Z coordinate
+	 * @return Is a block present?
+	 */
+	public boolean blockExists(int x, int y, int z) {
+		return (blocks[x][y][z] > 0);
 	}
 
 	public void setBlock(int x, int y, int z, Block block) {

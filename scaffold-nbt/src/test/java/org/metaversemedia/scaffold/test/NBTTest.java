@@ -3,6 +3,8 @@ package org.metaversemedia.scaffold.test;
 import java.io.File;
 import org.junit.Test;
 import org.scaffoldeditor.nbt.block.BlockWorld;
+import org.scaffoldeditor.nbt.block.Chunk;
+import org.scaffoldeditor.nbt.io.ChunkParser;
 
 import mryurihi.tbnbt.tag.NBTTagCompound;
 
@@ -22,9 +24,16 @@ public class NBTTest {
 //				}
 //			}
 			
-			for (NBTTagCompound e : world.entities()) {
-				System.out.println(e);
-			}
+			Chunk original = world.chunkAt(0, 1);
+			System.out.println("Original: "+original.blockAt(1, 0, 0));
+			NBTTagCompound chunkNBT = ChunkParser.writeNBT(world.chunkAt(0, 0));
+			System.out.println(chunkNBT);
+			
+			Chunk chunk = ChunkParser.parseNBT(chunkNBT);
+			System.out.println("Written: "+chunk.blockAt(1, 0, 0));
+			ChunkDebugger debugger = new ChunkDebugger();
+			debugger.characters.put("minecraft:bedrock", '@');
+			debugger.printLayer(0, original);
 
 		} catch (Exception e) {
 			System.out.println("THERE WAS AN ERROR!");

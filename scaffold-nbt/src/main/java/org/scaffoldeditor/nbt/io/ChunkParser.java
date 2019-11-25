@@ -1,12 +1,17 @@
 package org.scaffoldeditor.nbt.io;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.BitSet;
+import java.util.HashMap;
 import java.util.List;
 
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.Chunk;
+
+import mryurihi.tbnbt.TagType;
 import mryurihi.tbnbt.tag.NBTTag;
+import mryurihi.tbnbt.tag.NBTTagByte;
 import mryurihi.tbnbt.tag.NBTTagCompound;
 import mryurihi.tbnbt.tag.NBTTagList;
 import mryurihi.tbnbt.tag.NBTTagLongArray;
@@ -32,7 +37,40 @@ public final class ChunkParser {
 		// Variable to keep track of if section creation failed.
 		private boolean valid = false;
 		
-		public Section() {};
+		/**
+		 * Create a section from a chunk and a Y offset
+		 */
+		public Section(Chunk chunk, byte yOffset) {
+			this.y = yOffset;
+			palette.add(new Block("minecraft:air")); // Air must always be the first in the palette.
+			
+			for (int y = 0; y < 16; y++) {
+				for (int z = 0; z < 16; z++) {
+					for (int x = 0; x < 16; x++) {
+						setBlock(x, y, z, chunk.blockAt(x, this.y*16+y, z));
+					}
+				}
+			}
+			
+			valid = true;
+		};
+		
+		private void setBlock(int x, int y, int z, Block block) {
+			if (!palette.contains(block)) {
+				palette.add(block); // Make sure block is in palette
+			}
+			
+			// Find block in palette
+			short paletteIndex = 0;
+			for (short i = 0; i < palette.size(); i++) {
+				if (palette.get(i).equals(block)) {
+					paletteIndex = i;
+					break;
+				}
+			}
+			
+			blockArray[y][z][x] = paletteIndex;
+		}
 		
 		/**
 		 * Create a Section from NBT data.
@@ -66,6 +104,42 @@ public final class ChunkParser {
 			}
 			
 			valid = true;
+		}
+		
+		/**
+		 * Generate NBT data from the section.
+		 * @return NBT data.
+		 */
+		public NBTTagCompound getNBT() {
+			if (!isValid()) {
+				return null;
+			}
+			
+			NBTTagCompound nbt = new NBTTagCompound(new HashMap<String, NBTTag>());
+			nbt.put("Y", new NBTTagByte(y));
+			
+			// Insert palette.
+			List<NBTTag> palette = new ArrayList<NBTTag>();
+			for (Block b : this.palette) {
+				palette.add(b.toPaletteEntry());
+			}
+			nbt.put("Palette", new NBTTagList(palette));
+			
+			// Load blockstates from 3d array.
+			int[] blockStateArray = new int[4096];
+			int head = 0;
+			for (int y = 0; y < 16; y++) {
+				for (int z = 0; z < 16; z++) {
+					for (int x = 0; x < 16; x++) {
+						blockStateArray[head] = blockArray[y][z][x];
+						head++;
+					}
+				}
+			}
+			NBTTagLongArray blockstates = new NBTTagLongArray(writeBlockStates(blockStateArray));
+			nbt.put("BlockStates", blockstates);
+			
+			return nbt;
 		}
 		
 		/**
@@ -119,12 +193,69 @@ public final class ChunkParser {
 		}
 		
 		// Load entities.
-		NBTTagList entities = nbt.get("Entities").getAsTagList();
-		for (NBTTag t : entities.getValue()) {
-			chunk.entities.add(t.getAsTagCompound());
+		if (nbt.containsKey("Entities")) {
+			NBTTagList entities = nbt.get("Entities").getAsTagList();
+			for (NBTTag t : entities.getValue()) {
+				chunk.entities.add(t.getAsTagCompound());
+			}
 		}
 		
+		
 		return chunk;
+	}
+	
+	/**
+	 * Write <a href="https://minecraft.gamepedia.com/Chunk_format">NBT data</a> from a chunk.
+	 * @param chunk Chunk to write data for.
+	 * @return Written NBT.
+	 */
+	public static NBTTagCompound writeNBT(Chunk chunk) {
+		NBTTagCompound nbt = new NBTTagCompound(new HashMap<String, NBTTag>());
+		// Write sections.
+		List<NBTTag> sections = new ArrayList<NBTTag>();
+		for (byte y = 0; y < Chunk.HEIGHT/16; y++) {
+			if (sectionHasBlocks(chunk, y)) {
+				Section section = new Section(chunk, y);
+				sections.add(section.getNBT());
+			}
+		}
+		nbt.put("Sections", new NBTTagList(sections));
+		
+		// Write entities.
+		List<NBTTag> entities = new ArrayList<NBTTag>();
+		for (NBTTagCompound e : chunk.entities) {
+			entities.add(e);
+		}
+		
+		if (!entities.isEmpty()) {
+			nbt.put("Entities", new NBTTagList(entities));
+		} else {
+			nbt.put("Entities", new NBTTagList(TagType.COMPOUND));
+		}
+		
+		return nbt;
+	}
+	
+	/**
+	 * Check if a section has any non-air blocks in it.
+	 * @param chunk Chunk to look in.
+	 * @param section Section to check.
+	 * @return Were any blocks found?
+	 */
+	private static boolean sectionHasBlocks(Chunk chunk, int section) {
+		int yOffset = section * 16;
+		
+		for (int y = 0; y < 16; y++) {
+			for (int z = 0; z < 16; z++) {
+				for (int x = 0; x < 16; x++) {
+					if (chunk.blockExists(x, y+yOffset, z)) {
+						return true;
+					}
+				}
+			}
+		}
+		
+		return false;
 	}
 	
 	/**
@@ -138,9 +269,10 @@ public final class ChunkParser {
 		 * The size of an index in bits.
 		 * One section always stores 16*16*16 = 4096 blocks,
 		 * therefore the amount of bits per block can be calculated like that: 
-		 * size of BlockStates-Tahttps://www.youtube.com/watch?v=CKR_1vh5Jw0g * 64 / 4096 (64 = bit of a long value). 
+		 * size of BlockStates-Tag * 64 / 4096 (64 = bit of a long value),
+		 * which simplifies to longArrayLength/64. 
 		 */
-		int indexSize = longArray.length * 64 / 4096;
+		int indexSize = longArray.length / 64;
 		if (indexSize < 4) {
 			indexSize = 4;
 		}
@@ -151,21 +283,79 @@ public final class ChunkParser {
 		// Convert into int array.
 		int[] indices = new int[4096];
 		for (int i = 0; i < indices.length; i++) {
-			indices[i] = convert(bits.get(i*indexSize, (i+1)*indexSize-1));
+			indices[i] = bitsetToInt(bits.get(i*indexSize, (i+1)*indexSize-1));
 		}
-						
+//		System.out.println("Indices: "+Arrays.toString(indices)); // TESTING ONLY
 		return indices;
 	}
 	
+	/**
+	 * Write a BlockState long array from a list of indices.
+	 * @param indices Indices to write.
+	 * @return BlockState long array.
+	 */
+	private static long[] writeBlockStates(int[] indices) {
+		// Calculate the number of bits required to store the individual indices
+		
+		// doing the integer bit size formula, ceil(logbase2(n)) on the largest index.
+		int max = indices[0];
+		for (int index : indices) {
+			if (index > max) {
+				max = index;
+			}
+		}
+		
+		// Same definition as in function above.
+		int indexSize = (int) Math.ceil(Math.log(max)/Math.log(2));
+		if (indexSize < 4) {
+			indexSize = 4;
+		}
+		// Add all bits of indices to BitSet.
+		BitSet bits = BitSet.valueOf(new long[64*indexSize]);
+		for (int i = 0; i < indices.length; i++) {
+			insertBitSet(bits, intToBitset(indices[i]), i * indexSize);
+		}
+		
+		return bits.toLongArray();
+	}
+	
+	/**
+	 * Attempt to insert set1 into set2, starting at the o specified.
+	 */
+	private static void insertBitSet(BitSet set1, BitSet set2, int offset) {
+		int i = 0;
+		while (i < set1.length()+offset && i < set2.length()) {
+			set1.set(i+offset, set2.get(i));
+			i++;
+		}
+	}
+	
 	/*
-	 * Convert a BitSet to a Long.
+	 * Convert a BitSet to an int.
 	 * Copied from: https://stackoverflow.com/questions/2473597/bitset-to-and-from-integer-long
 	 */
-	private static int convert(BitSet bits) {
-	    int value = 0;
-	    for (int i = 0; i < bits.length(); ++i) {
-	      value += bits.get(i) ? (1L << i) : 0L;
-	    }
-	    return value;
-	  }
+	private static int bitsetToInt(BitSet bits) {
+		int value = 0;
+		for (int i = 0; i < bits.length(); ++i) {
+			value += bits.get(i) ? (1L << i) : 0L;
+		}
+		return value;
+	}
+	
+	/*
+	 * Convert an int to a BitSet.
+	 * Copied from: https://stackoverflow.com/questions/2473597/bitset-to-and-from-integer-long
+	 */
+	public static BitSet intToBitset(int value) {
+		BitSet bits = new BitSet();
+		int index = 0;
+		while (value != 0L) {
+			if (value % 2L != 0) {
+				bits.set(index);
+			}
+			++index;
+			value = value >>> 1;
+		}
+		return bits;
+	}
 }
