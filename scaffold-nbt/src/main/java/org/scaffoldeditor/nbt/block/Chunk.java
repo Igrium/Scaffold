@@ -173,8 +173,6 @@ public class Chunk implements BlockCollection {
 					headY++;
 				}
 			}
-			
 		};
 	}
-
 }

@@ -24,10 +24,10 @@ import mryurihi.tbnbt.tag.NBTTagCompound;
 public class BlockWorld implements BlockCollection {
 	
 	/**
-	 * Class to represent chunk coordinates in map key.
+	 * Class to represent chunk coordinate pairs.
 	 * @author Sam54123
 	 */
-	private class ChunkCoordinate {
+	public static class ChunkCoordinate implements Comparable<ChunkCoordinate> {
 		private int x;
 		private int z;
 		
@@ -55,6 +55,17 @@ public class BlockWorld implements BlockCollection {
 		public int hashCode() {
 			return x*10007 + z;
 		}
+
+		@Override
+		public int compareTo(ChunkCoordinate o) {
+			if (z == o.z) {
+				return x - o.x;
+			} else {
+				return z - o.z;
+			}
+		}
+		
+		
 	}
 
 	// Chunks are stored in a map with a 2 index long array of their coordinates
