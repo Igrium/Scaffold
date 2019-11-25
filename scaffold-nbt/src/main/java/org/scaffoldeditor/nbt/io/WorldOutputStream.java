@@ -3,13 +3,9 @@ package org.scaffoldeditor.nbt.io;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -54,6 +50,8 @@ public class WorldOutputStream implements Closeable {
 		for (ChunkCoordinate coord : chunks.keySet()) {
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
 			NBTOutputStream nbtos = new NBTOutputStream(new DeflaterOutputStream(bos));
+//			NBTOutputStream nbtos = new NBTOutputStream(bos);
+
 			nbtos.writeTag(chunks.get(coord), "root");
 			nbtos.close();
 			
@@ -75,7 +73,7 @@ public class WorldOutputStream implements Closeable {
 					byte[] offset = intToByteArray(head);
 					os.write(offset);
 					
-					byte length = (byte) (Math.ceil((double) compressed.get(coord).length/4096)); // Convert bytes to 4KiB sectors.
+					byte length = (byte) (Math.ceil((double) (compressed.get(coord).length+5)/4096)); // Convert bytes to 4KiB sectors.
 					os.write(length);
 					
 					System.out.println(head+", "+length); // TESTING ONLY
@@ -123,18 +121,10 @@ public class WorldOutputStream implements Closeable {
 		length[2] = (byte) (lengthNum >> 8);
 		length[3] = (byte) (lengthNum /*>> 0*/);
 		
-		System.out.println(Arrays.toString(length));
+		System.out.println("Length: "+lengthNum);
 		os.write(length);
-		
-		// TESTING ONLY
-		ByteBuffer lengthBuffer2 = ByteBuffer.wrap(length);
-		lengthBuffer2.order(ByteOrder.BIG_ENDIAN);
-		int lengthRead = lengthBuffer2.getInt();
-		System.out.println("Correct length: "+data.length+1);
-		System.out.println("Written length: "+lengthRead);
-		
-		os.write(data.length+1);
-		
+
+				
 		// Write compression type.
 		os.write(2);
 		
@@ -143,13 +133,14 @@ public class WorldOutputStream implements Closeable {
 		
 		// Skip to the end of the segment.
 		int sectors = (int) Math.ceil((double) data.length/4096);
-		byte[] padding = new byte[sectors*4096 - (data.length + 4)];
+		byte[] padding = new byte[sectors*4096 - (lengthNum + 4)];
 		os.write(padding);
-		System.out.println("Padding: "+data.length);
+		System.out.println("Padding: "+padding.length);
 		
-		// Parse NBT for debug.
+		// Decompress for debug
 		NBTInputStream nis = new NBTInputStream(new InflaterInputStream(new ByteArrayInputStream(data)));
 		System.out.println(nis.readTag());
+
 	}
 
 	@Override
@@ -158,7 +149,7 @@ public class WorldOutputStream implements Closeable {
 	}
 	
 	/**
-	 * Convert an integer to a big endian 3 byte byte array.
+	 * Convert an integer to a big endian 3 long byte array.
 	 */
 	private byte[] intToByteArray(int in) {
 		return new byte[] {(byte) ((in >> 16) & 0xFF), (byte) ((in >> 8) & 0xFF), (byte) (in & 0xFF)};

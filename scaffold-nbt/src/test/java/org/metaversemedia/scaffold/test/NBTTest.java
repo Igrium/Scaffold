@@ -3,6 +3,9 @@ package org.metaversemedia.scaffold.test;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.Arrays;
 import java.util.HashMap;
 import org.junit.Test;
 import org.scaffoldeditor.nbt.Constants;
@@ -22,6 +25,22 @@ public class NBTTest {
 	@Test
 	public void test() {
 		try {
+			byte[] length = new byte[4];
+			int i = 2741;
+			length[0] = (byte) (i >> 24);
+			length[1] = (byte) (i >> 16);
+			length[2] = (byte) (i >> 8);
+			length[3] = (byte) (i /*>> 0*/);
+			
+			System.out.println(Arrays.toString(length));
+			
+			// TESTING ONLY
+			ByteBuffer lengthBuffer2 = ByteBuffer.wrap(length);
+			lengthBuffer2.order(ByteOrder.BIG_ENDIAN);
+			int lengthRead = lengthBuffer2.getInt();
+			System.out.println("Correct length: "+i);
+			System.out.println("Written length: "+lengthRead);
+			
 			BlockWorld world = BlockWorld.deserialize(new File("C:\\Users\\Sam54123\\Documents\\Minecraft\\MapdevUtils\\Scaffold\\testProject\\game\\saves\\Test World\\region"));
 			System.out.println(world.blockAt(-1, 5, -1));
 			System.out.println(world.blockAt(11, 5, 16));
