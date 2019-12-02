@@ -167,8 +167,10 @@ public class WorldInputStream implements Closeable {
 		ByteBuffer lengthBuffer = ByteBuffer.wrap(lengthArray);
 		lengthBuffer.order(ByteOrder.BIG_ENDIAN);
 		int length = lengthBuffer.getInt();
-		
+				
 		int compressionType = is.read();
+		
+		System.out.println("Compression type read: "+compressionType); // TESTING ONLY
 		
 		// Decompress chunk.
 		Inflater inflater;

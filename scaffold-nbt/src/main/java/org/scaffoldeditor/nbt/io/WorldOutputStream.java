@@ -139,7 +139,7 @@ public class WorldOutputStream implements Closeable {
 		
 		// Decompress for debug
 		NBTInputStream nis = new NBTInputStream(new InflaterInputStream(new ByteArrayInputStream(data)));
-		System.out.println(nis.readTag());
+		System.out.println("Uncompressed data (after compression and decompression): "+nis.readTag());
 
 	}
 
