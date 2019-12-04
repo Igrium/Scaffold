@@ -3,17 +3,21 @@ package org.scaffoldeditor.nbt.block;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.io.FilenameUtils;
 import org.scaffoldeditor.nbt.io.ChunkParser;
 import org.scaffoldeditor.nbt.io.WorldInputStream;
+import org.scaffoldeditor.nbt.io.WorldOutputStream;
 
 import mryurihi.tbnbt.tag.NBTTagCompound;
 
@@ -262,7 +266,7 @@ public class BlockWorld implements BlockCollection {
 	 * @throws IOException If an IO exception occurs during file parsing.
 	 * @throws FileNotFoundException If the file is not found.
 	 */
-	private void parseRegionFile(File regionFile) throws FileNotFoundException, IOException {
+	public void parseRegionFile(File regionFile) throws FileNotFoundException, IOException {
 		System.out.println("Reading "+regionFile);
 		List<NBTTagCompound> chunkMaps = new ArrayList<NBTTagCompound>();
 		WorldInputStream is = new WorldInputStream(new FileInputStream(regionFile));
@@ -283,5 +287,40 @@ public class BlockWorld implements BlockCollection {
 			chunks.put(coord, ChunkParser.parseNBT(level));
 			
 		}
+	}
+	
+	/**
+	 * Write this BlockWorld to a Minecraft save file.
+	 * @param regionFolder Region folder of Minecraft world to write to.
+	 */
+	public void serialize(File regionFolder) {
+		
+	}
+	
+	/**
+	 * Write the appropriate chunks from this world into a region file. (.mca)
+	 * @param regionFile File to write to. Will replace if already exists.
+	 * @param xOffset X coordinate of the region file.
+	 * @param xOffset Z coordinate of the region file.
+	 * @throws IOException 
+	 */
+	public void writeRegionFile(File regionFile, int xOffset, int zOffset) throws IOException {
+		if (regionFile.exists()) {
+			regionFile.delete();
+		}
+		
+		// Keep track of all the chunks that belong in this file.
+		Map<ChunkCoordinate, NBTTagCompound> chunks = new HashMap<ChunkCoordinate, NBTTagCompound>();
+		for (ChunkCoordinate c : this.chunks.keySet()) {
+			int relativeX = c.x - xOffset*32;
+			int relativeZ = c.z - zOffset*32;
+			
+			if (0 <= relativeX && relativeX < 32 && 0 <= relativeZ && relativeZ < 32) {
+				chunks.put(c, ChunkParser.writeNBT(this.chunks.get(c)));
+			}
+		}
+		
+		WorldOutputStream wos = new WorldOutputStream(new FileOutputStream(regionFile));
+		wos.write(chunks, xOffset*32, zOffset*32);
 	}
 }

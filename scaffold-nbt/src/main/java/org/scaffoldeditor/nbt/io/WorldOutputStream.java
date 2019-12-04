@@ -1,6 +1,5 @@
 package org.scaffoldeditor.nbt.io;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.IOException;
@@ -11,11 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.DeflaterOutputStream;
-import java.util.zip.InflaterInputStream;
-
 import org.scaffoldeditor.nbt.block.BlockWorld.ChunkCoordinate;
 
-import mryurihi.tbnbt.stream.NBTInputStream;
 import mryurihi.tbnbt.stream.NBTOutputStream;
 import mryurihi.tbnbt.tag.NBTTagCompound;
 
@@ -136,11 +132,6 @@ public class WorldOutputStream implements Closeable {
 		byte[] padding = new byte[sectors*4096 - (lengthNum + 4)];
 		os.write(padding);
 		System.out.println("Padding: "+padding.length);
-		
-		// Decompress for debug
-		NBTInputStream nis = new NBTInputStream(new InflaterInputStream(new ByteArrayInputStream(data)), false);
-		System.out.println("Uncompressed data (after compression and decompression): "+nis.readTag());
-
 	}
 
 	@Override
