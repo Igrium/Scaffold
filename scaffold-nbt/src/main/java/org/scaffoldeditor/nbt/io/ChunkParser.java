@@ -55,6 +55,10 @@ public final class ChunkParser {
 		};
 		
 		private void setBlock(int x, int y, int z, Block block) {
+			if (block == null) {
+				return;
+			}
+			
 			if (!palette.contains(block)) {
 				palette.add(block); // Make sure block is in palette
 			}
@@ -209,7 +213,7 @@ public final class ChunkParser {
 	 * @return Written NBT.
 	 */
 	public static NBTTagCompound writeNBT(Chunk chunk) {
-		NBTTagCompound nbt = new NBTTagCompound(new HashMap<String, NBTTag>());
+		NBTTagCompound level = new NBTTagCompound(new HashMap<String, NBTTag>());
 		// Write sections.
 		List<NBTTag> sections = new ArrayList<NBTTag>();
 		for (byte y = 0; y < Chunk.HEIGHT/16; y++) {
@@ -218,7 +222,7 @@ public final class ChunkParser {
 				sections.add(section.getNBT());
 			}
 		}
-		nbt.put("Sections", new NBTTagList(sections));
+		level.put("Sections", new NBTTagList(sections));
 		
 		// Write entities.
 		List<NBTTag> entities = new ArrayList<NBTTag>();
@@ -227,12 +231,14 @@ public final class ChunkParser {
 		}
 		
 		if (!entities.isEmpty()) {
-			nbt.put("Entities", new NBTTagList(entities));
+			level.put("Entities", new NBTTagList(entities));
 		} else {
-			nbt.put("Entities", new NBTTagList(TagType.COMPOUND));
+			level.put("Entities", new NBTTagList(TagType.COMPOUND));
 		}
 		
-		return nbt;
+		NBTTagCompound root = new NBTTagCompound(new HashMap<String, NBTTag>());
+		root.put("Level", level);
+		return root;
 	}
 	
 	/**

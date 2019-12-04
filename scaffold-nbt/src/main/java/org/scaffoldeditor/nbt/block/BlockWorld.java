@@ -305,9 +305,6 @@ public class BlockWorld implements BlockCollection {
 	 * @throws IOException 
 	 */
 	public void writeRegionFile(File regionFile, int xOffset, int zOffset) throws IOException {
-		if (regionFile.exists()) {
-			regionFile.delete();
-		}
 		
 		// Keep track of all the chunks that belong in this file.
 		Map<ChunkCoordinate, NBTTagCompound> chunks = new HashMap<ChunkCoordinate, NBTTagCompound>();
@@ -320,7 +317,18 @@ public class BlockWorld implements BlockCollection {
 			}
 		}
 		
+		// Don't write file if there are no chunks.
+		if (chunks.size() < 1) {
+			return;
+		}
+		
+		// Override old file.
+		if (regionFile.exists()) {
+			regionFile.delete();
+		}
+		
 		WorldOutputStream wos = new WorldOutputStream(new FileOutputStream(regionFile));
 		wos.write(chunks, xOffset*32, zOffset*32);
+		wos.close();
 	}
 }
