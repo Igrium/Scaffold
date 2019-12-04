@@ -49,7 +49,7 @@ public class WorldOutputStream implements Closeable {
 		Map<ChunkCoordinate, byte[]> compressed = new HashMap<ChunkCoordinate, byte[]>();
 		for (ChunkCoordinate coord : chunks.keySet()) {
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
-			NBTOutputStream nbtos = new NBTOutputStream(new DeflaterOutputStream(bos));
+			NBTOutputStream nbtos = new NBTOutputStream(new DeflaterOutputStream(bos), false);
 //			NBTOutputStream nbtos = new NBTOutputStream(bos);
 
 			nbtos.writeTag(chunks.get(coord), "root");
@@ -138,7 +138,7 @@ public class WorldOutputStream implements Closeable {
 		System.out.println("Padding: "+padding.length);
 		
 		// Decompress for debug
-		NBTInputStream nis = new NBTInputStream(new InflaterInputStream(new ByteArrayInputStream(data)));
+		NBTInputStream nis = new NBTInputStream(new InflaterInputStream(new ByteArrayInputStream(data)), false);
 		System.out.println("Uncompressed data (after compression and decompression): "+nis.readTag());
 
 	}
