@@ -302,9 +302,12 @@ public class BlockWorld implements BlockCollection {
 	 * @param regionFile File to write to. Will replace if already exists.
 	 * @param xOffset X coordinate of the region file.
 	 * @param xOffset Z coordinate of the region file.
+	 * @param dataVersion Data version of Minecraft version to save to.
 	 * @throws IOException 
 	 */
-	public void writeRegionFile(File regionFile, int xOffset, int zOffset) throws IOException {
+	public void writeRegionFile(File regionFile, int xOffset, int zOffset, int dataVersion) throws IOException {
+		
+		ChunkParser parser = new ChunkParser(dataVersion);
 		
 		// Keep track of all the chunks that belong in this file.
 		Map<ChunkCoordinate, NBTTagCompound> chunks = new HashMap<ChunkCoordinate, NBTTagCompound>();
@@ -313,7 +316,8 @@ public class BlockWorld implements BlockCollection {
 			int relativeZ = c.z - zOffset*32;
 			
 			if (0 <= relativeX && relativeX < 32 && 0 <= relativeZ && relativeZ < 32) {
-				chunks.put(c, ChunkParser.writeNBT(this.chunks.get(c)));
+				// Serialize chunk to NBT.
+				chunks.put(c, parser.writeNBT(this.chunks.get(c), c.x, c.z));
 			}
 		}
 		

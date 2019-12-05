@@ -30,9 +30,16 @@ public class Chunk implements BlockCollection {
 	/**
 	 * A list of entities in the chunk, in <a href="https://minecraft.gamepedia.com/Chunk_format#entity_format">NBT format</a>.
 	 * <br>
-	 * Does not do anything natively. Functionallity must be implemented by other classes.
+	 * Does not do anything natively. Functionallity must be implemented externally.
 	 */
 	public final List<NBTTagCompound> entities = new ArrayList<NBTTagCompound>();
+	
+	/**
+	 * A list of tile entities in the chunk, in <a href="https://minecraft.gamepedia.com/Chunk_format#entity_format">NBT format</a>.
+	 * <br>
+	 * Does not do anything natively. Functionallity must be implemented externally.
+	 */
+	public final List<NBTTagCompound> tileEntities = new ArrayList<NBTTagCompound>();
 	
 	public Chunk() {
 		blocks = new short[WIDTH][HEIGHT][LENGTH];

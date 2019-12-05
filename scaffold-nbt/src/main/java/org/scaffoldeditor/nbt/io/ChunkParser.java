@@ -12,15 +12,18 @@ import mryurihi.tbnbt.TagType;
 import mryurihi.tbnbt.tag.NBTTag;
 import mryurihi.tbnbt.tag.NBTTagByte;
 import mryurihi.tbnbt.tag.NBTTagCompound;
+import mryurihi.tbnbt.tag.NBTTagInt;
 import mryurihi.tbnbt.tag.NBTTagList;
+import mryurihi.tbnbt.tag.NBTTagLong;
 import mryurihi.tbnbt.tag.NBTTagLongArray;
+import mryurihi.tbnbt.tag.NBTTagString;
 
 /**
  * This class is responsible for parsing (and writing)
  * <a href="https://minecraft.gamepedia.com/Chunk_format"> NBT </a>
  * representing Minecraft chunks.
  */
-public final class ChunkParser {
+public class ChunkParser {
 	/**
 	 * Represents a single sub-chunk.
 	 * <br>
@@ -165,6 +168,19 @@ public final class ChunkParser {
 	}
 	
 	/**
+	 * <a href="https://minecraft.gamepedia.com/Data_version">Data version</a> of the chunk NBT structure to use.
+	 */
+	public final int dataVersion;
+	
+	/**
+	 * Create a new chunk parser. 
+	 * @param dataVersion <a href="https://minecraft.gamepedia.com/Data_version">Data version</a> of the chunk NBT structure to use.
+	 */
+	public ChunkParser(int dataVersion) {
+		this.dataVersion = dataVersion;
+	}
+	
+	/**
 	 * Read a chunk from <a href="https://minecraft.gamepedia.com/Chunk_format">NBT data</a>
 	 * @param nbt NBT to parse.
 	 * @return Parsed chunk.
@@ -208,12 +224,18 @@ public final class ChunkParser {
 	}
 	
 	/**
-	 * Write <a href="https://minecraft.gamepedia.com/Chunk_format">NBT data</a> from a chunk.
+	 * Write <a href="https://minecraft.gamepedia.com/Chunk_format">NBT data</a> for a chunk.
 	 * @param chunk Chunk to write data for.
+	 * @param x X coordinate of the chunk.
+	 * @param z Z coordinate of the chunk.
 	 * @return Written NBT.
 	 */
-	public static NBTTagCompound writeNBT(Chunk chunk) {
+	public NBTTagCompound writeNBT(Chunk chunk, int x, int z) {
 		NBTTagCompound level = new NBTTagCompound(new HashMap<String, NBTTag>());
+		
+		level.put("xPos", new NBTTagInt(x));
+		level.put("zPos", new NBTTagInt(z));
+		
 		// Write sections.
 		List<NBTTag> sections = new ArrayList<NBTTag>();
 		for (byte y = 0; y < Chunk.HEIGHT/16; y++) {
@@ -236,8 +258,41 @@ public final class ChunkParser {
 			level.put("Entities", new NBTTagList(TagType.COMPOUND));
 		}
 		
+		// Write tile entities.
+		List<NBTTag> tileEntities = new ArrayList<NBTTag>();
+		for (NBTTagCompound e : chunk.tileEntities) {
+			tileEntities.add(e);
+		}
+		
+		if (!tileEntities.isEmpty()) {
+			level.put("Entities", new NBTTagList(tileEntities));
+		} else {
+			level.put("Entities", new NBTTagList(TagType.COMPOUND));
+		}
+		
+		// Write other shit that Minecraft needs to read the file.
+		NBTTagCompound structures = new NBTTagCompound(new HashMap<String, NBTTag>());
+		structures.put("References", new NBTTagCompound(new HashMap<String, NBTTag>()));
+		structures.put("Starts",  new NBTTagCompound(new HashMap<String, NBTTag>()));
+		level.put("Structures", structures);
+		
+		NBTTagList postProcessing = new NBTTagList(TagType.LIST);
+		for (int i = 0; i < 16; i++) {
+			postProcessing.add(new NBTTagList(TagType.COMPOUND));
+		}
+		level.put("PostProcessing", postProcessing);
+		
+		level.put("LiquidTicks", new NBTTagList(TagType.COMPOUND));
+		level.put("TileTicks", new NBTTagList(TagType.COMPOUND));
+		level.put("InhabitedTime", new NBTTagLong(0));
+		level.put("LastUpdate", new NBTTagLong(0));
+		level.put("IsLightOn", new NBTTagByte((byte) 0));
+		level.put("Status", new NBTTagString("finalized"));
+		
+		// Finalize with data version.
 		NBTTagCompound root = new NBTTagCompound(new HashMap<String, NBTTag>());
 		root.put("Level", level);
+		root.put("DataVersion", new NBTTagInt(dataVersion));
 		return root;
 	}
 	
