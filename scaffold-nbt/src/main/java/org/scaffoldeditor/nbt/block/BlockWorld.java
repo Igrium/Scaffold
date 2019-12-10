@@ -69,7 +69,10 @@ public class BlockWorld implements BlockCollection {
 			}
 		}
 		
-		
+		@Override
+		public String toString() {
+			return "["+x+", "+z+"]";
+		}
 	}
 
 	// Chunks are stored in a map with a 2 index long array of their coordinates
@@ -330,9 +333,6 @@ public class BlockWorld implements BlockCollection {
 		if (regionFile.exists()) {
 			regionFile.delete();
 		}
-		
-		WorldOutputStream wos = new WorldOutputStream(new FileOutputStream(regionFile));
-		wos.write(chunks, xOffset*32, zOffset*32);
-		wos.close();
+
 	}
 }
