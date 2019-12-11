@@ -30,9 +30,13 @@ public class NBTTest {
 			}
 			wis.close();
 			
-//			WorldOutputStream wos = new WorldOutputStream(new FileOutputStream(OUTPUT_FILE));
-//			wos.write(chunks, 0, 0);
-//			wos.close();
+			System.out.println("Writing region file...");
+			WorldOutputStream wos = new WorldOutputStream(new FileOutputStream(OUTPUT_FILE), new ChunkCoordinate(0,0));
+			for (ChunkCoordinate c : chunks.keySet()) {
+				wos.write(c, chunks.get(c));
+			}
+			
+			wos.close();
 			
 			// Re-Read for testing
 			WorldInputStream wis2 = new WorldInputStream(new FileInputStream(OUTPUT_FILE));
