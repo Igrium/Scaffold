@@ -1,6 +1,7 @@
 package org.scaffoldeditor.nbt.io;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
@@ -108,7 +109,6 @@ public class ChunkParser {
 					}
 				}
 			}
-			
 			valid = true;
 		}
 		
@@ -375,7 +375,7 @@ public class ChunkParser {
 		for (int i = 0; i < indices.length; i++) {
 			insertBitSet(bits, intToBitset(indices[i]), i * indexSize);
 		}
-		
+		System.out.println(Arrays.toString(bits.toLongArray()));
 		return bits.toLongArray();
 	}
 	
@@ -384,7 +384,7 @@ public class ChunkParser {
 	 */
 	private static void insertBitSet(BitSet set1, BitSet set2, int offset) {
 		int i = 0;
-		while (i < set1.length()+offset && i < set2.length()) {
+		while (i < set2.length()) {
 			set1.set(i+offset, set2.get(i));
 			i++;
 		}
