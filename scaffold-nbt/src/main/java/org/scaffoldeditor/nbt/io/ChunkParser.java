@@ -323,7 +323,7 @@ public class ChunkParser {
 	 * @param longArray Long array to parse.
 	 * @return Indices of BlockStates in the palette.
 	 */
-	private static int[] readBlockStates(long[] longArray) {
+	public static int[] readBlockStates(long[] longArray) {
 		
 		/*
 		 * The size of an index in bits.
@@ -354,7 +354,7 @@ public class ChunkParser {
 	 * @param indices Indices to write.
 	 * @return BlockState long array.
 	 */
-	private static long[] writeBlockStates(int[] indices) {
+	public static long[] writeBlockStates(int[] indices) {
 		// Calculate the number of bits required to store the individual indices
 		
 		// doing the integer bit size formula, ceil(logbase2(n)) on the largest index.
@@ -375,7 +375,7 @@ public class ChunkParser {
 		for (int i = 0; i < indices.length; i++) {
 			insertBitSet(bits, intToBitset(indices[i]), i * indexSize);
 		}
-		System.out.println(Arrays.toString(bits.toLongArray()));
+//		System.out.println(Arrays.toString(bits.toLongArray()));
 		return bits.toLongArray();
 	}
 	

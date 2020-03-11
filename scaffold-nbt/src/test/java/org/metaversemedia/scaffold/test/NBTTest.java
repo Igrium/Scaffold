@@ -2,6 +2,7 @@ package org.metaversemedia.scaffold.test;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,34 +18,42 @@ import mryurihi.tbnbt.tag.NBTTagCompound;
 
 public class NBTTest {
 
+//	@Test
+//	public void test() {
+//		try {
+//			String INPUT_FILE = "/Users/h205p1/Documents/Scaffold-Workspace/testProject/game/saves/TestWorld/region/r.0.0.mca";
+//			String OUTPUT_FILE = "/Users/h205p1/Documents/Scaffold-Workspace/testProject/game/saves/world/region/r.0.0.mca";
+//			
+//			Chunk chunk = new Chunk();
+//			chunk.setBlock(0, 0, 0, new Block("minecraft:stone"));
+//			chunk.setBlock(1, 0, 0, new Block("minecraft:dirt"));
+//			
+//			ChunkParser parser = new ChunkParser(Constants.DEFAULT_DATA_VERSION);
+//			WorldOutputStream wos = new WorldOutputStream(new FileOutputStream(OUTPUT_FILE), new ChunkCoordinate(0,0));
+//			wos.write(new ChunkCoordinate(0,0), parser.writeNBT(chunk, 0, 0));
+//			System.out.println("Wrote world.");
+//			wos.close();
+//
+//		} catch (Exception e) {
+//			System.out.println("THERE WAS AN ERROR!");
+//			e.printStackTrace();
+//		}
+//	}
+	
 	@Test
 	public void test() {
-		try {
-			String INPUT_FILE = "/Users/h205p1/Documents/Scaffold-Workspace/testProject/game/saves/TestWorld/region/r.0.0.mca";
-			String OUTPUT_FILE = "/Users/h205p1/Documents/Scaffold-Workspace/testProject/game/saves/world/region/r.0.0.mca";
-			
-			Chunk chunk = new Chunk();
-			chunk.setBlock(0, 0, 0, new Block("minecraft:stone"));
-			chunk.setBlock(1, 0, 0, new Block("minecraft:dirt"));
-			
-			ChunkParser parser = new ChunkParser(Constants.DEFAULT_DATA_VERSION);
-			WorldOutputStream wos = new WorldOutputStream(new FileOutputStream(OUTPUT_FILE), new ChunkCoordinate(0,0));
-			wos.write(new ChunkCoordinate(0,0), parser.writeNBT(chunk, 0, 0));
-			System.out.println("Wrote world.");
-			wos.close();
-
-		} catch (Exception e) {
-			System.out.println("THERE WAS AN ERROR!");
-			e.printStackTrace();
-		}
+		long[] longs = new long[] {12903849504923049L, 213872305987273L};
+		
+		int[] parsed = ChunkParser.readBlockStates(longs);
+		
+		long[] written = ChunkParser.writeBlockStates(parsed);
+		System.out.println("Original: "+Arrays.toString(longs));
+		System.out.println("Written: "+Arrays.toString(written));
+		
+		int[] parsed2 = ChunkParser.readBlockStates(written);
+		
+		assert(Arrays.equals(parsed, parsed2));
+		
 	}
-	
-//	// @Test
-//	public void test() {
-//		Chunk chunk = new Chunk();
-//		chunk.setBlock(0, 0, 0, new Block("minecraft:stone"));
-//		chunk.setBlock(0, 1, 0, new Block);
-//		
-//	}
 
 }
