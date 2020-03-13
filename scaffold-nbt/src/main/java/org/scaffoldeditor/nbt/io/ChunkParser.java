@@ -188,8 +188,11 @@ public class ChunkParser {
 	public static Chunk parseNBT(NBTTagCompound nbt) {
 		Chunk chunk = new Chunk();
 		
+		NBTTagCompound level = nbt.get("Level").getAsTagCompound();
+		
+//		System.out.println(nbt);
 		// Get sections from NBT.
-		NBTTagList sectionList = nbt.get("Sections").getAsTagList();
+		NBTTagList sectionList = level.get("Sections").getAsTagList();
 		
 		// Iterate through sections.
 		for (NBTTag t : sectionList.getValue()) {
@@ -356,7 +359,6 @@ public class ChunkParser {
 	 */
 	public static long[] writeBlockStates(int[] indices) {
 		// Calculate the number of bits required to store the individual indices
-		
 		// doing the integer bit size formula, ceil(logbase2(n)) on the largest index.
 		int max = indices[0];
 		for (int index : indices) {
@@ -365,7 +367,13 @@ public class ChunkParser {
 			}
 		}
 		
-		// Same definition as in function above.
+		/*
+		 * The size of an index in bits.
+		 * One section always stores 16*16*16 = 4096 blocks,
+		 * therefore the amount of bits per block can be calculated like that: 
+		 * size of BlockStates-Tag * 64 / 4096 (64 = bit of a long value),
+		 * which simplifies to longArrayLength/64. 
+		 */
 		int indexSize = (int) Math.ceil(Math.log(max)/Math.log(2));
 		if (indexSize < 4) {
 			indexSize = 4;
@@ -376,7 +384,18 @@ public class ChunkParser {
 			insertBitSet(bits, intToBitset(indices[i]), i * indexSize);
 		}
 //		System.out.println(Arrays.toString(bits.toLongArray()));
-		return bits.toLongArray();
+		
+		// BitSet.toLongArray() removes the trailing 0s. We can't have that, so we must re-add them.
+		
+		/*
+		 * Calculate the total number of longs we will need.
+		 * Given that the number of bits that need to be stored = indexSize * 4096
+		 * (there are 4096 total blocks), we can plug that into the equation for the amount
+		 * of longs specified by the BitSet.toLongArray() documentation.
+		 */
+		int numLongs = (indexSize * indices.length + 63) / 64;
+		
+		return Arrays.copyOf(bits.toLongArray(), numLongs);
 	}
 	
 	/**
