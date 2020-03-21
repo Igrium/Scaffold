@@ -12,6 +12,7 @@ import org.scaffoldeditor.nbt.block.Chunk;
 import mryurihi.tbnbt.TagType;
 import mryurihi.tbnbt.tag.NBTTag;
 import mryurihi.tbnbt.tag.NBTTagByte;
+import mryurihi.tbnbt.tag.NBTTagByteArray;
 import mryurihi.tbnbt.tag.NBTTagCompound;
 import mryurihi.tbnbt.tag.NBTTagInt;
 import mryurihi.tbnbt.tag.NBTTagList;
@@ -145,6 +146,10 @@ public class ChunkParser {
 			NBTTagLongArray blockstates = new NBTTagLongArray(writeBlockStates(blockStateArray));
 			nbt.put("BlockStates", blockstates);
 			
+			// Write SkyLight tag
+			// TODO: Write code to actually calculate skylight.
+			NBTTagByteArray skyLight = new NBTTagByteArray(new byte[2048]);
+			nbt.put("SkyLight", skyLight);
 			return nbt;
 		}
 		
@@ -247,7 +252,13 @@ public class ChunkParser {
 				sections.add(section.getNBT());
 			}
 		}
+		// For some reason, it overrides the chunk if no section with y = -1 exists.
+		
+		NBTTagCompound sec1 = new NBTTagCompound(new HashMap<String, NBTTag>());
+		
+		
 		level.put("Sections", new NBTTagList(sections));
+				
 		
 		// Write entities.
 		List<NBTTag> entities = new ArrayList<NBTTag>();
