@@ -118,8 +118,8 @@ public class BlockWorld implements BlockCollection {
 		}
 		// Get chunk to place in
 		ChunkCoordinate chunkKey = new ChunkCoordinate(
-				(int) Math.floor(x/Chunk.WIDTH),
-				(int) Math.floor(z/Chunk.WIDTH));
+				(int) Math.floor(x / (double) Chunk.WIDTH),
+				(int) Math.floor(z / (double) Chunk.LENGTH));
 		
 		Chunk chunk = null;
 		if (chunks.containsKey(chunkKey)) {
@@ -128,8 +128,11 @@ public class BlockWorld implements BlockCollection {
 			chunk = new Chunk();
 			chunks.put(chunkKey, chunk);
 		}
-
-		chunk.setBlock(x % Chunk.WIDTH, y, z % Chunk.LENGTH, block);
+		
+		int relativeX = x - chunkKey.x * Chunk.WIDTH;
+		int relativeZ = z - chunkKey.z * Chunk.LENGTH;
+				
+		chunk.setBlock(relativeX, y, relativeZ, block);
 	}
 	
 	/**
@@ -290,9 +293,27 @@ public class BlockWorld implements BlockCollection {
 	/**
 	 * Write this BlockWorld to a Minecraft save file.
 	 * @param regionFolder Region folder of Minecraft world to write to.
+	 * @param dataVersion The <a href="https://minecraft.gamepedia.com/Data_version">data version</a> to use.
+	 * @throws IOException If an IO Exception occurs.
 	 */
-	public void serialize(File regionFolder) {
+	public void serialize(File regionFolder, int dataVersion) throws IOException {
+		System.out.println("Writing world...");
 		
+		List<ChunkCoordinate> regions = new ArrayList<ChunkCoordinate>();
+		
+		// Figure out which regions need to be written.
+		for (ChunkCoordinate coord : chunks.keySet()) {
+			int regionX = (int) Math.floor(coord.x / 32.0);
+			int regionZ = (int) Math.floor(coord.z / 32.0);
+			
+			ChunkCoordinate region = new ChunkCoordinate(regionX, regionZ);
+			if (!regions.contains(region)) regions.add(region);
+		}
+		
+		for (ChunkCoordinate region : regions) {
+			File regionFile = new File(regionFolder, "r."+region.x+"."+region.z+".mca");
+			writeRegionFile(regionFile, region.x, region.z, dataVersion);
+		}
 	}
 	
 	/**
@@ -305,29 +326,41 @@ public class BlockWorld implements BlockCollection {
 	 */
 	public void writeRegionFile(File regionFile, int xOffset, int zOffset, int dataVersion) throws IOException {
 		
+		System.out.println("Writing region file " + regionFile.getName());
+		
 		ChunkParser parser = new ChunkParser(dataVersion);
 		
 		// Keep track of all the chunks that belong in this file.
 		Map<ChunkCoordinate, NBTTagCompound> chunks = new HashMap<ChunkCoordinate, NBTTagCompound>();
-		for (ChunkCoordinate c : this.chunks.keySet()) {
-			int relativeX = c.x - xOffset*32;
-			int relativeZ = c.z - zOffset*32;
+		for (ChunkCoordinate chunkCoord : this.chunks.keySet()) {
+			int relativeX = chunkCoord.x - xOffset*32;
+			int relativeZ = chunkCoord.z - zOffset*32;
 			
 			if (0 <= relativeX && relativeX < 32 && 0 <= relativeZ && relativeZ < 32) {
 				// Serialize chunk to NBT.
-				chunks.put(c, parser.writeNBT(this.chunks.get(c), c.x, c.z));
+				chunks.put(chunkCoord, parser.writeNBT(this.chunks.get(chunkCoord), chunkCoord.x, chunkCoord.z));
 			}
 		}
-		
 		// Don't write file if there are no chunks.
 		if (chunks.size() < 1) {
 			return;
 		}
-		
 		// Override old file.
 		if (regionFile.exists()) {
 			regionFile.delete();
 		}
-
+		
+		WorldOutputStream wos = new WorldOutputStream(new FileOutputStream(regionFile), new ChunkCoordinate(xOffset, zOffset));
+		
+		for (ChunkCoordinate coord : chunks.keySet()) {
+			
+			// Convert the coordinates into region space.
+			int relativeX = coord.x - xOffset*32;
+			int relativeZ = coord.z - zOffset*32;
+			
+			wos.write(new ChunkCoordinate(relativeX, relativeZ), chunks.get(coord));
+		}
+		
+		wos.close();
 	}
 }

@@ -68,9 +68,9 @@ public class WorldOutputStream implements Closeable {
 	 */
 	public void write(ChunkCoordinate coord, NBTTag chunk, String name) throws IOException {
 		// Make sure coordinates are in file.
-		if (coord.x() < offset.x()*SIZEX || coord.x() >= (offset.x()+1)*SIZEX
-				|| coord.z() < offset.z()*SIZEZ || coord.z() >= (offset.z()+1)*SIZEZ) {
-			throw new IllegalArgumentException("Chunk is outside of the range of the region file.");
+		if (coord.x() < 0 || coord.x() >= SIZEX
+				|| coord.z() < 0 || coord.z() >= SIZEZ) {
+			throw new IllegalArgumentException("Chunk " + coord +" is outside of the range of the region file.");
 		}
 
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
