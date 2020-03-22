@@ -5,21 +5,14 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.commons.io.FilenameUtils;
 import org.scaffoldeditor.nbt.io.ChunkParser;
 import org.scaffoldeditor.nbt.io.WorldInputStream;
 import org.scaffoldeditor.nbt.io.WorldOutputStream;
 
-import mryurihi.tbnbt.tag.NBTTagCompound;
+import com.github.mryurihi.tbnbt.tag.NBTTagCompound;
 
 /**
  * Represents all the blocks in a world.
@@ -50,14 +43,16 @@ public class BlockWorld implements BlockCollection {
 		
 		@Override
 		public boolean equals(Object obj) {
+			if (!(obj instanceof ChunkCoordinate)) {
+				return false;
+			}
 			ChunkCoordinate chunkCoordinate = (ChunkCoordinate) obj;
-			if (chunkCoordinate == null) {return false;}
 			return chunkCoordinate.x() == x && chunkCoordinate.z() == z;
 		}
 		
 		@Override
 		public int hashCode() {
-			return x*10007 + z;
+			return Objects.hash(x, z);
 		}
 
 		@Override

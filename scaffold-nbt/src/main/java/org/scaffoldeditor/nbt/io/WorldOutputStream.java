@@ -1,20 +1,19 @@
 package org.scaffoldeditor.nbt.io;
 
-import java.io.ByteArrayOutputStream;
-import java.io.Closeable;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.zip.DeflaterOutputStream;
+import java.util.zip.*;
 
+import com.github.mryurihi.tbnbt.stream.NBTInputStream;
+import com.github.mryurihi.tbnbt.tag.NBTTagCompound;
 import org.scaffoldeditor.nbt.block.BlockWorld.ChunkCoordinate;
 
-import mryurihi.tbnbt.stream.NBTOutputStream;
-import mryurihi.tbnbt.tag.NBTTag;
+import com.github.mryurihi.tbnbt.stream.NBTOutputStream;
+import com.github.mryurihi.tbnbt.tag.NBTTag;
 
 /**
  * An output stream to write Minecraft Region files.
@@ -38,7 +37,7 @@ public class WorldOutputStream implements Closeable {
 	/**
 	 * Master output stream of the world output stream.
 	 */
-	protected final OutputStream os;
+	protected final DataOutputStream os;
 	
 	/**
 	 * A compressed map of all the chunks to be written to file.
@@ -56,7 +55,7 @@ public class WorldOutputStream implements Closeable {
 	 * @param offset The region's coordinates.
 	 */
 	public WorldOutputStream(OutputStream os, ChunkCoordinate offset) {
-		this.os = os;
+		this.os = new DataOutputStream(os);
 		this.offset = offset;
 	}
 	
@@ -73,7 +72,7 @@ public class WorldOutputStream implements Closeable {
 				|| coord.z() < offset.z()*SIZEZ || coord.z() >= (offset.z()+1)*SIZEZ) {
 			throw new IllegalArgumentException("Chunk is outside of the range of the region file.");
 		}
-		
+
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		NBTOutputStream nbtos = new NBTOutputStream(new DeflaterOutputStream(bos), false);
 	
@@ -121,17 +120,18 @@ public class WorldOutputStream implements Closeable {
 		for (int z = 0; z < SIZEZ; z++) {
 			for (int x = 0; x < SIZEX; x++) {
 				ChunkCoordinate coord = new ChunkCoordinate(x, z);
+
 				if (chunks.containsKey(coord)) {
-					os.write(intToByteArray(head)); // Write chunk offset.
-					
 					// Convert bytes to 4KiB sectors.
-					byte length = (byte) (Math.ceil((double) (chunks.get(coord).length+5)/4096));
-					os.write(length);
+					byte length = (byte) (Math.ceil((double) (chunks.get(coord).length + 5) / 4096));
+					int offsetLength = (head << 8) | length & 15;
+
+					os.writeInt(offsetLength);
 					
 					head += length;
 				} else {
 					// If the chunk is non-existant, fill with 0s as specified in the format.
-					os.write(new byte[] {0,0,0,0});
+					os.writeInt(0);
 				}
 			}
 		}
@@ -153,14 +153,7 @@ public class WorldOutputStream implements Closeable {
 	private void writeChunk(byte[] data) throws IOException {
 		// Write length.
 		int length = data.length+1; // Length includes compression type byte (don't ask me why).
-		byte[] lengthData = new byte[4];
-		
-		lengthData[0] = (byte) (length >> 24);
-		lengthData[1] = (byte) (length >> 16);
-		lengthData[2] = (byte) (length >> 8);
-		lengthData[3] = (byte) (length /*>> 0*/);
-		
-		os.write(lengthData);
+		os.writeInt(length);
 		
 		// Write compression type.
 		os.write((byte) 2);
@@ -169,8 +162,8 @@ public class WorldOutputStream implements Closeable {
 		os.write(data);
 		
 		// Skip to the end of the sector.
-		int sectors = (int) Math.ceil((double) data.length/4096);
-		byte[] padding = new byte[sectors*4096 - (length + 4)];
+		int sectors = (int) Math.ceil((double) data.length / 4096);
+		byte[] padding = new byte[sectors * 4096 - (length + 4)];
 		os.write(padding);
 	}
 
@@ -178,13 +171,6 @@ public class WorldOutputStream implements Closeable {
 	public void close() throws IOException {
 		flush();
 		os.close();
-	}
-	
-	/**
-	 * Convert an integer to a big-endian 3 long byte array.
-	 */
-	private byte[] intToByteArray(int in) {
-		return new byte[] {(byte) ((in >> 16) & 0xFF), (byte) ((in >> 8) & 0xFF), (byte) (in & 0xFF)};
 	}
 	
 }

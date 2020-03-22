@@ -9,15 +9,15 @@ import java.util.List;
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.Chunk;
 
-import mryurihi.tbnbt.TagType;
-import mryurihi.tbnbt.tag.NBTTag;
-import mryurihi.tbnbt.tag.NBTTagByte;
-import mryurihi.tbnbt.tag.NBTTagCompound;
-import mryurihi.tbnbt.tag.NBTTagInt;
-import mryurihi.tbnbt.tag.NBTTagList;
-import mryurihi.tbnbt.tag.NBTTagLong;
-import mryurihi.tbnbt.tag.NBTTagLongArray;
-import mryurihi.tbnbt.tag.NBTTagString;
+import com.github.mryurihi.tbnbt.TagType;
+import com.github.mryurihi.tbnbt.tag.NBTTag;
+import com.github.mryurihi.tbnbt.tag.NBTTagByte;
+import com.github.mryurihi.tbnbt.tag.NBTTagCompound;
+import com.github.mryurihi.tbnbt.tag.NBTTagInt;
+import com.github.mryurihi.tbnbt.tag.NBTTagList;
+import com.github.mryurihi.tbnbt.tag.NBTTagLong;
+import com.github.mryurihi.tbnbt.tag.NBTTagLongArray;
+import com.github.mryurihi.tbnbt.tag.NBTTagString;
 
 /**
  * This class is responsible for parsing (and writing)
@@ -97,18 +97,7 @@ public class ChunkParser {
 			
 			// Load blockstates
 			NBTTagLongArray blockstates = nbt.get("BlockStates").getAsTagLongArray();
-			int[] blockStateArray = readBlockStates(blockstates.getValue());
-			
-			// Insert all blockstates indices into 3d array.
-			int head = 0;
-			for (int y = 0; y < 16; y++) {
-				for (int z = 0; z < 16; z++) {
-					for (int x = 0; x < 16; x++) {
-						blockArray[y][z][x] = blockStateArray[head];
-						head++;
-					}
-				}
-			}
+			blockArray = readBlockStates(blockstates.getValue());
 			valid = true;
 		}
 		
@@ -142,7 +131,7 @@ public class ChunkParser {
 					}
 				}
 			}
-			NBTTagLongArray blockstates = new NBTTagLongArray(writeBlockStates(blockStateArray));
+			NBTTagLongArray blockstates = new NBTTagLongArray(writeBlockStates(palette.size(), blockStateArray));
 			nbt.put("BlockStates", blockstates);
 			
 			return nbt;
@@ -265,9 +254,9 @@ public class ChunkParser {
 		}
 		
 		if (!tileEntities.isEmpty()) {
-			level.put("Entities", new NBTTagList(tileEntities));
+			level.put("TileEntities", new NBTTagList(tileEntities));
 		} else {
-			level.put("Entities", new NBTTagList(TagType.COMPOUND));
+			level.put("TileEntities", new NBTTagList(TagType.COMPOUND));
 		}
 		
 		// Write other shit that Minecraft needs to read the file.
@@ -287,7 +276,8 @@ public class ChunkParser {
 		level.put("InhabitedTime", new NBTTagLong(0));
 		level.put("LastUpdate", new NBTTagLong(0));
 		level.put("IsLightOn", new NBTTagByte((byte) 0));
-		level.put("Status", new NBTTagString("finalized"));
+		level.put("Status", new NBTTagString("full"));
+		level.put("Heightmaps", new NBTTagCompound(new HashMap<>()));
 		
 		// Finalize with data version.
 		NBTTagCompound root = new NBTTagCompound(new HashMap<String, NBTTag>());
@@ -323,7 +313,7 @@ public class ChunkParser {
 	 * @param longArray Long array to parse.
 	 * @return Indices of BlockStates in the palette.
 	 */
-	public static int[] readBlockStates(long[] longArray) {
+	public static int[][][] readBlockStates(long[] longArray) {
 		
 		/*
 		 * The size of an index in bits.
@@ -332,20 +322,35 @@ public class ChunkParser {
 		 * size of BlockStates-Tag * 64 / 4096 (64 = bit of a long value),
 		 * which simplifies to longArrayLength/64. 
 		 */
-		int indexSize = longArray.length / 64;
-		if (indexSize < 4) {
-			indexSize = 4;
-		}
-				
-		// Obtain all bits from long array.
-		BitSet bits = BitSet.valueOf(longArray);
+		int indexSize = Math.max(4, longArray.length / 64);
+		long maxEntryValue = (1L << indexSize) - 1;
 		
 		// Convert into int array.
-		int[] indices = new int[4096];
-		for (int i = 0; i < indices.length; i++) {
-			indices[i] = bitsetToInt(bits.get(i*indexSize, (i+1)*indexSize-1));
+		int[][][] indices = new int[16][16][16];
+
+		for (int y = 0; y < 16; y++) {
+			for (int z = 0; z < 16; z++) {
+				for (int x = 0; x < 16; x++) {
+					int arrayIndex = y << 8 | z << 4 | x;
+					int bitIndex = arrayIndex * indexSize;
+					int startIndex = bitIndex / 64;
+					int endIndex = ((arrayIndex + 1) * indexSize - 1) / 64;
+					int startBitSubIndex = bitIndex % 64;
+
+					int val;
+
+					if (startIndex == endIndex) {
+						val = (int) (longArray[startIndex] >>> startBitSubIndex & maxEntryValue);
+					} else {
+						int endBitSubIndex = 64 - startBitSubIndex;
+						val = (int) ((longArray[startIndex] >>> startBitSubIndex | longArray[endIndex] << endBitSubIndex) & maxEntryValue);
+					}
+
+					indices[y][z][x] = val;
+				}
+			}
 		}
-//		System.out.println("Indices: "+Arrays.toString(indices)); // TESTING ONLY
+
 		return indices;
 	}
 	
@@ -354,68 +359,32 @@ public class ChunkParser {
 	 * @param indices Indices to write.
 	 * @return BlockState long array.
 	 */
-	public static long[] writeBlockStates(int[] indices) {
-		// Calculate the number of bits required to store the individual indices
-		
-		// doing the integer bit size formula, ceil(logbase2(n)) on the largest index.
-		int max = indices[0];
-		for (int index : indices) {
-			if (index > max) {
-				max = index;
+	public static long[] writeBlockStates(int paletteSize, int[] indices) {
+		int indexSize = 4;
+
+		while (paletteSize > 1 << indexSize) {
+			indexSize += 1;
+		}
+
+		long maxEntryValue = (1L << indexSize) - 1;
+		int length = (int) Math.ceil(indices.length * indexSize / 64.0);
+		long[] data = new long[length];
+
+		for (int index = 0; index < indices.length; index++) {
+			int value = indices[index];
+			int bitIndex = index * indexSize;
+			int startIndex = bitIndex / 64;
+			int endIndex = ((index + 1) * indexSize - 1) / 64;
+			int startBitSubIndex = bitIndex % 64;
+
+			data[startIndex] = data[startIndex] & ~(maxEntryValue << startBitSubIndex) | ((long) value & maxEntryValue) << startBitSubIndex;
+
+			if (startIndex != endIndex) {
+				int endBitSubIndex = 64 - startBitSubIndex;
+				data[endIndex] = data[endIndex] >>> endBitSubIndex << endBitSubIndex | ((long) value & maxEntryValue) >> endBitSubIndex;
 			}
 		}
-		
-		// Same definition as in function above.
-		int indexSize = (int) Math.ceil(Math.log(max)/Math.log(2));
-		if (indexSize < 4) {
-			indexSize = 4;
-		}
-		// Add all bits of indices to BitSet.
-		BitSet bits = BitSet.valueOf(new long[64*indexSize]);
-		for (int i = 0; i < indices.length; i++) {
-			insertBitSet(bits, intToBitset(indices[i]), i * indexSize);
-		}
-//		System.out.println(Arrays.toString(bits.toLongArray()));
-		return bits.toLongArray();
-	}
-	
-	/**
-	 * Attempt to insert set1 into set2, starting at the o specified.
-	 */
-	private static void insertBitSet(BitSet set1, BitSet set2, int offset) {
-		int i = 0;
-		while (i < set2.length()) {
-			set1.set(i+offset, set2.get(i));
-			i++;
-		}
-	}
-	
-	/*
-	 * Convert a BitSet to an int.
-	 * Copied from: https://stackoverflow.com/questions/2473597/bitset-to-and-from-integer-long
-	 */
-	private static int bitsetToInt(BitSet bits) {
-		int value = 0;
-		for (int i = 0; i < bits.length(); ++i) {
-			value += bits.get(i) ? (1L << i) : 0L;
-		}
-		return value;
-	}
-	
-	/*
-	 * Convert an int to a BitSet.
-	 * Copied from: https://stackoverflow.com/questions/2473597/bitset-to-and-from-integer-long
-	 */
-	public static BitSet intToBitset(int value) {
-		BitSet bits = new BitSet();
-		int index = 0;
-		while (value != 0L) {
-			if (value % 2L != 0) {
-				bits.set(index);
-			}
-			++index;
-			value = value >>> 1;
-		}
-		return bits;
+
+		return data;
 	}
 }

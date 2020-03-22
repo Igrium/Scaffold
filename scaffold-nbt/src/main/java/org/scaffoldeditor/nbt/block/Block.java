@@ -1,10 +1,11 @@
 package org.scaffoldeditor.nbt.block;
 
 import java.util.HashMap;
+import java.util.Objects;
 
-import mryurihi.tbnbt.tag.NBTTag;
-import mryurihi.tbnbt.tag.NBTTagCompound;
-import mryurihi.tbnbt.tag.NBTTagString;
+import com.github.mryurihi.tbnbt.tag.NBTTag;
+import com.github.mryurihi.tbnbt.tag.NBTTagCompound;
+import com.github.mryurihi.tbnbt.tag.NBTTagString;
 
 /**
  * Represents a single Minecraft block and its data.
@@ -84,4 +85,10 @@ public class Block {
 				&& blockObj.properties.equals(properties));
 
 	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(name, properties);
+	}
+
 }
