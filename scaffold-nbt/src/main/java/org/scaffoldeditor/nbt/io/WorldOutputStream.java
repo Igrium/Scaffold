@@ -162,7 +162,7 @@ public class WorldOutputStream implements Closeable {
 		os.write(data);
 		
 		// Skip to the end of the sector.
-		int sectors = (int) Math.ceil((double) data.length / 4096);
+		int sectors = (int) Math.ceil((double) (data.length + 5) / 4096);
 		byte[] padding = new byte[sectors * 4096 - (length + 4)];
 		os.write(padding);
 	}
