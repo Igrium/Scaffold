@@ -15,12 +15,12 @@ import java.util.Map.Entry;
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.SizedBlockCollection;
 
-import mryurihi.tbnbt.stream.NBTInputStream;
-import mryurihi.tbnbt.tag.NBTTag;
-import mryurihi.tbnbt.tag.NBTTagCompound;
-import mryurihi.tbnbt.tag.NBTTagInt;
-import mryurihi.tbnbt.tag.NBTTagList;
-import mryurihi.tbnbt.tag.NBTTagString;
+import com.github.mryurihi.tbnbt.stream.NBTInputStream;
+import com.github.mryurihi.tbnbt.tag.NBTTag;
+import com.github.mryurihi.tbnbt.tag.NBTTagCompound;
+import com.github.mryurihi.tbnbt.tag.NBTTagInt;
+import com.github.mryurihi.tbnbt.tag.NBTTagList;
+import com.github.mryurihi.tbnbt.tag.NBTTagString;
 
 import java.util.Objects;
 
@@ -262,7 +262,7 @@ public class Structure implements SizedBlockCollection {
 			
 			
 		} else { // Block already exists
-			blockMap.remove("state");
+			blockMap.getValue().remove("state");
 			blockMap.put("state", new NBTTagInt(state));
 		}
 	}
