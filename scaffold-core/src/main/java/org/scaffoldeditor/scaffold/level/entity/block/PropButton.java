@@ -12,9 +12,9 @@ import org.scaffoldeditor.scaffold.level.entity.game.TargetSelectable;
 import org.scaffoldeditor.scaffold.logic.Datapack;
 import org.scaffoldeditor.scaffold.logic.MCFunction;
 
-import mryurihi.tbnbt.tag.NBTTag;
-import mryurihi.tbnbt.tag.NBTTagCompound;
-import mryurihi.tbnbt.tag.NBTTagString;
+import com.github.mryurihi.tbnbt.tag.NBTTag;
+import com.github.mryurihi.tbnbt.tag.NBTTagCompound;
+import com.github.mryurihi.tbnbt.tag.NBTTagString;
 
 /**
  * Represents a physical button ingame.

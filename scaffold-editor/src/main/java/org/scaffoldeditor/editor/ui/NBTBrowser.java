@@ -8,10 +8,10 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import mryurihi.tbnbt.TagType;
-import mryurihi.tbnbt.tag.NBTTag;
-import mryurihi.tbnbt.tag.NBTTagCompound;
-import mryurihi.tbnbt.tag.NBTTagList;
+import com.github.mryurihi.tbnbt.TagType;
+import com.github.mryurihi.tbnbt.tag.NBTTag;
+import com.github.mryurihi.tbnbt.tag.NBTTagCompound;
+import com.github.mryurihi.tbnbt.tag.NBTTagList;
 
 import javax.swing.JTree;
 import java.awt.event.ActionListener;

@@ -7,14 +7,14 @@ import java.io.IOException;
 import java.util.HashMap;
 import org.json.JSONObject;
 
-import mryurihi.tbnbt.stream.NBTOutputStream;
-import mryurihi.tbnbt.tag.NBTTag;
-import mryurihi.tbnbt.tag.NBTTagByte;
-import mryurihi.tbnbt.tag.NBTTagCompound;
-import mryurihi.tbnbt.tag.NBTTagDouble;
-import mryurihi.tbnbt.tag.NBTTagInt;
-import mryurihi.tbnbt.tag.NBTTagLong;
-import mryurihi.tbnbt.tag.NBTTagString;
+import com.github.mryurihi.tbnbt.stream.NBTOutputStream;
+import com.github.mryurihi.tbnbt.tag.NBTTag;
+import com.github.mryurihi.tbnbt.tag.NBTTagByte;
+import com.github.mryurihi.tbnbt.tag.NBTTagCompound;
+import com.github.mryurihi.tbnbt.tag.NBTTagDouble;
+import com.github.mryurihi.tbnbt.tag.NBTTagInt;
+import com.github.mryurihi.tbnbt.tag.NBTTagLong;
+import com.github.mryurihi.tbnbt.tag.NBTTagString;
 
 /**
  * This class stores and represents all the (relevent) data that would normally be in level.dat

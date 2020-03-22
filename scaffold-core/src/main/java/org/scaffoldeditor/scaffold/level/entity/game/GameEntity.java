@@ -12,11 +12,11 @@ import org.scaffoldeditor.scaffold.level.entity.Rotatable;
 import org.scaffoldeditor.scaffold.logic.Datapack;
 import org.scaffoldeditor.scaffold.math.Vector;
 
-import mryurihi.tbnbt.tag.NBTTag;
-import mryurihi.tbnbt.tag.NBTTagCompound;
-import mryurihi.tbnbt.tag.NBTTagFloat;
-import mryurihi.tbnbt.tag.NBTTagList;
-import mryurihi.tbnbt.tag.NBTTagString;
+import com.github.mryurihi.tbnbt.tag.NBTTag;
+import com.github.mryurihi.tbnbt.tag.NBTTagCompound;
+import com.github.mryurihi.tbnbt.tag.NBTTagFloat;
+import com.github.mryurihi.tbnbt.tag.NBTTagList;
+import com.github.mryurihi.tbnbt.tag.NBTTagString;
 
 /**
  * Represents a Minecraft entity in the editor
@@ -108,8 +108,8 @@ public class GameEntity extends Rotatable implements TargetSelectable {
 		
 		String command = "summon "+getEntityType()+" "+position.X()+" "+position.Y()+" "+position.Z()+" "+NBTStrings.nbtToString(nbt());
 		
-		nbt().remove("Rotation");
-		nbt().remove("CustomName");
+		nbt().getValue().remove("Rotation");
+		nbt().getValue().remove("CustomName");
 
 		return command;
 	}

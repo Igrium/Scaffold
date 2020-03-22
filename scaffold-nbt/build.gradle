@@ -38,7 +38,4 @@ repositories {
     // You can declare any Maven/Ivy/file repository here.
     jcenter()
     mavenCentral()
-    flatDir {
-        dirs 'libs'
-    }
 }
