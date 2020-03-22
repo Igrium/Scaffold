@@ -16,7 +16,7 @@ import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.Entity.AttributeDeclaration;
 import org.scaffoldeditor.scaffold.math.Vector;
 
-import mryurihi.tbnbt.tag.NBTTagCompound;
+import com.github.mryurihi.tbnbt.tag.NBTTagCompound;
 
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;

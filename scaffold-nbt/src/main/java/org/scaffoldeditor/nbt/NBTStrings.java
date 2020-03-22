@@ -7,16 +7,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import mryurihi.tbnbt.TagType;
-import mryurihi.tbnbt.tag.NBTTag;
-import mryurihi.tbnbt.tag.NBTTagByte;
-import mryurihi.tbnbt.tag.NBTTagCompound;
-import mryurihi.tbnbt.tag.NBTTagDouble;
-import mryurihi.tbnbt.tag.NBTTagFloat;
-import mryurihi.tbnbt.tag.NBTTagInt;
-import mryurihi.tbnbt.tag.NBTTagList;
-import mryurihi.tbnbt.tag.NBTTagLong;
-import mryurihi.tbnbt.tag.NBTTagString;
+import com.github.mryurihi.tbnbt.TagType;
+import com.github.mryurihi.tbnbt.tag.NBTTag;
+import com.github.mryurihi.tbnbt.tag.NBTTagByte;
+import com.github.mryurihi.tbnbt.tag.NBTTagCompound;
+import com.github.mryurihi.tbnbt.tag.NBTTagDouble;
+import com.github.mryurihi.tbnbt.tag.NBTTagFloat;
+import com.github.mryurihi.tbnbt.tag.NBTTagInt;
+import com.github.mryurihi.tbnbt.tag.NBTTagList;
+import com.github.mryurihi.tbnbt.tag.NBTTagLong;
+import com.github.mryurihi.tbnbt.tag.NBTTagString;
 
 /**
  * Utility class for common nbt functions

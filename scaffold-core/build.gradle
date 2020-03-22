@@ -20,8 +20,8 @@ dependencies {
 
     implementation 'org.json:json:20190722'
     implementation 'org.python:jython:2.7.1b3'
-    
-    compile 'com.github.mryurihi:tbnbt:0.1.3'
+
+    compile name: "tbnbt-0.1.4"
     compile project(':scaffold-nbt')
     
     // Use JUnit test framework

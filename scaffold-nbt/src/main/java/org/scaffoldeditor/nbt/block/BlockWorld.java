@@ -3,19 +3,16 @@ package org.scaffoldeditor.nbt.block;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.commons.io.FilenameUtils;
 import org.scaffoldeditor.nbt.io.ChunkParser;
 import org.scaffoldeditor.nbt.io.WorldInputStream;
+import org.scaffoldeditor.nbt.io.WorldOutputStream;
 
-import mryurihi.tbnbt.tag.NBTTagCompound;
+import com.github.mryurihi.tbnbt.tag.NBTTagCompound;
 
 /**
  * Represents all the blocks in a world.
@@ -24,10 +21,10 @@ import mryurihi.tbnbt.tag.NBTTagCompound;
 public class BlockWorld implements BlockCollection {
 	
 	/**
-	 * Class to represent chunk coordinates in map key.
+	 * Class to represent chunk coordinate pairs.
 	 * @author Sam54123
 	 */
-	private class ChunkCoordinate {
+	public static class ChunkCoordinate implements Comparable<ChunkCoordinate> {
 		private int x;
 		private int z;
 		
@@ -46,14 +43,30 @@ public class BlockWorld implements BlockCollection {
 		
 		@Override
 		public boolean equals(Object obj) {
+			if (!(obj instanceof ChunkCoordinate)) {
+				return false;
+			}
 			ChunkCoordinate chunkCoordinate = (ChunkCoordinate) obj;
-			if (chunkCoordinate == null) {return false;}
 			return chunkCoordinate.x() == x && chunkCoordinate.z() == z;
 		}
 		
 		@Override
 		public int hashCode() {
-			return x*10007 + z;
+			return Objects.hash(x, z);
+		}
+
+		@Override
+		public int compareTo(ChunkCoordinate o) {
+			if (z == o.z) {
+				return x - o.x;
+			} else {
+				return z - o.z;
+			}
+		}
+		
+		@Override
+		public String toString() {
+			return "["+x+", "+z+"]";
 		}
 	}
 
@@ -105,8 +118,8 @@ public class BlockWorld implements BlockCollection {
 		}
 		// Get chunk to place in
 		ChunkCoordinate chunkKey = new ChunkCoordinate(
-				(int) Math.floor(x/Chunk.WIDTH),
-				(int) Math.floor(z/Chunk.WIDTH));
+				(int) Math.floor(x / (double) Chunk.WIDTH),
+				(int) Math.floor(z / (double) Chunk.LENGTH));
 		
 		Chunk chunk = null;
 		if (chunks.containsKey(chunkKey)) {
@@ -115,8 +128,11 @@ public class BlockWorld implements BlockCollection {
 			chunk = new Chunk();
 			chunks.put(chunkKey, chunk);
 		}
-
-		chunk.setBlock(x % Chunk.WIDTH, y, z % Chunk.LENGTH, block);
+		
+		int relativeX = x - chunkKey.x * Chunk.WIDTH;
+		int relativeZ = z - chunkKey.z * Chunk.LENGTH;
+				
+		chunk.setBlock(relativeX, y, relativeZ, block);
 	}
 	
 	/**
@@ -187,6 +203,18 @@ public class BlockWorld implements BlockCollection {
 		chunks.clear();
 	}
 	
+	/**
+	 * Get a collection of all the entities in the world.
+	 * @return All the entities, represented by compound maps in the <a href="https://minecraft.gamepedia.com/Chunk_format#entity_format">entity format</a>
+	 */
+	public Collection<NBTTagCompound> entities() {
+		Collection<NBTTagCompound> entities = new ArrayList<NBTTagCompound>();
+		for (Chunk c : chunks.values()) {
+			entities.addAll(c.entities);
+		}
+		return entities;
+	}
+	
 	// Iterates over all chunks, and all blocks in the chunks.
 	@Override
 	public Iterator<Block> iterator() {
@@ -239,7 +267,7 @@ public class BlockWorld implements BlockCollection {
 	 * @throws IOException If an IO exception occurs during file parsing.
 	 * @throws FileNotFoundException If the file is not found.
 	 */
-	private void parseRegionFile(File regionFile) throws FileNotFoundException, IOException {
+	public void parseRegionFile(File regionFile) throws FileNotFoundException, IOException {
 		System.out.println("Reading "+regionFile);
 		List<NBTTagCompound> chunkMaps = new ArrayList<NBTTagCompound>();
 		WorldInputStream is = new WorldInputStream(new FileInputStream(regionFile));
@@ -260,5 +288,79 @@ public class BlockWorld implements BlockCollection {
 			chunks.put(coord, ChunkParser.parseNBT(level));
 			
 		}
+	}
+	
+	/**
+	 * Write this BlockWorld to a Minecraft save file.
+	 * @param regionFolder Region folder of Minecraft world to write to.
+	 * @param dataVersion The <a href="https://minecraft.gamepedia.com/Data_version">data version</a> to use.
+	 * @throws IOException If an IO Exception occurs.
+	 */
+	public void serialize(File regionFolder, int dataVersion) throws IOException {
+		System.out.println("Writing world...");
+		
+		List<ChunkCoordinate> regions = new ArrayList<ChunkCoordinate>();
+		
+		// Figure out which regions need to be written.
+		for (ChunkCoordinate coord : chunks.keySet()) {
+			int regionX = (int) Math.floor(coord.x / 32.0);
+			int regionZ = (int) Math.floor(coord.z / 32.0);
+			
+			ChunkCoordinate region = new ChunkCoordinate(regionX, regionZ);
+			if (!regions.contains(region)) regions.add(region);
+		}
+		
+		for (ChunkCoordinate region : regions) {
+			File regionFile = new File(regionFolder, "r."+region.x+"."+region.z+".mca");
+			writeRegionFile(regionFile, region.x, region.z, dataVersion);
+		}
+	}
+	
+	/**
+	 * Write the appropriate chunks from this world into a region file. (.mca)
+	 * @param regionFile File to write to. Will replace if already exists.
+	 * @param xOffset X coordinate of the region file.
+	 * @param xOffset Z coordinate of the region file.
+	 * @param dataVersion Data version of Minecraft version to save to.
+	 * @throws IOException 
+	 */
+	public void writeRegionFile(File regionFile, int xOffset, int zOffset, int dataVersion) throws IOException {
+		
+		System.out.println("Writing region file " + regionFile.getName());
+		
+		ChunkParser parser = new ChunkParser(dataVersion);
+		
+		// Keep track of all the chunks that belong in this file.
+		Map<ChunkCoordinate, NBTTagCompound> chunks = new HashMap<ChunkCoordinate, NBTTagCompound>();
+		for (ChunkCoordinate chunkCoord : this.chunks.keySet()) {
+			int relativeX = chunkCoord.x - xOffset*32;
+			int relativeZ = chunkCoord.z - zOffset*32;
+			
+			if (0 <= relativeX && relativeX < 32 && 0 <= relativeZ && relativeZ < 32) {
+				// Serialize chunk to NBT.
+				chunks.put(chunkCoord, parser.writeNBT(this.chunks.get(chunkCoord), chunkCoord.x, chunkCoord.z));
+			}
+		}
+		// Don't write file if there are no chunks.
+		if (chunks.size() < 1) {
+			return;
+		}
+		// Override old file.
+		if (regionFile.exists()) {
+			regionFile.delete();
+		}
+		
+		WorldOutputStream wos = new WorldOutputStream(new FileOutputStream(regionFile), new ChunkCoordinate(xOffset, zOffset));
+		
+		for (ChunkCoordinate coord : chunks.keySet()) {
+			
+			// Convert the coordinates into region space.
+			int relativeX = coord.x - xOffset*32;
+			int relativeZ = coord.z - zOffset*32;
+			
+			wos.write(new ChunkCoordinate(relativeX, relativeZ), chunks.get(coord));
+		}
+		
+		wos.close();
 	}
 }

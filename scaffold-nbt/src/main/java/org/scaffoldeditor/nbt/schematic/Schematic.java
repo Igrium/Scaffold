@@ -11,13 +11,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import mryurihi.tbnbt.stream.NBTInputStream;
-import mryurihi.tbnbt.tag.NBTTag;
-import mryurihi.tbnbt.tag.NBTTagByteArray;
-import mryurihi.tbnbt.tag.NBTTagCompound;
-import mryurihi.tbnbt.tag.NBTTagList;
-import mryurihi.tbnbt.tag.NBTTagShort;
-import mryurihi.tbnbt.tag.NBTTagString;
+import com.github.mryurihi.tbnbt.stream.NBTInputStream;
+import com.github.mryurihi.tbnbt.tag.NBTTag;
+import com.github.mryurihi.tbnbt.tag.NBTTagByteArray;
+import com.github.mryurihi.tbnbt.tag.NBTTagCompound;
+import com.github.mryurihi.tbnbt.tag.NBTTagList;
+import com.github.mryurihi.tbnbt.tag.NBTTagShort;
+import com.github.mryurihi.tbnbt.tag.NBTTagString;
 
 /**
  * Class responsible for loading and managing Minecraft schematics

@@ -1,8 +1,6 @@
 package org.scaffoldeditor.nbt.io;
 
-import java.io.Closeable;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
@@ -11,8 +9,8 @@ import java.util.List;
 import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
 
-import mryurihi.tbnbt.stream.NBTInputStream;
-import mryurihi.tbnbt.tag.NBTTagCompound;
+import com.github.mryurihi.tbnbt.stream.NBTInputStream;
+import com.github.mryurihi.tbnbt.tag.NBTTagCompound;
 
 /**
  * This class can read and parse Minecraft Region files,
@@ -20,39 +18,30 @@ import mryurihi.tbnbt.tag.NBTTagCompound;
  * @author Sam54123
  */
 public class WorldInputStream implements Closeable {
+
+	private static final int SECTOR_SIZE = 4096;
+
 	/**
 	 * Contains chunk location information defined in the header of the file.
 	 */
 	protected class ChunkLocation implements Comparable<ChunkLocation> {
 		/**
-		 * Chunk offset in 4KiB sectors from the start of the file.
+		 * Chunk offset from the start of the file.
 		 */
 		public final int offset;
 		
 		/**
-		 * The length of the chunk, also in 4KiB sectors.
+		 * The length of the chunk
 		 */
-		public final short length;
-		
-		/**
-		 * The X position in the region file of the chunk.
-		 */
-		public final short x;
-		
-		/**
-		 * The Z position in the region file of the chunk.
-		 */
-		public final short z;
+		public final int length;
 		
 		/**
 		 * For internal use only.
 		 * DO NOT CALL MANUALLY.
 		 */
-		public ChunkLocation(int offset, short length, short x, short z) {
+		public ChunkLocation(int offset, int length) {
 			this.offset = offset;
 			this.length = length;
-			this.x = x;
-			this.z = z;
 		}
 
 		@Override
@@ -76,12 +65,12 @@ public class WorldInputStream implements Closeable {
 		 * How many bytes were read while reading the chunk?
 		 */
 		public final int bytesRead;
-		
+
 		/**
 		 * The chunk's X position in the file.
 		 */
 		public final short x;
-		
+
 		/**
 		 * The chunk's Z position in the file.
 		 */
@@ -99,49 +88,39 @@ public class WorldInputStream implements Closeable {
 		}
 	}
 	
-	private final InputStream is;
+	private final DataInputStream is;
 	
 	// The head in the chunkLocations array.
 	private int locationHead = 0;
 	
 	public final List<ChunkLocation> chunkLocations = new ArrayList<ChunkLocation>();
-	
+
 	/**
 	 * Create a new WorldInputStream.
 	 * @param is Input Stream to read.
 	 * @throws IOException 
 	 */
 	public WorldInputStream(InputStream is) throws IOException {
-		this.is = is;
-		
-		// Load chunk data.
-		short x = 0;
-		short z = 0;
-		
-		// Iterate over chunk array and read location entries.
-		while (x < 32 && z < 32) {
-			byte[] bytes = new byte[4];
-			is.read(bytes);
-			
-			int loc = (bytes[2] & 0xFF) | ((bytes[1] & 0xFF) << 8) | ((bytes[0] & 0x0F) << 16);
-			short length = bytes[3];
-			
-			chunkLocations.add(new ChunkLocation(loc, length, x, z));
-			
-			// Increment chunk heads
-			if (x == 31) {
-				x = 0;
-				z++;
-			} else {
-				x++;
+		this.is = new DataInputStream(is);
+
+		for (int index = 0; index < 1024; index++) {
+			int entry = this.is.readInt();
+
+			if (entry != 0) {
+				int chunkOffset = entry >>> 8;
+				int chunkSize = entry & 15;
+
+                ChunkLocation chunkLocation = new ChunkLocation(chunkOffset * SECTOR_SIZE, chunkSize * SECTOR_SIZE);
+                chunkLocations.add(chunkLocation);
 			}
 		}
-		
-		// Sort the chunk locations list by order in file.
-		Collections.sort(chunkLocations);
-		
-		// Skip past timestamps
-		is.skip(4096);
+
+		chunkLocations.sort(ChunkLocation::compareTo);
+
+		// Skip timestamps and go to the first chunk
+        if (!chunkLocations.isEmpty()) {
+            is.skip(chunkLocations.get(0).offset - 4096);
+        }
 	}
 	
 	/**
@@ -150,25 +129,14 @@ public class WorldInputStream implements Closeable {
 	 * @throws IOException If an IOException occurs during reading the NBT.
 	 */
 	public ChunkNBTInfo readChunkNBT() throws IOException {
-		ChunkLocation location = chunkLocations.get(locationHead);
-		// Skip if chunk is empty
-		while (location.length == 0) {
-			if (locationHead < chunkLocations.size()-1) { // Make sure we have space to iterate.
-				locationHead++;	
-				location = chunkLocations.get(locationHead);
-			} else {
-				return null;
-			}
+		if (locationHead == chunkLocations.size()) {
+			return null;
 		}
-		
-		// Read chunk header.
-		byte[] lengthArray = new byte[4];
-		is.read(lengthArray);
-		ByteBuffer lengthBuffer = ByteBuffer.wrap(lengthArray);
-		lengthBuffer.order(ByteOrder.BIG_ENDIAN);
-		int length = lengthBuffer.getInt();
-		
-		int compressionType = is.read();
+
+		ChunkLocation location = chunkLocations.get(locationHead);
+
+		int length = is.readInt();
+		byte compressionType = is.readByte();
 		
 		// Decompress chunk.
 		Inflater inflater;
@@ -179,38 +147,30 @@ public class WorldInputStream implements Closeable {
 		}
 		
 		@SuppressWarnings("resource") // Root input stream still needs to be accessed.
-		NBTInputStream nbtIs = new NBTInputStream(new InflaterInputStream(is, inflater, length-1), false);
+		NBTInputStream nbtIs = new NBTInputStream(new InflaterInputStream(is, inflater, length - 1), false);
 		NBTTagCompound map = (NBTTagCompound) nbtIs.readTag();
-		
-		// Skip to the end of the sector.
-		is.skip(location.length*4096 - (length+4));
-		
-		if (locationHead < chunkLocations.size()) {
-			locationHead++;
+
+		locationHead++;
+
+		// Read till the next usable sector
+		if (locationHead != chunkLocations.size()) {
+			ChunkLocation nextLocation = chunkLocations.get(locationHead);
+			is.skip(nextLocation.offset - (location.offset + (length + 4)));
 		}
+
+		NBTTagCompound levelTag = map.get("Level").getAsTagCompound();
 		
-		return new ChunkNBTInfo(map, length+4, location.x, location.z);
+		return new ChunkNBTInfo(map, length + 4, (short) levelTag.get("xPos").getAsTagInt().getValue(), (short) levelTag.get("zPos").getAsTagInt().getValue());
 	}
-	
-	// Check if we have more chunks by attempting to iterate to them.
+
+	/**
+	 * Checks whether or not there are more chunks
+	 * left to be read
+	 *
+	 * @return true if there are, false otherwise
+	 */
 	public boolean hasNext() {
-		if (!(locationHead < chunkLocations.size())) {
-			return false;
-		}
-		
-		ChunkLocation location = chunkLocations.get(locationHead);
-		while (location.length == 0) {
-			if (locationHead < chunkLocations.size()-1) { // Make sure we have space to iterate.
-				locationHead++;	
-				location = chunkLocations.get(locationHead);
-			} else {
-				return false;
-			}
-		}
-		
-		// The loop only ends when we've found another location.
-		// If we've found one, we know we have a next location.
-		return true;
+		return locationHead < chunkLocations.size();
 	}
 
 	@Override

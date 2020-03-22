@@ -1,5 +1,7 @@
 package org.scaffoldeditor.nbt;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -33,4 +35,22 @@ public final class Constants {
 		DEFAULT_IDS.put(19, "minecraft:sponge");
 		DEFAULT_IDS.put(20, "minecraft:glass");
 	}
+	
+	/**
+	 * A map of Minecraft versions and their data versions.
+	 */
+	public static final Map<String, Integer> DATA_VERSIONS;
+	static {
+		Map<String, Integer> map = new HashMap<String, Integer>();
+		
+		map.put("1.14.4", 1976);
+		
+		DATA_VERSIONS = Collections.unmodifiableMap(map);
+		
+	}
+	
+	/**
+	 * The default data version, usually that of the latest minecraft release.
+	 */
+	public static final int DEFAULT_DATA_VERSION = 1976;
 }
