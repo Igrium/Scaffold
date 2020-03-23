@@ -6,6 +6,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.scaffoldeditor.nbt.block.BlockCollectionManager;
+
 /**
  * A Project is an object that defines all the main attributes of a project
  * @author Sam54123
@@ -30,6 +32,7 @@ public class Project {
 		this.projectFolder = projectFolder;
 		gameInfo = new GameInfo();
 		assetManager = new AssetManager(this);
+		BlockCollectionManager.registerDefaults();
 	}
 
 	

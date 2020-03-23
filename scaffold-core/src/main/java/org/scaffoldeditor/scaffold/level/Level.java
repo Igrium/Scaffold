@@ -414,43 +414,16 @@ public class Level {
 		blockWorld.clear(); // Clear the blockworld of previous compiles.
 		System.out.println("Compiling world...");
 		
-		// Collect used block passes.
-		List<Integer> blockPasses = new ArrayList<Integer>();
-		for (Entity e : entities.values()) {
-			if (!blockPasses.contains(e.getBlockPass())) {
-				blockPasses.add(e.getBlockPass());
-			}
-		}
-		Collections.sort(blockPasses);
-		
-		// Iterate through passes
-		for (int i : blockPasses) {
-			List<Entity> entities = collectBlockPass(i);
-			
-			for (Entity entity : entities) {
-				try {
-					BlockEntity blockEntity = (BlockEntity) entity;
-					blockEntity.compileWorld(blockWorld, full);
-				} catch (ClassCastException e) {
-					// We don't need to do anything if the entity can't create blocks.
-				}
+		for (Entity entity : entities.values()) {
+			try {
+				BlockEntity blockEntity = (BlockEntity) entity;
+				blockEntity.compileWorld(blockWorld, full);
+			} catch (ClassCastException e) {
+				// We don't need to do anything if the entity can't create blocks.
 			}
 		}
 		
-		return false;
-	}
-	
-	/* Assemble a list of all entities in a block pass */
-	private List<Entity> collectBlockPass(int pass) {
-		
-		List<Entity> blockPass = new ArrayList<Entity>();
-		for (Entity e : entities.values()) {
-			if (e.getBlockPass() == pass) {
-				blockPass.add(e);
-			}
-		}
-		
-		return blockPass;
+		return true;
 	}
 	
 	/**

@@ -12,6 +12,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.scaffoldeditor.nbt.block.BlockWorld;
+import org.scaffoldeditor.scaffold.core.Project;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.io.Input;
 import org.scaffoldeditor.scaffold.level.io.Output;
@@ -157,6 +158,16 @@ public class Entity {
 	 */
 	public Level getLevel() {
 		return level;
+	}
+	
+	/**
+	 * Shortcut method for getting the project this entity belongs to.
+	 * <br>
+	 * Same as <code>getLevel().getProject()</code>
+	 * @return The project this entity belongs to.
+	 */
+	public Project getProject() {
+		return getLevel().getProject();
 	}
 	
 	/**

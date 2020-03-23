@@ -1,9 +1,7 @@
 package org.scaffoldeditor.nbt.schematic;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -13,6 +11,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.scaffoldeditor.nbt.block.Block;
+import org.scaffoldeditor.nbt.block.BlockReader;
 import org.scaffoldeditor.nbt.block.SizedBlockCollection;
 
 import com.github.mryurihi.tbnbt.stream.NBTInputStream;
@@ -28,7 +27,7 @@ import java.util.Objects;
  * Represents a Minecraft structure schematic (.nbt)
  * @author Sam54123
  */
-public class Structure implements SizedBlockCollection {
+public class Structure implements SizedBlockCollection, BlockReader {
 	
 	private NBTTagCompound[] palette;
 	private List<NBTTagCompound> blocks;
@@ -40,9 +39,7 @@ public class Structure implements SizedBlockCollection {
 	
 	/* A value from 0-3 that represents structure's rotation */
 	private int rotation;
-	
-	private Structure() {};
-	
+		
 	/**
 	 * Get the name of the block at a particular location.
 	 * @param x X coordinate
@@ -86,7 +83,6 @@ public class Structure implements SizedBlockCollection {
 	 */
 	private NBTTagCompound blockMapAt(int x, int y, int z) {
 		for (NBTTagCompound block : blocks) {
-			@SuppressWarnings("unchecked")
 			NBTTagList coordTag = (NBTTagList) block.get("pos");
 
 			List<NBTTagInt> coords = new ArrayList<NBTTagInt>();
@@ -142,7 +138,6 @@ public class Structure implements SizedBlockCollection {
 		
 		// Translate all blocks to new location
 		for (NBTTagCompound block : blocks) {
-			@SuppressWarnings("unchecked")
 			NBTTagList coordTag = (NBTTagList) block.get("pos");
 			List<NBTTagInt> coords = new ArrayList<NBTTagInt>();
 			for (NBTTag t : coordTag.getValue()) {
@@ -299,7 +294,6 @@ public class Structure implements SizedBlockCollection {
 	 * @param map Compound map
 	 * @return Structure
 	 */
-	@SuppressWarnings("unchecked")
 	public static Structure fromCompoundMap(NBTTagCompound map) {
 		Structure structure = new Structure();
 		
@@ -361,25 +355,7 @@ public class Structure implements SizedBlockCollection {
 		}
 		return mapList;
 	}
-	
-	/**
-	 * Load a structure from a file
-	 * @param file File to load
-	 * @return Structure
-	 * @throws IOException 
-	 * @throws FileNotFoundException 
-	 */
-	public static Structure fromFile(File file) throws FileNotFoundException, IOException {
-		
-		NBTInputStream input = new NBTInputStream(new FileInputStream(file));
-	
-		NBTTagCompound map = (NBTTagCompound) input.readTag();
-		
-		Structure structure = fromCompoundMap(map);
-		input.close();
-		
-		return structure;
-	}
+
 
 	@Override
 	public Iterator<Block> iterator() {
@@ -399,5 +375,18 @@ public class Structure implements SizedBlockCollection {
 				return Block.fromBlockPalleteEntry(palette[state]);
 			}
 		};
+	}
+
+	@Override
+	public SizedBlockCollection readBlockCollection(InputStream in) throws IOException {
+		NBTInputStream input = new NBTInputStream(in);
+		NBTTagCompound map = input.readTag().getAsTagCompound();
+		input.close();
+		
+		if (map == null) {
+			throw new IOException("Improperly formatted structure file!");
+		}
+		
+		return fromCompoundMap(map);
 	}
 }
