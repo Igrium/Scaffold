@@ -20,6 +20,7 @@ import org.scaffoldeditor.nbt.NBTStrings;
 import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.scaffold.core.Constants;
 import org.scaffoldeditor.scaffold.core.Project;
+import org.scaffoldeditor.scaffold.level.entity.BlockEntity;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.game.TargetSelectable;
 import org.scaffoldeditor.scaffold.logic.Datapack;
@@ -411,6 +412,7 @@ public class Level {
 	 */
 	public boolean compileBlockWorld(boolean full) {
 		blockWorld.clear(); // Clear the blockworld of previous compiles.
+		System.out.println("Compiling world...");
 		
 		// Collect used block passes.
 		List<Integer> blockPasses = new ArrayList<Integer>();
@@ -425,8 +427,13 @@ public class Level {
 		for (int i : blockPasses) {
 			List<Entity> entities = collectBlockPass(i);
 			
-			for (Entity e : entities) {
-				e.compileWorld(blockWorld, full);
+			for (Entity entity : entities) {
+				try {
+					BlockEntity blockEntity = (BlockEntity) entity;
+					blockEntity.compileWorld(blockWorld, full);
+				} catch (ClassCastException e) {
+					// We don't need to do anything if the entity can't create blocks.
+				}
 			}
 		}
 		
@@ -512,6 +519,13 @@ public class Level {
 		try {
 			setupCompile(compileTarget, cheats);
 			
+			// Compile world
+			compileBlockWorld(true);
+			
+			File regionFolder = compileTarget.resolve("region").toFile();
+			regionFolder.mkdir();
+			blockWorld.serialize(regionFolder, org.scaffoldeditor.nbt.Constants.DEFAULT_DATA_VERSION);
+			
 			// Setup and compile logic.
 			Path datapackFolder = compileTarget.resolve("datapacks");
 			datapackFolder.toFile().mkdir();
@@ -523,6 +537,8 @@ public class Level {
 			Resourcepack resourcepack = new Resourcepack(getProject().assetManager().getAbsolutePath("assets"));
 			resourcepack.setDescription("Resources for "+project.getTitle());
 			resourcepack.compile(compileTarget.resolve("resources"), true);
+			
+			
 			
 			return true;
 		} catch (IOException e) {

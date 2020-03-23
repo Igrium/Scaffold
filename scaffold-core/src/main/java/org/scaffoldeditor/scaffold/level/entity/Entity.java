@@ -389,16 +389,6 @@ public class Entity {
 	}
 	
 	/**
-	 * Compile this entity into the physical world.
-	 * @param blockWorld BlockWorld to compile into.
-	 * @param full Is this a full compile? May run more complex algorithms if true.
-	 * @return Success.
-	 */
-	public boolean compileWorld(BlockWorld blockWorld, boolean full) {
-		return true;
-	}
-	
-	/**
 	 * Get the block pass of this entity.
 	 * Entities with higher block passes will compile over entities with lower block passes.
 	 * @return Block pass.

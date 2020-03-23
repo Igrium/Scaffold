@@ -4,13 +4,15 @@ package org.scaffoldeditor.scaffold.level.entity.block;
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.scaffold.level.Level;
+import org.scaffoldeditor.scaffold.level.entity.BlockEntity;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
+import org.scaffoldeditor.scaffold.math.Vector;
 
 /**
  * Class for entities that are represented as a single block ingame.
  * @author Sam54123
  */
-public abstract class SingleBlock extends Entity {
+public abstract class SingleBlock extends Entity implements BlockEntity {
 	
 	protected Block block;
 
@@ -44,6 +46,14 @@ public abstract class SingleBlock extends Entity {
 	}
 	
 	/**
+	 * Get the grid coordinates of the block.
+	 * @return Block grid coordinates.
+	 */
+	public Vector getBlockCoords() {
+		return Vector.floor(getPosition());
+	}
+	
+	/**
 	 * Get the entity's block.
 	 * @return
 	 */
@@ -53,11 +63,16 @@ public abstract class SingleBlock extends Entity {
 	
 	@Override
 	public boolean compileWorld(BlockWorld blockWorld, boolean full) {
-		if (!super.compileWorld(blockWorld, full)) {;
-			return false;
-		}
-		
 		blockWorld.setBlock(blockX(), blockY(), blockZ(), block);
 		return true;
+	}
+	
+	@Override
+	public Block blockAt(Vector coord) {
+		if (Vector.floor(coord).equals(getBlockCoords())) {
+			return block;
+		} else {
+			return null;
+		}
 	}
 }

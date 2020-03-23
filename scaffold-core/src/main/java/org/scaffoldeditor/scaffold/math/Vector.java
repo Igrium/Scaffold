@@ -43,6 +43,17 @@ public class Vector {
 		return "<"+x+", "+y+", "+z+">";
 	}
 	
+	@Override
+	public boolean equals(Object arg0) {
+		Vector other = (Vector) arg0;
+		if (other != null) {
+			return (this.X() == other.X() && this.Y() == other.Y() && this.Z() == other.Z());
+		} else {
+			return super.equals(arg0);
+		}
+
+	}
+	
 	public static Vector add(Vector vec1, Vector vec2) {
 		return new Vector(vec1.X() + vec2.X(), vec1.Y() + vec2.Y(), vec1.Z() + vec2.Z());
 	}
@@ -57,6 +68,10 @@ public class Vector {
 	
 	public static Vector divide(Vector vec, float num) {
 		return new Vector(vec.X()/num, vec.Y()/num, vec.Z()/num);
+	}
+	
+	public static Vector floor(Vector vec) {
+		return new Vector((float) Math.floor(vec.X()), (float) Math.floor(vec.Y()), (float) Math.floor(vec.Z()));
 	}
 	
 	
