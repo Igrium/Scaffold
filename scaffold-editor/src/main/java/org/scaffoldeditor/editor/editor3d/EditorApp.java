@@ -11,6 +11,7 @@ import com.jme3.app.SimpleApplication;
 import com.jme3.asset.plugins.ClasspathLocator;
 import com.jme3.asset.plugins.FileLocator;
 import com.jme3.scene.Spatial;
+import com.rvandoosselaer.blocks.BlocksConfig;
 
 /**
  * The 3d rendered part of the editor.
@@ -54,6 +55,7 @@ public class EditorApp extends SimpleApplication {
 		
 		getAssetManager().registerLocator("assets", ClasspathLocator.class); // Default assets
 		
+		BlocksConfig.initialize(assetManager);
 		reload();
 	}
 	

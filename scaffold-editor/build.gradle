@@ -30,6 +30,7 @@ dependencies {
     compile "org.jmonkeyengine:jme3-core:$jmonkeyengine_version"
     compile "org.jmonkeyengine:jme3-desktop:$jmonkeyengine_version"
     compile "org.jmonkeyengine:jme3-lwjgl:$jmonkeyengine_version"
+    compile 'com.rvandoosselaer:blocks:1.5.0'
     
     implementation 'org.json:json:20190722'
     
@@ -50,4 +51,5 @@ repositories {
     // Use jcenter for resolving your dependencies.
     // You can declare any Maven/Ivy/file repository here.
     jcenter()
+    maven { url 'https://dl.bintray.com/remyvd/rvandoosselaer' }
 }
