@@ -38,6 +38,8 @@ public class ChunkRegistry {
 			return registry.get(chunk);
 		}
 		
+		System.out.println("Registering render chunk at "+location); // TESTING ONLY
+		
 		com.rvandoosselaer.blocks.Chunk renderChunk = com.rvandoosselaer.blocks.Chunk.createAt(location);
 		registry.put(chunk, renderChunk);
 		return renderChunk;
@@ -67,8 +69,8 @@ public class ChunkRegistry {
 	public static void clean() {
 		for (Chunk c : chunks()) {
 			get(c).cleanup();
-			registry.remove(c);
 		}
+		registry.clear();
 	}
 	
 	/**
@@ -102,7 +104,7 @@ public class ChunkRegistry {
 					renderChunk.removeBlock(x, y, z);
 					
 					Block sBlock = chunk.blockAt(x, y, z);
-					if (sBlock != null && skipBlocksList.contains(sBlock.getName())) {
+					if (sBlock != null && !skipBlocksList.contains(sBlock.getName())) {
 						renderChunk.addBlock(x, y, z,
 								BlockUtils.scaffoldToRenderBlock(chunk.blockAt(x, y, z)));
 					}

@@ -87,6 +87,7 @@ public class EditorApp extends SimpleApplication {
 		}
 		
 		// Load the world
+		parent.getLevel().compileBlockWorld(false);
 		BlockWorld blockWorld = parent.getLevel().getBlockWorld();
 		WorldManager.loadWorld(blockWorld, rootNode);
 		

@@ -17,6 +17,7 @@ public final class WorldManager {
 	 * @param rootNode Node to add to.
 	 */
 	public static void loadWorld(BlockWorld world, Node rootNode) {
+		System.out.println("Loading render world...");
 		ChunkRegistry.clean();
 		
 		for (ChunkCoordinate coord : world.chunkCoords()) {
