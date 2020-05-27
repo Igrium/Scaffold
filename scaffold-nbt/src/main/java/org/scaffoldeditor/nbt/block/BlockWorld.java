@@ -185,7 +185,16 @@ public class BlockWorld implements BlockCollection {
 	 * @return Chunk at coordinates.
 	 */
 	public Chunk chunkAt(int x, int z) {
-		return chunks.get(new ChunkCoordinate(x,z));
+		return chunkAt(new ChunkCoordinate(x,z));
+	}
+	
+	/**
+	 * Get the chunk at a specific chunk coordinate.
+	 * @param coord Chunk coordinate.
+	 * @return Chunk at coordinate.
+	 */
+	public Chunk chunkAt(ChunkCoordinate coord) {
+		return chunks.get(coord);
 	}
 	
 	/**
@@ -194,6 +203,14 @@ public class BlockWorld implements BlockCollection {
 	 */
 	public Collection<Chunk> chunks() {
 		return chunks.values();
+	}
+	
+	/**
+	 * Get a set of all the chunk coordinates at which a chunk exists.
+	 * @return Chunk coordinates.
+	 */
+	public Set<ChunkCoordinate> chunkCoords() {
+		return chunks.keySet();
 	}
 	
 	/**

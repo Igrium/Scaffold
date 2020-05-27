@@ -4,14 +4,19 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.scaffoldeditor.editor.editor3d.block.WorldManager;
 import org.scaffoldeditor.editor.ui.EditorWindow;
+import org.scaffoldeditor.nbt.block.BlockWorld;
+import org.scaffoldeditor.nbt.block.Chunk;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 
 import com.jme3.app.SimpleApplication;
 import com.jme3.asset.plugins.ClasspathLocator;
 import com.jme3.asset.plugins.FileLocator;
+import com.jme3.light.AmbientLight;
 import com.jme3.scene.Spatial;
 import com.rvandoosselaer.blocks.BlocksConfig;
+import com.simsilica.mathd.Vec3i;
 
 /**
  * The 3d rendered part of the editor.
@@ -55,7 +60,10 @@ public class EditorApp extends SimpleApplication {
 		
 		getAssetManager().registerLocator("assets", ClasspathLocator.class); // Default assets
 		
+		// Initialize block system
 		BlocksConfig.initialize(assetManager);
+		BlocksConfig.getInstance().setChunkSize(new Vec3i(Chunk.WIDTH, Chunk.HEIGHT, Chunk.LENGTH));
+		
 		reload();
 	}
 	
@@ -77,7 +85,14 @@ public class EditorApp extends SimpleApplication {
 			entities.put(ent, ent3d);
 			rootNode.attachChild(ent3d);
 		}
-
+		
+		// Load the world
+		BlockWorld blockWorld = parent.getLevel().getBlockWorld();
+		WorldManager.loadWorld(blockWorld, rootNode);
+		
+		
+		rootNode.addLight(new AmbientLight());
+		
 	}
 	
 	/**

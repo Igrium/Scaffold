@@ -153,6 +153,14 @@ public class Level {
 	}
 	
 	/**
+	 * Get the block world of the level.
+	 * @return Block world.
+	 */
+	public BlockWorld getBlockWorld() {
+		return blockWorld;
+	}
+	
+	/**
 	 * Get this map's init function.
 	 * ONLY EXISTS DURING COMPILATION!
 	 * @return Init function.
