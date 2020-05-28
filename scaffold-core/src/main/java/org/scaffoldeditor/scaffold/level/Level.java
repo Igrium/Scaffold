@@ -463,15 +463,14 @@ public class Level {
 		
 		// Feed the entity blocks into the chunk.
 		
-		System.out.println(coord); // TESTING ONLY
+		System.out.println("Recompiling chunk"+ coord); // TESTING ONLY
 		
 		for (int y = 0; y < Chunk.HEIGHT; y++) {
 			for (int z = 0; z < Chunk.LENGTH; z++) {
 				for (int x = 0; x < Chunk.WIDTH; x++) {
 					int worldX = x + coord.x() * Chunk.WIDTH;
-					int worldZ = z + coord.z() * Chunk.HEIGHT;
+					int worldZ = z + coord.z() * Chunk.LENGTH;
 					blockWorld.setBlock(worldX, y, worldZ, null);
-					
 					for (BlockEntity e : blockEntities) { // TODO: Write an entity stack.
 						Block block = e.blockAt(new Vector(worldX, y, worldZ));
 						if (block != null) blockWorld.setBlock(worldX, y, worldZ, block);
