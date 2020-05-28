@@ -99,9 +99,9 @@ public class EditorApp extends SimpleApplication {
 	 * Refresh a chunk in the world.
 	 * @param chunk Chunk to refresh.
 	 */
-	public void refreshChunk(Chunk chunk) {
+	public void refreshChunk(ChunkCoordinate chunk) {
 		System.out.println("Refreshing chunk from editor");
-		WorldManager.refreshChunk(chunk, rootNode);
+		WorldManager.refreshChunk(chunk, parent.getLevel().getBlockWorld(), rootNode);
 	}
 	
 	/**

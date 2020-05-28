@@ -35,15 +35,23 @@ public final class WorldManager {
 	
 	/**
 	 * Refresh a chunk in the world.
-	 * @param chunk Chunk to refresh.
-	 * @param rootNode World to refresh in.
+	 * @param coord Chunk to refresh.
+	 * @param world World to load chunk from.
+	 * @param rootNode Render world to refresh in.
 	 */
-	public static void refreshChunk(Chunk chunk, Node rootNode) {
+	public static void refreshChunk(ChunkCoordinate coord, BlockWorld world, Node rootNode) {
+		Chunk chunk = world.chunkAt(coord);
+		com.rvandoosselaer.blocks.Chunk rChunk = ChunkRegistry.get(chunk);
+		
+		if (rChunk == null) {
+			rChunk = ChunkRegistry.registerChunk(chunk, new Vec3i(coord.x(), 0, coord.z()));
+		}
+		
 		ChunkRegistry.refreshChunk(chunk);
 		
 		ChunkMeshGenerator meshGenerator = BlocksConfig.getInstance().getChunkMeshGenerator();
-		com.rvandoosselaer.blocks.Chunk rChunk = ChunkRegistry.get(chunk);
-		rChunk.getNode().removeFromParent();
+		
+		if (rChunk.getNode() != null) rChunk.getNode().removeFromParent();
 		rChunk.createNode(meshGenerator);
 		rootNode.attachChild(rChunk.getNode());
 	}

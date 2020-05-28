@@ -480,7 +480,7 @@ public class EntityEditor extends JDialog {
 			System.out.println("Update Chunks: "+updateChunks); // TESTING ONLY
 			for (ChunkCoordinate c : updateChunks) {
 				parent.getLevel().compileChunk(c, false);
-				parent.get3dApp().refreshChunk(parent.getLevel().getBlockWorld().chunkAt(c));
+				parent.get3dApp().refreshChunk(c);
 			}
 		}
 	}
