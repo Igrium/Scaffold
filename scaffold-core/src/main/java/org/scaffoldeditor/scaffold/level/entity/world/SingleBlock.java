@@ -1,10 +1,14 @@
 package org.scaffoldeditor.scaffold.level.entity.world;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.BlockWorld;
+import org.scaffoldeditor.nbt.block.BlockWorld.ChunkCoordinate;
+import org.scaffoldeditor.nbt.block.Chunk;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.BlockEntity;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
@@ -60,7 +64,7 @@ public class SingleBlock extends Entity implements BlockEntity {
 	}
 
 	@Override
-	public boolean compileWorld(BlockWorld world, boolean full) {
+	public boolean compileWorld(BlockWorld world) {
 		Vector gridPos = gridPos();
 		world.setBlock((int) gridPos.X(), (int) gridPos.Y(), (int) gridPos.Z(), getBlock());
 		
@@ -74,6 +78,21 @@ public class SingleBlock extends Entity implements BlockEntity {
 		} else {
 			return null;
 		}
+	}
+
+	@Override
+	public boolean recompile(boolean full) {
+		return true;
+	}
+
+	@Override
+	public Collection<ChunkCoordinate> getOccupiedChunks() {
+		Collection<ChunkCoordinate> chunks = new ArrayList<ChunkCoordinate>();
+		Vector gridPos = gridPos();
+		chunks.add(new ChunkCoordinate((int) Math.floor(gridPos.X() / Chunk.WIDTH),
+				(int) Math.floor(gridPos.Z() / Chunk.LENGTH)));
+		
+		return chunks;
 	}
 
 }

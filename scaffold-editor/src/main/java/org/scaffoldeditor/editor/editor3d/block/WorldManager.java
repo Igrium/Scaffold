@@ -32,4 +32,20 @@ public final class WorldManager {
 			rootNode.attachChild(rChunk.getNode());
 		}
 	}
+	
+	/**
+	 * Refresh a chunk in the world.
+	 * @param chunk Chunk to refresh.
+	 * @param rootNode World to refresh in.
+	 */
+	public static void refreshChunk(Chunk chunk, Node rootNode) {
+		ChunkRegistry.refreshChunk(chunk);
+		
+		ChunkMeshGenerator meshGenerator = BlocksConfig.getInstance().getChunkMeshGenerator();
+		com.rvandoosselaer.blocks.Chunk rChunk = ChunkRegistry.get(chunk);
+		rChunk.getNode().removeFromParent();
+		rChunk.createNode(meshGenerator);
+		rootNode.attachChild(rChunk.getNode());
+	}
+
 }

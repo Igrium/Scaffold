@@ -2,11 +2,15 @@ package org.scaffoldeditor.scaffold.level.entity.world;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.BlockCollectionManager;
 import org.scaffoldeditor.nbt.block.BlockWorld;
+import org.scaffoldeditor.nbt.block.BlockWorld.ChunkCoordinate;
+import org.scaffoldeditor.nbt.block.Chunk;
 import org.scaffoldeditor.nbt.block.SizedBlockCollection;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.BlockEntity;
@@ -60,11 +64,7 @@ public class PropStatic extends Faceable implements BlockEntity {
 	}
 
 	@Override
-	public boolean compileWorld(BlockWorld world, boolean full) {
-		if (full) {
-			reload();
-		}
-		
+	public boolean compileWorld(BlockWorld world) {
 		if (model == null) {
 			return true;
 		}
@@ -79,8 +79,47 @@ public class PropStatic extends Faceable implements BlockEntity {
 
 	@Override
 	public Block blockAt(Vector coord) {
-		// TODO Implement this.
-		return null;
+		Vector localCoord = Vector.floor(Vector.subtract(coord, this.getPosition()));
+		return model.blockAt((int) localCoord.X(), (int) localCoord.Y(), (int) localCoord.Z());
+	}
+
+	@Override
+	public boolean recompile(boolean full) {
+		if (full) {
+			reload();
+		}
+		// This entity is simple and doesn't need to do anything else.
+		return true;
+	}
+
+	@Override
+	public Collection<ChunkCoordinate> getOccupiedChunks() {
+		// GET ALL CHUNKS IN BOUNDS
+		Collection<ChunkCoordinate> boundChunks = new ArrayList<ChunkCoordinate>();
+		
+		// Get bounds.
+		Vector v1 = Vector.floor(getPosition());
+		Vector v2 = new Vector(
+				v1.X() + model.getWidth(),
+				v1.Y() + model.getHeight(),
+				v1.Z() + model.getWidth());
+		
+		System.out.println(v1); // TESTING ONLY
+		System.out.println(v2); // TESTING ONLY
+		
+		// Put into chunk coordinates
+		Vector c1 = Vector.floor(Vector.divide(v1, Chunk.WIDTH));
+		Vector c2 = Vector.floor(Vector.divide(v2, Chunk.LENGTH));
+		
+		for (int x = (int) c1.X(); x <= c2.X(); x++) {
+			for (int z = (int) c1.Z(); z <= c2.Z(); z++) {
+				boundChunks.add(new ChunkCoordinate(x, z));
+			}
+		}
+		
+		// TODO: Search chunks for blocks.
+		
+		return boundChunks;
 	}
 	
 }

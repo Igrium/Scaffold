@@ -1,13 +1,16 @@
 package org.scaffoldeditor.editor.editor3d;
 
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.scaffoldeditor.editor.editor3d.block.WorldManager;
 import org.scaffoldeditor.editor.ui.EditorWindow;
 import org.scaffoldeditor.nbt.block.BlockWorld;
+import org.scaffoldeditor.nbt.block.BlockWorld.ChunkCoordinate;
 import org.scaffoldeditor.nbt.block.Chunk;
+import org.scaffoldeditor.scaffold.level.entity.BlockEntity;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 
 import com.jme3.app.SimpleApplication;
@@ -72,11 +75,7 @@ public class EditorApp extends SimpleApplication {
 	 */
 	public void reload() {
 		restart();
-		for (Spatial n : rootNode.getChildren()) {
-			n.removeFromParent();
-		}
-		
-		entities.clear();
+		clean();
 		
 		
 		// Add all entities
@@ -97,15 +96,45 @@ public class EditorApp extends SimpleApplication {
 	}
 	
 	/**
+	 * Refresh a chunk in the world.
+	 * @param chunk Chunk to refresh.
+	 */
+	public void refreshChunk(Chunk chunk) {
+		System.out.println("Refreshing chunk from editor");
+		WorldManager.refreshChunk(chunk, rootNode);
+	}
+	
+	/**
+	 * Clear the entire scene.
+	 */
+	public void clean() {
+		for (Spatial n : rootNode.getChildren()) {
+			n.removeFromParent();
+		}
+		
+		entities.clear();
+		rootNode.getLocalLightList().clear();
+	}
+	
+	/**
 	 * Refresh the visual element of an entity.
 	 * @param ent Entity to refresh
 	 */
 	public void refreshEntity(Entity ent) {
 		Entity3D ent3d = entities.get(ent);
-		if (ent3d == null) {
-			return;
+		if (ent3d != null) {
+			ent3d.refresh();
 		}
-		ent3d.refresh();
+		
+	}
+	
+	/**
+	 * Refresh the voxel appearence of a block entity.
+	 * @param ent Entity to refresh.
+	 * @param additionalChunks Additional chunks to refresh.
+	 */
+	public void refreshBlockEntity(BlockEntity ent, Collection<ChunkCoordinate> additionalChunks) {
+		
 	}
 	
 	/**

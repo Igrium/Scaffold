@@ -7,7 +7,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +16,10 @@ import org.apache.commons.io.FilenameUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.scaffoldeditor.nbt.NBTStrings;
+import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.BlockWorld;
+import org.scaffoldeditor.nbt.block.BlockWorld.ChunkCoordinate;
+import org.scaffoldeditor.nbt.block.Chunk;
 import org.scaffoldeditor.scaffold.core.Constants;
 import org.scaffoldeditor.scaffold.core.Project;
 import org.scaffoldeditor.scaffold.level.entity.BlockEntity;
@@ -425,9 +427,56 @@ public class Level {
 		for (Entity entity : entities.values()) {
 			try {
 				BlockEntity blockEntity = (BlockEntity) entity;
-				blockEntity.compileWorld(blockWorld, full);
+				blockEntity.recompile(full);
+				blockEntity.compileWorld(blockWorld);
 			} catch (ClassCastException e) {
 				// We don't need to do anything if the entity can't create blocks.
+			}
+		}
+		
+		return true;
+	}
+	
+	/**
+	 * Compile a specific chunk.
+	 * @param coord Chunk to recompile.
+	 * @param recompileEntities Wheter to recompile the entities in the chunk.
+	 * @return Success.
+	 */
+	public boolean compileChunk(ChunkCoordinate coord, boolean recompileEntities) {
+		// List all the entities in the chunk.
+		List<BlockEntity> blockEntities = new ArrayList<BlockEntity>();
+		
+		for (Entity e : getEntities().values()) {
+			if (e instanceof BlockEntity) {
+				BlockEntity blockEntity = (BlockEntity) e;
+				if (blockEntity.getOccupiedChunks().contains(coord)) blockEntities.add(blockEntity);
+			}
+		}
+		
+		// Recompile the entities.
+		if (recompileEntities) {
+			for (BlockEntity b : blockEntities) {
+				if (!b.recompile(false)) return false;
+			}
+		}
+		
+		// Feed the entity blocks into the chunk.
+		
+		System.out.println(coord); // TESTING ONLY
+		
+		for (int y = 0; y < Chunk.HEIGHT; y++) {
+			for (int z = 0; z < Chunk.LENGTH; z++) {
+				for (int x = 0; x < Chunk.WIDTH; x++) {
+					int worldX = x + coord.x() * Chunk.WIDTH;
+					int worldZ = z + coord.z() * Chunk.HEIGHT;
+					blockWorld.setBlock(worldX, y, worldZ, null);
+					
+					for (BlockEntity e : blockEntities) { // TODO: Write an entity stack.
+						Block block = e.blockAt(new Vector(worldX, y, worldZ));
+						if (block != null) blockWorld.setBlock(worldX, y, worldZ, block);
+					}
+				}
 			}
 		}
 		

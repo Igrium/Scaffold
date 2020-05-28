@@ -94,6 +94,7 @@ public class ChunkRegistry {
 	 * @param chunk Chunk to refresh the render chunk of.
 	 */
 	public static void refreshChunk(Chunk chunk) {
+		
 		com.rvandoosselaer.blocks.Chunk renderChunk = get(chunk);
 		
 		List<String> skipBlocksList = Arrays.asList(skipBlocks);

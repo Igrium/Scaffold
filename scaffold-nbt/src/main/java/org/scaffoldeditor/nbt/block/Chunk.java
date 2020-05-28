@@ -80,6 +80,11 @@ public class Chunk implements BlockCollection {
 	}
 
 	public void setBlock(int x, int y, int z, Block block) {
+		if (block == null) {
+			blocks[x][y][z] = -1;
+			return;
+		}
+		
 		if (!palette.contains(block)) {
 			palette.add(block); // Make sure block is in palette
 		}

@@ -1,7 +1,10 @@
 package org.scaffoldeditor.scaffold.level.entity;
 
+import java.util.Collection;
+
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.BlockWorld;
+import org.scaffoldeditor.nbt.block.BlockWorld.ChunkCoordinate;
 import org.scaffoldeditor.scaffold.math.Vector;
 
 /**
@@ -11,13 +14,21 @@ import org.scaffoldeditor.scaffold.math.Vector;
 public interface BlockEntity {
 	
 	/**
-	 * Compile this entity's blocks into the world.
+	 * Tell this entity to recompile it's block structure.
+	 * Must be called before compileWorld or blockAt is called.
+	 * @param full Whether or not this is a full compile. Some operations will take longer if true.
+	 * @return Success.
+	 */
+	public boolean recompile(boolean full);
+	
+	/**
+	 * Output this entity's blocks into the world.
 	 * @param world The world to compile into.
 	 * @param full Whether or not this is a full compile.
 	 * Long operations are only allowed to run if this is true.
 	 * @return Success.
 	 */
-	public boolean compileWorld(BlockWorld world, boolean full);
+	public boolean compileWorld(BlockWorld world);
 	
 	/**
 	 * Get the block this entity believes should be at a particular location. This function
@@ -27,4 +38,11 @@ public interface BlockEntity {
 	 * @return The block at the requested location. Null if the entity doesn't care what's in this location.
 	 */
 	public Block blockAt(Vector coord);
+	
+	/**
+	 * Get the chunks which this block entity occupies.
+	 * @return Occupied chunks.
+	 */
+	public Collection<ChunkCoordinate> getOccupiedChunks();
+	
 }

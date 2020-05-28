@@ -12,6 +12,8 @@ import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 
 import org.scaffoldeditor.nbt.NBTStrings;
+import org.scaffoldeditor.nbt.block.BlockWorld.ChunkCoordinate;
+import org.scaffoldeditor.scaffold.level.entity.BlockEntity;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.Entity.AttributeDeclaration;
 import org.scaffoldeditor.scaffold.math.Vector;
@@ -24,6 +26,7 @@ import javax.swing.JTextField;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyAdapter;
@@ -439,6 +442,14 @@ public class EntityEditor extends JDialog {
 	 * Save info back into entity
 	 */
 	public void save() {
+		// Save the chunks to update.
+		Collection<ChunkCoordinate> updateChunks = new ArrayList<ChunkCoordinate>();
+		
+		if (entity instanceof BlockEntity) {
+			BlockEntity bEntity = (BlockEntity) entity;
+			updateChunks.addAll(bEntity.getOccupiedChunks());
+		}
+		
 		// Save position
 		try {
 			entity.setPosition(new Vector(
@@ -459,6 +470,19 @@ public class EntityEditor extends JDialog {
 		parent.getOutliner().reload();
 		parent.get3dApp().refreshEntity(entity);
 		parent.markUnsaved();
+		
+		// Update chunks
+		if (entity instanceof BlockEntity) {
+			BlockEntity bEntity = (BlockEntity) entity;
+			bEntity.recompile(false);
+			
+			updateChunks.addAll(bEntity.getOccupiedChunks());
+			System.out.println("Update Chunks: "+updateChunks); // TESTING ONLY
+			for (ChunkCoordinate c : updateChunks) {
+				parent.getLevel().compileChunk(c, false);
+				parent.get3dApp().refreshChunk(parent.getLevel().getBlockWorld().chunkAt(c));
+			}
+		}
 	}
 
 	protected JLabel getTypeLabel() {
