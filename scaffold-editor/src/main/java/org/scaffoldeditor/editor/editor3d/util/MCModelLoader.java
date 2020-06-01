@@ -13,6 +13,7 @@ import org.scaffoldeditor.scaffold.core.Project;
 /**
  * Asset loader responsible for loading Minecraft model files
  * @author Sam54123
+ * @deprecated Use BlockMesh
  */
 public class MCModelLoader {
 	private Project project;
@@ -62,7 +63,7 @@ public class MCModelLoader {
 			finalObject.put("elements", object.get("elements"));
 		} else if (parent != null && parent.has("elements")) {
 			finalObject.put("elements", parent.get("elements"));
-		}
+		}			 
 		
 		if (object.has("textures")) {
 			finalObject.put("textures", object.get("textures"));

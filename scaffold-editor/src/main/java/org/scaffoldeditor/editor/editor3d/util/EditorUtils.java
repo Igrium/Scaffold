@@ -1,5 +1,6 @@
 package org.scaffoldeditor.editor.editor3d.util;
 
+import org.json.JSONArray;
 import org.scaffoldeditor.scaffold.math.Vector;
 
 import com.jme3.math.Vector3f;
@@ -25,5 +26,16 @@ public final class EditorUtils {
 	 */
 	public static Vector mVectorToSVector(Vector3f vector) {
 		return new Vector(vector.getX(), vector.getY(), vector.getZ());
+	}
+	
+	/**
+	 * Convert a JSON array to a JMonkeyEngine vector.
+	 * <br>
+	 * array[0] => x, array[1] => y, array[2] => z
+	 * @param array JSON array.
+	 * @return JMonkeyEngine vector.
+	 */
+	public static Vector3f jsonArrayToMVector(JSONArray array) {
+		return new Vector3f(array.getFloat(0), array.getFloat(1), array.getFloat(2));
 	}
 }
