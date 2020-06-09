@@ -4,15 +4,20 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+
 import org.json.JSONObject;
 
+import com.github.mryurihi.tbnbt.TagType;
 import com.github.mryurihi.tbnbt.stream.NBTOutputStream;
 import com.github.mryurihi.tbnbt.tag.NBTTag;
 import com.github.mryurihi.tbnbt.tag.NBTTagByte;
 import com.github.mryurihi.tbnbt.tag.NBTTagCompound;
 import com.github.mryurihi.tbnbt.tag.NBTTagDouble;
 import com.github.mryurihi.tbnbt.tag.NBTTagInt;
+import com.github.mryurihi.tbnbt.tag.NBTTagList;
 import com.github.mryurihi.tbnbt.tag.NBTTagLong;
 import com.github.mryurihi.tbnbt.tag.NBTTagString;
 
@@ -142,6 +147,25 @@ public class LevelData {
 		data.put("version", new NBTTagInt(19133));
 		data.put("WanderingTraderSpawnChance", new NBTTagInt(0));
 		data.put("WanderingTraderSpawnDelay", new NBTTagInt(15600));
+		
+		// Set generator options
+		NBTTagCompound generatorOptions = new NBTTagCompound(new HashMap<String, NBTTag>()); {
+			NBTTagCompound structures = new NBTTagCompound(new HashMap<String, NBTTag>()); {
+				structures.put("village", new NBTTagCompound(new HashMap<String, NBTTag>()));
+			}
+			generatorOptions.put("structures", structures);
+			
+			NBTTagList layers = new NBTTagList(TagType.COMPOUND); {
+				NBTTagCompound layer = new NBTTagCompound(new HashMap<String, NBTTag>()); {
+					layer.put("block", new NBTTagString("minecraft:air"));
+					layer.put("height", new NBTTagByte((byte) 1));
+				}
+				layers.add(layer);
+			}
+			generatorOptions.put("layers", layers);
+			generatorOptions.put("biome", new NBTTagString("minecraft:plains"));
+		}
+		data.put("generatorOptions", generatorOptions);
 		
 		// Compile gamerules
 		NBTTagCompound gameruleMap = new NBTTagCompound(new HashMap<String, NBTTag>());
