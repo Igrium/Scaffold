@@ -79,6 +79,10 @@ public class PropStatic extends Faceable implements BlockEntity {
 
 	@Override
 	public Block blockAt(Vector coord) {
+		if (model == null) {
+			return null;
+		}
+		
 		Vector localCoord = Vector.floor(Vector.subtract(coord, this.getPosition()));
 		return model.blockAt((int) localCoord.X(), (int) localCoord.Y(), (int) localCoord.Z());
 	}
@@ -94,6 +98,10 @@ public class PropStatic extends Faceable implements BlockEntity {
 
 	@Override
 	public Collection<ChunkCoordinate> getOccupiedChunks() {
+		if (model == null) {
+			return new ArrayList<ChunkCoordinate>();
+		}
+		
 		// GET ALL CHUNKS IN BOUNDS
 		Collection<ChunkCoordinate> boundChunks = new ArrayList<ChunkCoordinate>();
 		
