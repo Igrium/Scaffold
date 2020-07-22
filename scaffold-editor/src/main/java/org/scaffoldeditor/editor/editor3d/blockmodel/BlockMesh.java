@@ -93,6 +93,12 @@ public class BlockMesh extends Mesh {
 		return ret;
 	}
 	
+	/**
+	 * Create the top face of an element.
+	 * @param face 
+	 * @param from
+	 * @param to
+	 */
 	private void createUpFace(JSONObject face, Vector3f from, Vector3f to) {
 		List<Vector3f> vertices = vertexGroups.get(MeshFaceSide.UP);
 		int offset = vertices.size();
@@ -107,7 +113,7 @@ public class BlockMesh extends Mesh {
 		
 		CreateFaceReturn genFace = createFace(localVerts, jsonToFloatArray(face.optJSONArray("uv")));
 		
-		appendFaces(localVerts, genFace.texCoords, genFace.indices, MeshFaceSide.UP);
+		appendVerts(localVerts, genFace.texCoords, genFace.indices, MeshFaceSide.UP);
 	}
 	
 	/**
@@ -117,7 +123,7 @@ public class BlockMesh extends Mesh {
 	 * @param indices
 	 * @param side The side to apply it to.
 	 */
-	private void appendFaces(List<Vector3f> vertices, List<Vector2f> texCoord, List<Integer> indices, MeshFaceSide side) {
+	private void appendVerts(List<Vector3f> vertices, List<Vector2f> texCoord, List<Integer> indices, MeshFaceSide side) {
 		List<Vector3f> meshVerts = vertexGroups.get(side);
 		List<Vector2f> meshTexCoord = texCoordGroups.get(side);
 		List<Integer> meshIndices = indexGroups.get(side);
