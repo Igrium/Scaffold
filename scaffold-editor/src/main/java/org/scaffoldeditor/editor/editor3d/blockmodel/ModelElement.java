@@ -93,7 +93,7 @@ public class ModelElement {
 		rotation = new ElementRotation();
 		JSONObject rotationTag = element.optJSONObject("rotation");
 		if (rotationTag != null) {
-			rotation.origin = jsonArray3ToVector3(rotationTag.getJSONArray("origin"));
+			rotation.origin = jsonArray3ToVector3(rotationTag.getJSONArray("origin")).divide(16);
 			rotation.angle = element.getFloat("angle");
 			rotation.rescale = element.getBoolean("rescale");
 			
@@ -109,8 +109,8 @@ public class ModelElement {
 		
 		
 		// Parse from and to
-		from = jsonArray3ToVector3(element.getJSONArray("from"));
-		to = jsonArray3ToVector3(element.getJSONArray("to"));
+		from = jsonArray3ToVector3(element.getJSONArray("from")).divide(16);
+		to = jsonArray3ToVector3(element.getJSONArray("to")).divide(16);
 		
 		faces = element.getJSONObject("faces");
 		
