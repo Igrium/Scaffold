@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.scaffoldeditor.editor.editor3d.block.WorldManager;
+import org.scaffoldeditor.editor.editor3d.blockmodel.BlockModelLoader;
 import org.scaffoldeditor.editor.editor3d.test.Tester;
 import org.scaffoldeditor.editor.ui.EditorWindow;
 import org.scaffoldeditor.nbt.block.BlockWorld;
@@ -63,6 +64,8 @@ public class EditorApp extends SimpleApplication {
 		}
 		
 		getAssetManager().registerLocator("assets", ClasspathLocator.class); // Default assets
+		
+		getAssetManager().registerLoader(BlockModelLoader.class, "json");
 		
 		// Initialize block system
 		BlocksConfig.initialize(assetManager);
