@@ -94,12 +94,13 @@ public class ModelElement {
 		JSONObject rotationTag = element.optJSONObject("rotation");
 		if (rotationTag != null) {
 			rotation.origin = jsonArray3ToVector3(rotationTag.getJSONArray("origin")).divide(16);
-			rotation.angle = element.getFloat("angle");
-			rotation.rescale = element.getBoolean("rescale");
+			rotation.angle = rotationTag.getFloat("angle");
+						
+			rotation.rescale = rotationTag.optBoolean("rescale");
 			
-			String axisString = element.getString(element.getString("axis"));
+			String axisString = rotationTag.getString("axis");
 			if (axisString.matches("x")) {
-				rotation.axis = RotationAxis.X;
+				rotation.axis = RotationAxis.X;	
 			} else if (axisString.matches("y")) {
 				rotation.axis = RotationAxis.Y;
 			} else if (axisString.matches("z")) {
@@ -145,9 +146,9 @@ public class ModelElement {
 		
 		List<Vector3f> verts = Arrays.asList(new Vector3f[] {
 				getGlobalPosition(new Vector3f(from.x, to.y, from.z)),
-				getGlobalPosition(new Vector3f(to.x, to.y, from.z)),
-				getGlobalPosition(to),
-				getGlobalPosition(new Vector3f(from.x, to.y, to.z))
+				getGlobalPosition(new Vector3f(from.x, to.y, to.z)),
+				getGlobalPosition(new Vector3f(to.x, to.y, to.z)),
+				getGlobalPosition(new Vector3f(to.x, to.y, from.z))
 		});
 		
 		return createFace(verts, face);
@@ -164,10 +165,10 @@ public class ModelElement {
 		}
 		
 		List<Vector3f> verts = Arrays.asList(new Vector3f[] {
-				getGlobalPosition(new Vector3f(from.x, from.y, from.z)),
 				getGlobalPosition(new Vector3f(from.x, from.y, to.z)),
-				getGlobalPosition(new Vector3f(to.x, from.y, to.z)),
-				getGlobalPosition(new Vector3f(to.x, from.y, from.z))
+				getGlobalPosition(new Vector3f(from.x, from.y, from.z)),
+				getGlobalPosition(new Vector3f(to.x, from.y, from.z)),
+				getGlobalPosition(new Vector3f(to.x, from.y, to.z))
 		});
 		
 		return createFace(verts, face);

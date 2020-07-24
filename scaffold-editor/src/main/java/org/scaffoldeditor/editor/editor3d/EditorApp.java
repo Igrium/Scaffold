@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.scaffoldeditor.editor.editor3d.block.WorldManager;
+import org.scaffoldeditor.editor.editor3d.test.Tester;
 import org.scaffoldeditor.editor.ui.EditorWindow;
 import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.nbt.block.BlockWorld.ChunkCoordinate;
@@ -144,6 +145,14 @@ public class EditorApp extends SimpleApplication {
 		for (Entity3D ent3d : entities.values()) {
 			ent3d.refresh();
 		}
+	}
+	
+	/**
+	 * Runn the test code.
+	 * @see org.scaffoldeditor.editor.editor3d.test.Tester
+	 */
+	public void runTestCode() {
+		Tester.test(this);
 	}
 
 }

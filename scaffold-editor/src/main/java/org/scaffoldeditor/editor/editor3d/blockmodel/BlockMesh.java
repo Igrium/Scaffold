@@ -1,7 +1,7 @@
 package org.scaffoldeditor.editor.editor3d.blockmodel;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -9,33 +9,30 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.scaffoldeditor.editor.editor3d.blockmodel.ModelElement.Face;
 import org.scaffoldeditor.editor.editor3d.blockmodel.ModelElement.CullFace;
-import org.scaffoldeditor.editor.editor3d.util.EditorUtils;
-
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Mesh;
 import com.jme3.scene.VertexBuffer.Type;
 import com.jme3.util.BufferUtils;
+import com.rvandoosselaer.blocks.Chunk;
+import com.rvandoosselaer.blocks.ChunkMesh;
+import com.rvandoosselaer.blocks.Direction;
+import com.rvandoosselaer.blocks.Shape;
+import com.simsilica.mathd.Vec3i;
 
 /**
  * A mesh used to store there rendering data of a block model.
  * @author Sam54123
  */
-public class BlockMesh extends Mesh {
+public class BlockMesh extends Mesh implements Shape {
 	
-	
-	private class CreateFaceReturn {
-		public List<Vector2f> texCoords;
-		public List<Integer> indices;
-	}
-	
-	private List<ModelElement> elements;
+	private List<ModelElement> elements = new ArrayList<ModelElement>();
 	
 	// Keep track of everything that creates a mesh in different groups so they can be turned off.
 	// texCoord and indices are stored with respect to local array.
-	private Map<ModelElement.CullFace, List<Vector3f>> vertexGroups;
-	private Map<ModelElement.CullFace, List<Vector2f>> texCoordGroups;
-	private Map<ModelElement.CullFace, List<Integer>> indexGroups;
+	private Map<ModelElement.CullFace, List<Vector3f>> vertexGroups = new HashMap<ModelElement.CullFace, List<Vector3f>>();
+	private Map<ModelElement.CullFace, List<Vector2f>> texCoordGroups = new HashMap<ModelElement.CullFace, List<Vector2f>>();
+	private Map<ModelElement.CullFace, List<Integer>> indexGroups = new HashMap<ModelElement.CullFace, List<Integer>>();
 	
 	public BlockMesh() {};
 	
@@ -91,31 +88,33 @@ public class BlockMesh extends Mesh {
 		List<Vector2f> texCoordBuffer = new ArrayList<Vector2f>();
 		List<Integer> indexBuffer = new ArrayList<Integer>();
 		
-		if (upVisible) {
+		if (upVisible && vertexGroups.containsKey(CullFace.UP)) {
 			addVertsToBuffers(vertBuffer, texCoordBuffer, indexBuffer, vertexGroups.get(CullFace.UP),  texCoordGroups.get(CullFace.UP), indexGroups.get(CullFace.UP));
 		}
 		
-		if (downVisible) {
+		if (downVisible && vertexGroups.containsKey(CullFace.DOWN)) {
 			addVertsToBuffers(vertBuffer, texCoordBuffer, indexBuffer, vertexGroups.get(CullFace.DOWN),  texCoordGroups.get(CullFace.DOWN), indexGroups.get(CullFace.DOWN));
 		}
 		
-		if (northVisible) {
+		if (northVisible && vertexGroups.containsKey(CullFace.NORTH)) {
 			addVertsToBuffers(vertBuffer, texCoordBuffer, indexBuffer, vertexGroups.get(CullFace.NORTH),  texCoordGroups.get(CullFace.NORTH), indexGroups.get(CullFace.NORTH));
 		}
 		
-		if (southVisible) {
+		if (southVisible && vertexGroups.containsKey(CullFace.SOUTH)) {
 			addVertsToBuffers(vertBuffer, texCoordBuffer, indexBuffer, vertexGroups.get(CullFace.SOUTH),  texCoordGroups.get(CullFace.SOUTH), indexGroups.get(CullFace.SOUTH));
 		}
 		
-		if (eastVisible) {
+		if (eastVisible && vertexGroups.containsKey(CullFace.EAST)) {
 			addVertsToBuffers(vertBuffer, texCoordBuffer, indexBuffer, vertexGroups.get(CullFace.EAST),  texCoordGroups.get(CullFace.EAST), indexGroups.get(CullFace.EAST));
 		}
 		
-		if (westVisible) {
+		if (westVisible && vertexGroups.containsKey(CullFace.WEST)) {
 			addVertsToBuffers(vertBuffer, texCoordBuffer, indexBuffer, vertexGroups.get(CullFace.WEST),  texCoordGroups.get(CullFace.WEST), indexGroups.get(CullFace.WEST));
 		}
 		
-		addVertsToBuffers(vertBuffer, texCoordBuffer, indexBuffer, vertexGroups.get(CullFace.NONE),  texCoordGroups.get(CullFace.NONE), indexGroups.get(CullFace.NONE));
+		if (vertexGroups.containsKey(CullFace.NONE)) {
+			addVertsToBuffers(vertBuffer, texCoordBuffer, indexBuffer, vertexGroups.get(CullFace.NONE),  texCoordGroups.get(CullFace.NONE), indexGroups.get(CullFace.NONE));
+		}
 		
 		mesh.setBuffer(Type.Position, 3, BufferUtils.createFloatBuffer(vertBuffer.toArray(new Vector3f[vertBuffer.size()])));
 		mesh.setBuffer(Type.TexCoord, 2, BufferUtils.createFloatBuffer(texCoordBuffer.toArray(new Vector2f[texCoordBuffer.size()])));
@@ -129,6 +128,21 @@ public class BlockMesh extends Mesh {
 			array[i] = list.get(i);
 		}
 		return array;
+	}
+	
+	@Override
+	public void add(Vec3i location, Chunk chunk, ChunkMesh chunkMesh) {
+		Mesh mesh = new Mesh();
+		boolean upVisible = chunk.isFaceVisible(location, Direction.TOP);
+		boolean downVisible = chunk.isFaceVisible(location, Direction.BOTTOM);
+		boolean northVisible = chunk.isFaceVisible(location, Direction.FRONT);
+		boolean southVisible = chunk.isFaceVisible(location, Direction.BACK);
+		boolean eastVisible = chunk.isFaceVisible(location, Direction.LEFT);
+		boolean westVisible = chunk.isFaceVisible(location, Direction.RIGHT); // East and west may have to be flipped.
+		
+		compileMesh(mesh, upVisible, downVisible, northVisible, southVisible, eastVisible, westVisible);
+		
+		
 	}
 	
 	

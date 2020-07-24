@@ -63,6 +63,9 @@ public class EditorWindow extends JFrame {
 	private String desiredTitle = "";
 	private JMenuItem mntmNewEntity;
 	
+	private JMenu devMenu;
+	private JMenuItem mntmTestCode;
+	
 	
 	/**
 	 * Get the loaded project.
@@ -244,6 +247,16 @@ public class EditorWindow extends JFrame {
 			
 		});
 		
+		devMenu = new JMenu("Developer");
+		mntmTestCode = new JMenuItem("Run Test Code");
+		mntmTestCode.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				runTestCode();
+			}
+		});
+		devMenu.add(mntmTestCode);
+		menuBar.add(devMenu);
+		
 	}
 	
 	/**
@@ -422,6 +435,14 @@ public class EditorWindow extends JFrame {
 	public void showLevelInfo() {
 		LevelInfo levelInfo = new LevelInfo(this);
 		levelInfo.setVisible(true);
+	}
+	
+	public void runTestCode() {
+		try {
+			get3dApp().runTestCode();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	protected JMenuItem getMntmSave() {
