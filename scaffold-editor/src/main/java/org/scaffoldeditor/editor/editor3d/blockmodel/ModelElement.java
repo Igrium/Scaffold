@@ -280,12 +280,31 @@ public class ModelElement {
 		
 		JSONArray texCoords = face.optJSONArray("uv");
 		
-		// TODO: Make sure UVs are being added correctly.
+		// Add UVs
 		if (texCoords != null) {
-			ret.texCoords.add(new Vector2f(texCoords.getFloat(0), texCoords.getFloat(1)));
-			ret.texCoords.add(new Vector2f(texCoords.getFloat(2), texCoords.getFloat(1)));
-			ret.texCoords.add(new Vector2f(texCoords.getFloat(2), texCoords.getFloat(3)));
-			ret.texCoords.add(new Vector2f(texCoords.getFloat(0), texCoords.getFloat(3)));
+			
+			Vector2f vec1 = new Vector2f(texCoords.getFloat(0), texCoords.getFloat(1));
+			Vector2f vec2 = new Vector2f(texCoords.getFloat(2), texCoords.getFloat(3));
+			
+			Vector2f vector1 = new Vector2f(vec2.x, vec1.y).divide(16);
+			Vector2f vector2 = vec1.divide(16);
+			Vector2f vector3 = new Vector2f(vec1.x, vec2.y).divide(16);
+			Vector2f vector4 = vec2.divide(16);
+			
+			// Workaround for a bug causing uvs to be upsidedown
+			ret.texCoords.add(new Vector2f(vector2.x, 1-vector2.y));
+			ret.texCoords.add(new Vector2f(vector3.x, 1-vector3.y));
+			ret.texCoords.add(new Vector2f(vector4.x, 1-vector4.y));
+			ret.texCoords.add(new Vector2f(vector1.x, 1-vector1.y));
+			
+			int rotation = 0;
+			if (face.has("rotation")) {
+				rotation = (int) (face.optFloat("rotation") / 90);
+			}	
+			
+			cycleList(ret.texCoords, rotation);
+			
+			
 		} else {
 			ret.texCoords.add(new Vector2f(0, 0));
 			ret.texCoords.add(new Vector2f(1, 0));
@@ -341,5 +360,27 @@ public class ModelElement {
 		return new Vector3f(array.getFloat(0), array.getFloat(1), array.getFloat(2));
 	}
 	
-	
+	private static void cycleList(List<Vector2f> list, int amount) {
+		if (amount == 0) {
+			return;
+		} else {
+			List<Vector2f> templist = new ArrayList<Vector2f>(list);
+			if (amount == 1) {
+				list.set(0, templist.get(1));
+				list.set(1, templist.get(2));
+				list.set(2, templist.get(3));
+				list.set(3, templist.get(0));
+			} else if (amount == 2) {
+				list.set(0, templist.get(2));
+				list.set(1, templist.get(3));
+				list.set(2, templist.get(0));
+				list.set(3, templist.get(1));
+			} else if (amount == 3) {
+				list.set(0, templist.get(3));
+				list.set(1, templist.get(0));
+				list.set(2, templist.get(1));
+				list.set(3, templist.get(2));
+			}
+		}
+	}
 }

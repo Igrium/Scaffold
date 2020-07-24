@@ -14,6 +14,8 @@ import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.scene.Geometry;
+import com.jme3.texture.Texture;
+import com.jme3.texture.Texture.MagFilter;
 
 /**
  * The tester is a place to put 3d view test methods without congesting the code.
@@ -41,7 +43,9 @@ public class Tester {
 			Geometry model = new Geometry("model", mesh);
 			
 			Material mat1 = new Material(app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-			mat1.setTexture("ColorMap", app.getAssetManager().loadTexture("testTexture.png"));
+			Texture tex = app.getAssetManager().loadTexture("testTexture.png");
+			tex.setMagFilter(MagFilter.Nearest);
+			mat1.setTexture("ColorMap", tex);
 			model.setMaterial(mat1);
 			
 			app.getRootNode().attachChild(model);
