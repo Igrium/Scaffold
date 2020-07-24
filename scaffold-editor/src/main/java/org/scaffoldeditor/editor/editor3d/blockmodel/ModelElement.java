@@ -326,11 +326,11 @@ public class ModelElement {
 	private void setupRotation() {
 		if (rotation != null) {
 			if (rotation.axis == RotationAxis.X) {
-				rotatedSpatial.rotate(rotation.angle, 0, 0);
+				rotatedSpatial.rotate((float) Math.toRadians(rotation.angle), 0, 0);
 			} else if (rotation.axis == RotationAxis.Y) {
-				rotatedSpatial.rotate(0, rotation.angle, 0);
+				rotatedSpatial.rotate(0, (float) Math.toRadians(rotation.angle), 0);
 			} else if (rotation.axis == RotationAxis.Z) {
-				rotatedSpatial.rotate(0, 0, rotation.angle);
+				rotatedSpatial.rotate(0, 0, (float) Math.toRadians(rotation.angle));
 			}
 			
 			rotatedSpatial.setLocalTranslation(rotation.origin);

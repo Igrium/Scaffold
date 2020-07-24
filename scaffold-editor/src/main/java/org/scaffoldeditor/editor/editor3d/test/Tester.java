@@ -10,6 +10,7 @@ import org.scaffoldeditor.editor.editor3d.blockmodel.BlockMesh;
 import org.scaffoldeditor.scaffold.core.Project;
 import org.scaffoldeditor.scaffold.util.JSONUtils;
 
+import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.scene.Geometry;
@@ -40,7 +41,7 @@ public class Tester {
 			Geometry model = new Geometry("model", mesh);
 			
 			Material mat1 = new Material(app.getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-			mat1.setColor("Color", ColorRGBA.Gray);
+			mat1.setTexture("ColorMap", app.getAssetManager().loadTexture("testTexture.png"));
 			model.setMaterial(mat1);
 			
 			app.getRootNode().attachChild(model);
