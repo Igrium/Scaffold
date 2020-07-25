@@ -23,6 +23,7 @@ public class MeshRegistry {
 	 */
 	public void registerMesh(String key, BlockMesh mesh) {
 		registry.put(key, mesh);
+		System.out.println(registry); // TESTING ONLY
 	}
 	
 	/**

@@ -22,9 +22,10 @@ import com.simsilica.mathd.Vec3i;
 
 /**
  * A mesh used to store there rendering data of a block model.
- * @author Sam54123
+ * @author Igrium
  */
 public class BlockMesh extends Mesh implements Shape {
+	
 	
 	private List<ModelElement> elements = new ArrayList<ModelElement>();
 	
@@ -84,55 +85,58 @@ public class BlockMesh extends Mesh implements Shape {
 	public void compileMesh(Mesh mesh, boolean upVisible, boolean downVisible,
 			boolean northVisible, boolean southVisible, boolean eastVisible, boolean westVisible) {
 		
-		List<Vector3f> vertBuffer = new ArrayList<Vector3f>();
-		List<Vector2f> texCoordBuffer = new ArrayList<Vector2f>();
-		List<Integer> indexBuffer = new ArrayList<Integer>();
+		LightMesh lMesh = compileMesh(upVisible, downVisible, northVisible, southVisible, eastVisible, westVisible);
+		lMesh.toMesh(mesh);	
+	}
+	
+	/**
+	 * Compile the block mesh into a light mesh.
+	 * @param upVisible Is the top face visible?
+	 * @param downVisible Is the bottom face visible?
+	 * @param northVisible Is the north face visible?
+	 * @param southVisible Is the south face visible?
+	 * @param eastVisible Is the east face visible?
+	 * @param westVisible Is the west face visible?
+	 * @return Compiled light mesh.
+	 */
+	public LightMesh compileMesh(boolean upVisible, boolean downVisible,
+			boolean northVisible, boolean southVisible, boolean eastVisible, boolean westVisible) {
+		LightMesh lMesh = new LightMesh();
 		
+
 		if (upVisible && vertexGroups.containsKey(CullFace.UP)) {
-			addVertsToBuffers(vertBuffer, texCoordBuffer, indexBuffer, vertexGroups.get(CullFace.UP),  texCoordGroups.get(CullFace.UP), indexGroups.get(CullFace.UP));
+			addVertsToBuffers(lMesh.vertBuffer, lMesh.texCoordBuffer, lMesh.indexBuffer, vertexGroups.get(CullFace.UP),  texCoordGroups.get(CullFace.UP), indexGroups.get(CullFace.UP));
 		}
 		
 		if (downVisible && vertexGroups.containsKey(CullFace.DOWN)) {
-			addVertsToBuffers(vertBuffer, texCoordBuffer, indexBuffer, vertexGroups.get(CullFace.DOWN),  texCoordGroups.get(CullFace.DOWN), indexGroups.get(CullFace.DOWN));
+			addVertsToBuffers(lMesh.vertBuffer, lMesh.texCoordBuffer, lMesh.indexBuffer, vertexGroups.get(CullFace.DOWN),  texCoordGroups.get(CullFace.DOWN), indexGroups.get(CullFace.DOWN));
 		}
 		
 		if (northVisible && vertexGroups.containsKey(CullFace.NORTH)) {
-			addVertsToBuffers(vertBuffer, texCoordBuffer, indexBuffer, vertexGroups.get(CullFace.NORTH),  texCoordGroups.get(CullFace.NORTH), indexGroups.get(CullFace.NORTH));
+			addVertsToBuffers(lMesh.vertBuffer, lMesh.texCoordBuffer, lMesh.indexBuffer, vertexGroups.get(CullFace.NORTH),  texCoordGroups.get(CullFace.NORTH), indexGroups.get(CullFace.NORTH));
 		}
 		
 		if (southVisible && vertexGroups.containsKey(CullFace.SOUTH)) {
-			addVertsToBuffers(vertBuffer, texCoordBuffer, indexBuffer, vertexGroups.get(CullFace.SOUTH),  texCoordGroups.get(CullFace.SOUTH), indexGroups.get(CullFace.SOUTH));
+			addVertsToBuffers(lMesh.vertBuffer, lMesh.texCoordBuffer, lMesh.indexBuffer, vertexGroups.get(CullFace.SOUTH),  texCoordGroups.get(CullFace.SOUTH), indexGroups.get(CullFace.SOUTH));
 		}
 		
 		if (eastVisible && vertexGroups.containsKey(CullFace.EAST)) {
-			addVertsToBuffers(vertBuffer, texCoordBuffer, indexBuffer, vertexGroups.get(CullFace.EAST),  texCoordGroups.get(CullFace.EAST), indexGroups.get(CullFace.EAST));
+			addVertsToBuffers(lMesh.vertBuffer, lMesh.texCoordBuffer, lMesh.indexBuffer, vertexGroups.get(CullFace.EAST),  texCoordGroups.get(CullFace.EAST), indexGroups.get(CullFace.EAST));
 		}
 		
 		if (westVisible && vertexGroups.containsKey(CullFace.WEST)) {
-			addVertsToBuffers(vertBuffer, texCoordBuffer, indexBuffer, vertexGroups.get(CullFace.WEST),  texCoordGroups.get(CullFace.WEST), indexGroups.get(CullFace.WEST));
+			addVertsToBuffers(lMesh.vertBuffer, lMesh.texCoordBuffer, lMesh.indexBuffer, vertexGroups.get(CullFace.WEST),  texCoordGroups.get(CullFace.WEST), indexGroups.get(CullFace.WEST));
 		}
 		
 		if (vertexGroups.containsKey(CullFace.NONE)) {
-			addVertsToBuffers(vertBuffer, texCoordBuffer, indexBuffer, vertexGroups.get(CullFace.NONE),  texCoordGroups.get(CullFace.NONE), indexGroups.get(CullFace.NONE));
+			addVertsToBuffers(lMesh.vertBuffer, lMesh.texCoordBuffer, lMesh.indexBuffer, vertexGroups.get(CullFace.NONE),  texCoordGroups.get(CullFace.NONE), indexGroups.get(CullFace.NONE));
 		}
 		
-		mesh.setBuffer(Type.Position, 3, BufferUtils.createFloatBuffer(vertBuffer.toArray(new Vector3f[vertBuffer.size()])));
-		mesh.setBuffer(Type.TexCoord, 2, BufferUtils.createFloatBuffer(texCoordBuffer.toArray(new Vector2f[texCoordBuffer.size()])));
-		mesh.setBuffer(Type.Index, 3, BufferUtils.createIntBuffer(integerListToInt(indexBuffer)));
-		mesh.updateBound();
-	}
-	
-	private int[] integerListToInt(List<Integer> list) {
-		int[] array = new int[list.size()];
-		for (int i = 0; i < array.length; i++) {
-			array[i] = list.get(i);
-		}
-		return array;
+		return lMesh;
 	}
 	
 	@Override
 	public void add(Vec3i location, Chunk chunk, ChunkMesh chunkMesh) {
-		Mesh mesh = new Mesh();
 		boolean upVisible = chunk.isFaceVisible(location, Direction.TOP);
 		boolean downVisible = chunk.isFaceVisible(location, Direction.BOTTOM);
 		boolean northVisible = chunk.isFaceVisible(location, Direction.FRONT);
@@ -140,8 +144,8 @@ public class BlockMesh extends Mesh implements Shape {
 		boolean eastVisible = chunk.isFaceVisible(location, Direction.LEFT);
 		boolean westVisible = chunk.isFaceVisible(location, Direction.RIGHT); // East and west may have to be flipped.
 		
-		compileMesh(mesh, upVisible, downVisible, northVisible, southVisible, eastVisible, westVisible);
-		
+		LightMesh mesh = compileMesh(upVisible, downVisible, northVisible, southVisible, eastVisible, westVisible);
+		BlockMeshUtils.addMesh(mesh, location, chunkMesh, 1.0f);
 		
 	}
 	
@@ -236,19 +240,6 @@ public class BlockMesh extends Mesh implements Shape {
 		}
 		
 		indexBuffer.addAll(correctedIndices);
-	}
-	
-	private static float[] jsonToFloatArray(JSONArray in) {
-		if (in == null) {
-			return null;
-		}
-		
-		float[] array = new float[in.length()];
-		
-		for (int i = 0; i < in.length(); i++) {
-			array[i] = in.getFloat(i);
-		}
-		return array;
 	}
 	
 }

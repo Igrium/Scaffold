@@ -46,7 +46,6 @@ public class BlockModelLoader implements AssetLoader {
 	 * @throws IOException If an IO exception occurs in parent finding.
 	 */
 	public Geometry loadGeom(JSONObject object, AssetInfo assetInfo, String name) throws IOException {
-		// TODO: integrate with shape registry for optimization.
 		
 		BlockMesh mesh = loadMesh(object, assetInfo.getManager(), assetInfo.getKey().getName());
 		
@@ -56,14 +55,18 @@ public class BlockModelLoader implements AssetLoader {
 		JSONObject textures = object.optJSONObject("textures");
 		Material mat = new Material(assetInfo.getManager(), "Common/MatDefs/Misc/Unshaded.j3md");
 		
-		if (textures != null) {
-			String texString = textures.getString("0");
-			Texture tex = assetInfo.getManager().loadTexture("textures/"+texString+".png");
+		
+		try {
+			String texString = textures.getString((String) textures.keySet().toArray()[0]); // TODO: make this better
+			String texMCPath = "textures/"+texString+".png";
+			Texture tex = assetInfo.getManager().loadTexture(Paths.get(scaffoldAssetManager.getNamespace(texMCPath), texMCPath).toString());
 			tex.setMagFilter(MagFilter.Nearest);
 			mat.setTexture("ColorMap", tex);
-		} else {
+		} catch (Exception e) {
+			e.printStackTrace();
 			mat.setColor("Color", ColorRGBA.Red);
 		}
+
 		
 		geom.setMaterial(mat);
 		
@@ -96,7 +99,7 @@ public class BlockModelLoader implements AssetLoader {
 			
 		} else if (object.has("parent")) {
 			// Get JME path of parent.
-			String parent = object.getString("parent");
+			String parent = object.getString("parent")+".json";
 			String parentNamespace = scaffoldAssetManager.getNamespace("models/"+parent);
 			String parentPath = Paths.get(parentNamespace, "models", parent).toString();
 			

@@ -212,7 +212,7 @@ public class AssetManager {
 		}
 		
 		for (String namespace : namespaces) {
-			if (findAsset(convertAssetPath(path, namespace).toString()) != null) {
+			if (findAsset(convertAssetPath(path, namespace).toString(), true) != null) {
 				namespaceCache.put(path, namespace);
 				return namespace;
 			}	
