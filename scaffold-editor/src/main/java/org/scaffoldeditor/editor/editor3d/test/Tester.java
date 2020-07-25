@@ -23,7 +23,6 @@ public class Tester {
 		
 		Chunk chunk = new Chunk(new Vec3i(0,0,0));
 		
-		Block block1 = Block.builder().name("stair1").build();
 		
 		Spatial model = app.getAssetManager().loadModel("minecraft/models/block/cobblestone_stairs.json");
 		Spatial model2 = app.getAssetManager().loadModel("minecraft/models/block/birch_stairs.json");
