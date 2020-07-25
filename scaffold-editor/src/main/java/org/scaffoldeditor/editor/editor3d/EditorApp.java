@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.scaffoldeditor.editor.editor3d.block.WorldManager;
 import org.scaffoldeditor.editor.editor3d.blockmodel.BlockModelLoader;
+import org.scaffoldeditor.editor.editor3d.blockmodel.MeshRegistry;
 import org.scaffoldeditor.editor.editor3d.test.Tester;
 import org.scaffoldeditor.editor.ui.EditorWindow;
 import org.scaffoldeditor.nbt.block.BlockWorld;
@@ -29,10 +30,25 @@ import com.simsilica.mathd.Vec3i;
  */
 public class EditorApp extends SimpleApplication {
 	
+	/**
+	 * The last instance that was created.
+	 */
+	private static EditorApp instance;
+	
+	/**
+	 * Get the last instance that was created.
+	 * @return Instance of EditorApp.
+	 */
+	public static EditorApp getInstance() {
+		return instance;
+	}
+	
 	private EditorWindow parent;
 	
 	// Maps entity3ds to their entity counterparts.
 	private Map<Entity, Entity3D> entities = new HashMap<Entity, Entity3D>();
+	
+	private MeshRegistry meshRegistry;
 	
 	/**
 	 * Get this app's parent window.
@@ -42,12 +58,17 @@ public class EditorApp extends SimpleApplication {
 		return parent;
 	}
 	
+	public MeshRegistry getMeshRegistry() {
+		return meshRegistry;
+	}
+	
 	/**
 	 * Create an editor app.
 	 * @param parent Parent window.
 	 */
 	public EditorApp(EditorWindow parent) {
 		this.parent = parent;
+		instance = this;
 	}
 	
 	
@@ -70,6 +91,8 @@ public class EditorApp extends SimpleApplication {
 		// Initialize block system
 		BlocksConfig.initialize(assetManager);
 		BlocksConfig.getInstance().setChunkSize(new Vec3i(Chunk.WIDTH, Chunk.HEIGHT, Chunk.LENGTH));
+		
+		meshRegistry = new MeshRegistry();
 		
 		reload();
 	}

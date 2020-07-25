@@ -17,7 +17,7 @@ public class Tester {
 		Project project = app.getParent().getProject();
 
 		
-		Spatial model = app.getAssetManager().loadModel("testModel.json");
+		Spatial model = app.getAssetManager().loadModel("models/testModel.json");
 		
 		app.getRootNode().attachChild(model);
 	}

@@ -3,7 +3,6 @@ package org.scaffoldeditor.scaffold.core;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -112,7 +111,7 @@ public class AssetManager {
 	/**
 	 * Cache of loaded json objects.
 	 */
-	protected Map<String, JSONObject> jsonCache = new HashMap<String, JSONObject>();
+	protected Map<Path, JSONObject> jsonCache = new HashMap<Path, JSONObject>();
 	
 
 	/**
@@ -121,11 +120,11 @@ public class AssetManager {
 	 * @return Contents of JSON file.
 	 * @throws IOException If an IO exception occurs.
 	 */
-	public JSONObject loadJSON(String assetPath) throws IOException {
+	public JSONObject loadJSON(Path assetPath) throws IOException {
 		if (jsonCache.containsKey(assetPath)) {
 			return jsonCache.get(assetPath);
 		}
-		Path fullPath = findAsset(assetPath);
+		Path fullPath = findAsset(assetPath.toString());
 		JSONObject object = JSONUtils.loadJSON(fullPath);
 		jsonCache.put(assetPath, object);
 		return object;
@@ -138,7 +137,7 @@ public class AssetManager {
 	 * @return Contents of the JSON file
 	 * @throws IOException If an IO exception occurs.
 	 */
-	public JSONObject loadJSON(String assetPath, InputStream is) throws IOException {
+	public JSONObject loadJSON(Path assetPath, InputStream is) throws IOException {
 		if (jsonCache.containsKey(assetPath)) {
 			return jsonCache.get(assetPath);
 		}
@@ -150,17 +149,17 @@ public class AssetManager {
 	/**
 	 * Remove a JSON file from the cache.
 	 * @param assetPath File to remove.
-	 * @return The previous data that was assosiated with the file, if any.
+	 * @return The previous data that was associated with the file, if any.
 	 */
-	public JSONObject removeJSON(String assetPath) {
+	public JSONObject removeJSON(Path assetPath) {
 		return jsonCache.remove(assetPath);
 	}
 	
 	/**
-	 * Get a set of all the assets that have been cached.
+	 * Get a set of all the JSON assets that have been cached.
 	 * @return Cached asset paths.
 	 */
-	public Set<String> cachedFiles() {
+	public Set<Path> cachedJSON() {
 		return jsonCache.keySet();
 	}
 	
