@@ -1,9 +1,19 @@
 package org.scaffoldeditor.scaffold.core;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.json.JSONObject;
+import org.scaffoldeditor.scaffold.util.JSONUtils;
 
 /**
  * This class takes care of working with paths and loading assets in the guise of the project folder
@@ -17,13 +27,14 @@ public class AssetManager {
 	public Project getProject() {
 		return project;
 	}
-	
+		
 	/**
 	 * Initialize an asset manager with a project
 	 * @param project Project to initialize with
 	 */
 	public AssetManager(Project project) {
 		this.project = project;
+		loadAssetNamespaces();
 	}
 	
 	/**
@@ -65,12 +76,22 @@ public class AssetManager {
 	}
 	
 	/**
-	 * Search in loaded paths for an asset. Returns null if asset cannot be found.
+	 * Search in loaded paths for an asset.
 	 * @param assetPath Relative path to asset to find.
-	 * @return Absolute path to asset
+	 * @return Absolute path to asset. Null if asset cannot be found.
 	 */
 	public Path findAsset(String assetPath) {
+		return findAsset(assetPath, false);
 		
+	}
+	
+	/**
+	 * Search in loaded paths for an asset.
+	 * @param assetPath Relative path to asset to find.
+	 * @param suppressError Whether to suppress the "unable to find asset" message.
+	 * @return Absolute path to asset. Null if asset cannot be found.
+	 */
+	public Path findAsset(String assetPath, boolean suppressError) {
 		ArrayList<Path> loadedPaths = getLoadedPaths();
 		
 		// Look in order from first to last in list
@@ -80,8 +101,124 @@ public class AssetManager {
 			}
 		}
 		
-		System.out.println("Unable to find asset "+assetPath);
+		if (!suppressError) {
+			System.out.println("Unable to find asset "+assetPath);
+		}
 		return null;
 	}
 	
+	// CACHE
+	
+	/**
+	 * Cache of loaded json objects.
+	 */
+	protected Map<String, JSONObject> jsonCache = new HashMap<String, JSONObject>();
+	
+
+	/**
+	 * Load a JSON file into memory. If the file is already loaded, retrieve it from memory.
+	 * @param assetPath Path to the file to load.
+	 * @return Contents of JSON file.
+	 * @throws IOException If an IO exception occurs.
+	 */
+	public JSONObject loadJSON(String assetPath) throws IOException {
+		if (jsonCache.containsKey(assetPath)) {
+			return jsonCache.get(assetPath);
+		}
+		Path fullPath = findAsset(assetPath);
+		JSONObject object = JSONUtils.loadJSON(fullPath);
+		jsonCache.put(assetPath, object);
+		return object;
+	}
+	
+	/**
+	 * Force a JSON file into memory from an input stream. If the file is already loaded, retrieve it from memory.
+	 * @param assetPath Path name to load the file under.
+	 * @param is Input stream to load from.
+	 * @return Contents of the JSON file
+	 * @throws IOException If an IO exception occurs.
+	 */
+	public JSONObject loadJSON(String assetPath, InputStream is) throws IOException {
+		if (jsonCache.containsKey(assetPath)) {
+			return jsonCache.get(assetPath);
+		}
+		JSONObject object = JSONUtils.loadJSON(is);
+		jsonCache.put(assetPath, object);
+		return object;
+	}
+	
+	/**
+	 * Remove a JSON file from the cache.
+	 * @param assetPath File to remove.
+	 * @return The previous data that was assosiated with the file, if any.
+	 */
+	public JSONObject removeJSON(String assetPath) {
+		return jsonCache.remove(assetPath);
+	}
+	
+	/**
+	 * Get a set of all the assets that have been cached.
+	 * @return Cached asset paths.
+	 */
+	public Set<String> cachedFiles() {
+		return jsonCache.keySet();
+	}
+	
+	// ASSET LOCATOR
+	
+	/**
+	 * All the loaded namespaces.
+	 */
+	protected List<String> namespaces = new ArrayList<String>();
+	
+	/**
+	 * A map mapping resourcepack asset paths to the namespace they were found under.
+	 */
+	protected Map<String, String> namespaceCache = new HashMap<String, String>();
+	
+	/**
+	 * Scan the assets folder and load any namespaces it finds.
+	 */
+	protected void loadAssetNamespaces() {
+		namespaces.add("minecraft");
+		for (Path p : getLoadedPaths()) {
+			File[] directories = p.resolve("assets").toFile().listFiles(File::isDirectory);
+			for (File f : directories) {
+				String name = f.getName();
+				if (!namespaces.contains(name)) {
+					namespaces.add(name);
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Convert a resourcepack asset path to a valid Scaffold asset path.
+	 * @param path Resourcepack asset path.
+	 * @param namespace Namespace to use.
+	 * @return Scaffold path.
+	 */
+	public Path convertAssetPath(String path, String namespace) {
+		return Paths.get("assets", namespace, path);
+	}
+	
+	/**
+	 * Find the namespace a resourcepack file is under.
+	 * @param path Path to the file (under namespace)
+	 * @return File namespace.
+	 */
+	public String getNamespace(String path) {
+		if (namespaceCache.containsKey(path)) {
+			return namespaceCache.get(path);
+		}
+		
+		for (String namespace : namespaces) {
+			if (findAsset(convertAssetPath(path, namespace).toString()) != null) {
+				namespaceCache.put(path, namespace);
+				return namespace;
+			}	
+		}
+		namespaceCache.put(path, "minecraft");
+		return "minecraft";
+	}
 }
