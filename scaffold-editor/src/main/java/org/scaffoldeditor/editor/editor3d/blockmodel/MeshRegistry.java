@@ -9,11 +9,14 @@ import org.json.JSONObject;
 import org.scaffoldeditor.editor.editor3d.EditorApp;
 import org.scaffoldeditor.editor.editor3d.util.EditorUtils;
 
+import com.rvandoosselaer.blocks.Shape;
+import com.rvandoosselaer.blocks.ShapeRegistry;
+
 /**
  * Keeps track of block meshes in relation to their JSON files.
  * @author Igrium
  */
-public class MeshRegistry {
+public class MeshRegistry extends ShapeRegistry {
 	private Map<String, BlockMesh> registry = new HashMap<String, BlockMesh>() ;
 	
 	/**
@@ -69,4 +72,16 @@ public class MeshRegistry {
 			return mesh;
 		}
 	}
+	
+	@Override
+	public Shape get(String name) {
+		System.out.println("Pulling from custom shape registry");
+		try {
+			return loadMesh(name);
+		} catch (IOException e) {
+			System.out.println("Cannot load mesh file "+name+". Falling back to JME Blocks shape registry.");
+			return super.get(name);
+		}
+	}
+	
 }

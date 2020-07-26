@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.scaffoldeditor.editor.editor3d.block.BlockManager;
 import org.scaffoldeditor.editor.editor3d.block.WorldManager;
 import org.scaffoldeditor.editor.editor3d.blockmodel.BlockModelLoader;
 import org.scaffoldeditor.editor.editor3d.blockmodel.MeshRegistry;
@@ -22,6 +23,7 @@ import com.jme3.asset.plugins.FileLocator;
 import com.jme3.light.AmbientLight;
 import com.jme3.scene.Spatial;
 import com.rvandoosselaer.blocks.BlocksConfig;
+import com.rvandoosselaer.blocks.FacesMeshGenerator;
 import com.simsilica.mathd.Vec3i;
 
 /**
@@ -49,6 +51,7 @@ public class EditorApp extends SimpleApplication {
 	private Map<Entity, Entity3D> entities = new HashMap<Entity, Entity3D>();
 	
 	private MeshRegistry meshRegistry;
+	private BlockManager blockManager;
 	
 	/**
 	 * Get this app's parent window.
@@ -60,6 +63,10 @@ public class EditorApp extends SimpleApplication {
 	
 	public MeshRegistry getMeshRegistry() {
 		return meshRegistry;
+	}
+	
+	public BlockManager getBlockManager() {
+		return blockManager;
 	}
 	
 	/**
@@ -89,10 +96,18 @@ public class EditorApp extends SimpleApplication {
 		getAssetManager().registerLoader(BlockModelLoader.class, "json");
 		
 		// Initialize block system
+		
+		
 		BlocksConfig.initialize(assetManager);
 		BlocksConfig.getInstance().setChunkSize(new Vec3i(Chunk.WIDTH, Chunk.HEIGHT, Chunk.LENGTH));
 		
 		meshRegistry = new MeshRegistry();
+		BlocksConfig.getInstance().setShapeRegistry(meshRegistry);
+		
+		// The chunk mesh generator must be re-instantiated after setShapeRegistry()
+		BlocksConfig.getInstance().setChunkMeshGenerator(new FacesMeshGenerator(meshRegistry, BlocksConfig.getInstance().getTypeRegistry()));
+		
+		blockManager = new BlockManager();
 		
 		reload();
 	}

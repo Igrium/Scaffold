@@ -5,7 +5,9 @@ import org.scaffoldeditor.scaffold.core.Project;
 import com.jme3.scene.Spatial;
 import com.rvandoosselaer.blocks.Block;
 import com.rvandoosselaer.blocks.BlockIds;
+import com.rvandoosselaer.blocks.BlocksConfig;
 import com.rvandoosselaer.blocks.Chunk;
+import com.rvandoosselaer.blocks.ChunkMeshGenerator;
 import com.rvandoosselaer.blocks.ShapeIds;
 import com.simsilica.mathd.Vec3i;
 
@@ -23,13 +25,25 @@ public class Tester {
 		
 		Chunk chunk = new Chunk(new Vec3i(0,0,0));
 		
+		Block block1 = app.getBlockManager().get("minecraft/models/block/cobblestone_stairs.json");
+		Block block2 = app.getBlockManager().get("minecraft/models/block/birch_stairs.json");
 		
-		Spatial model = app.getAssetManager().loadModel("minecraft/models/block/cobblestone_stairs.json");
-		Spatial model2 = app.getAssetManager().loadModel("minecraft/models/block/birch_stairs.json");
+		chunk.addBlock(0, 0, 0, block1);
+		chunk.addBlock(new Vec3i(0,0,1), block2);
 		
-		model2.setLocalTranslation(0, 0, 1);
+		ChunkMeshGenerator meshGenerator = BlocksConfig.getInstance().getChunkMeshGenerator();
+		chunk.createNode(meshGenerator);
 		
-		app.getRootNode().attachChild(model);
-		app.getRootNode().attachChild(model2);
+		app.getRootNode().attachChild(chunk.getNode());
+				
+//		Spatial model = app.getAssetManager().loadModel("minecraft/models/block/cobblestone_stairs.json");
+//		Spatial model2 = app.getAssetManager().loadModel("minecraft/models/block/birch_stairs.json");
+//		
+//		model2.setLocalTranslation(0, 0, 1);
+//		
+//		app.getRootNode().attachChild(model);
+//		app.getRootNode().attachChild(model2);
+		
+
 	}
 }
