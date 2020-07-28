@@ -1,6 +1,7 @@
 package org.scaffoldeditor.editor.editor3d.blockmodel;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,7 @@ public class BlockMesh extends Mesh implements Shape {
 	private Map<ModelElement.CullFace, List<Vector3f>> vertexGroups = new HashMap<ModelElement.CullFace, List<Vector3f>>();
 	private Map<ModelElement.CullFace, List<Vector2f>> texCoordGroups = new HashMap<ModelElement.CullFace, List<Vector2f>>();
 	private Map<ModelElement.CullFace, List<Integer>> indexGroups = new HashMap<ModelElement.CullFace, List<Integer>>();
+	private Map<ModelElement.CullFace, List<Vector3f>> normalGroups = new HashMap<ModelElement.CullFace, List<Vector3f>>();
 	
 	public BlockMesh() {};
 	
@@ -103,31 +105,38 @@ public class BlockMesh extends Mesh implements Shape {
 		
 
 		if (upVisible && vertexGroups.containsKey(CullFace.UP)) {
-			addVertsToBuffers(lMesh.vertBuffer, lMesh.texCoordBuffer, lMesh.indexBuffer, vertexGroups.get(CullFace.UP),  texCoordGroups.get(CullFace.UP), indexGroups.get(CullFace.UP));
+			addVertsToBuffers(lMesh.vertBuffer, lMesh.texCoordBuffer, lMesh.indexBuffer, lMesh.normalBuffer,
+					vertexGroups.get(CullFace.UP),  texCoordGroups.get(CullFace.UP), indexGroups.get(CullFace.UP), normalGroups.get(CullFace.UP));
 		}
 		
 		if (downVisible && vertexGroups.containsKey(CullFace.DOWN)) {
-			addVertsToBuffers(lMesh.vertBuffer, lMesh.texCoordBuffer, lMesh.indexBuffer, vertexGroups.get(CullFace.DOWN),  texCoordGroups.get(CullFace.DOWN), indexGroups.get(CullFace.DOWN));
+			addVertsToBuffers(lMesh.vertBuffer, lMesh.texCoordBuffer, lMesh.indexBuffer, lMesh.normalBuffer,
+					vertexGroups.get(CullFace.DOWN),  texCoordGroups.get(CullFace.DOWN), indexGroups.get(CullFace.DOWN), normalGroups.get(CullFace.DOWN));
 		}
 		
 		if (northVisible && vertexGroups.containsKey(CullFace.NORTH)) {
-			addVertsToBuffers(lMesh.vertBuffer, lMesh.texCoordBuffer, lMesh.indexBuffer, vertexGroups.get(CullFace.NORTH),  texCoordGroups.get(CullFace.NORTH), indexGroups.get(CullFace.NORTH));
+			addVertsToBuffers(lMesh.vertBuffer, lMesh.texCoordBuffer, lMesh.indexBuffer, lMesh.normalBuffer,
+					vertexGroups.get(CullFace.NORTH),  texCoordGroups.get(CullFace.NORTH), indexGroups.get(CullFace.NORTH), normalGroups.get(CullFace.NORTH));
 		}
 		
 		if (southVisible && vertexGroups.containsKey(CullFace.SOUTH)) {
-			addVertsToBuffers(lMesh.vertBuffer, lMesh.texCoordBuffer, lMesh.indexBuffer, vertexGroups.get(CullFace.SOUTH),  texCoordGroups.get(CullFace.SOUTH), indexGroups.get(CullFace.SOUTH));
+			addVertsToBuffers(lMesh.vertBuffer, lMesh.texCoordBuffer, lMesh.indexBuffer, lMesh.normalBuffer,
+					vertexGroups.get(CullFace.SOUTH),  texCoordGroups.get(CullFace.SOUTH), indexGroups.get(CullFace.SOUTH), normalGroups.get(CullFace.SOUTH));
 		}
 		
 		if (eastVisible && vertexGroups.containsKey(CullFace.EAST)) {
-			addVertsToBuffers(lMesh.vertBuffer, lMesh.texCoordBuffer, lMesh.indexBuffer, vertexGroups.get(CullFace.EAST),  texCoordGroups.get(CullFace.EAST), indexGroups.get(CullFace.EAST));
+			addVertsToBuffers(lMesh.vertBuffer, lMesh.texCoordBuffer, lMesh.indexBuffer, lMesh.normalBuffer,
+					vertexGroups.get(CullFace.EAST),  texCoordGroups.get(CullFace.EAST), indexGroups.get(CullFace.EAST), normalGroups.get(CullFace.EAST));
 		}
 		
 		if (westVisible && vertexGroups.containsKey(CullFace.WEST)) {
-			addVertsToBuffers(lMesh.vertBuffer, lMesh.texCoordBuffer, lMesh.indexBuffer, vertexGroups.get(CullFace.WEST),  texCoordGroups.get(CullFace.WEST), indexGroups.get(CullFace.WEST));
+			addVertsToBuffers(lMesh.vertBuffer, lMesh.texCoordBuffer, lMesh.indexBuffer, lMesh.normalBuffer,
+					vertexGroups.get(CullFace.WEST),  texCoordGroups.get(CullFace.WEST), indexGroups.get(CullFace.WEST), normalGroups.get(CullFace.WEST));
 		}
 		
 		if (vertexGroups.containsKey(CullFace.NONE)) {
-			addVertsToBuffers(lMesh.vertBuffer, lMesh.texCoordBuffer, lMesh.indexBuffer, vertexGroups.get(CullFace.NONE),  texCoordGroups.get(CullFace.NONE), indexGroups.get(CullFace.NONE));
+			addVertsToBuffers(lMesh.vertBuffer, lMesh.texCoordBuffer, lMesh.indexBuffer, lMesh.normalBuffer,
+					vertexGroups.get(CullFace.NONE),  texCoordGroups.get(CullFace.NONE), indexGroups.get(CullFace.NONE), normalGroups.get(CullFace.NONE));
 		}
 		
 		return lMesh;
@@ -141,9 +150,10 @@ public class BlockMesh extends Mesh implements Shape {
 		boolean southVisible = chunk.isFaceVisible(location, Direction.BACK);
 		boolean eastVisible = chunk.isFaceVisible(location, Direction.LEFT);
 		boolean westVisible = chunk.isFaceVisible(location, Direction.RIGHT); // East and west may have to be flipped.
+		System.out.println(Arrays.toString(new boolean[] {upVisible, downVisible, northVisible, southVisible, eastVisible, westVisible}));
 		
-		LightMesh mesh = compileMesh(upVisible, downVisible, northVisible, southVisible, eastVisible, westVisible);
-		BlockMeshUtils.addMesh(mesh, location, chunkMesh, 1.0f);
+		Mesh mesh = compileMesh(upVisible, downVisible, northVisible, southVisible, eastVisible, westVisible).toMesh(new Mesh());
+		BlockMeshUtils.fillFromMesh(mesh, location, chunkMesh, 1.0f);
 		
 	}
 	
@@ -181,7 +191,7 @@ public class BlockMesh extends Mesh implements Shape {
 	
 	private void appendFace(Face face) {
 		if (face != null) {
-			appendVerts(face.vertices, face.texCoords, face.indices, face.cullFace);
+			appendVerts(face.vertices, face.texCoords, face.indices, face.normals, face.cullFace);
 		}
 	}
 	
@@ -192,7 +202,7 @@ public class BlockMesh extends Mesh implements Shape {
 	 * @param indices
 	 * @param side The side to apply it to.
 	 */
-	private void appendVerts(List<Vector3f> vertices, List<Vector2f> texCoord, List<Integer> indices, ModelElement.CullFace side) {
+	private void appendVerts(List<Vector3f> vertices, List<Vector2f> texCoord, List<Integer> indices, List<Vector3f> normals, ModelElement.CullFace side) {
 		// Make sure mesh maps are initialized.
 		if (!vertexGroups.containsKey(side)) {
 			vertexGroups.put(side, new ArrayList<Vector3f>());
@@ -203,16 +213,21 @@ public class BlockMesh extends Mesh implements Shape {
 		if (!indexGroups.containsKey(side)) {
 			indexGroups.put(side, new ArrayList<Integer>());
 		}
+		if (!normalGroups.containsKey(side)) {
+			normalGroups.put(side, new ArrayList<Vector3f>());
+		}
 		
 		List<Vector3f> meshVerts = vertexGroups.get(side);
 		List<Vector2f> meshTexCoord = texCoordGroups.get(side);
 		List<Integer> meshIndices = indexGroups.get(side);
+		List<Vector3f> meshNormals = normalGroups.get(side);
 		
 		// The index offset in the mesh.
 		int offset = meshVerts.size();
 		
 		meshVerts.addAll(vertices);
 		meshTexCoord.addAll(texCoord);
+		meshNormals.addAll(normals);
 		
 		// Clone indices so we don't screw up the passed array.
 		List<Integer> correctedIndices = new ArrayList<Integer>(indices);
@@ -223,13 +238,14 @@ public class BlockMesh extends Mesh implements Shape {
 		meshIndices.addAll(correctedIndices);
 	}
 	
-	private void addVertsToBuffers(List<Vector3f> vertBuffer, List<Vector2f> texCoordBuffer, List<Integer> indexBuffer,
-			List<Vector3f> vertices, List<Vector2f> texCoord, List<Integer> indices) {
+	private void addVertsToBuffers(List<Vector3f> vertBuffer, List<Vector2f> texCoordBuffer, List<Integer> indexBuffer, List<Vector3f> normalBuffer,
+			List<Vector3f> vertices, List<Vector2f> texCoord, List<Integer> indices, List<Vector3f> normals) {
 		// index offset of buffers.
 		int offset = vertBuffer.size();
 		
 		vertBuffer.addAll(vertices);
 		texCoordBuffer.addAll(texCoord);
+		normalBuffer.addAll(normals);
 		
 		// Clone indices so we don't screw up the passed list
 		List<Integer> correctedIndices = new ArrayList<Integer>(indices);

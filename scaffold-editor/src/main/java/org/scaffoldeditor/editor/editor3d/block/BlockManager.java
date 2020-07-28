@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.rvandoosselaer.blocks.Block;
+import com.rvandoosselaer.blocks.ShapeIds;
 import com.rvandoosselaer.blocks.TypeIds;
 
 /**
@@ -47,7 +48,14 @@ public class BlockManager {
 	 * @return Generated block.
 	 */
 	protected Block generateBlock(String key) {
-		Block block = new Block(key, key, TypeIds.COBBLESTONE, false, false, true);
+		Block block = Block.builder()
+                .name(key)
+                .shape(key)
+                .type(TypeIds.COBBLESTONE)
+                .usingMultipleImages(false)
+                .transparent(false)
+                .solid(true)
+                .build();
 		registry.put(key, block);
 		
 		return block;

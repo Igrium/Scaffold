@@ -17,6 +17,10 @@ import com.rvandoosselaer.blocks.ShapeRegistry;
  * @author Igrium
  */
 public class MeshRegistry extends ShapeRegistry {
+	public MeshRegistry() {
+		super();
+	}
+	
 	private Map<String, BlockMesh> registry = new HashMap<String, BlockMesh>() ;
 	
 	/**
@@ -78,8 +82,9 @@ public class MeshRegistry extends ShapeRegistry {
 		System.out.println("Pulling from custom shape registry");
 		try {
 			return loadMesh(name);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			System.out.println("Cannot load mesh file "+name+". Falling back to JME Blocks shape registry.");
+			e.printStackTrace();
 			return super.get(name);
 		}
 	}

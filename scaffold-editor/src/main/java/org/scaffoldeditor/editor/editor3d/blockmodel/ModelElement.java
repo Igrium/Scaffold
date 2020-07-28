@@ -62,6 +62,7 @@ public class ModelElement {
 		public List<Vector3f> vertices;
 		public List<Integer> indices;
 		public List<Vector2f> texCoords;
+		public List<Vector3f> normals;
 		public CullFace cullFace = CullFace.NONE;
 	}
 	
@@ -151,7 +152,14 @@ public class ModelElement {
 				getGlobalPosition(new Vector3f(to.x, to.y, from.z))
 		});
 		
-		return createFace(verts, face);
+		List<Vector3f> normals = Arrays.asList(new Vector3f[] {
+				getGlobalRotation(new Vector3f(0, 1, 0)),
+				getGlobalRotation(new Vector3f(0, 1, 0)),
+				getGlobalRotation(new Vector3f(0, 1, 0)),
+				getGlobalRotation(new Vector3f(0, 1, 0)),
+		});
+		
+		return createFace(verts, normals, face);
 	}
 	
 	/**
@@ -171,7 +179,14 @@ public class ModelElement {
 				getGlobalPosition(new Vector3f(to.x, from.y, to.z))
 		});
 		
-		return createFace(verts, face);
+		List<Vector3f> normals = Arrays.asList(new Vector3f[] {
+				getGlobalRotation(new Vector3f(0, -1, 0)),
+				getGlobalRotation(new Vector3f(0, -1, 0)),
+				getGlobalRotation(new Vector3f(0, -1, 0)),
+				getGlobalRotation(new Vector3f(0, -1, 0)),
+		});
+		
+		return createFace(verts, normals, face);
 	}
 	
 	/**
@@ -191,7 +206,14 @@ public class ModelElement {
 				getGlobalPosition(new Vector3f(from.x, to.y, from.z))
 		});
 		
-		return createFace(verts, face);
+		List<Vector3f> normals = Arrays.asList(new Vector3f[] {
+				getGlobalRotation(new Vector3f(0, 0, -1)),
+				getGlobalRotation(new Vector3f(0, 0, -1)),
+				getGlobalRotation(new Vector3f(0, 0, -1)),
+				getGlobalRotation(new Vector3f(0, 0, -1)),
+		});
+		
+		return createFace(verts, normals, face);
 	}
 	
 	/**
@@ -211,7 +233,14 @@ public class ModelElement {
 				getGlobalPosition(new Vector3f(to.x, to.y, to.z))
 		});
 		
-		return createFace(verts, face);
+		List<Vector3f> normals = Arrays.asList(new Vector3f[] {
+				getGlobalRotation(new Vector3f(0, 0, 1)),
+				getGlobalRotation(new Vector3f(0, 0, 1)),
+				getGlobalRotation(new Vector3f(0, 0, 1)),
+				getGlobalRotation(new Vector3f(0, 0, 1)),
+		});
+		
+		return createFace(verts, normals, face);
 	}
 	
 	/**
@@ -231,7 +260,14 @@ public class ModelElement {
 				getGlobalPosition(new Vector3f(from.x, to.y, to.z))
 		});
 		
-		return createFace(verts, face);
+		List<Vector3f> normals = Arrays.asList(new Vector3f[] {
+				getGlobalRotation(new Vector3f(-1, 0, 0)),
+				getGlobalRotation(new Vector3f(-1, 0, 0)),
+				getGlobalRotation(new Vector3f(-1, 0, 0)),
+				getGlobalRotation(new Vector3f(-1, 0, 0)),
+		});
+		
+		return createFace(verts, normals, face);
 	}
 	
 	/**
@@ -252,7 +288,14 @@ public class ModelElement {
 
 		});
 		
-		return createFace(verts, face);
+		List<Vector3f> normals = Arrays.asList(new Vector3f[] {
+				getGlobalRotation(new Vector3f(1, 0, 0)),
+				getGlobalRotation(new Vector3f(1, 0, 0)),
+				getGlobalRotation(new Vector3f(1, 0, 0)),
+				getGlobalRotation(new Vector3f(1, 0, 0)),
+		});
+		
+		return createFace(verts, normals, face);
 	}
 	
 	/**
@@ -268,15 +311,26 @@ public class ModelElement {
 	}
 	
 	/**
+	 * Get the global rotation of a vector with the element rotation taken into account.
+	 * @param in Vector WITHOUT element rotation.
+	 * @return Vector WITH element rotation.
+	 */
+	protected Vector3f getGlobalRotation(Vector3f in) {
+		return rotatedSpatial.localToWorld(in, null);
+	}
+	
+	/**
 	 * Finish the process of creating a face from a list of vertices.
 	 * @param vertices The input vertices going counterclockwise.
+	 * @param normals The corresponding normals to the vertices.
 	 * @param face The JSON object representing the face in the file.
 	 * @return The generated values with respect to the input array.
 	 */
-	protected Face createFace(List<Vector3f> vertices, JSONObject face) {
+	protected Face createFace(List<Vector3f> vertices, List<Vector3f> normals, JSONObject face) {
 		Face ret = new Face();
 		ret.texCoords = new ArrayList<Vector2f>();
 		ret.vertices = vertices;
+		ret.normals = normals;
 		
 		JSONArray texCoords = face.optJSONArray("uv");
 		
@@ -316,6 +370,7 @@ public class ModelElement {
 		
 		ret.indices.addAll(Arrays.asList(new Integer[] {0,1,3}));
 		ret.indices.addAll(Arrays.asList(new Integer[] {3,1,2}));
+		
 		
 		// Parse cullface.
 		String cullfaceString = face.optString("cullface");

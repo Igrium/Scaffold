@@ -17,6 +17,7 @@ public class LightMesh {
 	public List<Vector3f> vertBuffer = new ArrayList<Vector3f>();
 	public List<Vector2f> texCoordBuffer = new ArrayList<Vector2f>();
 	public List<Integer> indexBuffer = new ArrayList<Integer>();
+	public List<Vector3f> normalBuffer = new ArrayList<Vector3f>();
 	
 	/**
 	 * Create a full JME mesh from this light mesh.
@@ -27,7 +28,10 @@ public class LightMesh {
 		mesh.setBuffer(Type.Position, 3, BufferUtils.createFloatBuffer(vertBuffer.toArray(new Vector3f[vertBuffer.size()])));
 		mesh.setBuffer(Type.TexCoord, 2, BufferUtils.createFloatBuffer(texCoordBuffer.toArray(new Vector2f[texCoordBuffer.size()])));
 		mesh.setBuffer(Type.Index, 3, BufferUtils.createIntBuffer(integerListToInt(indexBuffer)));
+		mesh.setBuffer(Type.Normal, 3, BufferUtils.createFloatBuffer(normalBuffer.toArray(new Vector3f[normalBuffer.size()])));
 		mesh.updateBound();
+		
+		BlockMeshUtils.generateTangent(mesh);
 		
 		return mesh;
 	}
