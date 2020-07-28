@@ -74,8 +74,7 @@ public class BlockManager {
 			typeID = Paths.get(EditorApp.getInstance().getParent().getProject()
 					.assetManager().getNamespace(texMCPath), texMCPath).toString();
 			
-		} catch (IOException | JSONException e) {
-			e.printStackTrace();
+		} catch (IOException | JSONException | NullPointerException e) {
 			typeID = TypeIds.COBBLESTONE;
 		}
 		

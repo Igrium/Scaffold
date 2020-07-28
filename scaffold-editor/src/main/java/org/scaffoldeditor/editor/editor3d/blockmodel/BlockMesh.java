@@ -150,7 +150,6 @@ public class BlockMesh extends Mesh implements Shape {
 		boolean southVisible = chunk.isFaceVisible(location, Direction.BACK);
 		boolean eastVisible = chunk.isFaceVisible(location, Direction.LEFT);
 		boolean westVisible = chunk.isFaceVisible(location, Direction.RIGHT); // East and west may have to be flipped.
-		System.out.println(Arrays.toString(new boolean[] {upVisible, downVisible, northVisible, southVisible, eastVisible, westVisible}));
 		
 		Mesh mesh = compileMesh(upVisible, downVisible, northVisible, southVisible, eastVisible, westVisible).toMesh(new Mesh());
 		BlockMeshUtils.fillFromMesh(mesh, location, chunkMesh, 1.0f);

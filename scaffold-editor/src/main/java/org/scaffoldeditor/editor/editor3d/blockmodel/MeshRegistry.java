@@ -1,7 +1,9 @@
 package org.scaffoldeditor.editor.editor3d.blockmodel;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -17,11 +19,18 @@ import com.rvandoosselaer.blocks.ShapeRegistry;
  * @author Igrium
  */
 public class MeshRegistry extends ShapeRegistry {
+	public static final EmptyBlockMesh EMPTYBLOCKMESH = new EmptyBlockMesh();
+	
 	public MeshRegistry() {
 		super();
 	}
 	
 	private Map<String, BlockMesh> registry = new HashMap<String, BlockMesh>() ;
+	
+	/**
+	 * List of keys which are known to fail loading. Used to prevent the repeat attempted loading of non-working keys.
+	 */
+	protected List<String> blacklist = new ArrayList<String>();
 	
 	/**
 	 * Register a block mesh.
@@ -30,7 +39,6 @@ public class MeshRegistry extends ShapeRegistry {
 	 */
 	public void registerMesh(String key, BlockMesh mesh) {
 		registry.put(key, mesh);
-		System.out.println(registry); // TESTING ONLY
 	}
 	
 	/**
@@ -79,14 +87,32 @@ public class MeshRegistry extends ShapeRegistry {
 	
 	@Override
 	public Shape get(String name) {
-		System.out.println("Pulling from custom shape registry");
+		if (blacklist.contains(name)) {
+			return loadBackup(name);
+		}
+		
 		try {
 			return loadMesh(name);
 		} catch (Exception e) {
-			System.out.println("Cannot load mesh file "+name+". Falling back to JME Blocks shape registry.");
 			e.printStackTrace();
-			return super.get(name);
+			System.out.println("Cannot load mesh file "+name+". Falling back to JME Blocks shape registry.");
+			
+			blacklist.add(name);
+			return loadBackup(name);
 		}
 	}
 	
+	/**
+	 * Called when the loading of a mesh has failed and we must fall back to the JME Blocks shape registry.
+	 * @param name Shape key.
+	 * @return Shape to render.
+	 */
+	protected Shape loadBackup(String name) {
+		Shape shape = super.get(name);
+		if (shape == null) {
+			return EMPTYBLOCKMESH;
+		} else {
+			return shape;
+		}
+	}
 }

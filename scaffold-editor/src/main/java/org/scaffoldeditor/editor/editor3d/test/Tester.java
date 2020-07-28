@@ -28,9 +28,13 @@ public class Tester {
 		
 		Block block1 = app.getBlockManager().get("minecraft/models/block/cobblestone_stairs.json");
 		Block block2 = app.getBlockManager().get("minecraft/models/block/flower_pot.json");
+//		Block block3 = app.getBlockManager().get("saudghauisd");
+//		Block block4 = app.getBlockManager().get(ShapeIds.CUBE);
 		
 		chunk.addBlock(0, 0, 2, block1);
 		chunk.addBlock(0, 0, 3, block2);
+//		chunk.addBlock(0, 0, 3, block3);
+//		chunk.addBlock(0, 0, 4, block4);
 		
 		ChunkMeshGenerator meshGenerator = BlocksConfig.getInstance().getChunkMeshGenerator();
 		chunk.createNode(meshGenerator);
