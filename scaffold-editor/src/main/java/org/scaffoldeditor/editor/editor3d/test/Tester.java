@@ -27,14 +27,7 @@ public class Tester {
 		Chunk chunk = new Chunk(new Vec3i(0,0,0));
 		
 		Block block1 = app.getBlockManager().get("minecraft/models/block/cobblestone_stairs.json");
-		Block block2 = Block.builder()
-                .name("block2")
-                .shape("minecraft/models/block/andisite_stairs.json")
-                .type(TypeIds.COBBLESTONE)
-                .usingMultipleImages(false)
-                .transparent(false)
-                .solid(true)
-                .build();
+		Block block2 = app.getBlockManager().get("minecraft/models/block/flower_pot.json");
 		
 		chunk.addBlock(0, 0, 2, block1);
 		chunk.addBlock(0, 0, 3, block2);

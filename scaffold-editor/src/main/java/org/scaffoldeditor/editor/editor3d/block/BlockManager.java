@@ -1,7 +1,18 @@
 package org.scaffoldeditor.editor.editor3d.block;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.annotation.Nullable;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.scaffoldeditor.editor.editor3d.EditorApp;
+import org.scaffoldeditor.editor.editor3d.util.EditorUtils;
+import org.scaffoldeditor.scaffold.util.JSONUtils;
 
 import com.rvandoosselaer.blocks.Block;
 import com.rvandoosselaer.blocks.ShapeIds;
@@ -13,6 +24,7 @@ import com.rvandoosselaer.blocks.TypeIds;
  * Each blockmodel is a separate block.
  * @author Igrium
  */
+@SuppressWarnings("unused")
 public class BlockManager {
 	
 	private Map<String, Block> registry = new HashMap<String, Block>();
@@ -48,10 +60,29 @@ public class BlockManager {
 	 * @return Generated block.
 	 */
 	protected Block generateBlock(String key) {
+		// Block texture from JSON. Also pre-loads the JSON into memory.
+		// TODO: support multiple textures.
+		
+		String typeID;
+		
+		try {
+			JSONObject modelJson = EditorUtils.loadJMEJson(key);
+			JSONObject textures = modelJson.optJSONObject("textures");
+			String texString = textures.getString((String) textures.keySet().toArray()[0]); // TODO: make this better
+			String texMCPath = "textures/"+texString+".png";
+			
+			typeID = Paths.get(EditorApp.getInstance().getParent().getProject()
+					.assetManager().getNamespace(texMCPath), texMCPath).toString();
+			
+		} catch (IOException | JSONException e) {
+			e.printStackTrace();
+			typeID = TypeIds.COBBLESTONE;
+		}
+		
 		Block block = Block.builder()
                 .name(key)
                 .shape(key)
-                .type(TypeIds.COBBLESTONE)
+                .type(typeID)
                 .usingMultipleImages(false)
                 .transparent(false)
                 .solid(true)

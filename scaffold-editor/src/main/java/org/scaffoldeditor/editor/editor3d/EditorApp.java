@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.scaffoldeditor.editor.editor3d.block.BlockManager;
+import org.scaffoldeditor.editor.editor3d.block.ScaffoldTypeRegistry;
 import org.scaffoldeditor.editor.editor3d.block.WorldManager;
 import org.scaffoldeditor.editor.editor3d.blockmodel.BlockModelLoader;
 import org.scaffoldeditor.editor.editor3d.blockmodel.MeshRegistry;
@@ -104,8 +105,11 @@ public class EditorApp extends SimpleApplication {
 		meshRegistry = new MeshRegistry();
 		BlocksConfig.getInstance().setShapeRegistry(meshRegistry);
 		
+		ScaffoldTypeRegistry typeRegistry = new ScaffoldTypeRegistry(assetManager);
+		BlocksConfig.getInstance().setTypeRegistry(typeRegistry);
+		
 		// The chunk mesh generator must be re-instantiated after setShapeRegistry()
-		BlocksConfig.getInstance().setChunkMeshGenerator(new FacesMeshGenerator(meshRegistry, BlocksConfig.getInstance().getTypeRegistry()));
+		BlocksConfig.getInstance().setChunkMeshGenerator(new FacesMeshGenerator(meshRegistry, typeRegistry));
 		
 		blockManager = new BlockManager();
 		
