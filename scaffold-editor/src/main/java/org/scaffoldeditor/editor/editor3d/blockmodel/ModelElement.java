@@ -80,15 +80,32 @@ public class ModelElement {
 	protected Vector3f to;
 	
 	/**
+	 * Specifies how much the block is rotated. Always rotates around <8,8,8>.
+	 */
+	protected float modelRotation = 0.0f;
+	
+	/**
 	 * The spatial that assists the element rotation.
 	 */
 	private Spatial rotatedSpatial = new Node();
+	private Spatial modelRotationSpatial = new Node();
 	
 	/**
 	 * Create a model element from a JSON object.
 	 * @param element Element JSON object.
 	 */
 	public ModelElement(JSONObject element) {
+		this(element, 0);
+	}
+	
+	/**
+	 * Create a model element from a JSON object.
+	 * @param element Element JSON object.
+	 * @param modelRotation The rotation of the block.
+
+	 */
+	public ModelElement(JSONObject element, float modelRotation) {
+		this.modelRotation = modelRotation;
 		
 		// Parse rotation
 		rotation = new ElementRotation();
@@ -119,6 +136,8 @@ public class ModelElement {
 		setupRotation();
 	}
 	
+	private ModelElement() {}
+	
 	/**
 	 * Get the start point of the cube.
 	 * @return From value.
@@ -133,6 +152,31 @@ public class ModelElement {
 	 */
 	public Vector3f getTo() {
 		return to;
+	}
+	
+	/**
+	 * Get the model rotation this element was created with.
+	 * @return Model rotation.
+	 */
+	public float getModelRotation() {
+		return modelRotation;
+	}
+	
+	/**
+	 * Get a copy of this model element with a new model rotation.
+	 * @param modelRotation New model rotation in degrees.
+	 * @return New model element.
+	 */
+	public ModelElement getRotatedCopy(float modelRotation) {
+		ModelElement element = new ModelElement();
+		element.rotation = rotation;
+		element.from = from;
+		element.to = to;
+		element.faces = faces;
+		element.modelRotation = modelRotation;
+		
+		element.setupRotation();
+		return element;
 	}
 	
 	/**
@@ -306,8 +350,15 @@ public class ModelElement {
 	protected Vector3f getGlobalPosition(Vector3f point) {
 		// Get position relative to rotation root to prevent undesired translation.
 		Vector3f localPoint = point.subtract(rotation.origin);
+		localPoint = rotatedSpatial.localToWorld(localPoint, null);	
 		
-		return rotatedSpatial.localToWorld(localPoint, null);		
+		// There's a more efficient way to do this mathematically but I'm lazy and this code only runs on load.
+		if (modelRotation != 0) {
+			localPoint = localPoint.subtract(BlockMeshUtils.MODELCENTER);
+			localPoint = modelRotationSpatial.localToWorld(localPoint, null);
+		}
+		
+		return localPoint;
 	}
 	
 	/**
@@ -316,7 +367,9 @@ public class ModelElement {
 	 * @return Vector WITH element rotation.
 	 */
 	protected Vector3f getGlobalRotation(Vector3f in) {
-		return rotatedSpatial.localToWorld(in, null);
+		return modelRotationSpatial.localToWorld(
+				rotatedSpatial.localToWorld(in, null),
+				null);
 	}
 	
 	/**
@@ -368,7 +421,6 @@ public class ModelElement {
 		
 		ret.indices = new ArrayList<Integer>();
 		
-		ret.indices.addAll(Arrays.asList(new Integer[] {0,1,3}));
 		ret.indices.addAll(Arrays.asList(new Integer[] {3,1,2}));
 		
 		
@@ -409,6 +461,9 @@ public class ModelElement {
 			
 			rotatedSpatial.setLocalTranslation(rotation.origin);
 		}
+		
+		modelRotationSpatial.rotate(0, modelRotation, 0);
+		modelRotationSpatial.setLocalTranslation(BlockMeshUtils.MODELCENTER);
 	}
 	
 	private static Vector3f jsonArray3ToVector3(JSONArray array) {

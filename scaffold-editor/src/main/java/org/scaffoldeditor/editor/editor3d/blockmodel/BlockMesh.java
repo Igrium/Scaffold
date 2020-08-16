@@ -1,7 +1,6 @@
 package org.scaffoldeditor.editor.editor3d.blockmodel;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +24,10 @@ import com.simsilica.mathd.Vec3i;
  */
 public class BlockMesh extends Mesh implements Shape {
 	
+	/**
+	 * A value from 0-3 indicating how many times this model has been rotated 90 degrees
+	 */
+	private int modelRotation = 0;
 	
 	private List<ModelElement> elements = new ArrayList<ModelElement>();
 	
@@ -43,9 +46,30 @@ public class BlockMesh extends Mesh implements Shape {
 	 * taken from the elements tag of a <a href=https://minecraft.gamepedia.com/Model#Block_models>block model.</a> 
 	 */
 	public BlockMesh(JSONArray elements) {
+		this(elements, 0);
+	}
+	
+	/**
+	 * Create a block mesh from a set of elements.
+	 * @param elements Elements to create from;
+	 * taken from the elements tag of a <a href=https://minecraft.gamepedia.com/Model#Block_models>block model.</a>
+	 * @param modelRotation The rotation to be applied to the model in degrees.
+	 * Will be rounded down to multiple of 90.
+	 */
+	public BlockMesh(JSONArray elements, int modelRotation) {
+		setModelRotation(modelRotation);
 		for (int i = 0; i < elements.length(); i++) {
 			loadElement(elements.getJSONObject(i));
 		}
+		recompileElements();
+	}
+	
+	public BlockMesh(List<ModelElement> elements, int modelRotation) {
+		setModelRotation(modelRotation);
+		for (ModelElement element : elements) {
+			this.elements.add(element.getRotatedCopy(modelRotation));
+		}
+		
 		recompileElements();
 	}
 	
@@ -55,6 +79,31 @@ public class BlockMesh extends Mesh implements Shape {
 	 */
 	public List<ModelElement> getElements() {
 		return elements;
+	}
+	
+	/**
+	 * Get the rotation of the model.
+	 * @return Model rotation in degrees.
+	 */
+	public int getModelRotation() {
+		return modelRotation * 90;
+	}
+	
+	/**
+	 * Set the model rotation.
+	 * ELEMENDS MUST BE RE-CREATED AFTER SET
+	 * @param value Model rotation in degrees. Rounded down to the nearest 90.
+	 */
+	protected void setModelRotation(int value) {
+		int temp = Math.floorDiv(value, 90);
+		
+		// insure value is between 0 and 3.
+		int translation = Math.floorDiv(value, 4);
+		modelRotation = temp - translation;
+	}
+	
+	public BlockMesh getRotatedCopy(int rotation) {
+		return new BlockMesh(elements, rotation);
 	}
 	
 	/**
@@ -162,7 +211,7 @@ public class BlockMesh extends Mesh implements Shape {
 	 * @param element Element to load.
 	 */
 	protected void loadElement(JSONObject element) {
-		elements.add(new ModelElement(element));
+		elements.add(new ModelElement(element, getModelRotation()));
 	}
 	
 	/**
@@ -179,6 +228,41 @@ public class BlockMesh extends Mesh implements Shape {
 	}
 	
 	/**
+	 * Get the new direction (north, south, east, west) of a face, taking model rotation into account.
+	 * @param face Original face.
+	 * @return Rotated face.
+	 */
+	protected CullFace getRotatedFace(CullFace face) {
+		if (modelRotation == 0 || face == CullFace.UP || face == CullFace.DOWN || face == CullFace.NONE) {
+			return face;
+		}
+		
+		// TODO: Can you do this with pure math? Given the nature of enums, all I can think to do is brute force it.
+		if (face == CullFace.NORTH && modelRotation == 0) { return CullFace.NORTH; }
+		if (face == CullFace.NORTH && modelRotation == 1) { return CullFace.WEST; }
+		if (face == CullFace.NORTH && modelRotation == 2) { return CullFace.SOUTH; }
+		if (face == CullFace.NORTH && modelRotation == 3) { return CullFace.EAST; }
+		
+		if (face == CullFace.WEST && modelRotation == 0) { return CullFace.WEST; }
+		if (face == CullFace.WEST && modelRotation == 1) { return CullFace.SOUTH; }
+		if (face == CullFace.WEST && modelRotation == 2) { return CullFace.EAST; }
+		if (face == CullFace.WEST && modelRotation == 3) { return CullFace.NORTH; }
+		
+		if (face == CullFace.SOUTH && modelRotation == 0) { return CullFace.SOUTH; }
+		if (face == CullFace.SOUTH && modelRotation == 1) { return CullFace.EAST; }
+		if (face == CullFace.SOUTH && modelRotation == 3) { return CullFace.NORTH; }
+		if (face == CullFace.SOUTH && modelRotation == 3) { return CullFace.WEST; }
+		
+		if (face == CullFace.EAST && modelRotation == 0) { return CullFace.EAST; }
+		if (face == CullFace.EAST && modelRotation == 1) { return CullFace.NORTH; }
+		if (face == CullFace.EAST && modelRotation == 2) { return CullFace.WEST; }
+		if (face == CullFace.EAST && modelRotation == 3) { return CullFace.SOUTH; }
+		
+		
+		return face;
+	}
+	
+	/**
 	 * Clear all the compiled mesh data.
 	 * ONLY CALL IF YOU KNOW WHAT YOU'RE DOING
 	 */
@@ -190,7 +274,7 @@ public class BlockMesh extends Mesh implements Shape {
 	
 	private void appendFace(Face face) {
 		if (face != null) {
-			appendVerts(face.vertices, face.texCoords, face.indices, face.normals, face.cullFace);
+			appendVerts(face.vertices, face.texCoords, face.indices, face.normals, getRotatedFace(face.cullFace));
 		}
 	}
 	

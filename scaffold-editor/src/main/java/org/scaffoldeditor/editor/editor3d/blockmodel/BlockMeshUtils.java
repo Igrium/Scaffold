@@ -23,6 +23,8 @@ import com.simsilica.mathd.Vec3i;
  */
 public class BlockMeshUtils {
 	
+	public static final Vector3f MODELCENTER = new Vector3f(8,8,8);
+	
 	/**
 	 * Add a mesh to the voxel world.
 	 * @param mesh Light mesh to add.
