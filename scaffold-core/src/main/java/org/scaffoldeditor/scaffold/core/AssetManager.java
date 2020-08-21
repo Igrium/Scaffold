@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.json.JSONObject;
+import org.scaffoldeditor.scaffold.mc.BlockStateParser;
 import org.scaffoldeditor.scaffold.util.JSONUtils;
 
 /**
@@ -23,8 +24,19 @@ public class AssetManager {
 	/* The project this asset manager is associated with */
 	private Project project;
 	
+	private BlockStateParser blockStateParser = new BlockStateParser();
+	
+	
 	public Project getProject() {
 		return project;
+	}
+	
+	public BlockStateParser getBlockStateParser() {
+		return blockStateParser;
+	}
+	
+	public void setBlockStateParser(BlockStateParser parser) {
+		blockStateParser = parser;
 	}
 		
 	/**

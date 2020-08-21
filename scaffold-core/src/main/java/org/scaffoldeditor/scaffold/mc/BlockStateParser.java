@@ -18,12 +18,24 @@ import com.github.mryurihi.tbnbt.tag.NBTTagCompound;
 public class BlockStateParser {
 	
 	/**
+	 * Contains data about a block state obtained by the block state file.
+	 * @author Igrium
+	 */
+	public static class BlockStateData {
+		public String model;
+		public int x = 0;
+		public int y = 0;
+		public boolean uvLock = false;
+		public float weight = 1;
+	}
+	
+	/**
 	 * Parse a Minecraft block state.
 	 * @param blockState The block's current block state.
 	 * @param file The block's blockstate.json file.
-	 * @return Resourcepack path to the model that should be loaded.
+	 * @return Model data of the model that should be loaded.
 	 */
-	public static String parseBlockState(NBTTagCompound blockState, JSONObject file) {
+	public BlockStateData parseBlockState(NBTTagCompound blockState, JSONObject file) {
 		if (file.has("variants")) {
 			return parseVariants(blockState, file);
 		} else if (file.has("multipart")) {
@@ -37,9 +49,9 @@ public class BlockStateParser {
 	 * Parse a Minecraft block state with a variants tag.
 	 * @param blockState The block's current block state.
 	 * @param file The block's blockstate.json file.
-	 * @return Resourcepack path to the model that should be loaded.
+	 * @return Model data of the model that should be loaded.
 	 */
-	public static String parseVariants(NBTTagCompound blockState, JSONObject file) {
+	public BlockStateData parseVariants(NBTTagCompound blockState, JSONObject file) {
 		JSONObject variants = file.getJSONObject("variants");
 		
 		for (String key : variants.keySet()) {
@@ -56,7 +68,7 @@ public class BlockStateParser {
 		throw new IllegalArgumentException("Current block state, "+blockState.toString()+" is not listed in blockstate json file.");
 	}
 	
-	protected static boolean shouldUseVariant(NBTTagCompound blockState, String varient) {
+	protected boolean shouldUseVariant(NBTTagCompound blockState, String varient) {
 		// Parse the varient.
 		Map<String, String> kvPairs = Splitter.on(',').withKeyValueSeparator("=").split(varient);
 		
@@ -72,34 +84,51 @@ public class BlockStateParser {
 	/**
 	 * Look through a varient JSON entry and decide which model to use.
 	 * @param variant Varient JSON entry.
-	 * @return Resourcepack path to block to use.
+	 * @return Model data
 	 */
-	protected static String parseVariant(JSONArray variant) {
-		int index = (int) Math.random() * variant.length();
-		
+	protected BlockStateData parseVariant(JSONArray variant) {
+		float[] weights = new float[variant.length()];
+		for (int i = 0; i < weights.length; i++) {
+			JSONObject entry = variant.getJSONObject(i);
+			weights[i] = entry.has("weight") ? entry.getFloat("weight") : 1;
+		}
+		int index = chooseIndex(weights);
 		return parseVariant(variant.getJSONObject(index));
 	}
 	
 	/**
 	 * Look through a varient JSON entry and decide which model to use.
 	 * @param variant Varient JSON entry.
-	 * @return Resourcepack path to block to use.
+	 * @return Model data.
 	 */
-	protected static String parseVariant(JSONObject variant) {
-		return variant.getString("model");
+	protected BlockStateData parseVariant(JSONObject variant) {
+		BlockStateData data = new BlockStateData();
+		data.model = variant.getString("model");
+		if (variant.has("x")) data.x = variant.getInt("x");
+		if (variant.has("y")) data.y = variant.getInt("y");
+		if (variant.has("uvlock")) data.uvLock = variant.getBoolean("uvlock");
+		if (variant.has("weight")) data.weight = variant.getFloat("weight");
+		
+		return data;
 	}
 	
 	/**
 	 * Parse a Minecraft block state with a multipart tag.
 	 * @param blockState The block's current block state.
 	 * @param file The block's blockstate.json file.
-	 * @return Resourcepack path to the model that should be loaded.
+	 * @return Model data of the model that should be loaded.
 	 */
-	public static String parseMultipart(NBTTagCompound blockState, JSONObject file) {
+	public BlockStateData parseMultipart(NBTTagCompound blockState, JSONObject file) {
 		return null;
 	}
 	
-	private static boolean tagEquals(NBTTag tag, String string) {
+	/**
+	 * Check if a tag value equals a string value.
+	 * @param tag The tag value.
+	 * @param string The string value.
+	 * @return If they equal each other.
+	 */
+	protected static boolean tagEquals(NBTTag tag, String string) {
 		if (tag.getTagType() == TagType.BYTE) {
 			boolean bool = Boolean.parseBoolean(string);
 			byte byt = tag.getAsTagByte().getValue();
@@ -134,4 +163,17 @@ public class BlockStateParser {
 		return false;
 	}
 	
+	private static int chooseIndex(float[] weights) {
+		float sum = 0;
+		for (float val : weights) sum += val;
+		
+		float randNum = (float) (Math.random() * sum);
+		
+		sum = 0;
+		for (int i = 0; i < weights.length; i++) {
+			sum += weights[i];
+			if (randNum < sum) return i;
+		}
+		return weights.length - 1;
+	}
 }
