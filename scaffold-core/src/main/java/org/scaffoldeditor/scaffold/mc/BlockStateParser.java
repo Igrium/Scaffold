@@ -1,5 +1,7 @@
 package org.scaffoldeditor.scaffold.mc;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 
 import org.json.JSONArray;
@@ -27,6 +29,16 @@ public class BlockStateParser {
 		public int y = 0;
 		public boolean uvLock = false;
 		public float weight = 1;
+	}
+	
+	/**
+	 * Locate the blockstate file that a block should use.
+	 * @param name Namespaced name of block.
+	 * @return Scaffold path to blockstate file.
+	 */
+	public static Path locateBlockState(String name) {
+		String[] nameSeperated = name.split(":");
+		return Paths.get("assets", nameSeperated[0], "blockstates", nameSeperated[2]+".json");
 	}
 	
 	/**
