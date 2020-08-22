@@ -2,9 +2,12 @@ package org.scaffoldeditor.scaffold.mc;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.python.google.common.base.Splitter;
 
@@ -85,12 +88,12 @@ public class BlockStateParser {
 		Map<String, String> kvPairs = Splitter.on(',').withKeyValueSeparator("=").split(varient);
 		
 		for (String key : kvPairs.keySet()) {
-			if (blockState.containsKey(key) && tagEquals(blockState.get(key), kvPairs.get(key))) {
-				return true;
+			if (!(blockState.containsKey(key) && tagEquals(blockState.get(key), kvPairs.get(key)))) {
+				return false;
 			}
 		}
 		
-		return false;
+		return true;
 	}
 	
 	/**
@@ -131,7 +134,35 @@ public class BlockStateParser {
 	 * @return Model data of the model that should be loaded.
 	 */
 	public BlockStateData parseMultipart(NBTTagCompound blockState, JSONObject file) {
-		return null;
+		List<BlockStateData> data = new ArrayList<BlockStateData>();
+		JSONArray multipart = file.getJSONArray("multipart");
+		
+		for (int i = 0; i < multipart.length(); i++) {
+			JSONObject part = multipart.getJSONObject(i);
+			if (shouldUsePart(blockState, part.getJSONObject("when"))) {
+				data.add(parseVariant(part.getJSONObject("apply")));
+			}
+		}
+		
+		// TODO: properly support multiple parts.
+		return data.get(0);
+		
+	}
+	
+	/**
+	 * Determine whether we should use a multipart part.
+	 * @param blockState The current block state.
+	 * @param when The "when" tag of the part.
+	 * @return Should we use this part?
+	 */
+	protected boolean shouldUsePart(NBTTagCompound blockState, JSONObject when) {
+		for (String key : when.keySet()) {
+			if (!(blockState.containsKey(key) && tagEquals(blockState.get(key), when, key))) {
+				return false;
+			}
+		}
+		
+		return true;
 	}
 	
 	/**
@@ -171,6 +202,38 @@ public class BlockStateParser {
 		if (tag.getTagType() == TagType.STRING) {
 			return (tag.getAsTagString().getValue().matches(string));
 		}
+		
+		return false;
+	}
+	
+	/**
+	 * Check if an nbt tag equals a json tag.
+	 * @param tag Tag to check.
+	 * @param object JSON object json tag belongs to.
+	 * @param key JSON tag key.
+	 * @return Do they equal?
+	 */
+	protected static boolean tagEquals(NBTTag tag, JSONObject object, String key) {
+		
+		// JSON has no number type differentiation, so we have to test the tag type.
+		if (tag.getTagType() == TagType.INT) return tag.getAsTagInt().getValue() == object.getInt(key);
+		if (tag.getTagType() == TagType.FLOAT) return tag.getAsTagInt().getValue() == object.getFloat(key);
+		if (tag.getTagType() == TagType.DOUBLE) return tag.getAsTagInt().getValue() == object.getDouble(key);
+		if (tag.getTagType() == TagType.SHORT) return tag.getAsTagShort().getValue() == object.getInt(key);
+		if (tag.getTagType() == TagType.LONG) return tag.getAsTagLong().getValue() == object.getLong(key);
+		if (tag.getTagType() == TagType.STRING) return tag.getAsTagString().getValue().equals(object.get(key));
+		
+		// NBT has no boolean tag; instead byte is used. Deal with that here.
+		if (tag.getTagType() == TagType.BYTE) {
+			try {
+				return object.getBoolean(key) == (tag.getAsTagByte().getValue() != 0);
+			} catch (JSONException e) {
+				return object.getInt(key) == tag.getAsTagByte().getValue();
+			}
+		}
+
+		
+		if (object.optString(key) != null) return tag.getAsTagString().getValue().equals(object.getString(key));
 		
 		return false;
 	}
