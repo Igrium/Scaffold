@@ -253,6 +253,7 @@ public class BlockWorld implements BlockCollection {
 		File[] regionFiles = regionFolder.listFiles();
 		for (File f : regionFiles) {
 			if (FilenameUtils.getExtension(f.toString()).matches("mca")) {
+				System.out.println("Parsing region file "+f.toString());
 				world.parseRegionFile(f);
 			}
 		}
@@ -279,7 +280,9 @@ public class BlockWorld implements BlockCollection {
 		is.close();
 		
 		// Add chunks to world.
-		for (NBTTagCompound c : chunkMaps) {
+		for (int i = 0; i < chunkMaps.size(); i++) {
+			System.out.println("Parsing chunk "+i+"/"+chunkMaps.size());
+			NBTTagCompound c = chunkMaps.get(i);
 			NBTTagCompound level = c.get("Level").getAsTagCompound();
 			ChunkCoordinate coord = new ChunkCoordinate(
 					level.get("xPos").getAsTagInt().getValue(),

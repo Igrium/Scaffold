@@ -9,7 +9,12 @@
 plugins {
     // Apply the java-library plugin to add support for Java Library
     id 'java-library'
+
+    id 'application'
 }
+
+mainClassName = 'org.scaffoldeditor.nbt.test.NBTTester'
+
 
 dependencies {
     // This dependency is exported to consumers, that is to say found on their compile classpath.

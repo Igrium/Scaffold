@@ -1,8 +1,6 @@
 package org.scaffoldeditor.nbt.io;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.BitSet;
 import java.util.HashMap;
 import java.util.List;
 
@@ -147,7 +145,11 @@ public class ChunkParser {
 
 		public Block blockAt(int x, int y, int z) {
 			if (valid) {
-				return palette.get(blockArray[y][z][x]);
+				try {
+					return palette.get(blockArray[y][z][x]);	
+				} catch (IndexOutOfBoundsException e) {
+					return null;
+				}
 			} else {
 				return null;
 			}
