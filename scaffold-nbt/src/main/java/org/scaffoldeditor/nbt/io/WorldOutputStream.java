@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.zip.*;
 
-import com.github.mryurihi.tbnbt.stream.NBTInputStream;
-import com.github.mryurihi.tbnbt.tag.NBTTagCompound;
 import org.scaffoldeditor.nbt.block.BlockWorld.ChunkCoordinate;
 
 import com.github.mryurihi.tbnbt.stream.NBTOutputStream;
