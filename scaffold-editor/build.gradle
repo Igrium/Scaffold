@@ -20,6 +20,7 @@ ext {
 
 // Define the main class for the application
 mainClassName = 'org.scaffoldeditor.editor.Scaffold'
+version = '0.1.0'
 
 dependencies {
     // This dependency is found on compile classpath of this component and consumers.
@@ -39,7 +40,7 @@ dependencies {
     compile group: 'com.jgoodies', name: 'forms', version: '1.2.1'
     
     
-    compile project(':scaffold-core')
+    compile group: 'org.scaffoldeditor', name: 'scaffold-core', version: version
 
     // Use JUnit test framework
     testCompile 'junit:junit:4.12'
@@ -50,4 +51,5 @@ repositories {
     // Use jcenter for resolving your dependencies.
     // You can declare any Maven/Ivy/file repository here.
     jcenter()
+    mavenLocal()
 }
