@@ -9,11 +9,13 @@
 plugins {
     // Apply the java-library plugin to add support for Java Library
     id 'java-library'
-
     id 'application'
+    id 'maven-publish'
 }
 
 mainClassName = 'org.scaffoldeditor.nbt.test.NBTTester'
+version = '0.1.0'
+group = 'org.scaffoldeditor'
 
 
 dependencies {
@@ -37,6 +39,32 @@ test {
 	}
 }
 
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = 'scaffold-nbt'
+            version = version
+            from components.java
+            pom {
+                name = 'Scaffold NBT'
+                description = 'A library allowing you to read from and write to Minecraft worlds.'
+                url = 'http://scaffoldeditor.org'
+            }
+        }
+    }
+    
+
+    repositories {
+        // maven {
+        //     credentials {
+        //         username = "$usr"
+        //         password = "$pwd"
+        //     }
+        // }
+        mavenLocal()
+    }
+}
+
 // In this section you declare where to find the dependencies of your project
 repositories {
     // Use jcenter for resolving your dependencies.
@@ -44,7 +72,4 @@ repositories {
     jcenter()
     mavenCentral()
 
-    flatDir {
-        dirs 'libs'
-    }
 }
