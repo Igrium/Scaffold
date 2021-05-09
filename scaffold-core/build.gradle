@@ -9,9 +9,11 @@
 plugins {
     // Apply the java-library plugin to add support for Java Library
     id 'java-library'
+    id 'maven-publish'
 }
 
 version = '0.1.0'
+group = 'org.scaffoldeditor'
 
 dependencies {
     // This dependency is exported to consumers, that is to say found on their compile classpath.
@@ -27,6 +29,32 @@ dependencies {
     
     // Use JUnit test framework
     testImplementation 'junit:junit:4.12'
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = 'scaffold-core'
+            version = version
+            from components.java
+            pom {
+                name = 'Scaffold Core'
+                description = 'The core code for Scaffold.'
+                url = 'http://scaffoldeditor.org'
+            }
+        }
+    }
+    
+
+    repositories {
+        // maven {
+        //     credentials {
+        //         username = "$usr"
+        //         password = "$pwd"
+        //     }
+        // }
+        mavenLocal()
+    }
 }
 
 test {
