@@ -197,6 +197,14 @@ public class BlockWorld implements BlockCollection {
 	}
 	
 	/**
+	 * Get all this worlds chunks.
+	 * @return A map with chunk coordinates as keys and their corresponding chunks as values.
+	 */
+	public Map<ChunkCoordinate, Chunk> getChunks() {
+		return this.chunks;
+	}
+	
+	/**
 	 * Clear the BlockWorld of all chunks and blocks.
 	 */
 	public void clear() {
