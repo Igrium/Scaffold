@@ -189,7 +189,7 @@ public class NBTStrings {
 	
 	/**
 	 * Parse a string formatted tag back into a tag.
-	 * @param in String to parse.
+	 * @param value String to parse.
 	 * @return Parsed tag.
 	 * @throws IOException If the string is formatted improperly.
 	 */
