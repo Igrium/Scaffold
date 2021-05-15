@@ -78,7 +78,7 @@ public class Level {
 	/**
 	 * Create a new level
 	 * @param project Project to create level in
-	 * @param name Level name.
+	 * @param prettyName Level name.
 	 */
 	public Level(Project project, String prettyName) {
 		this.project = project;
@@ -424,6 +424,10 @@ public class Level {
 		}
 		
 		return true;
+	}
+	
+	public BlockWorld getBlockWorld() {
+		return this.blockWorld;
 	}
 	
 	/**

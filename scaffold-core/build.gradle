@@ -33,6 +33,13 @@ dependencies {
     testImplementation 'junit:junit:4.12'
 }
 
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+
+
 publishing {
     publications {
         mavenJava(MavenPublication) {

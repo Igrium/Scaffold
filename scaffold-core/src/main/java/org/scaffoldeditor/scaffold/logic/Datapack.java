@@ -139,7 +139,7 @@ public class Datapack {
 	
 	/**
 	 * Format a function name as if it were in the default namespace.
-	 * @param function Function name to format.
+	 * @param name Function name to format.
 	 * @return Formatted name.
 	 */
 	public String formatFunctionCall(String name) {
