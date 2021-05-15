@@ -145,9 +145,9 @@ public class BlockWorld implements BlockCollection {
 	 * @param override Should override existing blocks?
 	 */
 	public void addBlockCollection(SizedBlockCollection collection, int x, int y, int z, boolean override) {
-		for (int Y = 0; Y < collection.getWidth(); Y++) {
+		for (int Y = 0; Y < collection.getHeight(); Y++) {
 			for (int Z = 0; Z < collection.getLength(); Z++) {
-				for (int X = 0; X < collection.getHeight(); X++) {
+				for (int X = 0; X < collection.getWidth(); X++) {
 					int globalX = x + X;
 					int globalY = y + Y;
 					int globalZ = z + Z;
