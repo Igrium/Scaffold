@@ -1,6 +1,5 @@
 package org.scaffoldeditor.scaffold.level.entity.game;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,6 +7,9 @@ import java.util.List;
 import org.json.JSONObject;
 import org.scaffoldeditor.nbt.NBTStrings;
 import org.scaffoldeditor.scaffold.level.Level;
+import org.scaffoldeditor.scaffold.level.entity.Entity;
+import org.scaffoldeditor.scaffold.level.entity.EntityFactory;
+import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
 import org.scaffoldeditor.scaffold.level.entity.Rotatable;
 import org.scaffoldeditor.scaffold.logic.Datapack;
 import org.scaffoldeditor.scaffold.math.Vector;
@@ -24,6 +26,15 @@ import com.github.mryurihi.tbnbt.tag.NBTTagString;
  *
  */
 public class GameEntity extends Rotatable implements TargetSelectable {
+	
+	public static void Register() {
+		EntityRegistry.registry.put("game_entity", new EntityFactory<Entity>() {		
+			@Override
+			public Entity create(Level level, String name) {
+				return new GameEntity(level, name);
+			}
+		});
+	}
 
 	public GameEntity(Level level, String name) {
 		super(level, name);

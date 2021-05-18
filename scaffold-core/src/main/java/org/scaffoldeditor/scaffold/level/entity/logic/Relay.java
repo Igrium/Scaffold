@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
+import org.scaffoldeditor.scaffold.level.entity.EntityFactory;
+import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
 import org.scaffoldeditor.scaffold.level.io.Input;
 import org.scaffoldeditor.scaffold.logic.Datapack;
 import org.scaffoldeditor.scaffold.logic.MCFunction;
@@ -14,6 +16,15 @@ import org.scaffoldeditor.scaffold.logic.MCFunction;
  * @author Sam54123
  */
 public class Relay extends Entity {
+	
+	public static void Register() {
+		EntityRegistry.registry.put("logic_relay", new EntityFactory<Entity>() {		
+			@Override
+			public Entity create(Level level, String name) {
+				return new Relay(level, name);
+			}
+		});
+	}
 
 	public Relay(Level level, String name) {
 		super(level, name);

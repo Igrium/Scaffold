@@ -8,6 +8,8 @@ import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.BlockEntity;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
+import org.scaffoldeditor.scaffold.level.entity.EntityFactory;
+import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
 import org.scaffoldeditor.scaffold.math.Vector;
 
 import com.github.mryurihi.tbnbt.tag.NBTTag;
@@ -18,6 +20,15 @@ import com.github.mryurihi.tbnbt.tag.NBTTagCompound;
  * @author Sam54123
  */
 public class SingleBlock extends Entity implements BlockEntity {
+	
+	public static void Register() {
+		EntityRegistry.registry.put("single_block", new EntityFactory<Entity>() {		
+			@Override
+			public Entity create(Level level, String name) {
+				return new SingleBlock(level, name);
+			}
+		});
+	}
 	
 	public SingleBlock(Level level, String name) {
 		super(level, name);

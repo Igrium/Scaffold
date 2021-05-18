@@ -6,7 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.scaffoldeditor.nbt.block.BlockCollectionManager;
+import org.scaffoldeditor.scaffold.plugin_utils.DefaultPlugin;
 
 /**
  * A Project is an object that defines all the main attributes of a project
@@ -25,14 +25,14 @@ public class Project {
 	private AssetManager assetManager;
 	
 	/**
-	 * Create an empty project wckith an empty gameinfo
+	 * Create an empty project with an empty gameinfo
 	 * @param projectFolder Folder to initialize the project in
 	 */
 	public Project(Path projectFolder) {
 		this.projectFolder = projectFolder;
 		gameInfo = new GameInfo();
 		assetManager = new AssetManager(this);
-		BlockCollectionManager.registerDefaults();
+		new DefaultPlugin().initialize();
 	}
 
 	
@@ -108,7 +108,7 @@ public class Project {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			System.out.println("Unable to create folder structure!");
+			System.err.println("Unable to create folder structure!");
 		}
 		
 		return project;

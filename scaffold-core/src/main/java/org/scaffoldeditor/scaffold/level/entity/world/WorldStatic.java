@@ -10,6 +10,9 @@ import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.nbt.block.SizedBlockCollection;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.BlockEntity;
+import org.scaffoldeditor.scaffold.level.entity.Entity;
+import org.scaffoldeditor.scaffold.level.entity.EntityFactory;
+import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
 import org.scaffoldeditor.scaffold.level.entity.Faceable;
 import org.scaffoldeditor.scaffold.math.Vector;
 
@@ -17,11 +20,20 @@ import org.scaffoldeditor.scaffold.math.Vector;
  * This entity compiles a standard block collection into the world.
  * @author Sam54123
  */
-public class PropStatic extends Faceable implements BlockEntity {
+public class WorldStatic extends Faceable implements BlockEntity {
 	
 	private SizedBlockCollection model;
+	
+	public static void Register() {
+		EntityRegistry.registry.put("world_static", new EntityFactory<Entity>() {		
+			@Override
+			public Entity create(Level level, String name) {
+				return new WorldStatic(level, name);
+			}
+		});
+	}
 
-	public PropStatic(Level level, String name) {
+	public WorldStatic(Level level, String name) {
 		super(level, name);
 		setAttribute("model", "");
 	}

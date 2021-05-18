@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
+import org.scaffoldeditor.scaffold.level.entity.EntityFactory;
+import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
 import org.scaffoldeditor.scaffold.level.io.Input;
 
 /**
@@ -11,6 +13,15 @@ import org.scaffoldeditor.scaffold.level.io.Input;
  * @author Sam54123
  */
 public class FunctionEntity extends Entity {
+	
+	public static void Register() {
+		EntityRegistry.registry.put("logic_function", new EntityFactory<Entity>() {		
+			@Override
+			public Entity create(Level level, String name) {
+				return new FunctionEntity(level, name);
+			}
+		});
+	}
 	
 	public FunctionEntity(Level level, String name) {
 		super(level, name);
