@@ -16,10 +16,11 @@ import org.scaffoldeditor.scaffold.level.io.Input;
 import org.scaffoldeditor.scaffold.level.io.Output;
 import org.scaffoldeditor.scaffold.logic.Datapack;
 import org.scaffoldeditor.scaffold.math.Vector;
+import org.w3c.dom.Element;
 
 /**
  * Base entity class in maps
- * @author Sam54123
+ * @author Igrium
  *
  */
 public class Entity {
@@ -44,7 +45,7 @@ public class Entity {
 	/**
 	 * The type name this entity gets saved with when serialized.
 	 */
-	public String typeName;
+	public String registryName;
 	
 	
 	/* Position of the entity in world space */
@@ -290,75 +291,12 @@ public class Entity {
 		
 		return object;
 	}
-
-	
-//	/**
-//	 * Unserialize an entity fom a JSON object.
-//	 * @param level Level this entity should belong to
-//	 * @param name Name of the entity
-//	 * @param object JSON object to unserialize from
-//	 * @return Unserialized entity
-//	 */
-//	public static Entity unserialize(Level level, String name, JSONObject object) {
-//		try {
-//			// Create object	
-//			Class<?> entityType = Class.forName(object.getString("type"));
-//			Entity entity;
-//			
-//			if (!Entity.class.isAssignableFrom(entityType)) {
-//				System.out.println(entityType+
-//						" is not a subclass of org.metaversemedia.scaffold.level.entity.Entity!");
-//				return null;
-//			}
-//			
-//			entity = (Entity)
-//						entityType.getDeclaredConstructor(new Class[] {Level.class,String.class}).newInstance(level, name);
-//			
-//			
-//			// Basic info
-//			entity.setPosition(Vector.fromJSONArray(object.getJSONArray("position")));
-//			
-//			// Attributes
-//			JSONObject attributes = object.getJSONObject("attributes");
-//			
-//			for (String key : attributes.keySet()) {
-//				Object attribute = attributes.get(key);
-//				entity.attributes().put(key, attribute);
-//			}
-//			
-//			// Outputs
-//			JSONArray outputs = object.getJSONArray("outputs");
-//			for (Object o : outputs) {
-//				JSONObject outputJSON = (JSONObject) o;
-//				entity.outputs.add(Output.unserialize(outputJSON, entity));
-//				
-//			}
-//			
-//			entity.onUpdateAttributes();
-//			entity.onUnserialized(object);
-//			return entity;
-//		} catch (JSONException e) {
-//			System.out.println("Improperly formatted entity: "+name);
-//			return null;
-//			
-//		} catch (ClassNotFoundException e) {
-//			// TODO Auto-generated catch block
-//			System.out.println("Unknown class: "+object.getString("type"));
-//			return null;
-//			
-//		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-//				| InvocationTargetException | NoSuchMethodException | SecurityException e) {
-//			e.printStackTrace();
-//			return null;
-//		}
-//		
-//	}
 	
 	/**
-	 * Called when entity is unserialized for subclasses to act on.
-	 * @param object JSONObject serialized from.
+	 * Called when entity is deserialized for subclasses to act on.
+	 * @param xml XML element that it was deserialized from.
 	 */
-	protected void onUnserialized(JSONObject object) {}
+	public void onUnserialized(Element xml) {}
 	
 	/**
 	 * Called whenever any attributes are updated for subclasses to act on.

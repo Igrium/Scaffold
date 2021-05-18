@@ -16,19 +16,19 @@ public final class EntityRegistry {
 	
 	/**
 	 * Spawn an entity.
-	 * @param typeName Type of entity to spawn.
+	 * @param registryName Registry name of the entity to spawn.
 	 * @param level Level to spawn in.
 	 * @param name Name to assign.
 	 * @return Newly created entity.
 	 */
-	public static Entity createEntity(String typeName, Level level, String name) {
-		if (!registry.containsKey(typeName)) {
-			System.err.println("Unknown entity type: "+typeName);
+	public static Entity createEntity(String registryName, Level level, String name) {
+		if (!registry.containsKey(registryName)) {
+			System.err.println("Unknown entity type: "+registryName);
 			return null;
 		}
 		
-		Entity entity = registry.get(typeName).create(level, name);
-		entity.typeName = typeName;
+		Entity entity = registry.get(registryName).create(level, name);
+		entity.registryName = registryName;
 		return entity;
 	}
 }
