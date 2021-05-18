@@ -10,11 +10,18 @@ import org.w3c.dom.Text;
 import com.github.mryurihi.tbnbt.tag.NBTTagCompound;
 
 public class NBTSerializer implements XMLSerializable<NBTTagCompound> {
+	
+	public static final String TAG_NAME = "NBT";
 
-
+	private final NBTTagCompound object;
+	
+	public NBTSerializer(NBTTagCompound nbt) {
+		object = nbt;
+	}
+	
 	@Override
-	public Element serialize(NBTTagCompound object, Document document) {
-		Element element = document.createElement("NBT");
+	public Element serialize(Document document) {
+		Element element = document.createElement(TAG_NAME);
 		Text text = document.createTextNode(NBTStrings.nbtToString(object));
 		element.appendChild(text);
 		return element;

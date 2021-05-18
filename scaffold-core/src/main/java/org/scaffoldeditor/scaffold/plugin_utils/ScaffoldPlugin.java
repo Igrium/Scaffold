@@ -1,12 +1,12 @@
 package org.scaffoldeditor.scaffold.plugin_utils;
 
 import static java.lang.annotation.ElementType.TYPE;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import java.lang.annotation.RetentionPolicy;
 
-import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+import java.lang.annotation.Retention;
 
-@Retention(RUNTIME)
+@Retention(RetentionPolicy.RUNTIME)
 @Target(TYPE)
 /**
  * Classes marked as a scaffold plugin that implement PluginInitializer

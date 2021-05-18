@@ -15,5 +15,5 @@ public interface XMLSerializable<T> {
 	 * @param document The document to serialize onto.
 	 * @return Serialized XML node.
 	 */
-	public Node serialize(T object, Document document);
+	public Node serialize(Document document);
 }
