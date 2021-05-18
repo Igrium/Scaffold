@@ -28,6 +28,7 @@ dependencies {
 
     implementation 'org.json:json:20190722'
     implementation 'org.python:jython:2.7.1b3'
+    implementation 'org.reflections:reflections:0.9.11'
     
     // Use JUnit test framework
     testImplementation 'junit:junit:4.12'

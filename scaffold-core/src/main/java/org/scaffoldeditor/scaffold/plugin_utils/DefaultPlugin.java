@@ -7,10 +7,12 @@ import org.scaffoldeditor.scaffold.level.entity.logic.Relay;
 import org.scaffoldeditor.scaffold.level.entity.world.WorldStatic;
 import org.scaffoldeditor.scaffold.level.entity.world.SingleBlock;
 
+@ScaffoldPlugin
 public class DefaultPlugin implements PluginInitializer {
 
 	@Override
 	public void initialize() {
+		System.out.println("Initializing default plugin...");
 		BlockCollectionManager.registerDefaults();
 
 		WorldStatic.Register();
