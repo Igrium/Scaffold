@@ -2,8 +2,6 @@ package org.scaffoldeditor.scaffold.level.entity.world;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
-
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.BlockCollectionManager;
 import org.scaffoldeditor.nbt.block.BlockWorld;
@@ -14,6 +12,7 @@ import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.EntityFactory;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
 import org.scaffoldeditor.scaffold.level.entity.Faceable;
+import org.scaffoldeditor.scaffold.level.entity.attribute.StringAttribute;
 import org.scaffoldeditor.scaffold.math.Vector;
 
 /**
@@ -35,14 +34,7 @@ public class WorldStatic extends Faceable implements BlockEntity {
 
 	public WorldStatic(Level level, String name) {
 		super(level, name);
-		setAttribute("model", "");
-	}
-	
-	@Override
-	public List<AttributeDeclaration> getAttributeFields() {
-		List<AttributeDeclaration> attributes = super.getAttributeFields();
-		attributes.add(new AttributeDeclaration("model", String.class));
-		return attributes;
+		setAttribute("model", new StringAttribute(""));
 	}
 	
 	@Override
@@ -55,7 +47,8 @@ public class WorldStatic extends Faceable implements BlockEntity {
 	 * Reload model from file.
 	 */
 	public void reload() {
-		String model = (String) getAttribute("model");	
+		StringAttribute attribute = (StringAttribute) getAttribute("model");
+		String model = attribute.getValue();
 		System.out.println("Loading model " + model);
 		if (model.contentEquals("")) {
 			return;

@@ -1,9 +1,8 @@
 package org.scaffoldeditor.scaffold.level.entity;
 
-import java.util.List;
-
 import org.json.JSONObject;
 import org.scaffoldeditor.scaffold.level.Level;
+import org.scaffoldeditor.scaffold.level.entity.attribute.StringAttribute;
 /**
  * This type of entity can face any of the four cardinal directions,
  * but cannot have arbitrary rotations
@@ -23,29 +22,26 @@ public class Faceable extends Entity {
 
 	public Faceable(Level level, String name) {
 		super(level, name);
-		attributes().put("direction", Direction.NORTH);
+		setDirection(Direction.NORTH);
 	}
 	
 	/* Make sure Direction is an enum, and not a string */
 	@Override
 	public void onUnserialized(JSONObject object) {
 		if (getAttribute("direction").equals("SOUTH")) {
-			setAttribute("direction", Direction.SOUTH);
+			setDirection(Direction.SOUTH);
 		} else if (getAttribute("direction").equals("WEST")) {
-			setAttribute("direction", Direction.WEST);
+			setDirection(Direction.WEST);
 		} else if (getAttribute("direction").equals("EAST")) {
-			setAttribute("direction", Direction.EAST);
+			setDirection(Direction.EAST);
 		} else {
-			setAttribute("direction", Direction.NORTH); // North is default
+			setDirection(Direction.NORTH); // North is default
 		}
 		
 	}
 	
-	@Override
-	public List<AttributeDeclaration> getAttributeFields() {
-		List<AttributeDeclaration> attributeFields = super.getAttributeFields();
-		attributeFields.add(new AttributeDeclaration("Direction", Direction.class));
-		return attributeFields;
+	public void setDirection(Direction direction) {
+		setAttribute("direction", new StringAttribute(direction.toString()));
 	}
 	
 }

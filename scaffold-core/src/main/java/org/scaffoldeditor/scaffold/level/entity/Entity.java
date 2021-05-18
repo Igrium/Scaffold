@@ -1,6 +1,5 @@
 package org.scaffoldeditor.scaffold.level.entity;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -9,10 +8,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.scaffoldeditor.scaffold.core.Project;
 import org.scaffoldeditor.scaffold.level.Level;
+import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.io.Input;
 import org.scaffoldeditor.scaffold.level.io.Output;
 import org.scaffoldeditor.scaffold.logic.Datapack;
@@ -24,26 +23,6 @@ import org.scaffoldeditor.scaffold.math.Vector;
  *
  */
 public class Entity {
-	
-	/**
-	 * Used to declare attribute types by name.
-	 */
-	public class AttributeDeclaration {
-		private String name;
-		private Class<? extends Object> type;
-		
-		public AttributeDeclaration(String name, Class<? extends Object> type) {
-			this.name = name;
-			this.type = type;
-		}
-		
-		public String name() {
-			return name;
-		}
-		public Class<? extends Object> type() {
-			return type;
-		}
-	}
 	
 	/**
 	 * Special case used to declare file paths as attributes.
@@ -78,7 +57,7 @@ public class Entity {
 	private Level level;
 	
 	/* All this entity's attributes */
-	private Map<String, Object> attributes = new HashMap<String, Object>();
+	private Map<String, Attribute<?>> attributes = new HashMap<>();
 	
 	/**
 	 * Construct a new entity with a name and a level.
@@ -122,14 +101,6 @@ public class Entity {
 	 */
 	public String getRenderAsset() {
 		return "scaffold/textures/editor/billboard_generic.png";
-	}
-	
-	/**
-	 * Get a list of all the attribute fields.
-	 * @return Attribute Fields.
-	 */
-	public List<AttributeDeclaration> getAttributeFields() {
-		return new ArrayList<AttributeDeclaration>();
 	}
 	
 	/**
@@ -179,7 +150,7 @@ public class Entity {
 	 * Get a map of this entity's attributes.
 	 * @return Attributes
 	 */
-	protected Map<String, Object> attributes() {
+	protected Map<String, Attribute<?>> attributes() {
 		return attributes;
 	}
 	
@@ -197,7 +168,7 @@ public class Entity {
 	 * @param name Attribute name.
 	 * @param value Attribute value.
 	 */
-	public void setAttribute(String name, Object value) {
+	public void setAttribute(String name, Attribute<?> value) {
 		attributes.put(name, value);
 		onUpdateAttributes();
 	}
@@ -207,7 +178,7 @@ public class Entity {
 	 * Get an attribute by name
 	 * @param name Attribute
 	 */
-	public Object getAttribute(String name) {
+	public Attribute<?> getAttribute(String name) {
 		return attributes.get(name);
 	}
 	
@@ -321,67 +292,67 @@ public class Entity {
 	}
 
 	
-	/**
-	 * Unserialize an entity fom a JSON object.
-	 * @param level Level this entity should belong to
-	 * @param name Name of the entity
-	 * @param object JSON object to unserialize from
-	 * @return Unserialized entity
-	 */
-	public static Entity unserialize(Level level, String name, JSONObject object) {
-		try {
-			// Create object	
-			Class<?> entityType = Class.forName(object.getString("type"));
-			Entity entity;
-			
-			if (!Entity.class.isAssignableFrom(entityType)) {
-				System.out.println(entityType+
-						" is not a subclass of org.metaversemedia.scaffold.level.entity.Entity!");
-				return null;
-			}
-			
-			entity = (Entity)
-						entityType.getDeclaredConstructor(new Class[] {Level.class,String.class}).newInstance(level, name);
-			
-			
-			// Basic info
-			entity.setPosition(Vector.fromJSONArray(object.getJSONArray("position")));
-			
-			// Attributes
-			JSONObject attributes = object.getJSONObject("attributes");
-			
-			for (String key : attributes.keySet()) {
-				Object attribute = attributes.get(key);
-				entity.attributes().put(key, attribute);
-			}
-			
-			// Outputs
-			JSONArray outputs = object.getJSONArray("outputs");
-			for (Object o : outputs) {
-				JSONObject outputJSON = (JSONObject) o;
-				entity.outputs.add(Output.unserialize(outputJSON, entity));
-				
-			}
-			
-			entity.onUpdateAttributes();
-			entity.onUnserialized(object);
-			return entity;
-		} catch (JSONException e) {
-			System.out.println("Improperly formatted entity: "+name);
-			return null;
-			
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			System.out.println("Unknown class: "+object.getString("type"));
-			return null;
-			
-		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-				| InvocationTargetException | NoSuchMethodException | SecurityException e) {
-			e.printStackTrace();
-			return null;
-		}
-		
-	}
+//	/**
+//	 * Unserialize an entity fom a JSON object.
+//	 * @param level Level this entity should belong to
+//	 * @param name Name of the entity
+//	 * @param object JSON object to unserialize from
+//	 * @return Unserialized entity
+//	 */
+//	public static Entity unserialize(Level level, String name, JSONObject object) {
+//		try {
+//			// Create object	
+//			Class<?> entityType = Class.forName(object.getString("type"));
+//			Entity entity;
+//			
+//			if (!Entity.class.isAssignableFrom(entityType)) {
+//				System.out.println(entityType+
+//						" is not a subclass of org.metaversemedia.scaffold.level.entity.Entity!");
+//				return null;
+//			}
+//			
+//			entity = (Entity)
+//						entityType.getDeclaredConstructor(new Class[] {Level.class,String.class}).newInstance(level, name);
+//			
+//			
+//			// Basic info
+//			entity.setPosition(Vector.fromJSONArray(object.getJSONArray("position")));
+//			
+//			// Attributes
+//			JSONObject attributes = object.getJSONObject("attributes");
+//			
+//			for (String key : attributes.keySet()) {
+//				Object attribute = attributes.get(key);
+//				entity.attributes().put(key, attribute);
+//			}
+//			
+//			// Outputs
+//			JSONArray outputs = object.getJSONArray("outputs");
+//			for (Object o : outputs) {
+//				JSONObject outputJSON = (JSONObject) o;
+//				entity.outputs.add(Output.unserialize(outputJSON, entity));
+//				
+//			}
+//			
+//			entity.onUpdateAttributes();
+//			entity.onUnserialized(object);
+//			return entity;
+//		} catch (JSONException e) {
+//			System.out.println("Improperly formatted entity: "+name);
+//			return null;
+//			
+//		} catch (ClassNotFoundException e) {
+//			// TODO Auto-generated catch block
+//			System.out.println("Unknown class: "+object.getString("type"));
+//			return null;
+//			
+//		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+//				| InvocationTargetException | NoSuchMethodException | SecurityException e) {
+//			e.printStackTrace();
+//			return null;
+//		}
+//		
+//	}
 	
 	/**
 	 * Called when entity is unserialized for subclasses to act on.

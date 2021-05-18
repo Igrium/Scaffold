@@ -1,8 +1,7 @@
 package org.scaffoldeditor.scaffold.level.entity;
 
-import java.util.List;
-
 import org.scaffoldeditor.scaffold.level.Level;
+import org.scaffoldeditor.scaffold.level.entity.attribute.FloatAttribute;
 
 /**
  * Defines an entity that can be rotated on the X and Y axis
@@ -13,18 +12,8 @@ public class Rotatable extends Entity {
 
 	public Rotatable(Level level, String name) {
 		super(level, name);
-		attributes().put("rotX", 0.0f);
-		attributes().put("rotY", 0.0f);
-	}
-	
-	@Override
-	public List<AttributeDeclaration> getAttributeFields() {
-		List<AttributeDeclaration> attributeFields = super.getAttributeFields();
-		
-		attributeFields.add(new AttributeDeclaration("rotX", Float.class));
-		attributeFields.add(new AttributeDeclaration("rotY", Float.class));
-		
-		return attributeFields;
+		attributes().put("rotX", new FloatAttribute(0f));
+		attributes().put("rotY", new FloatAttribute(0f));
 	}
 	
 	/**
@@ -32,7 +21,7 @@ public class Rotatable extends Entity {
 	 * @return X Degrees
 	 */
 	public float rotX() {
-		return (float) getAttribute("rotX");
+		return ((FloatAttribute) getAttribute("rotX")).getValue();
 	}
 	
 	/**
@@ -40,7 +29,7 @@ public class Rotatable extends Entity {
 	 * @return Y Degrees
 	 */
 	public float rotY() {
-		return (float) getAttribute("rotY");
+		return ((FloatAttribute) getAttribute("rotY")).getValue();
 	}
 	
 	/**
@@ -48,7 +37,7 @@ public class Rotatable extends Entity {
 	 * @param deg X Degrees
 	 */
 	public void setRotX(float deg) {
-		setAttribute("rotX", deg);
+		setAttribute("rotX", new FloatAttribute(deg));
 	}
 	
 	/**
@@ -56,7 +45,7 @@ public class Rotatable extends Entity {
 	 * @param deg Y Degrees
 	 */
 	public void setRotY(float deg) {
-		setAttribute("rotY", deg);
+		setAttribute("rotY", new FloatAttribute(deg));
 	}
 
 }

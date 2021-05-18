@@ -14,4 +14,9 @@ public abstract class Attribute<T> implements XMLSerializable<Attribute<T>> {
 	public abstract void setValue(T value);
 	public abstract Element serialize(Document document);
 	
+	@Override
+	public String toString() {
+		return getValue().toString();
+	}
+	
 }

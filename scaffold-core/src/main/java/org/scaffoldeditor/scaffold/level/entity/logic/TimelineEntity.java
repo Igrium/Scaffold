@@ -6,6 +6,7 @@ import java.util.List;
 import org.json.JSONException;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
+import org.scaffoldeditor.scaffold.level.entity.attribute.StringAttribute;
 import org.scaffoldeditor.scaffold.level.io.Input;
 import org.scaffoldeditor.scaffold.logic.Datapack;
 import org.scaffoldeditor.scaffold.logic.MCFunction;
@@ -23,7 +24,7 @@ public class TimelineEntity extends Entity {
 
 	public TimelineEntity(Level level, String name) {
 		super(level, name);
-		setAttribute("file", "");
+		setAttribute("file", new StringAttribute(name));
 		
 		this.registerInput(new Input(this) {
 
@@ -101,22 +102,15 @@ public class TimelineEntity extends Entity {
 	}
 	
 	@Override
-	public List<AttributeDeclaration> getAttributeFields() {
-		List<AttributeDeclaration> attributes = super.getAttributeFields();
-		attributes.add(new AttributeDeclaration("file", String.class));
-		return attributes;
-	}
-	
-	@Override
 	protected void onUpdateAttributes() {
 		super.onUpdateAttributes();
 		
-		if (!((String) getAttribute("file")).matches(oldFile)) {
+		if (!((StringAttribute) getAttribute("file")).getValue().matches(oldFile)) {
 			
 			// Load timeline from file.
 			try {
 				timeline = Timeline.unserialize(JSONUtils
-						.loadJSON(getLevel().getProject().assetManager().findAsset((String) getAttribute("file"))));
+						.loadJSON(getLevel().getProject().assetManager().findAsset(((StringAttribute) getAttribute("file")).getValue())));
 				System.out.println("Loaded timeline: "+getAttribute("file"));
 			} catch (JSONException | IOException e) {
 				System.out.println("Unable to load timeline: "+getAttribute("file"));
