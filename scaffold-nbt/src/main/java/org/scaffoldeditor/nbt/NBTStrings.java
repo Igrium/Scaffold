@@ -1,6 +1,5 @@
 package org.scaffoldeditor.nbt;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -143,9 +142,9 @@ public class NBTStrings {
 	 * Generate a compound map from a string.
 	 * @param inString String to generate from.
 	 * @return Generated CompoundMap.
-	 * @throws IOException If the string is formatted improperly.
+	 * @throws IllegalArgumentException If the string is formatted improperly.
 	 */
-	public static NBTTagCompound nbtFromString(String inString) throws IOException {
+	public static NBTTagCompound nbtFromString(String inString) throws IllegalArgumentException {
 		NBTTagCompound map = new NBTTagCompound(new HashMap<String, NBTTag>());
 		
 		if (inString.length() < 2) {
@@ -156,7 +155,7 @@ public class NBTStrings {
 		inString = inString.trim();
 		inString = inString.replace("\n", "");
 		if (!(inString.charAt(0) == '{' && inString.charAt(inString.length()-1) == '}')) {
-			throw new IOException("NBT String is missing brackets! ({})");
+			throw new IllegalArgumentException("NBT String is missing brackets! ({})");
 		}
 		// Remove brackets
 		inString = inString.substring(1,inString.length()-1);
@@ -191,9 +190,9 @@ public class NBTStrings {
 	 * Parse a string formatted tag back into a tag.
 	 * @param value String to parse.
 	 * @return Parsed tag.
-	 * @throws IOException If the string is formatted improperly.
+	 * @throws IllegalArgumentException If the string is formatted improperly.
 	 */
-	public static NBTTag parseTag(String value) throws IOException {
+	public static NBTTag parseTag(String value) throws IllegalArgumentException {
 
 		// Generate tag
 		NBTTag tag = null;
@@ -218,20 +217,20 @@ public class NBTStrings {
 		} else if (value.charAt(value.length()-1) == 'b') {
 			tag = new NBTTagByte(parseByte(value));
 		} else {
-			throw new IOException("Unable to parse nbt string: "+value);
+			throw new IllegalArgumentException("Unable to parse nbt string: "+value);
 		}
 		
 		return tag;
 	}
 	
-	private static NBTTagList parseList(String inString) throws IOException {
+	private static NBTTagList parseList(String inString) throws IllegalArgumentException {
 		// Remove newlines and whitespace
 		inString = inString.trim();
 		inString = inString.replace("\n", "");
 		
 		// Check for brackets
 		if (!(inString.charAt(0) == '[' && inString.charAt(inString.length()-1) == ']')) {
-			throw new IOException("NBT List String is missing brackets! ([])");
+			throw new IllegalArgumentException("NBT List String is missing brackets! ([])");
 		}
 		
 		// Remove brackets
@@ -253,9 +252,9 @@ public class NBTStrings {
 		return in.substring(1,in.length()-1); // Remove quotes
 	}
 	
-	public static byte parseByte(String in) throws IOException {
+	public static byte parseByte(String in) throws IllegalArgumentException {
 		if (in.charAt(in.length()-1) != 'b') {
-			throw new IOException("Unable to parse byte: "+in);
+			throw new IllegalArgumentException("Unable to parse byte: "+in);
 		}
 		
 		in = in.substring(0, in.length()-1); // remove b at the end

@@ -130,12 +130,7 @@ public class GameEntity extends Rotatable implements TargetSelectable {
 		
 		// Parse NBT data.
 		String nbt = (String) getAttribute("nbt");
-		try {
-			setAttribute("nbt", NBTStrings.nbtFromString(nbt));
-		} catch (IOException e) {
-			System.out.println("Unable to parse NBT: "+nbt);
-			setAttribute("nbt", new NBTTagCompound(new HashMap<String, NBTTag>()));
-		}
+		setAttribute("nbt", NBTStrings.nbtFromString(nbt));
 	}
 	
 	
