@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +22,7 @@ import org.scaffoldeditor.scaffold.core.Constants;
 import org.scaffoldeditor.scaffold.core.Project;
 import org.scaffoldeditor.scaffold.level.entity.BlockEntity;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
+import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
 import org.scaffoldeditor.scaffold.level.entity.game.TargetSelectable;
 import org.scaffoldeditor.scaffold.logic.Datapack;
 import org.scaffoldeditor.scaffold.logic.MCFunction;
@@ -49,6 +52,9 @@ public class Level {
 	
 	/* All the entities in the map */
 	private Map<String, Entity> entities = new HashMap<String, Entity>();
+	
+	/* The order of entities in the map */
+	private List<String> entityStack = new ArrayList<>();
 	
 	private LevelData levelData = new LevelData(this);
 	
@@ -97,6 +103,10 @@ public class Level {
 	 */
 	public Map<String, Entity> getEntities() {
 		return entities;
+	}
+	
+	public List<String> getEntityStack() {
+		return entityStack;
 	}
 	
 	/**
@@ -177,40 +187,40 @@ public class Level {
 		return datapack;
 	}
 	
-	/**
-	 * Create a new entity.
-	 * @param entityType Class of entity object to create
-	 * @param name Name of entity
-	 * @param position Position of entity
-	 * @return Newly created entity
-	 */
-	public Entity newEntity(Class<? extends Entity> entityType, String name, Vector position) {
-		// Make sure entity with name doesn't already exist
+	protected String validateName(String name, String[] ignore) {
+		if (Arrays.asList(ignore).contains(name)) {
+			return name;
+		}
+		
 		while (entities.get(name) != null) {
 			// Attempt to increment number
-			if (Character.isDigit(name.charAt(name.length()-1))) {
-				int lastNum = Character.getNumericValue(name.charAt(name.length()-1))+1;
-				name = name.substring(0,name.length() - 1) + lastNum;
+			if (Character.isDigit(name.charAt(name.length() - 1))) {
+				int lastNum = Character.getNumericValue(name.charAt(name.length() - 1)) + 1;
+				name = name.substring(0, name.length() - 1) + lastNum;
 			} else {
-				name = name+'1';
+				name = name + '1';
 			}
-
 		}
-		// Create entity
-		Entity entity = null;
-		try {
-			entity = entityType.getDeclaredConstructor(new Class[] {Level.class,String.class}).newInstance(this, name);
-			entity.setPosition(position);
-		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
-				| NoSuchMethodException | SecurityException e) {
-			e.printStackTrace();
-			return null;
-		}
+		return name;
+	}
+	
+	/**
+	 * Create a new entitiy.
+	 * @param typeName Type name of entity to spawn.
+	 * @param name Name of entity.
+	 * @param position Position of entity.
+	 * @return Newly created entity.
+	 */
+	public Entity newEntity(String typeName, String name, Vector position) {
+		// Make sure entity with name doesn't already exist
+		name = validateName(name, new String[] {});
 		
-		// Add to entities list
+		Entity entity = EntityRegistry.createEntity(typeName, this, name);
+		entity.setPosition(position);
+		
 		entities.put(name, entity);
+		entityStack.add(name);
 		
-		compileBlockWorld(false);
 		return entity;
 	}
 	
@@ -223,13 +233,18 @@ public class Level {
 	 */
 	public boolean renameEntity(String oldName, String newName) {
 		// Make sure entity exists and name is available
-		if (entities.get(oldName) == null || entities.get(newName) != null) {
+		if (entities.get(oldName) == null) {
 			return false;
 		}
+		
+		newName = validateName(newName, new String[] {oldName});
 		
 		Entity ent = entities.get(oldName);
 		entities.put(newName, ent);
 		entities.remove(oldName);
+		
+		int stackIndex = entityStack.indexOf(oldName);
+		entityStack.set(stackIndex, newName);
 		
 		ent.setName(newName);
 		return true;

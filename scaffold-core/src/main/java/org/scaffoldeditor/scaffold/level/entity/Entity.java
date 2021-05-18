@@ -11,7 +11,6 @@ import java.util.Set;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.scaffold.core.Project;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.io.Input;
@@ -62,6 +61,12 @@ public class Entity {
 	public enum RenderType {
 		SPRITE, MODEL
 	}
+	
+	/**
+	 * The type name this entity gets saved with when serialized.
+	 */
+	public String typeName;
+	
 	
 	/* Position of the entity in world space */
 	private Vector position;
