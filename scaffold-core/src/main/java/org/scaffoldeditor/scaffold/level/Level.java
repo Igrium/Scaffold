@@ -87,6 +87,7 @@ public class Level {
 	public boolean autoRecompile = true;
 	
 	private List<WorldUpdateListener> worldUpdateListeners = new ArrayList<>();
+	private List<Runnable> updateStackListeners = new ArrayList<>();
 	
 	/**
 	 * Create a new level
@@ -245,6 +246,7 @@ public class Level {
 		
 		entities.put(name, entity);
 		entityStack.add(name);
+		updateEntityStack();
 		
 		return entity;
 	}
@@ -270,8 +272,8 @@ public class Level {
 		
 		int stackIndex = entityStack.indexOf(oldName);
 		entityStack.set(stackIndex, newName);
-		
 		ent.setName(newName);
+		updateEntityStack();
 		return true;
 	}
 	
@@ -527,6 +529,22 @@ public class Level {
 	
 	public BlockWorld getBlockWorld() {
 		return this.blockWorld;
+	}
+	
+	/**
+	 * Called when there is an update to the entity stack.
+	 */
+	public void onUpdateEntityStack(Runnable listener) {
+		updateStackListeners.add(listener);
+	}
+	
+	/**
+	 * Trigger all entity stack listeners.
+	 */
+	public void updateEntityStack() {
+		for (Runnable listener : updateStackListeners) {
+			listener.run();
+		}
 	}
 	
 	/**

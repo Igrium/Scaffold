@@ -67,6 +67,7 @@ public class LevelSerializer implements XMLSerializable<Level> {
 				EntitySerializer.deserialize((Element) child, level);
 			}
 		}
+		level.updateEntityStack();
 	}
 	
 	/**
