@@ -54,7 +54,7 @@ public class EntitySerializer implements XMLSerializable<Entity> {
 	public static Entity deserialize(Element xml, Level level) {
 		String typeName = xml.getTagName();
 		String name = xml.getAttribute("name");	
-		Entity entity = EntityRegistry.createEntity(typeName, level, name);	
+		Entity entity = EntityRegistry.createEntity(typeName, level, name, true);	
 
 		NodeList children = xml.getChildNodes();
 		for (int i = 0; i < children.getLength(); i++) {
@@ -73,6 +73,7 @@ public class EntitySerializer implements XMLSerializable<Entity> {
 		level.getEntityStack().add(name);
 		
 		entity.onUnserialized(xml);
+		entity.onUpdateAttributes();
 		return entity;
 	}
 	
@@ -86,7 +87,5 @@ public class EntitySerializer implements XMLSerializable<Entity> {
 				entity.setAttribute(element.getAttribute("name"), attribute, true);
 			}
 		}
-		entity.onUpdateAttributes();
 	}
-
 }

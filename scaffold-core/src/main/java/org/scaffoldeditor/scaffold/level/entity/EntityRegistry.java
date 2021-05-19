@@ -22,6 +22,18 @@ public final class EntityRegistry {
 	 * @return Newly created entity.
 	 */
 	public static Entity createEntity(String registryName, Level level, String name) {
+		return createEntity(registryName, level, name, false);
+	}
+	
+	/**
+	 * Spawn an entity.
+	 * @param registryName Registry name of the entity to spawn.
+	 * @param level Level to spawn in.
+	 * @param name Name to assign.
+	 * @param supressUpdate Don't call <code>onUpdateAttributes()</code> when spawning entity.
+	 * @return Newly created entity.
+	 */
+	public static Entity createEntity(String registryName, Level level, String name, boolean supressUpdate) {
 		if (!registry.containsKey(registryName)) {
 			System.err.println("Unknown entity type: "+registryName);
 			return null;
@@ -29,7 +41,9 @@ public final class EntityRegistry {
 		
 		Entity entity = registry.get(registryName).create(level, name);
 		entity.registryName = registryName;
-		entity.onUpdateAttributes();
+		if (!supressUpdate) {
+			entity.onUpdateAttributes();
+		}
 		return entity;
 	}
 }
