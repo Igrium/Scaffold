@@ -7,11 +7,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.scaffoldeditor.scaffold.core.Project;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
+import org.scaffoldeditor.scaffold.level.entity.attribute.VectorAttribute;
 import org.scaffoldeditor.scaffold.level.io.Input;
 import org.scaffoldeditor.scaffold.level.io.Output;
 import org.scaffoldeditor.scaffold.logic.Datapack;
@@ -47,10 +46,6 @@ public class Entity {
 	 */
 	public String registryName;
 	
-	
-	/* Position of the entity in world space */
-	private Vector position;
-	
 	/* Name of the entity */
 	private String name;
 	
@@ -68,6 +63,7 @@ public class Entity {
 	public Entity(Level level, String name) {
 		this.name = name;
 		this.level = level;
+		attributes().put("position", new VectorAttribute(new Vector(0, 0, 0)));
 	}
 	
 	/**
@@ -117,7 +113,7 @@ public class Entity {
 	 * @return Position
 	 */
 	public Vector getPosition() {
-		return position;
+		return ((VectorAttribute) getAttribute("position")).getValue();
 	}
 	
 	/**
@@ -126,7 +122,7 @@ public class Entity {
 	 * @param position New position
 	 */
 	public void setPosition(Vector position) {
-		this.position = position;
+		this.setAttribute("position", new VectorAttribute(position));
 	}
 	
 	/**
@@ -272,39 +268,6 @@ public class Entity {
 		}
 		return null;
 	}
-	
-	/**
-	 * Serialize this entity into a JSON object.
-	 * @return Serialized entity
-	 */
-	public JSONObject serialize() {
-		// Create object
-		JSONObject object = new JSONObject();
-		
-		// Basic information
-		object.put("type", getClass().getName());
-		object.put("position", position.toJSONArray());
-		
-		// Attributes
-		JSONObject attributeObject = new JSONObject();
-		
-		for (String key : attributes.keySet()) {
-			if (attributes.get(key) != null) {
-				attributeObject.put(key, attributes.get(key));
-			}
-		}
-		
-		object.put("attributes", attributeObject);
-		
-		JSONArray outputs = new JSONArray();
-		for (Output o : this.outputs) {
-			outputs.put(o.serialize());
-		}
-		object.put("outputs", outputs);
-		
-		return object;
-	}
-	
 	/**
 	 * Called when entity is deserialized for subclasses to act on.
 	 * @param xml XML element that it was deserialized from.

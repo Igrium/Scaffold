@@ -5,7 +5,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,13 +15,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.scaffoldeditor.nbt.NBTStrings;
 import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.nbt.block.Chunk;
 import org.scaffoldeditor.nbt.block.BlockWorld.ChunkCoordinate;
-import org.scaffoldeditor.scaffold.core.Constants;
 import org.scaffoldeditor.scaffold.core.Project;
 import org.scaffoldeditor.scaffold.level.WorldUpdates.WorldUpdateEvent;
 import org.scaffoldeditor.scaffold.level.WorldUpdates.WorldUpdateListener;
@@ -303,77 +299,6 @@ public class Level {
 		nbt.put("Duration", new NBTTagInt(2000000000));
 		
 		return "summon "+SCOREBOARDTYPE+" 0 0 0 "+NBTStrings.nbtToString(nbt);
-	}
-	
-	/**
-	 * Serialize this level into a JSONObject.
-	 * @return Serialized level
-	 */
-	public JSONObject serialize() {
-		JSONObject object = new JSONObject();
-		
-		object.put("editorVersion", Constants.VERSION);
-		object.put("prettyName", getPrettyName());
-		
-		// Add all maps
-		JSONObject entities = new JSONObject();
-		
-		for (String key : this.entities.keySet()) {
-			entities.put(key, this.entities.get(key).serialize());
-		}
-		
-		object.put("entities", entities);
-		object.put("data", levelData.getData());
-		
-		return object;
-	}
-	
-	/**
-	 * Unserialize a level from a JSONObject.
-	 * @param project Project the level should belong to.
-	 * @param object Serialized level.
-	 * @return Unserlailized level.
-	 */
-	public static Level unserialize(Project project, JSONObject object) {
-		Level level = new Level(project);
-		
-		// Unserialize JSON
-		try {		
-			level.setPrettyName(object.optString("prettyName"));
-			
-			JSONObject entities = object.getJSONObject("entities");
-			level.levelData = new LevelData(level, object.getJSONObject("data"));
-			
-			for (String key : entities.keySet()) {
-				// Find entity class
-				String className = entities.getJSONObject(key).getString("type");
-				
-				try {
-					@SuppressWarnings("unchecked")
-					Class<? extends Entity> entityClass = (Class<? extends Entity>) Class.forName(className);
-					
-					// Involk unserialize method
-					level.entities.put(key, (Entity) entityClass.getMethod("unserialize",
-							new Class[] {Level.class, String.class, JSONObject.class})
-							.invoke(null, level, key, entities.getJSONObject(key)));
-					
-				} catch (ClassNotFoundException 
-						| IllegalAccessException 
-						| IllegalArgumentException 
-						| InvocationTargetException 
-						| NoSuchMethodException 
-						| SecurityException e) {
-					System.out.println("Unable to instantiate class "+className);
-				}
-			}
-			
-		} catch (JSONException e) {
-			System.out.println("Improperly formatted level!");
-			return null;
-		}
-		
-		level.compileBlockWorld(false); // Initial compile on blockWorld.
-		return level;
 	}
 	
 	/**
