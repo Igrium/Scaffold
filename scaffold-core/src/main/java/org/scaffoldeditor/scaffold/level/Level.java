@@ -36,6 +36,8 @@ import com.github.mryurihi.tbnbt.tag.NBTTagCompound;
 import com.github.mryurihi.tbnbt.tag.NBTTagInt;
 import com.github.mryurihi.tbnbt.tag.NBTTagString;
 
+import operation.OperationManager;
+
 /**
  * Represents a single level file
  * @author Sam54123
@@ -72,6 +74,8 @@ public class Level {
 	
 	/* The BlockWorld that this level uses */
 	private BlockWorld blockWorld = new BlockWorld();
+	
+	private OperationManager operationManager = new OperationManager(this);
 	
 	/**
 	 * Create a new level
@@ -160,6 +164,14 @@ public class Level {
 	 */
 	public String getPrettyName() {
 		return prettyName;
+	}
+	
+	/**
+	 * Get the level's operation manager.
+	 * @return Operation manager.
+	 */
+	public OperationManager getOperationManager() {
+		return operationManager;
 	}
 	
 	/**
