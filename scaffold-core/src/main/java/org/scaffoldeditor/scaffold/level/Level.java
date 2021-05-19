@@ -34,6 +34,7 @@ import org.scaffoldeditor.scaffold.logic.Datapack;
 import org.scaffoldeditor.scaffold.logic.MCFunction;
 import org.scaffoldeditor.scaffold.logic.Resourcepack;
 import org.scaffoldeditor.scaffold.math.Vector;
+import org.scaffoldeditor.scaffold.operation.OperationManager;
 import org.scaffoldeditor.scaffold.serialization.LevelReader;
 import org.scaffoldeditor.scaffold.serialization.LevelWriter;
 
@@ -41,8 +42,6 @@ import com.github.mryurihi.tbnbt.tag.NBTTag;
 import com.github.mryurihi.tbnbt.tag.NBTTagCompound;
 import com.github.mryurihi.tbnbt.tag.NBTTagInt;
 import com.github.mryurihi.tbnbt.tag.NBTTagString;
-
-import operation.OperationManager;
 
 /**
  * Represents a single level file

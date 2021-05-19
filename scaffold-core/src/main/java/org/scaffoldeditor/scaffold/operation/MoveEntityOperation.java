@@ -1,4 +1,4 @@
-package operation;
+package org.scaffoldeditor.scaffold.operation;
 
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;

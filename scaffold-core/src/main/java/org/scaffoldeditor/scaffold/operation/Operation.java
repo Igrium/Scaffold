@@ -1,4 +1,4 @@
-package operation;
+package org.scaffoldeditor.scaffold.operation;
 
 /**
  * An operation is an undoable action performed by the user.
