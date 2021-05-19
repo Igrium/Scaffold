@@ -1,12 +1,9 @@
 package org.scaffoldeditor.scaffold.level.entity.logic;
 
-import java.util.List;
-
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.EntityFactory;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
-import org.scaffoldeditor.scaffold.level.entity.attribute.FloatAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.IntAttribute;
 import org.scaffoldeditor.scaffold.level.io.Input;
 import org.scaffoldeditor.scaffold.logic.Datapack;
@@ -30,7 +27,7 @@ public class Relay extends Entity {
 
 	public Relay(Level level, String name) {
 		super(level, name);
-		setAttribute("delay", new IntAttribute(0));
+		setAttribute("delay", new IntAttribute(0), true);
 		
 		// Called to activate the relay.
 		registerInput(new Input(this) {

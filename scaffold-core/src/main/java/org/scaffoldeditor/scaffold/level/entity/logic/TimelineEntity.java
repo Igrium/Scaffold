@@ -1,8 +1,6 @@
 package org.scaffoldeditor.scaffold.level.entity.logic;
 
 import java.io.IOException;
-import java.util.List;
-
 import org.json.JSONException;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
@@ -24,7 +22,7 @@ public class TimelineEntity extends Entity {
 
 	public TimelineEntity(Level level, String name) {
 		super(level, name);
-		setAttribute("file", new StringAttribute(name));
+		setAttribute("file", new StringAttribute(name), true);
 		
 		this.registerInput(new Input(this) {
 

@@ -24,7 +24,7 @@ public class FunctionEntity extends Entity {
 	
 	public FunctionEntity(Level level, String name) {
 		super(level, name);
-		setAttribute("function", new StringAttribute(name));
+		setAttribute("function", new StringAttribute(name), true);
 		
 		registerInput(new Input(this) {
 
