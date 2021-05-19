@@ -24,6 +24,8 @@ import org.scaffoldeditor.nbt.block.Chunk;
 import org.scaffoldeditor.nbt.block.BlockWorld.ChunkCoordinate;
 import org.scaffoldeditor.scaffold.core.Constants;
 import org.scaffoldeditor.scaffold.core.Project;
+import org.scaffoldeditor.scaffold.level.WorldUpdates.WorldUpdateEvent;
+import org.scaffoldeditor.scaffold.level.WorldUpdates.WorldUpdateListener;
 import org.scaffoldeditor.scaffold.level.entity.BlockEntity;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
@@ -54,7 +56,7 @@ public class Level {
 	
 	/* The type of the entity that keeps track of level scoreboard objectives */
 	public static final String SCOREBOARDTYPE = "minecraft:area_effect_cloud";
-	
+		
 	/* The project this level belongs to */
 	private Project project;
 	
@@ -84,6 +86,8 @@ public class Level {
 	public final Set<ChunkCoordinate> dirtyChunks = new HashSet<>();
 	/** Whether the level should automatically recompile the relevent chunks when a block entity is updated. */
 	public boolean autoRecompile = true;
+	
+	private List<WorldUpdateListener> worldUpdateListeners = new ArrayList<>();
 	
 	/**
 	 * Create a new level
@@ -444,6 +448,7 @@ public class Level {
 				blockEntity.compileWorld(blockWorld, full);
 			}
 		}
+		fireWorldUpdateEvent(new HashSet<>());
 		
 		return true;
 	}
@@ -497,6 +502,7 @@ public class Level {
 	 */
 	public void quickRecompile() {
 		compileChunks(dirtyChunks);
+		fireWorldUpdateEvent(dirtyChunks);
 		dirtyChunks.clear();
 	}
 	
@@ -505,6 +511,19 @@ public class Level {
 	 */
 	public void markChunkDirty(ChunkCoordinate chunk) {
 		dirtyChunks.add(chunk);
+	}
+	
+	/**
+	 * Called when the world is recompiled.
+	 */
+	public void onWorldUpdate(WorldUpdateListener listener) {
+		this.worldUpdateListeners.add(listener);
+	}
+	
+	protected void fireWorldUpdateEvent(Set<ChunkCoordinate> chunks) {
+		for (WorldUpdateListener listener : worldUpdateListeners) {
+			listener.onWorldUpdated(new WorldUpdateEvent(this, chunks));
+		}
 	}
 	
 	public BlockWorld getBlockWorld() {
