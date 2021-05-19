@@ -170,8 +170,21 @@ public class Entity {
 	 * @param value Attribute value.
 	 */
 	public void setAttribute(String name, Attribute<?> value) {
+		setAttribute(name, value, false);
+	}
+	
+	/**
+	 * Set an attribute by name
+	 * @param name Attribute name.
+	 * @param value Attribute value.
+	 * @param supressUpdate Don't call <code>onUpdateAttributes()</code>.
+	 * This should be set when calling from the constructor.
+	 */
+	public void setAttribute(String name, Attribute<?> value, boolean supressUpdate) {
 		attributes.put(name, value);
-		onUpdateAttributes();
+		if (!supressUpdate) {
+			onUpdateAttributes();
+		}
 	}
 	
 	
@@ -302,7 +315,7 @@ public class Entity {
 	 * Called whenever any attributes are updated for subclasses to act on.
 	 * This is called once on unserialization, before onUnserialized, and again whenever setAttribute() is called.
 	 */
-	protected void onUpdateAttributes() {}
+	public void onUpdateAttributes() {}
 	
 	/**
 	 * Compile this entity's logic.

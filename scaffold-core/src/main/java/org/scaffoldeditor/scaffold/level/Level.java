@@ -1,10 +1,11 @@
 package org.scaffoldeditor.scaffold.level;
 
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.scaffoldeditor.nbt.NBTStrings;
@@ -28,6 +28,8 @@ import org.scaffoldeditor.scaffold.logic.Datapack;
 import org.scaffoldeditor.scaffold.logic.MCFunction;
 import org.scaffoldeditor.scaffold.logic.Resourcepack;
 import org.scaffoldeditor.scaffold.math.Vector;
+import org.scaffoldeditor.scaffold.serialization.LevelReader;
+import org.scaffoldeditor.scaffold.serialization.LevelWriter;
 
 import com.github.mryurihi.tbnbt.tag.NBTTag;
 import com.github.mryurihi.tbnbt.tag.NBTTagCompound;
@@ -355,15 +357,16 @@ public class Level {
 	 * @return Success
 	 */
 	public boolean saveFile(File file) {
-		JSONObject serialized = serialize();
-		
-		FileWriter writer;
 		try {
-			writer = new FileWriter(file);
-			serialized.write(writer, 4, 0);
-			writer.close();
+			if (file.exists()) {
+				file.delete();
+			}
+			FileOutputStream out = new FileOutputStream(file);
+			new LevelWriter(out).write(this);
+			out.close();
+			
 		} catch (IOException e) {
-			System.out.println("Unable to write to file "+file);
+			e.printStackTrace();
 			return false;
 		}
 		
@@ -385,27 +388,14 @@ public class Level {
 	 * @param file File to load
 	 * @return Loaded level
 	 */
-	public static Level loadFile(Project project, Path file) {
-		
-		JSONObject serialized;
+	public static Level loadFile(Project project, File file) {
 		try {
-			serialized = loadJSON(file);
-		} catch (JSONException e) {
-			System.out.println("Improperly formatted file: "+file.toString());
-			return null;
-		} catch (IOException e) {
-			System.out.println("Unable to read file "+file.toString());
-			return null;
+			FileInputStream in = new FileInputStream(file);
+			return new LevelReader(in).read(project);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			throw new AssertionError("Unable to load level "+file.getName(), e);
 		}
-		
-		Level level = unserialize(project, serialized);
-		level.setName(FilenameUtils.removeExtension(file.getFileName().toString())); // Set level name
-		
-		if (level.getPrettyName() == null) {
-			level.setPrettyName(level.getName());
-		}
-		
-		return level;
 	}
 	
 	/**
@@ -415,7 +405,7 @@ public class Level {
 	 * @return Loaded level
 	 */
 	public static Level loadFile(Project project, String file) {
-		return loadFile(project, project.assetManager().getAbsolutePath(file));
+		return loadFile(project, project.assetManager().getAbsolutePath(file).toFile());
 	}
 	
 	/**
@@ -551,13 +541,5 @@ public class Level {
 	public boolean compileLogic(String dataPath) {
 		return compileLogic(project.assetManager().getAbsolutePath(dataPath));
 	}
-	
-	/* Load a JSONObject from a file */
-	private static JSONObject loadJSON(Path inputPath) throws IOException, JSONException {
-		List<String> jsonFile = Files.readAllLines(inputPath);
-		JSONObject jsonObject = new JSONObject(String.join("", jsonFile));
-		return jsonObject;
-	}
-	
-	
+		
 }

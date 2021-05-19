@@ -33,25 +33,25 @@ public class EntitySerializer implements XMLSerializable<Entity> {
 		Element vector = entity.getPosition().serialize(document);
 		root.appendChild(vector);
 		
-		Element entities = document.createElement("entities");
+		Element attributes = document.createElement("attributes");
 		for (String name : entity.getAttributes()) {
 			Element attribute = entity.getAttribute(name).serialize(document);
 			attribute.setAttribute("name", name);
-			entities.appendChild(attribute);
+			attributes.appendChild(attribute);
 		}
 		
-		root.appendChild(entities);
+		root.appendChild(attributes);
 		
 		return root;
 	}
 	
 	/**
-	 * Load an entity from XML.
+	 * Load an entity from XML and add it to the level.
 	 * @param xml XML element to load from.
 	 * @param level Level to load into.
 	 * @return Loaded entity.
 	 */
-	public Entity deserialize(Element xml, Level level) {
+	public static Entity deserialize(Element xml, Level level) {
 		String typeName = xml.getTagName();
 		String name = xml.getAttribute("name");	
 		Entity entity = EntityRegistry.createEntity(typeName, level, name);	
@@ -69,20 +69,24 @@ public class EntitySerializer implements XMLSerializable<Entity> {
 			}
 		}	
 		
+		level.getEntities().put(name, entity);
+		level.getEntityStack().add(name);
+		
 		entity.onUnserialized(xml);
 		return entity;
 	}
 	
-	private void loadAttributes(Element xml, Entity entity) {
+	private static void loadAttributes(Element xml, Entity entity) {
 		NodeList children = xml.getChildNodes();
 		for (int i = 0; i < children.getLength(); i++) {
 			Node child = children.item(i);
 			if (child.getNodeType() == Node.ELEMENT_NODE) {
 				Element element = (Element) child;
 				Attribute<?> attribute = AttributeRegistry.deserializeAttribute(element);
-				entity.setAttribute(element.getAttribute("name"), attribute);
+				entity.setAttribute(element.getAttribute("name"), attribute, true);
 			}
 		}
+		entity.onUpdateAttributes();
 	}
 
 }

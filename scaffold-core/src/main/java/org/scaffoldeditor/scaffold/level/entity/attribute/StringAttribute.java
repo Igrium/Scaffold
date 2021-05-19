@@ -6,6 +6,7 @@ import org.w3c.dom.Element;
 public class StringAttribute extends Attribute<String> {
 	public static final String REGISTRY_NAME = "string_attribute";
 	
+	
 	public static void register() {
 		AttributeRegistry.registry.put(REGISTRY_NAME, new AttributeFactory<StringAttribute>() {
 			
@@ -24,6 +25,7 @@ public class StringAttribute extends Attribute<String> {
 	private String value;
 	
 	public StringAttribute(String value) {
+		this.registryName = REGISTRY_NAME;
 		this.value = value;
 	}
 
@@ -39,6 +41,7 @@ public class StringAttribute extends Attribute<String> {
 
 	@Override
 	public Element serialize(Document document) {
+		System.out.println("registy name: "+registryName);
 		Element element = document.createElement(registryName);
 		element.setAttribute("value", value);
 		return element;

@@ -102,7 +102,7 @@ public class TimelineEntity extends Entity {
 	}
 	
 	@Override
-	protected void onUpdateAttributes() {
+	public void onUpdateAttributes() {
 		super.onUpdateAttributes();
 		
 		if (!((StringAttribute) getAttribute("file")).getValue().matches(oldFile)) {

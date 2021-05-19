@@ -115,8 +115,8 @@ public class Vector implements XMLSerializable<Vector> {
 		Element element = document.createElement(REGISTRY_NAME);
 		element.setAttribute("x", String.valueOf(x));
 		element.setAttribute("y", String.valueOf(y));
-		element.setAttribute("y", String.valueOf("z"));
-		return null;
+		element.setAttribute("z", String.valueOf(z));
+		return element;
 	}
 	
 	public static Vector deserialize(Element xml) {

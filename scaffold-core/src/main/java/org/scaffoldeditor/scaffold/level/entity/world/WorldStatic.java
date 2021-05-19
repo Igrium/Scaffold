@@ -32,13 +32,15 @@ public class WorldStatic extends Faceable implements BlockEntity {
 		});
 	}
 
+
 	public WorldStatic(Level level, String name) {
 		super(level, name);
-		setAttribute("model", new StringAttribute(""));
+		System.out.println("Constructing world static");
+		setAttribute("model", new StringAttribute("/"), true);
 	}
 	
 	@Override
-	protected void onUpdateAttributes() {
+	public void onUpdateAttributes() {
 		super.onUpdateAttributes();
 		reload();
 	}

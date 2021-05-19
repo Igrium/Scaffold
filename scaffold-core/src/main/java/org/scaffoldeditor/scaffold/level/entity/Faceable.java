@@ -28,7 +28,7 @@ public class Faceable extends Entity {
 	}
 	
 	public void setDirection(String direction) {
-		setAttribute("direction", new StringAttribute(direction));
+		setAttribute("direction", new StringAttribute(direction), true);
 	}
 	
 }
