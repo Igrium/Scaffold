@@ -58,8 +58,10 @@ public class WorldStatic extends Faceable implements BlockEntity {
 		
 		File modelFile = getProject().assetManager().findAsset(model).toFile();
 		
+		getLevel().dirtyChunks.addAll(getOverlappingChunks(getLevel().getBlockWorld()));
 		try {
 			this.model = BlockCollectionManager.readFile(modelFile);
+			getLevel().dirtyChunks.addAll(getOverlappingChunks(getLevel().getBlockWorld()));
 		} catch (IOException e) {
 			System.out.println("Unable to load model " + model);
 			System.out.println(e.getMessage());
@@ -89,5 +91,17 @@ public class WorldStatic extends Faceable implements BlockEntity {
 		// TODO Implement this.
 		return null;
 	}
+
+
+	@Override
+	public Vector[] getBounds() {
+		return new Vector[] { getPosition(), Vector.add(getPosition(), new Vector(model.getWidth(), model.getHeight(), model.getLength())) };
+	}
 	
+	@Override
+	public void setPosition(Vector position) {	
+		getLevel().dirtyChunks.addAll(getOverlappingChunks(getLevel().getBlockWorld()));
+		super.setPosition(position);
+		getLevel().dirtyChunks.addAll(getOverlappingChunks(getLevel().getBlockWorld()));		
+	}
 }

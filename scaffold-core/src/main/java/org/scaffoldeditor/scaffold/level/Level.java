@@ -10,14 +10,18 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.scaffoldeditor.nbt.NBTStrings;
 import org.scaffoldeditor.nbt.block.BlockWorld;
+import org.scaffoldeditor.nbt.block.Chunk;
+import org.scaffoldeditor.nbt.block.BlockWorld.ChunkCoordinate;
 import org.scaffoldeditor.scaffold.core.Constants;
 import org.scaffoldeditor.scaffold.core.Project;
 import org.scaffoldeditor.scaffold.level.entity.BlockEntity;
@@ -74,8 +78,12 @@ public class Level {
 	
 	/* The BlockWorld that this level uses */
 	private BlockWorld blockWorld = new BlockWorld();
-	
 	private OperationManager operationManager = new OperationManager(this);
+	
+	/** Chunks that have uncompiled changes. */
+	public final Set<ChunkCoordinate> dirtyChunks = new HashSet<>();
+	/** Whether the level should automatically recompile the relevent chunks when a block entity is updated. */
+	public boolean autoRecompile = true;
 	
 	/**
 	 * Create a new level
@@ -421,7 +429,7 @@ public class Level {
 	}
 	
 	/**
-	 * Compile the blockworld.
+	 * Compile the entire blockworld.
 	 * @param full Should this be a full compile? If true, entities may run more complex algorithems.
 	 * @return Success.
 	 */
@@ -429,16 +437,74 @@ public class Level {
 		blockWorld.clear(); // Clear the blockworld of previous compiles.
 		System.out.println("Compiling world...");
 		
-		for (Entity entity : entities.values()) {
-			try {
+		for (String name : entityStack) {
+			Entity entity = getEntity(name);
+			if (entity instanceof BlockEntity) {
 				BlockEntity blockEntity = (BlockEntity) entity;
 				blockEntity.compileWorld(blockWorld, full);
-			} catch (ClassCastException e) {
-				// We don't need to do anything if the entity can't create blocks.
 			}
 		}
 		
 		return true;
+	}
+	
+	/**
+	 * Compile a specific set of chunks.
+	 * Less efficient than <code>compileBlockWorld()</code> if compiling the entire world.
+	 * @param chunks Chunks to compile.
+	 * @return Success.
+	 */
+	public boolean compileChunks(Set<ChunkCoordinate> chunks) {
+		// Compile into a temporary block world so other chunks don't get corrupted.
+		BlockWorld tempWorld = new BlockWorld();
+		
+		List<BlockEntity> updatingEntities = new ArrayList<>();
+		
+		for (String entName : entityStack) {
+			Entity entity = getEntity(entName);
+			if (entity instanceof BlockEntity) {
+				BlockEntity blockEntity = (BlockEntity) entity;
+				// See if entity is within chunkList.
+				for (ChunkCoordinate chunk : chunks) {
+					float[] chunkStart = new float[] { chunk.x() * Chunk.WIDTH, chunk.z() * Chunk.LENGTH };
+					float[] chunkEnd = new float[] { chunkStart[0] + Chunk.WIDTH, chunkStart[1] + Chunk.LENGTH };
+					
+					if (blockEntity.overlapsArea(chunkStart, chunkEnd)) {
+						updatingEntities.add(blockEntity);
+						break;
+					}
+				}
+			}
+		}
+		
+		if (updatingEntities.size() == 0) {
+			return true;
+		}
+		
+		for (BlockEntity entity : updatingEntities) {
+			entity.compileWorld(tempWorld, false);
+		}
+		
+		for (ChunkCoordinate coord : tempWorld.getChunks().keySet()) {
+			blockWorld.getChunks().put(coord, tempWorld.getChunks().get(coord));
+		}
+		
+		return true;
+	}
+	
+	/**
+	 * Compile all the chunks marked as dirty.
+	 */
+	public void quickRecompile() {
+		compileChunks(dirtyChunks);
+		dirtyChunks.clear();
+	}
+	
+	/**
+	 * Mark a chunk as needing compiling.
+	 */
+	public void markChunkDirty(ChunkCoordinate chunk) {
+		dirtyChunks.add(chunk);
 	}
 	
 	public BlockWorld getBlockWorld() {

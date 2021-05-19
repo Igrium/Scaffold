@@ -1,8 +1,13 @@
 package org.scaffoldeditor.scaffold.level.entity.world;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.BlockWorld;
+import org.scaffoldeditor.nbt.block.BlockWorld.ChunkCoordinate;
+import org.scaffoldeditor.nbt.block.Chunk;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.BlockEntity;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
@@ -78,4 +83,23 @@ public class SingleBlock extends Entity implements BlockEntity {
 		}
 	}
 
+	@Override
+	public Vector[] getBounds() {
+		return new Vector[] {getPosition(), Vector.add(getPosition(), new Vector(1,1,1))};
+	}
+	
+	@Override
+	public Set<ChunkCoordinate> getOverlappingChunks(BlockWorld world) {
+		Set<ChunkCoordinate> set = new HashSet<>();
+		set.add(new ChunkCoordinate((int) Math.floor(getPosition().X() / Chunk.WIDTH), (int) Math.floor(getPosition().Z() / Chunk.LENGTH)));
+		return set;
+	}
+	
+	@Override
+	public void setPosition(Vector position) {	
+		getLevel().dirtyChunks.addAll(getOverlappingChunks(getLevel().getBlockWorld()));
+		super.setPosition(position);
+		getLevel().dirtyChunks.addAll(getOverlappingChunks(getLevel().getBlockWorld()));
+			
+	}
 }
