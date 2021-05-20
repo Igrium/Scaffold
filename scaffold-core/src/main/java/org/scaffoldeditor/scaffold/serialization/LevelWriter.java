@@ -53,9 +53,8 @@ public class LevelWriter {
 			
 			transformer.transform(source, output);
 			
-		} catch (ParserConfigurationException | TransformerException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
-			throw new AssertionError("Unable  to save level.", e);
 		}
 	}
 	

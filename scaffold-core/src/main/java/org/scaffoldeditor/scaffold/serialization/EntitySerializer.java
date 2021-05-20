@@ -6,6 +6,7 @@ import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.AttributeRegistry;
 import org.scaffoldeditor.scaffold.math.Vector;
+import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -35,9 +36,14 @@ public class EntitySerializer implements XMLSerializable<Entity> {
 		
 		Element attributes = document.createElement("attributes");
 		for (String name : entity.getAttributes()) {
-			Element attribute = entity.getAttribute(name).serialize(document);
-			attribute.setAttribute("name", name);
-			attributes.appendChild(attribute);
+			try {
+				Element attribute = entity.getAttribute(name).serialize(document);
+				attribute.setAttribute("name", name);
+				attributes.appendChild(attribute);	
+			} catch (DOMException e) {
+				e.printStackTrace();
+			}
+
 		}
 		
 		root.appendChild(attributes);

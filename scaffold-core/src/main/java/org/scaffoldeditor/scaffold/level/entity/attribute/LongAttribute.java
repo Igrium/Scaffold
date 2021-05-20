@@ -26,6 +26,7 @@ public class LongAttribute extends Attribute<Long> {
 	
 	public LongAttribute(long value) {
 		this.value = value;
+		this.registryName = REGISTRY_NAME;
 	}
 
 	@Override

@@ -26,6 +26,7 @@ public class IntAttribute extends Attribute<Integer> {
 	
 	public IntAttribute(int value) {
 		this.value = value;
+		this.registryName = REGISTRY_NAME;
 	}
 
 	@Override

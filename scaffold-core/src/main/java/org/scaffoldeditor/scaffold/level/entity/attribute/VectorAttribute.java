@@ -31,6 +31,7 @@ public class VectorAttribute extends Attribute<Vector> {
 	
 	public VectorAttribute(Vector value) {
 		this.value = value;
+		this.registryName = REGISTRY_NAME;
 	}
 
 	@Override

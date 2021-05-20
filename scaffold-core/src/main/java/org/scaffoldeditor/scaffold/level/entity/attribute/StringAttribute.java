@@ -41,7 +41,6 @@ public class StringAttribute extends Attribute<String> {
 
 	@Override
 	public Element serialize(Document document) {
-		System.out.println("registy name: "+registryName);
 		Element element = document.createElement(registryName);
 		element.setAttribute("value", value);
 		return element;

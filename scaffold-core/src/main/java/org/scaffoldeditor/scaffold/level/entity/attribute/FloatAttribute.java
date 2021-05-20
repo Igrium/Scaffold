@@ -26,6 +26,7 @@ public class FloatAttribute extends Attribute<Float> {
 	
 	public FloatAttribute(float value) {
 		this.value = value;
+		this.registryName = REGISTRY_NAME;
 	}
 
 	@Override

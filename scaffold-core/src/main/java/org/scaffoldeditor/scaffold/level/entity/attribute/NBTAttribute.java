@@ -42,6 +42,7 @@ public class NBTAttribute extends Attribute<NBTTagCompound> {
 	
 	public NBTAttribute(NBTTagCompound value) {
 		this.value = value;
+		this.registryName = REGISTRY_NAME;
 	}
 	
 	@Override

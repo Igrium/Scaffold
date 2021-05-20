@@ -26,6 +26,7 @@ public class BooleanAttribute extends Attribute<Boolean> {
 	
 	public BooleanAttribute(boolean value) {
 		this.value = value;
+		this.registryName = REGISTRY_NAME;
 	}
 	
 	@Override

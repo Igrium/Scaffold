@@ -26,6 +26,7 @@ public class DoubleAttribute extends Attribute<Double> {
 	
 	public DoubleAttribute(double value) {
 		this.value = value;
+		this.registryName = REGISTRY_NAME;
 	}
 	
 	@Override

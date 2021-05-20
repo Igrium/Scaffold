@@ -308,9 +308,6 @@ public class Level {
 	 */
 	public boolean saveFile(File file) {
 		try {
-			if (file.exists()) {
-				file.delete();
-			}
 			FileOutputStream out = new FileOutputStream(file);
 			new LevelWriter(out).write(this);
 			out.close();
