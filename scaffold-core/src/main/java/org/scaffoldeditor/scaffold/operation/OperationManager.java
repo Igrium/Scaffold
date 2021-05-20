@@ -35,7 +35,7 @@ public class OperationManager {
 	 * @param operation Operation to perform.
 	 * @return Operation success.
 	 */
-	public boolean performOperation(Operation operation) {
+	public boolean execute(Operation operation) {
 		if (operation.execute()) {
 			redoStack.clear();
 			undoStack.add(operation);
