@@ -4,7 +4,7 @@ import java.util.EventListener;
 import java.util.EventObject;
 import java.util.Set;
 
-import org.scaffoldeditor.nbt.block.BlockWorld.ChunkCoordinate;
+import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
 
 
 public final class WorldUpdates {
@@ -12,13 +12,13 @@ public final class WorldUpdates {
 		
 		private static final long serialVersionUID = -8940483835789392307L;
 		/**
-		 * The chunks that were updated. If empty, the entire world has been recompiled.
+		 * The sections that were updated. If empty, the entire world has been recompiled.
 		 */
-		public final Set<ChunkCoordinate> updatedChunks;
+		public final Set<SectionCoordinate> updatedSections;
 		
-		public WorldUpdateEvent(Object source, Set<ChunkCoordinate> updatedChunks) {
+		public WorldUpdateEvent(Object source, Set<SectionCoordinate> updatedSections) {
 			super(source);
-			this.updatedChunks = updatedChunks;
+			this.updatedSections = updatedSections;
 		}
 	}
 	

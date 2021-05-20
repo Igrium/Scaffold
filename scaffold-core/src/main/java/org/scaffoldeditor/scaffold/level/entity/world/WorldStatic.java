@@ -108,9 +108,9 @@ public class WorldStatic extends Faceable implements BlockEntity {
 	
 	@Override
 	public void setPosition(Vector position) {	
-		getLevel().dirtyChunks.addAll(getOverlappingChunks(getLevel().getBlockWorld()));
+		getLevel().dirtySections.addAll(getOverlappingSections(getLevel().getBlockWorld()));
 		super.setPosition(position);
-		getLevel().dirtyChunks.addAll(getOverlappingChunks(getLevel().getBlockWorld()));
+		getLevel().dirtySections.addAll(getOverlappingSections(getLevel().getBlockWorld()));
 		if (getLevel().autoRecompile) {
 			getLevel().quickRecompile();
 		}

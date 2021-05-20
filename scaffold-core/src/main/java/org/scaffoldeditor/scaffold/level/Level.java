@@ -18,6 +18,8 @@ import org.apache.commons.io.FileUtils;
 import org.scaffoldeditor.nbt.NBTStrings;
 import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.nbt.block.Chunk;
+import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
+import org.scaffoldeditor.nbt.block.Section;
 import org.scaffoldeditor.nbt.block.BlockWorld.ChunkCoordinate;
 import org.scaffoldeditor.scaffold.core.Project;
 import org.scaffoldeditor.scaffold.level.WorldUpdates.WorldUpdateEvent;
@@ -79,6 +81,10 @@ public class Level {
 	
 	/** Chunks that have uncompiled changes. */
 	public final Set<ChunkCoordinate> dirtyChunks = new HashSet<>();
+	
+	/** Sections that have uncompiled changes. */
+	public final Set<SectionCoordinate> dirtySections = new HashSet<>();
+	
 	/** Whether the level should automatically recompile the relevent chunks when a block entity is updated. */
 	public boolean autoRecompile = true;
 	
@@ -380,9 +386,11 @@ public class Level {
 	 * Compile a specific set of chunks.
 	 * Less efficient than <code>compileBlockWorld()</code> if compiling the entire world.
 	 * @param chunks Chunks to compile.
-	 * @return Success.
 	 */
-	public boolean compileChunks(Set<ChunkCoordinate> chunks) {
+	public void compileChunks(Set<ChunkCoordinate> chunks) {
+		if (chunks.isEmpty()) {
+			return;
+		}
 		// Compile into a temporary block world so other chunks don't get corrupted.
 		BlockWorld tempWorld = new BlockWorld();
 		
@@ -406,7 +414,7 @@ public class Level {
 		}
 		
 		if (updatingEntities.size() == 0) {
-			return true;
+			return;
 		}
 		
 		for (BlockEntity entity : updatingEntities) {
@@ -419,7 +427,68 @@ public class Level {
 			blockWorld.getChunks().put(coord, tempWorld.getChunks().get(coord));
 		}
 		
-		return true;
+		return;
+	}
+	
+	/**
+	 * Compile a specific set of sections. Less efficient than
+	 * <code>compileBlockWorld()</code> and <code>compileChunks()</code> if
+	 * compiling the entire world or an entire set of chunks.
+	 * 
+	 * @param sections Sections to compile.
+	 */
+	public void compileSections(Set<SectionCoordinate> sections) {
+		if (sections.isEmpty()) {
+			return;
+		}
+		// Compile into a temporary block world so other chunks don't get corrupted.
+		BlockWorld tempWorld = new BlockWorld();
+		
+		List<BlockEntity> updatingEntities = new ArrayList<>();
+		
+		for (String entName : entityStack) {
+			Entity entity = getEntity(entName);
+			if (entity instanceof BlockEntity) {
+				BlockEntity blockEntity = (BlockEntity) entity;
+				// See if entity is within chunkList.
+				for (SectionCoordinate section : sections) {
+					Vector sectionStart = new Vector(section.x * Chunk.WIDTH, section.y * Section.HEIGHT, section.z * Chunk.LENGTH);
+					Vector sectionEnd = new Vector(sectionStart.x + Chunk.WIDTH, section.y + Section.HEIGHT, section.z + Chunk.HEIGHT);
+					
+					if (blockEntity.overlapsVolume(sectionStart, sectionEnd)) {
+						updatingEntities.add(blockEntity);
+						break;
+					}
+				}
+			}
+		}
+		
+		if (updatingEntities.size() == 0) {
+			return;
+		}
+		
+		for (BlockEntity entity : updatingEntities) {
+			entity.compileWorld(tempWorld, false);
+		}
+		
+		for (ChunkCoordinate coord : tempWorld.getChunks().keySet()) {
+			// Only save if the chunk is marked for update or it's not present in the main world.
+			if (!getBlockWorld().getChunks().keySet().contains(coord)) {
+				blockWorld.getChunks().put(coord, tempWorld.getChunks().get(coord));
+			} else {
+				Chunk chunk = tempWorld.getChunks().get(coord);
+				for (int y = 0; y < chunk.sections.length; y++) {
+					if (sections.contains(new SectionCoordinate(coord.x(), y, coord.z()))) {
+						 getBlockWorld().chunkAt(coord.x(), coord.z()).sections[y] = chunk.sections[y];
+					}
+				}
+				
+			}
+//			if (sections.contains(coord) || !getBlockWorld().getChunks().keySet().contains(coord))
+//			blockWorld.getChunks().put(coord, tempWorld.getChunks().get(coord));
+		}
+		
+		return;
 	}
 	
 	/**
@@ -427,7 +496,8 @@ public class Level {
 	 */
 	public void quickRecompile() {
 		compileChunks(dirtyChunks);
-		fireWorldUpdateEvent(dirtyChunks);
+		compileSections(dirtySections);
+		fireWorldUpdateEvent(dirtySections);
 		dirtyChunks.clear();
 	}
 	
@@ -445,9 +515,9 @@ public class Level {
 		this.worldUpdateListeners.add(listener);
 	}
 	
-	protected void fireWorldUpdateEvent(Set<ChunkCoordinate> chunks) {
+	protected void fireWorldUpdateEvent(Set<SectionCoordinate> sections) {
 		for (WorldUpdateListener listener : worldUpdateListeners) {
-			listener.onWorldUpdated(new WorldUpdateEvent(this, chunks));
+			listener.onWorldUpdated(new WorldUpdateEvent(this, sections));
 		}
 	}
 	

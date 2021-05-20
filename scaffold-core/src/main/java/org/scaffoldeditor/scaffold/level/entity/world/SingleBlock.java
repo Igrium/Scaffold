@@ -7,6 +7,8 @@ import java.util.Set;
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.nbt.block.BlockWorld.ChunkCoordinate;
+import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
+import org.scaffoldeditor.nbt.block.Section;
 import org.scaffoldeditor.nbt.block.Chunk;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.BlockEntity;
@@ -92,6 +94,13 @@ public class SingleBlock extends Entity implements BlockEntity {
 	public Set<ChunkCoordinate> getOverlappingChunks(BlockWorld world) {
 		Set<ChunkCoordinate> set = new HashSet<>();
 		set.add(new ChunkCoordinate((int) Math.floor(getPosition().X() / Chunk.WIDTH), (int) Math.floor(getPosition().Z() / Chunk.LENGTH)));
+		return set;
+	}
+	
+	@Override
+	public Set<SectionCoordinate> getOverlappingSections(BlockWorld world) {
+		Set<SectionCoordinate> set = new HashSet<>();
+		set.add(new SectionCoordinate((int) Math.floor(getPosition().X() / Chunk.WIDTH), (int) Math.floor(getPosition().Y() / Section.HEIGHT), (int) Math.floor(getPosition().Z() / Chunk.LENGTH)));
 		return set;
 	}
 	

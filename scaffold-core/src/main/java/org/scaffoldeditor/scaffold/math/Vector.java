@@ -13,9 +13,9 @@ public class Vector implements XMLSerializable<Vector> {
 	
 	public static final String REGISTRY_NAME = "vector";
 	
-	private float x;
-	private float y;
-	private float z;
+	public final float x;
+	public final float y;
+	public final float z;
 	
 	public Vector(float x, float y, float z) {
 		this.x = x;
