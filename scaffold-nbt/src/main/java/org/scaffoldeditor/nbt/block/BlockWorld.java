@@ -76,7 +76,7 @@ public class BlockWorld implements BlockCollection {
 	@Override
 	public Block blockAt(int x, int y, int z) {
 		if (y < 0 || y > Chunk.HEIGHT) {
-			throw new IllegalArgumentException("Block Y value must be between 0 and "+Chunk.HEIGHT);
+			return null;
 		}
 		
 		// Find chunk block is in
@@ -114,7 +114,7 @@ public class BlockWorld implements BlockCollection {
 	 */
 	public void setBlock(int x, int y, int z, Block block) {
 		if (y < 0 || y > Chunk.HEIGHT) {
-			throw new IllegalArgumentException("Block Y value must be between 0 and "+Chunk.HEIGHT);
+			return;
 		}
 		// Get chunk to place in
 		ChunkCoordinate chunkKey = new ChunkCoordinate(
