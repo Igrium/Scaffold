@@ -31,9 +31,7 @@ public class EntitySerializer implements XMLSerializable<Entity> {
 	public Element serialize(Document document) {
 		Element root = document.createElement(entity.registryName);
 		root.setAttribute("name", entity.getName());
-		Element vector = entity.getPosition().serialize(document);
-		root.appendChild(vector);
-		
+
 		Element attributes = document.createElement("attributes");
 		for (String name : entity.getAttributes()) {
 			try {
