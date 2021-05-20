@@ -1,6 +1,5 @@
 package org.scaffoldeditor.scaffold.level.entity;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -8,43 +7,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.scaffold.core.Project;
 import org.scaffoldeditor.scaffold.level.Level;
+import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
+import org.scaffoldeditor.scaffold.level.entity.attribute.VectorAttribute;
 import org.scaffoldeditor.scaffold.level.io.Input;
 import org.scaffoldeditor.scaffold.level.io.Output;
 import org.scaffoldeditor.scaffold.logic.Datapack;
 import org.scaffoldeditor.scaffold.math.Vector;
+import org.w3c.dom.Element;
 
 /**
  * Base entity class in maps
- * @author Sam54123
+ * @author Igrium
  *
  */
 public class Entity {
-	
-	/**
-	 * Used to declare attribute types by name.
-	 */
-	public class AttributeDeclaration {
-		private String name;
-		private Class<? extends Object> type;
-		
-		public AttributeDeclaration(String name, Class<? extends Object> type) {
-			this.name = name;
-			this.type = type;
-		}
-		
-		public String name() {
-			return name;
-		}
-		public Class<? extends Object> type() {
-			return type;
-		}
-	}
 	
 	/**
 	 * Special case used to declare file paths as attributes.
@@ -63,8 +41,10 @@ public class Entity {
 		SPRITE, MODEL
 	}
 	
-	/* Position of the entity in world space */
-	private Vector position;
+	/**
+	 * The type name this entity gets saved with when serialized.
+	 */
+	public String registryName;
 	
 	/* Name of the entity */
 	private String name;
@@ -73,7 +53,7 @@ public class Entity {
 	private Level level;
 	
 	/* All this entity's attributes */
-	private Map<String, Object> attributes = new HashMap<String, Object>();
+	private Map<String, Attribute<?>> attributes = new HashMap<>();
 	
 	/**
 	 * Construct a new entity with a name and a level.
@@ -83,6 +63,7 @@ public class Entity {
 	public Entity(Level level, String name) {
 		this.name = name;
 		this.level = level;
+		attributes().put("position", new VectorAttribute(new Vector(0, 0, 0)));
 	}
 	
 	/**
@@ -120,14 +101,6 @@ public class Entity {
 	}
 	
 	/**
-	 * Get a list of all the attribute fields.
-	 * @return Attribute Fields.
-	 */
-	public List<AttributeDeclaration> getAttributeFields() {
-		return new ArrayList<AttributeDeclaration>();
-	}
-	
-	/**
 	 * Get the name the entity should have when it is first spawned into the editor.
 	 * @return Default name.
 	 */
@@ -140,7 +113,7 @@ public class Entity {
 	 * @return Position
 	 */
 	public Vector getPosition() {
-		return position;
+		return ((VectorAttribute) getAttribute("position")).getValue();
 	}
 	
 	/**
@@ -149,7 +122,7 @@ public class Entity {
 	 * @param position New position
 	 */
 	public void setPosition(Vector position) {
-		this.position = position;
+		this.setAttribute("position", new VectorAttribute(position));
 	}
 	
 	/**
@@ -174,7 +147,7 @@ public class Entity {
 	 * Get a map of this entity's attributes.
 	 * @return Attributes
 	 */
-	protected Map<String, Object> attributes() {
+	protected Map<String, Attribute<?>> attributes() {
 		return attributes;
 	}
 	
@@ -192,9 +165,22 @@ public class Entity {
 	 * @param name Attribute name.
 	 * @param value Attribute value.
 	 */
-	public void setAttribute(String name, Object value) {
+	public void setAttribute(String name, Attribute<?> value) {
+		setAttribute(name, value, false);
+	}
+	
+	/**
+	 * Set an attribute by name
+	 * @param name Attribute name.
+	 * @param value Attribute value.
+	 * @param supressUpdate Don't call <code>onUpdateAttributes()</code>.
+	 * This should be set when calling from the constructor.
+	 */
+	public void setAttribute(String name, Attribute<?> value, boolean supressUpdate) {
 		attributes.put(name, value);
-		onUpdateAttributes();
+		if (!supressUpdate) {
+			onUpdateAttributes();
+		}
 	}
 	
 	
@@ -202,7 +188,7 @@ public class Entity {
 	 * Get an attribute by name
 	 * @param name Attribute
 	 */
-	public Object getAttribute(String name) {
+	public Attribute<?> getAttribute(String name) {
 		return attributes.get(name);
 	}
 	
@@ -282,113 +268,17 @@ public class Entity {
 		}
 		return null;
 	}
-	
 	/**
-	 * Serialize this entity into a JSON object.
-	 * @return Serialized entity
+	 * Called when entity is deserialized for subclasses to act on.
+	 * @param xml XML element that it was deserialized from.
 	 */
-	public JSONObject serialize() {
-		// Create object
-		JSONObject object = new JSONObject();
-		
-		// Basic information
-		object.put("type", getClass().getName());
-		object.put("position", position.toJSONArray());
-		
-		// Attributes
-		JSONObject attributeObject = new JSONObject();
-		
-		for (String key : attributes.keySet()) {
-			if (attributes.get(key) != null) {
-				attributeObject.put(key, attributes.get(key));
-			}
-		}
-		
-		object.put("attributes", attributeObject);
-		
-		JSONArray outputs = new JSONArray();
-		for (Output o : this.outputs) {
-			outputs.put(o.serialize());
-		}
-		object.put("outputs", outputs);
-		
-		return object;
-	}
-
-	
-	/**
-	 * Unserialize an entity fom a JSON object.
-	 * @param level Level this entity should belong to
-	 * @param name Name of the entity
-	 * @param object JSON object to unserialize from
-	 * @return Unserialized entity
-	 */
-	public static Entity unserialize(Level level, String name, JSONObject object) {
-		try {
-			// Create object	
-			Class<?> entityType = Class.forName(object.getString("type"));
-			Entity entity;
-			
-			if (!Entity.class.isAssignableFrom(entityType)) {
-				System.out.println(entityType+
-						" is not a subclass of org.metaversemedia.scaffold.level.entity.Entity!");
-				return null;
-			}
-			
-			entity = (Entity)
-						entityType.getDeclaredConstructor(new Class[] {Level.class,String.class}).newInstance(level, name);
-			
-			
-			// Basic info
-			entity.setPosition(Vector.fromJSONArray(object.getJSONArray("position")));
-			
-			// Attributes
-			JSONObject attributes = object.getJSONObject("attributes");
-			
-			for (String key : attributes.keySet()) {
-				Object attribute = attributes.get(key);
-				entity.attributes().put(key, attribute);
-			}
-			
-			// Outputs
-			JSONArray outputs = object.getJSONArray("outputs");
-			for (Object o : outputs) {
-				JSONObject outputJSON = (JSONObject) o;
-				entity.outputs.add(Output.unserialize(outputJSON, entity));
-				
-			}
-			
-			entity.onUpdateAttributes();
-			entity.onUnserialized(object);
-			return entity;
-		} catch (JSONException e) {
-			System.out.println("Improperly formatted entity: "+name);
-			return null;
-			
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			System.out.println("Unknown class: "+object.getString("type"));
-			return null;
-			
-		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-				| InvocationTargetException | NoSuchMethodException | SecurityException e) {
-			e.printStackTrace();
-			return null;
-		}
-		
-	}
-	
-	/**
-	 * Called when entity is unserialized for subclasses to act on.
-	 * @param object JSONObject serialized from.
-	 */
-	protected void onUnserialized(JSONObject object) {}
+	public void onUnserialized(Element xml) {}
 	
 	/**
 	 * Called whenever any attributes are updated for subclasses to act on.
 	 * This is called once on unserialization, before onUnserialized, and again whenever setAttribute() is called.
 	 */
-	protected void onUpdateAttributes() {}
+	public void onUpdateAttributes() {}
 	
 	/**
 	 * Compile this entity's logic.

@@ -2,6 +2,8 @@ package org.scaffoldeditor.scaffold.level.entity.logic;
 
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
+import org.scaffoldeditor.scaffold.level.entity.EntityFactory;
+import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
 import org.scaffoldeditor.scaffold.logic.Datapack;
 
 /**
@@ -10,6 +12,15 @@ import org.scaffoldeditor.scaffold.logic.Datapack;
  * @author Sam54123
  */
 public class Auto extends Entity {
+	
+	public static void Register() {
+		EntityRegistry.registry.put("logic_auto", new EntityFactory<Entity>() {		
+			@Override
+			public Entity create(Level level, String name) {
+				return new Auto(level, name);
+			}
+		});
+	}
 
 	public Auto(Level level, String name) {
 		super(level, name);

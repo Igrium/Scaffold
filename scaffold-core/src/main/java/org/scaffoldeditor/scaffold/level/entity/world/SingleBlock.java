@@ -1,16 +1,24 @@
 package org.scaffoldeditor.scaffold.level.entity.world;
 
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.BlockWorld;
+import org.scaffoldeditor.nbt.block.BlockWorld.ChunkCoordinate;
+import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
+import org.scaffoldeditor.nbt.block.Section;
+import org.scaffoldeditor.nbt.block.Chunk;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.BlockEntity;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
+import org.scaffoldeditor.scaffold.level.entity.EntityFactory;
+import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
+import org.scaffoldeditor.scaffold.level.entity.attribute.NBTAttribute;
+import org.scaffoldeditor.scaffold.level.entity.attribute.StringAttribute;
 import org.scaffoldeditor.scaffold.math.Vector;
 
-import com.github.mryurihi.tbnbt.tag.NBTTag;
 import com.github.mryurihi.tbnbt.tag.NBTTagCompound;
 
 /**
@@ -19,19 +27,19 @@ import com.github.mryurihi.tbnbt.tag.NBTTagCompound;
  */
 public class SingleBlock extends Entity implements BlockEntity {
 	
-	public SingleBlock(Level level, String name) {
-		super(level, name);
-		attributes().put("blockName", "minecraft:stone");
-		attributes().put("blockProperties", new NBTTagCompound(new HashMap<String, NBTTag>()));
+	public static void Register() {
+		EntityRegistry.registry.put("single_block", new EntityFactory<Entity>() {		
+			@Override
+			public Entity create(Level level, String name) {
+				return new SingleBlock(level, name);
+			}
+		});
 	}
 	
-	@Override
-	public List<AttributeDeclaration> getAttributeFields() {
-		List<AttributeDeclaration> attributeFields = super.getAttributeFields();
-		attributeFields.add(new AttributeDeclaration("blockName", String.class));
-		attributeFields.add(new AttributeDeclaration("blockProperties", NBTTagCompound.class));
-
-		return attributeFields;
+	public SingleBlock(Level level, String name) {
+		super(level, name);
+		attributes().put("blockName", new StringAttribute("minecraft:stone"));
+		attributes().put("blockProperties", new NBTAttribute(new NBTTagCompound(new HashMap<>())));
 	}
 	
 	/**
@@ -39,7 +47,8 @@ public class SingleBlock extends Entity implements BlockEntity {
 	 * @return
 	 */
 	public Block getBlock() {
-		return new Block((String) getAttribute("blockName"), (NBTTagCompound) getAttribute("blockProperties"));
+		return new Block(((StringAttribute) getAttribute("blockName")).getValue(),
+				((NBTAttribute) getAttribute("blockProperties")).getValue());
 	}
 	
 	/**
@@ -47,8 +56,8 @@ public class SingleBlock extends Entity implements BlockEntity {
 	 * @param block Block to set.
 	 */
 	public void setBlock(Block block) {
-		setAttribute("blockName", block.getName());
-		setAttribute("blockProperties", block.getProperties());
+		setAttribute("blockName", new StringAttribute(block.getName()));
+		setAttribute("blockProperties", new NBTAttribute(block.getProperties()));
 	}
 	
 	/**
@@ -76,4 +85,30 @@ public class SingleBlock extends Entity implements BlockEntity {
 		}
 	}
 
+	@Override
+	public Vector[] getBounds() {
+		return new Vector[] {getPosition(), Vector.add(getPosition(), new Vector(1,1,1))};
+	}
+	
+	@Override
+	public Set<ChunkCoordinate> getOverlappingChunks(BlockWorld world) {
+		Set<ChunkCoordinate> set = new HashSet<>();
+		set.add(new ChunkCoordinate((int) Math.floor(getPosition().X() / Chunk.WIDTH), (int) Math.floor(getPosition().Z() / Chunk.LENGTH)));
+		return set;
+	}
+	
+	@Override
+	public Set<SectionCoordinate> getOverlappingSections(BlockWorld world) {
+		Set<SectionCoordinate> set = new HashSet<>();
+		set.add(new SectionCoordinate((int) Math.floor(getPosition().X() / Chunk.WIDTH), (int) Math.floor(getPosition().Y() / Section.HEIGHT), (int) Math.floor(getPosition().Z() / Chunk.LENGTH)));
+		return set;
+	}
+	
+	@Override
+	public void setPosition(Vector position) {	
+		getLevel().dirtyChunks.addAll(getOverlappingChunks(getLevel().getBlockWorld()));
+		super.setPosition(position);
+		getLevel().dirtyChunks.addAll(getOverlappingChunks(getLevel().getBlockWorld()));
+			
+	}
 }

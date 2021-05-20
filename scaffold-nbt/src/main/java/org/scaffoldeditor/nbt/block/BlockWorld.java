@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.*;
 
 import org.apache.commons.io.FilenameUtils;
+import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
 import org.scaffoldeditor.nbt.io.ChunkParser;
 import org.scaffoldeditor.nbt.io.WorldInputStream;
 import org.scaffoldeditor.nbt.io.WorldOutputStream;
@@ -25,12 +26,17 @@ public class BlockWorld implements BlockCollection {
 	 * @author Sam54123
 	 */
 	public static class ChunkCoordinate implements Comparable<ChunkCoordinate> {
-		private int x;
-		private int z;
+		public final int x;
+		public final int z;
 		
 		public ChunkCoordinate(int x, int z) {
 			this.x = x;
 			this.z = z;
+		}
+		
+		public ChunkCoordinate(SectionCoordinate c) {
+			this.x = c.x;
+			this.z = c.z;
 		}
 		
 		public int x() {
@@ -76,7 +82,7 @@ public class BlockWorld implements BlockCollection {
 	@Override
 	public Block blockAt(int x, int y, int z) {
 		if (y < 0 || y > Chunk.HEIGHT) {
-			throw new IllegalArgumentException("Block Y value must be between 0 and "+Chunk.HEIGHT);
+			return null;
 		}
 		
 		// Find chunk block is in
@@ -114,7 +120,7 @@ public class BlockWorld implements BlockCollection {
 	 */
 	public void setBlock(int x, int y, int z, Block block) {
 		if (y < 0 || y > Chunk.HEIGHT) {
-			throw new IllegalArgumentException("Block Y value must be between 0 and "+Chunk.HEIGHT);
+			return;
 		}
 		// Get chunk to place in
 		ChunkCoordinate chunkKey = new ChunkCoordinate(
@@ -186,6 +192,10 @@ public class BlockWorld implements BlockCollection {
 	 */
 	public Chunk chunkAt(int x, int z) {
 		return chunks.get(new ChunkCoordinate(x,z));
+	}
+	
+	public Section sectionAt(int x, int y, int z) {
+		return chunks.get(new ChunkCoordinate(x,z)).sections[Math.floorDiv(y, Section.HEIGHT)];
 	}
 	
 	/**

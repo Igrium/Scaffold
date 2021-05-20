@@ -1,32 +1,40 @@
 package org.scaffoldeditor.scaffold.level;
 
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.scaffoldeditor.nbt.NBTStrings;
 import org.scaffoldeditor.nbt.block.BlockWorld;
-import org.scaffoldeditor.scaffold.core.Constants;
+import org.scaffoldeditor.nbt.block.Chunk;
+import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
+import org.scaffoldeditor.nbt.block.Section;
+import org.scaffoldeditor.nbt.block.BlockWorld.ChunkCoordinate;
 import org.scaffoldeditor.scaffold.core.Project;
+import org.scaffoldeditor.scaffold.level.WorldUpdates.WorldUpdateEvent;
+import org.scaffoldeditor.scaffold.level.WorldUpdates.WorldUpdateListener;
 import org.scaffoldeditor.scaffold.level.entity.BlockEntity;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
+import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
 import org.scaffoldeditor.scaffold.level.entity.game.TargetSelectable;
 import org.scaffoldeditor.scaffold.logic.Datapack;
 import org.scaffoldeditor.scaffold.logic.MCFunction;
 import org.scaffoldeditor.scaffold.logic.Resourcepack;
 import org.scaffoldeditor.scaffold.math.Vector;
+import org.scaffoldeditor.scaffold.operation.OperationManager;
+import org.scaffoldeditor.scaffold.serialization.LevelReader;
+import org.scaffoldeditor.scaffold.serialization.LevelWriter;
 
 import com.github.mryurihi.tbnbt.tag.NBTTag;
 import com.github.mryurihi.tbnbt.tag.NBTTagCompound;
@@ -45,12 +53,15 @@ public class Level {
 	
 	/* The type of the entity that keeps track of level scoreboard objectives */
 	public static final String SCOREBOARDTYPE = "minecraft:area_effect_cloud";
-	
+		
 	/* The project this level belongs to */
 	private Project project;
 	
 	/* All the entities in the map */
 	private Map<String, Entity> entities = new HashMap<String, Entity>();
+	
+	/* The order of entities in the map */
+	private List<String> entityStack = new ArrayList<>();
 	
 	private LevelData levelData = new LevelData(this);
 	
@@ -66,6 +77,19 @@ public class Level {
 	
 	/* The BlockWorld that this level uses */
 	private BlockWorld blockWorld = new BlockWorld();
+	private OperationManager operationManager = new OperationManager(this);
+	
+	/** Chunks that have uncompiled changes. */
+	public final Set<ChunkCoordinate> dirtyChunks = new HashSet<>();
+	
+	/** Sections that have uncompiled changes. */
+	public final Set<SectionCoordinate> dirtySections = new HashSet<>();
+	
+	/** Whether the level should automatically recompile the relevent chunks when a block entity is updated. */
+	public boolean autoRecompile = true;
+	
+	private List<WorldUpdateListener> worldUpdateListeners = new ArrayList<>();
+	private List<Runnable> updateStackListeners = new ArrayList<>();
 	
 	/**
 	 * Create a new level
@@ -99,6 +123,10 @@ public class Level {
 	 */
 	public Map<String, Entity> getEntities() {
 		return entities;
+	}
+	
+	public List<String> getEntityStack() {
+		return entityStack;
 	}
 	
 	/**
@@ -153,6 +181,14 @@ public class Level {
 	}
 	
 	/**
+	 * Get the level's operation manager.
+	 * @return Operation manager.
+	 */
+	public OperationManager getOperationManager() {
+		return operationManager;
+	}
+	
+	/**
 	 * Get this map's init function.
 	 * ONLY EXISTS DURING COMPILATION!
 	 * @return Init function.
@@ -179,40 +215,41 @@ public class Level {
 		return datapack;
 	}
 	
-	/**
-	 * Create a new entity.
-	 * @param entityType Class of entity object to create
-	 * @param name Name of entity
-	 * @param position Position of entity
-	 * @return Newly created entity
-	 */
-	public Entity newEntity(Class<? extends Entity> entityType, String name, Vector position) {
-		// Make sure entity with name doesn't already exist
+	protected String validateName(String name, String[] ignore) {
+		if (Arrays.asList(ignore).contains(name)) {
+			return name;
+		}
+		
 		while (entities.get(name) != null) {
 			// Attempt to increment number
-			if (Character.isDigit(name.charAt(name.length()-1))) {
-				int lastNum = Character.getNumericValue(name.charAt(name.length()-1))+1;
-				name = name.substring(0,name.length() - 1) + lastNum;
+			if (Character.isDigit(name.charAt(name.length() - 1))) {
+				int lastNum = Character.getNumericValue(name.charAt(name.length() - 1)) + 1;
+				name = name.substring(0, name.length() - 1) + lastNum;
 			} else {
-				name = name+'1';
+				name = name + '1';
 			}
-
 		}
-		// Create entity
-		Entity entity = null;
-		try {
-			entity = entityType.getDeclaredConstructor(new Class[] {Level.class,String.class}).newInstance(this, name);
-			entity.setPosition(position);
-		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
-				| NoSuchMethodException | SecurityException e) {
-			e.printStackTrace();
-			return null;
-		}
+		return name;
+	}
+	
+	/**
+	 * Create a new entitiy.
+	 * @param typeName Type name of entity to spawn.
+	 * @param name Name of entity.
+	 * @param position Position of entity.
+	 * @return Newly created entity.
+	 */
+	public Entity newEntity(String typeName, String name, Vector position) {
+		// Make sure entity with name doesn't already exist
+		name = validateName(name, new String[] {});
 		
-		// Add to entities list
+		Entity entity = EntityRegistry.createEntity(typeName, this, name);
+		entity.setPosition(position);
+		
 		entities.put(name, entity);
+		entityStack.add(name);
+		updateEntityStack();
 		
-		compileBlockWorld(false);
 		return entity;
 	}
 	
@@ -225,15 +262,20 @@ public class Level {
 	 */
 	public boolean renameEntity(String oldName, String newName) {
 		// Make sure entity exists and name is available
-		if (entities.get(oldName) == null || entities.get(newName) != null) {
+		if (entities.get(oldName) == null) {
 			return false;
 		}
+		
+		newName = validateName(newName, new String[] {oldName});
 		
 		Entity ent = entities.get(oldName);
 		entities.put(newName, ent);
 		entities.remove(oldName);
 		
+		int stackIndex = entityStack.indexOf(oldName);
+		entityStack.set(stackIndex, newName);
 		ent.setName(newName);
+		updateEntityStack();
 		return true;
 	}
 	
@@ -266,91 +308,18 @@ public class Level {
 	}
 	
 	/**
-	 * Serialize this level into a JSONObject.
-	 * @return Serialized level
-	 */
-	public JSONObject serialize() {
-		JSONObject object = new JSONObject();
-		
-		object.put("editorVersion", Constants.VERSION);
-		object.put("prettyName", getPrettyName());
-		
-		// Add all maps
-		JSONObject entities = new JSONObject();
-		
-		for (String key : this.entities.keySet()) {
-			entities.put(key, this.entities.get(key).serialize());
-		}
-		
-		object.put("entities", entities);
-		object.put("data", levelData.getData());
-		
-		return object;
-	}
-	
-	/**
-	 * Unserialize a level from a JSONObject.
-	 * @param project Project the level should belong to.
-	 * @param object Serialized level.
-	 * @return Unserlailized level.
-	 */
-	public static Level unserialize(Project project, JSONObject object) {
-		Level level = new Level(project);
-		
-		// Unserialize JSON
-		try {		
-			level.setPrettyName(object.optString("prettyName"));
-			
-			JSONObject entities = object.getJSONObject("entities");
-			level.levelData = new LevelData(level, object.getJSONObject("data"));
-			
-			for (String key : entities.keySet()) {
-				// Find entity class
-				String className = entities.getJSONObject(key).getString("type");
-				
-				try {
-					@SuppressWarnings("unchecked")
-					Class<? extends Entity> entityClass = (Class<? extends Entity>) Class.forName(className);
-					
-					// Involk unserialize method
-					level.entities.put(key, (Entity) entityClass.getMethod("unserialize",
-							new Class[] {Level.class, String.class, JSONObject.class})
-							.invoke(null, level, key, entities.getJSONObject(key)));
-					
-				} catch (ClassNotFoundException 
-						| IllegalAccessException 
-						| IllegalArgumentException 
-						| InvocationTargetException 
-						| NoSuchMethodException 
-						| SecurityException e) {
-					System.out.println("Unable to instantiate class "+className);
-				}
-			}
-			
-		} catch (JSONException e) {
-			System.out.println("Improperly formatted level!");
-			return null;
-		}
-		
-		level.compileBlockWorld(false); // Initial compile on blockWorld.
-		return level;
-	}
-	
-	/**
 	 * Save this level to a file
 	 * @param file File to save to
 	 * @return Success
 	 */
 	public boolean saveFile(File file) {
-		JSONObject serialized = serialize();
-		
-		FileWriter writer;
 		try {
-			writer = new FileWriter(file);
-			serialized.write(writer, 4, 0);
-			writer.close();
+			FileOutputStream out = new FileOutputStream(file);
+			new LevelWriter(out).write(this);
+			out.close();
+			
 		} catch (IOException e) {
-			System.out.println("Unable to write to file "+file);
+			e.printStackTrace();
 			return false;
 		}
 		
@@ -372,27 +341,14 @@ public class Level {
 	 * @param file File to load
 	 * @return Loaded level
 	 */
-	public static Level loadFile(Project project, Path file) {
-		
-		JSONObject serialized;
+	public static Level loadFile(Project project, File file) {
 		try {
-			serialized = loadJSON(file);
-		} catch (JSONException e) {
-			System.out.println("Improperly formatted file: "+file.toString());
-			return null;
-		} catch (IOException e) {
-			System.out.println("Unable to read file "+file.toString());
-			return null;
+			FileInputStream in = new FileInputStream(file);
+			return new LevelReader(in).read(project);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			throw new AssertionError("Unable to load level "+file.getName(), e);
 		}
-		
-		Level level = unserialize(project, serialized);
-		level.setName(FilenameUtils.removeExtension(file.getFileName().toString())); // Set level name
-		
-		if (level.getPrettyName() == null) {
-			level.setPrettyName(level.getName());
-		}
-		
-		return level;
 	}
 	
 	/**
@@ -402,11 +358,11 @@ public class Level {
 	 * @return Loaded level
 	 */
 	public static Level loadFile(Project project, String file) {
-		return loadFile(project, project.assetManager().getAbsolutePath(file));
+		return loadFile(project, project.assetManager().getAbsolutePath(file).toFile());
 	}
 	
 	/**
-	 * Compile the blockworld.
+	 * Compile the entire blockworld.
 	 * @param full Should this be a full compile? If true, entities may run more complex algorithems.
 	 * @return Success.
 	 */
@@ -414,20 +370,175 @@ public class Level {
 		blockWorld.clear(); // Clear the blockworld of previous compiles.
 		System.out.println("Compiling world...");
 		
-		for (Entity entity : entities.values()) {
-			try {
+		for (String name : entityStack) {
+			Entity entity = getEntity(name);
+			if (entity instanceof BlockEntity) {
 				BlockEntity blockEntity = (BlockEntity) entity;
 				blockEntity.compileWorld(blockWorld, full);
-			} catch (ClassCastException e) {
-				// We don't need to do anything if the entity can't create blocks.
 			}
 		}
+		fireWorldUpdateEvent(new HashSet<>());
 		
 		return true;
 	}
 	
+	/**
+	 * Compile a specific set of chunks.
+	 * Less efficient than <code>compileBlockWorld()</code> if compiling the entire world.
+	 * @param chunks Chunks to compile.
+	 */
+	public void compileChunks(Set<ChunkCoordinate> chunks) {
+		if (chunks.isEmpty()) {
+			return;
+		}
+		// Compile into a temporary block world so other chunks don't get corrupted.
+		BlockWorld tempWorld = new BlockWorld();
+		
+		List<BlockEntity> updatingEntities = new ArrayList<>();
+		
+		for (String entName : entityStack) {
+			Entity entity = getEntity(entName);
+			if (entity instanceof BlockEntity) {
+				BlockEntity blockEntity = (BlockEntity) entity;
+				// See if entity is within chunkList.
+				for (ChunkCoordinate chunk : chunks) {
+					float[] chunkStart = new float[] { chunk.x() * Chunk.WIDTH, chunk.z() * Chunk.LENGTH };
+					float[] chunkEnd = new float[] { chunkStart[0] + Chunk.WIDTH, chunkStart[1] + Chunk.LENGTH };
+					
+					if (blockEntity.overlapsArea(chunkStart, chunkEnd)) {
+						updatingEntities.add(blockEntity);
+						break;
+					}
+				}
+			}
+		}
+		
+		if (updatingEntities.size() == 0) {
+			return;
+		}
+		
+		for (BlockEntity entity : updatingEntities) {
+			entity.compileWorld(tempWorld, false);
+		}
+		
+		for (ChunkCoordinate coord : tempWorld.getChunks().keySet()) {
+			// Only save if the chunk is marked for update or it's not present in the main world.
+			if (chunks.contains(coord) || !getBlockWorld().getChunks().keySet().contains(coord))
+			blockWorld.getChunks().put(coord, tempWorld.getChunks().get(coord));
+		}
+		
+		return;
+	}
+	
+	/**
+	 * Compile a specific set of sections. Less efficient than
+	 * <code>compileBlockWorld()</code> and <code>compileChunks()</code> if
+	 * compiling the entire world or an entire set of chunks.
+	 * 
+	 * @param sections Sections to compile.
+	 */
+	public void compileSections(Set<SectionCoordinate> sections) {
+		if (sections.isEmpty()) {
+			return;
+		}
+		// Compile into a temporary block world so other chunks don't get corrupted.
+		BlockWorld tempWorld = new BlockWorld();
+		
+		List<BlockEntity> updatingEntities = new ArrayList<>();
+		
+		for (String entName : entityStack) {
+			Entity entity = getEntity(entName);
+			if (entity instanceof BlockEntity) {
+				BlockEntity blockEntity = (BlockEntity) entity;
+				// See if entity is within chunkList.
+				for (SectionCoordinate section : sections) {
+					Vector sectionStart = new Vector(section.x * Chunk.WIDTH, section.y * Section.HEIGHT, section.z * Chunk.LENGTH);
+					Vector sectionEnd = new Vector(sectionStart.x + Chunk.WIDTH, section.y + Section.HEIGHT, section.z + Chunk.HEIGHT);
+					
+					if (blockEntity.overlapsVolume(sectionStart, sectionEnd)) {
+						updatingEntities.add(blockEntity);
+						break;
+					}
+				}
+			}
+		}
+		
+		if (updatingEntities.size() == 0) {
+			return;
+		}
+		
+		for (BlockEntity entity : updatingEntities) {
+			entity.compileWorld(tempWorld, false);
+		}
+		
+		for (ChunkCoordinate coord : tempWorld.getChunks().keySet()) {
+			// Only save if the chunk is marked for update or it's not present in the main world.
+			if (!getBlockWorld().getChunks().keySet().contains(coord)) {
+				blockWorld.getChunks().put(coord, tempWorld.getChunks().get(coord));
+			} else {
+				Chunk chunk = tempWorld.getChunks().get(coord);
+				for (int y = 0; y < chunk.sections.length; y++) {
+					if (sections.contains(new SectionCoordinate(coord.x(), y, coord.z()))) {
+						 getBlockWorld().chunkAt(coord.x(), coord.z()).sections[y] = chunk.sections[y];
+					}
+				}
+				
+			}
+//			if (sections.contains(coord) || !getBlockWorld().getChunks().keySet().contains(coord))
+//			blockWorld.getChunks().put(coord, tempWorld.getChunks().get(coord));
+		}
+		
+		return;
+	}
+	
+	/**
+	 * Compile all the chunks marked as dirty.
+	 */
+	public void quickRecompile() {
+		compileChunks(dirtyChunks);
+		compileSections(dirtySections);
+		fireWorldUpdateEvent(dirtySections);
+		dirtyChunks.clear();
+	}
+	
+	/**
+	 * Mark a chunk as needing compiling.
+	 */
+	public void markChunkDirty(ChunkCoordinate chunk) {
+		dirtyChunks.add(chunk);
+	}
+	
+	/**
+	 * Called when the world is recompiled.
+	 */
+	public void onWorldUpdate(WorldUpdateListener listener) {
+		this.worldUpdateListeners.add(listener);
+	}
+	
+	protected void fireWorldUpdateEvent(Set<SectionCoordinate> sections) {
+		for (WorldUpdateListener listener : worldUpdateListeners) {
+			listener.onWorldUpdated(new WorldUpdateEvent(this, sections));
+		}
+	}
+	
 	public BlockWorld getBlockWorld() {
 		return this.blockWorld;
+	}
+	
+	/**
+	 * Called when there is an update to the entity stack.
+	 */
+	public void onUpdateEntityStack(Runnable listener) {
+		updateStackListeners.add(listener);
+	}
+	
+	/**
+	 * Trigger all entity stack listeners.
+	 */
+	public void updateEntityStack() {
+		for (Runnable listener : updateStackListeners) {
+			listener.run();
+		}
 	}
 	
 	/**
@@ -538,13 +649,5 @@ public class Level {
 	public boolean compileLogic(String dataPath) {
 		return compileLogic(project.assetManager().getAbsolutePath(dataPath));
 	}
-	
-	/* Load a JSONObject from a file */
-	private static JSONObject loadJSON(Path inputPath) throws IOException, JSONException {
-		List<String> jsonFile = Files.readAllLines(inputPath);
-		JSONObject jsonObject = new JSONObject(String.join("", jsonFile));
-		return jsonObject;
-	}
-	
-	
+		
 }

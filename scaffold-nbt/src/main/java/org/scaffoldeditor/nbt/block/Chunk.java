@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
+
+import org.scaffoldeditor.nbt.block.BlockWorld.ChunkCoordinate;
 
 import com.github.mryurihi.tbnbt.tag.NBTTagCompound;
 
@@ -16,6 +19,58 @@ public class Chunk implements BlockCollection {
 	public static final int WIDTH = 16;
 	public static final int LENGTH = 16;
 	public static final int HEIGHT = 256;
+	
+	public static class SectionCoordinate {
+		/** X position of the chunk */
+		public final int x;
+		/** Index of the section in the chunk */
+		public final int y;
+		/** Z position of the chunk */
+		public final int z;
+		
+		public SectionCoordinate(int x, int y, int z) {
+			this.x = x;
+			this.y = y;
+			this.z = z;
+		}
+		
+		public SectionCoordinate(ChunkCoordinate chunk, int index) {
+			this.x = chunk.x();
+			this.y = index;
+			this.z = chunk.z();
+		}
+		
+		public ChunkCoordinate getChunk() {
+			return new ChunkCoordinate(x, z);
+		}
+		
+		public int getEndX() {
+			return x + WIDTH;
+		}
+		
+		public int getEndY() {
+			return y + Section.HEIGHT;
+		}
+		
+		public int getEndZ() {
+			return z + LENGTH;
+		}
+		
+		
+		@Override
+		public boolean equals(Object obj) {
+			if (!(obj instanceof SectionCoordinate)) {
+				return false;
+			}
+			SectionCoordinate other = (SectionCoordinate) obj;
+			return (x == other.x && y == other.y && z == other.z);	
+		}
+		
+		@Override
+		public int hashCode() {
+			return Objects.hash(x, y, z);
+		}
+	}
 	
 	/**
 	 * A list of all the block types that are in the chunk.
@@ -41,7 +96,16 @@ public class Chunk implements BlockCollection {
 	 */
 	public final List<NBTTagCompound> tileEntities = new ArrayList<NBTTagCompound>();
 	
+	/**
+	 * All the sections in the chunk.
+	 */
+	public final Section[] sections = new Section[HEIGHT / Section.HEIGHT];
+	
 	public Chunk() {
+		for (int i = 0; i < sections.length; i++) {
+			sections[i] = new Section();
+		}
+		
 		blocks = new short[WIDTH][HEIGHT][LENGTH];
 		for (short[][] row : blocks) {
 			for (short[] column : row) {
@@ -54,18 +118,8 @@ public class Chunk implements BlockCollection {
 	
 	@Override
 	public Block blockAt(int x, int y, int z) {
-		try {
-			short paletteIndex = blocks[x][y][z];
-			if (paletteIndex == -1) {
-				return null;
-			} else {
-				return palette.get(paletteIndex);
-			}
-			
-		} catch (IndexOutOfBoundsException e) {
-			System.out.println("Block "+x+" "+y+" "+z+" is out of range!");
-			return null;
-		}
+		Section section = sections[Math.floorDiv(y, Section.HEIGHT)];
+		return section.blockAt(x, y % Section.HEIGHT, z);
 	}
 	
 	/**
@@ -76,108 +130,36 @@ public class Chunk implements BlockCollection {
 	 * @return Is a block present?
 	 */
 	public boolean blockExists(int x, int y, int z) {
-		return (blocks[x][y][z] > 0);
+		Section section = sections[Math.floorDiv(y, Section.HEIGHT)];
+		return section.blockExists(x, y % Section.HEIGHT, z);
+//		return (blocks[x][y][z] > 0);
 	}
 
 	public void setBlock(int x, int y, int z, Block block) {
-		if (!palette.contains(block)) {
-			palette.add(block); // Make sure block is in palette
-		}
-		
-		// Find block in palette
-		short paletteIndex = 0;
-		for (short i = 0; i < palette.size(); i++) {
-			if (palette.get(i).equals(block)) {
-				paletteIndex = i;
-				break;
-			}
-		}
-		
-		blocks[x][y][z] = paletteIndex;
+		Section section = sections[Math.floorDiv(y, Section.HEIGHT)];
+		section.setBlock(x, y % Section.HEIGHT, z, block);	
 	}
 	
-	/**
-	 * Get a list of all the blocks the chunk has.
-	 * @return Palette.
-	 */
-	public List<Block> palette() {
-		return palette;
-	}
-	
-	public Block[][][] getBlocks() {
-		Block[][][] blockArray = new Block[WIDTH][HEIGHT][LENGTH];
-		
-		for (int x = 0; x < WIDTH; x++) {
-			for (int y = 0; y < HEIGHT; y++) {
-				for (int z = 0; z < LENGTH; z++) {
-					blockArray[x][y][z] = palette.get(blocks[x][y][z]);
-				}
-			}
-		}
-		
-		return blockArray;
-	}
-
 	@Override
 	public Iterator<Block> iterator() {
 		return new Iterator<Block>() {
 			
-			private int headX = 0;
-			private int headY = 0;
-			private int headZ = 0;
+			int currentSection = 0;
+			Iterator<Block> sectionIterator = sections[0].iterator();
 
 			@Override
 			public boolean hasNext() {
-				// Backup the heads.
-				int oldHeadX = this.headX;
-				int oldHeadY = this.headY;
-				int oldHeadZ = this.headZ;
-
-				// Search for additional values
-				boolean success = false;
-				while (headX < WIDTH && headY < HEIGHT && headZ < LENGTH) {
-					if (blocks[headX][headY][headZ] != -1) {
-						success = true;
-						break;
-					}
-					iterate();
-				}
-
-				headX = oldHeadX;
-				headY = oldHeadY;
-				headZ = oldHeadZ;
-
-				return success;
+				return currentSection < sections.length - 1 || sectionIterator.hasNext();
 			}
 
 			@Override
 			public Block next() {
-				short index = -1;
-				
-				// Iterate until we find a non-void block
-				while (index < 0 && hasNext()) {
-					index = blocks[headX][headY][headZ];
-					iterate();
-				}
-				
-				iterate();
-				return palette.get(index);
-			}
-			
-			/**
-			 * Move the heads to the next available slot.
-			 * Scans in an X -> Z -> Y order
-			 */
-			private void iterate() {
-				if (headX+1 < WIDTH) {
-					headX++;
-				} else if (headZ+1 < LENGTH) {
-					headX = 0;
-					headZ++;
-				} else if (headY < HEIGHT) {
-					headX = 0;
-					headZ = 0;
-					headY++;
+				if (sectionIterator.hasNext()) {
+					return sectionIterator.next();
+				} else {
+					currentSection++;
+					sectionIterator = sections[currentSection].iterator();
+					return sectionIterator.next();
 				}
 			}
 		};

@@ -1,9 +1,10 @@
 package org.scaffoldeditor.scaffold.level.entity.logic;
 
-import java.util.List;
-
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
+import org.scaffoldeditor.scaffold.level.entity.EntityFactory;
+import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
+import org.scaffoldeditor.scaffold.level.entity.attribute.IntAttribute;
 import org.scaffoldeditor.scaffold.level.io.Input;
 import org.scaffoldeditor.scaffold.logic.Datapack;
 import org.scaffoldeditor.scaffold.logic.MCFunction;
@@ -14,10 +15,19 @@ import org.scaffoldeditor.scaffold.logic.MCFunction;
  * @author Sam54123
  */
 public class Relay extends Entity {
+	
+	public static void Register() {
+		EntityRegistry.registry.put("logic_relay", new EntityFactory<Entity>() {		
+			@Override
+			public Entity create(Level level, String name) {
+				return new Relay(level, name);
+			}
+		});
+	}
 
 	public Relay(Level level, String name) {
 		super(level, name);
-		setAttribute("delay", 0);
+		setAttribute("delay", new IntAttribute(0), true);
 		
 		// Called to activate the relay.
 		registerInput(new Input(this) {
@@ -35,7 +45,7 @@ public class Relay extends Entity {
 
 			@Override
 			public String getCommand(Entity instigator, Entity caller, String[] args) {
-				if ((int) getAttribute("delay") <= 0) { // if delay < 0, ignore it.
+				if (((IntAttribute) getAttribute("delay")).getValue() <= 0) { // if delay < 0, ignore it.
 					return "function "+getLevel().getDatapack().formatFunctionCall(getFunctionName());
 				}  else {
 					return "schedule function "+getLevel().getDatapack().formatFunctionCall(getFunctionName())+" "+getAttribute("delay");
@@ -43,13 +53,6 @@ public class Relay extends Entity {
 			}
 
 		});
-	}
-
-	@Override
-	public List<AttributeDeclaration> getAttributeFields() {
-		List<AttributeDeclaration> attributes = super.getAttributeFields();
-		attributes.add(new AttributeDeclaration("delay", Integer.class));
-		return attributes;
 	}
 
 	@Override

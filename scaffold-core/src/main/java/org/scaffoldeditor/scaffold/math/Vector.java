@@ -2,14 +2,20 @@ package org.scaffoldeditor.scaffold.math;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.scaffoldeditor.scaffold.serialization.XMLSerializable;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * 3D Vector implementation
  */
-public class Vector {
-	private float x;
-	private float y;
-	private float z;
+public class Vector implements XMLSerializable<Vector> {
+	
+	public static final String REGISTRY_NAME = "vector";
+	
+	public final float x;
+	public final float y;
+	public final float z;
 	
 	public Vector(float x, float y, float z) {
 		this.x = x;
@@ -102,6 +108,19 @@ public class Vector {
 			return null;
 		}
 
+	}
+
+	@Override
+	public Element serialize(Document document) {
+		Element element = document.createElement(REGISTRY_NAME);
+		element.setAttribute("x", String.valueOf(x));
+		element.setAttribute("y", String.valueOf(y));
+		element.setAttribute("z", String.valueOf(z));
+		return element;
+	}
+	
+	public static Vector deserialize(Element xml) {
+		return new Vector(Float.valueOf(xml.getAttribute("x")), Float.valueOf(xml.getAttribute("y")), Float.valueOf(xml.getAttribute("z")));
 	}
 
 }

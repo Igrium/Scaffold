@@ -1,9 +1,10 @@
 package org.scaffoldeditor.scaffold.level.entity.logic;
 
-import java.util.List;
-
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
+import org.scaffoldeditor.scaffold.level.entity.EntityFactory;
+import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
+import org.scaffoldeditor.scaffold.level.entity.attribute.StringAttribute;
 import org.scaffoldeditor.scaffold.level.io.Input;
 
 /**
@@ -12,9 +13,18 @@ import org.scaffoldeditor.scaffold.level.io.Input;
  */
 public class FunctionEntity extends Entity {
 	
+	public static void Register() {
+		EntityRegistry.registry.put("logic_function", new EntityFactory<Entity>() {		
+			@Override
+			public Entity create(Level level, String name) {
+				return new FunctionEntity(level, name);
+			}
+		});
+	}
+	
 	public FunctionEntity(Level level, String name) {
 		super(level, name);
-		setAttribute("function", "");
+		setAttribute("function", new StringAttribute(name), true);
 		
 		registerInput(new Input(this) {
 
@@ -30,17 +40,14 @@ public class FunctionEntity extends Entity {
 
 			@Override
 			public String getCommand(Entity instigator, Entity caller, String[] args) {
-				return "function "+getAttribute("function");
+				return "function "+getFunction();
 			}
 			
 		});
 	}
 	
-	@Override
-	public List<AttributeDeclaration> getAttributeFields() {
-		List<AttributeDeclaration> attributes = super.getAttributeFields();
-		attributes.add(new AttributeDeclaration("function", String.class));
-		return attributes;
+	public String getFunction() {
+		return ((StringAttribute) getAttribute("function")).getValue();
 	}
 	
 	@Override

@@ -2,11 +2,19 @@ package org.scaffoldeditor.scaffold.core;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Set;
 
-import org.scaffoldeditor.nbt.block.BlockCollectionManager;
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.scanners.TypeAnnotationsScanner;
+import org.reflections.util.ConfigurationBuilder;
+import org.scaffoldeditor.scaffold.plugin_utils.DefaultPlugin;
+import org.scaffoldeditor.scaffold.plugin_utils.PluginInitializer;
+import org.scaffoldeditor.scaffold.plugin_utils.ScaffoldPlugin;
 
 /**
  * A Project is an object that defines all the main attributes of a project
@@ -25,14 +33,39 @@ public class Project {
 	private AssetManager assetManager;
 	
 	/**
-	 * Create an empty project wckith an empty gameinfo
+	 * Create an empty project with an empty gameinfo
 	 * @param projectFolder Folder to initialize the project in
 	 */
 	public Project(Path projectFolder) {
 		this.projectFolder = projectFolder;
 		gameInfo = new GameInfo();
 		assetManager = new AssetManager(this);
-		BlockCollectionManager.registerDefaults();
+		new DefaultPlugin().initialize();
+		loadPlugins();
+	}
+	
+	protected void loadPlugins() {
+		System.out.println("Loading plugins...");
+		
+		
+		Reflections reflections = new Reflections(new ConfigurationBuilder()
+				.setScanners(new TypeAnnotationsScanner(), new SubTypesScanner(false)));
+		
+		Set<Class<?>> classes = reflections.getTypesAnnotatedWith(ScaffoldPlugin.class);
+		System.out.println(classes.toString());
+		
+		for (Class<?> c : classes) {
+			if (c.isAssignableFrom(PluginInitializer.class)) {
+				try {
+					System.out.println("Initializing plugin: "+c.getName());
+					PluginInitializer plugin = (PluginInitializer) c.getConstructors()[0].newInstance();
+					plugin.initialize();
+				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+						| InvocationTargetException | SecurityException e) {
+					System.err.println("Unable to instantiate plugin: "+c.getName());
+				}
+			}
+		}
 	}
 
 	
@@ -108,7 +141,7 @@ public class Project {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			System.out.println("Unable to create folder structure!");
+			System.err.println("Unable to create folder structure!");
 		}
 		
 		return project;
