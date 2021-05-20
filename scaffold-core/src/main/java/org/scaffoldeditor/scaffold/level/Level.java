@@ -414,6 +414,8 @@ public class Level {
 		}
 		
 		for (ChunkCoordinate coord : tempWorld.getChunks().keySet()) {
+			// Only save if the chunk is marked for update or it's not present in the main world.
+			if (chunks.contains(coord) || !getBlockWorld().getChunks().keySet().contains(coord))
 			blockWorld.getChunks().put(coord, tempWorld.getChunks().get(coord));
 		}
 		
