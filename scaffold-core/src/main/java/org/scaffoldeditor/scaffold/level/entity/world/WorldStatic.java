@@ -23,6 +23,9 @@ public class WorldStatic extends Faceable implements BlockEntity {
 	
 	private SizedBlockCollection model;
 	
+	// Keep track of the model path on our own for optimization.
+	private String modelpath;
+	
 	public static void Register() {
 		EntityRegistry.registry.put("world_static", new EntityFactory<Entity>() {		
 			@Override
@@ -42,7 +45,10 @@ public class WorldStatic extends Faceable implements BlockEntity {
 	@Override
 	public void onUpdateAttributes() {
 		super.onUpdateAttributes();
-		reload();
+		
+		if (!((StringAttribute) getAttribute("model")).getValue().equals(modelpath)) {
+			reload();	
+		}
 	}
 	
 	/**
@@ -52,6 +58,7 @@ public class WorldStatic extends Faceable implements BlockEntity {
 		StringAttribute attribute = (StringAttribute) getAttribute("model");
 		String model = attribute.getValue();
 		System.out.println("Loading model " + model);
+		modelpath = model;
 		if (model.contentEquals("")) {
 			return;
 		}
