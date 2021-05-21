@@ -88,7 +88,6 @@ public class WorldStatic extends Faceable implements BlockEntity {
 		Vector gridPos = Vector.floor(getPosition());
 		
 		world.addBlockCollection(model, (int) gridPos.X() , (int) gridPos.Y(), (int) gridPos.Z(), true, this);
-		System.out.println("Added block collection to world.");
 		
 		return true;
 	}

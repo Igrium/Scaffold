@@ -57,15 +57,15 @@ public class Chunk implements BlockCollection {
 		}
 		
 		public int getEndX() {
-			return getStartX() + WIDTH;
+			return getStartX() + WIDTH - 1;
 		}
 		
 		public int getEndY() {
-			return getStartY() + Section.HEIGHT;
+			return getStartY() + Section.HEIGHT - 1;
 		}
 		
 		public int getEndZ() {
-			return getStartZ() + LENGTH;
+			return getStartZ() + LENGTH - 1;
 		}
 		
 		

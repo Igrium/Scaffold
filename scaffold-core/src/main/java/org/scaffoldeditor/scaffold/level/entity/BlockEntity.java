@@ -116,7 +116,6 @@ public interface BlockEntity {
 				}
 			}
 		}
-		System.out.println(overlapping);
 		return overlapping;
 	}
 }
