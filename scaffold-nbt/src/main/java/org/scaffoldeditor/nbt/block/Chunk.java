@@ -44,16 +44,28 @@ public class Chunk implements BlockCollection {
 			return new ChunkCoordinate(x, z);
 		}
 		
+		public int getStartX() {
+			return x * WIDTH;
+		}
+		
+		public int getStartY() {
+			return y * Section.HEIGHT;
+		}
+		
+		public int getStartZ() {
+			return z * LENGTH;
+		}
+		
 		public int getEndX() {
-			return x + WIDTH;
+			return getStartX() + WIDTH;
 		}
 		
 		public int getEndY() {
-			return y + Section.HEIGHT;
+			return getStartY() + Section.HEIGHT;
 		}
 		
 		public int getEndZ() {
-			return z + LENGTH;
+			return getStartZ() + LENGTH;
 		}
 		
 		
@@ -69,6 +81,11 @@ public class Chunk implements BlockCollection {
 		@Override
 		public int hashCode() {
 			return Objects.hash(x, y, z);
+		}
+		
+		@Override
+		public String toString() {
+			return "SectionCoordinate: ["+x+", "+y+", "+z+"]";
 		}
 	}
 	

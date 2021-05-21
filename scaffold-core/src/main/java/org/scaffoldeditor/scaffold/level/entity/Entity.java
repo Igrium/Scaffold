@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.scaffold.core.Project;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
@@ -131,6 +132,10 @@ public class Entity {
 	 */
 	public Level getLevel() {
 		return level;
+	}
+	
+	public BlockWorld getWorld() {
+		return level.getBlockWorld();
 	}
 	
 	/**

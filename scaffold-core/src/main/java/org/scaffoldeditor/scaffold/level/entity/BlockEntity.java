@@ -63,18 +63,19 @@ public interface BlockEntity {
 	 * Check if this block entity overlaps a certian volume.
 	 */
 	default boolean overlapsVolume(Vector point1, Vector point2) {
-		// Math reference: https://developer.mozilla.org/en-US/docs/Games/Techniques/3D_collision_detection
-				Vector[] bounds = getBounds();
-				boolean x = (Math.min(bounds[0].x, bounds[1].x) <= Math.max(point1.x, point2.x) &&
-						Math.max(bounds[0].x, bounds[1].x) >= Math.min(point1.x, point2.x));
-				
-				boolean y = (Math.min(bounds[0].y, bounds[1].y) <= Math.max(point1.y, point2.y) &&
-						Math.max(bounds[0].y, bounds[1].y) >= Math.min(point1.y, point2.y));
-				
-				boolean z = (Math.min(bounds[0].z, bounds[1].z) <= Math.max(point1.z, point2.z) &&
-						Math.max(bounds[0].z, bounds[1].z) >= Math.min(point1.z, point2.z));
-				
-				return (x && y && z);
+		// Math reference:
+		// https://developer.mozilla.org/en-US/docs/Games/Techniques/3D_collision_detection
+		Vector[] bounds = getBounds();
+		boolean x = (Math.min(bounds[0].x, bounds[1].x) <= Math.max(point1.x, point2.x)
+				&& Math.max(bounds[0].x, bounds[1].x) >= Math.min(point1.x, point2.x));
+
+		boolean y = (Math.min(bounds[0].y, bounds[1].y) <= Math.max(point1.y, point2.y)
+				&& Math.max(bounds[0].y, bounds[1].y) >= Math.min(point1.y, point2.y));
+
+		boolean z = (Math.min(bounds[0].z, bounds[1].z) <= Math.max(point1.z, point2.z)
+				&& Math.max(bounds[0].z, bounds[1].z) >= Math.min(point1.z, point2.z));
+
+		return (x && y && z);
 	}
 	
 	/**
@@ -115,6 +116,7 @@ public interface BlockEntity {
 				}
 			}
 		}
+		System.out.println(overlapping);
 		return overlapping;
 	}
 }
