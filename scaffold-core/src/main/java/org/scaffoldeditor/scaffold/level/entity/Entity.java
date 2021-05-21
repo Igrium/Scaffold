@@ -316,4 +316,9 @@ public class Entity {
 
 		return commands.toArray(new String[0]);
 	}
+	
+	@Override
+	public String toString() {
+		return getName();
+	}
 }

@@ -123,6 +123,15 @@ public class Chunk implements BlockCollection {
 	}
 	
 	/**
+	 * Get the owner of a block in this chunk.
+	 * @return The owner, or null if there is no owner.
+	 */
+	public Object getOwner(int x, int y, int z) {
+		Section section = sections[Math.floorDiv(y, Section.HEIGHT)];
+		return section.getOwner(x, y % Section.HEIGHT, z);
+	}
+	
+	/**
 	 * Check for a non-air block at the given chunk coordinates. (More efficiant than blockAt).
 	 * @param x X coordinate.
 	 * @param y Y coordinate.
@@ -134,10 +143,19 @@ public class Chunk implements BlockCollection {
 		return section.blockExists(x, y % Section.HEIGHT, z);
 //		return (blocks[x][y][z] > 0);
 	}
-
+	
 	public void setBlock(int x, int y, int z, Block block) {
+		setBlock(x, y, z, block, null);
+	}
+
+	public void setBlock(int x, int y, int z, Block block, Object owner) {
 		Section section = sections[Math.floorDiv(y, Section.HEIGHT)];
-		section.setBlock(x, y % Section.HEIGHT, z, block);	
+		section.setBlock(x, y % Section.HEIGHT, z, block, owner);
+	}
+	
+	public void setOwner(int x, int y, int z, Object owner) {
+		Section section = sections[Math.floorDiv(y, Section.HEIGHT)];
+		section.setOwner(x, y % Section.HEIGHT, z, owner);
 	}
 	
 	@Override

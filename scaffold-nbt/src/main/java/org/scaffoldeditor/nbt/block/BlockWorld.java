@@ -111,6 +111,32 @@ public class BlockWorld implements BlockCollection {
 		return chunk.blockAt(chunkX, y, chunkZ);
 	}
 	
+	public Object getBlockOwner(int x, int y, int z) {
+		// Find chunk block is in
+		ChunkCoordinate chunkKey = new ChunkCoordinate((int) Math.floor((double) x / Chunk.WIDTH),
+				(int) Math.floor((double) z / Chunk.WIDTH));
+
+		Chunk chunk = null;
+		if (chunks.containsKey(chunkKey)) {
+			chunk = chunks.get(chunkKey);
+		} else {
+			return null;
+		}
+
+		// Convert into chunk coordinates.
+		int chunkX = x % Chunk.WIDTH;
+		int chunkZ = z % Chunk.LENGTH;
+
+		if (chunkX < 0) {
+			chunkX = Chunk.WIDTH + chunkX;
+		}
+		if (chunkZ < 0) {
+			chunkZ = Chunk.LENGTH + chunkZ;
+		}
+		
+		return chunk.getOwner(chunkX, y, chunkZ);
+	}
+	
 	/**
 	 * Set the block at a particular location.
 	 * @param x X coordinate.
@@ -119,6 +145,18 @@ public class BlockWorld implements BlockCollection {
 	 * @param block Block to set.
 	 */
 	public void setBlock(int x, int y, int z, Block block) {
+		setBlock(x, y, z, block, null);
+	}
+	
+	/**
+	 * Set the block at a particular location.
+	 * @param x X coordinate.
+	 * @param y Y coordinate.
+	 * @param z Z coordinate.
+	 * @param owner Owner object to attribute the block to.
+	 * @param block Block to set.
+	 */
+	public void setBlock(int x, int y, int z, Block block, Object owner) {
 		if (y < 0 || y > Chunk.HEIGHT) {
 			return;
 		}
@@ -138,7 +176,7 @@ public class BlockWorld implements BlockCollection {
 		int relativeX = x - chunkKey.x * Chunk.WIDTH;
 		int relativeZ = z - chunkKey.z * Chunk.LENGTH;
 				
-		chunk.setBlock(relativeX, y, relativeZ, block);
+		chunk.setBlock(relativeX, y, relativeZ, block, owner);
 	}
 	
 	/**
@@ -148,9 +186,10 @@ public class BlockWorld implements BlockCollection {
 	 * @param x X position.
 	 * @param y Y position.
 	 * @param z Z position.
+	 * @param z Owner to assign blocks to.
 	 * @param override Should override existing blocks?
 	 */
-	public void addBlockCollection(SizedBlockCollection collection, int x, int y, int z, boolean override) {
+	public void addBlockCollection(SizedBlockCollection collection, int x, int y, int z, boolean override, Object owner) {
 		for (int Y = 0; Y < collection.getHeight(); Y++) {
 			for (int Z = 0; Z < collection.getLength(); Z++) {
 				for (int X = 0; X < collection.getWidth(); X++) {
@@ -163,7 +202,7 @@ public class BlockWorld implements BlockCollection {
 					
 					if (newBlock != null &&
 							(override || oldBlock == null || oldBlock.getName().matches("minecraft:air"))) {
-						setBlock(globalX, globalY, globalZ, newBlock);
+						setBlock(globalX, globalY, globalZ, newBlock, owner);
 					}
 				}
 			}
@@ -177,9 +216,22 @@ public class BlockWorld implements BlockCollection {
 	 * @param x X position.
 	 * @param y Y position.
 	 * @param z Z position.
+	 * @param override Should override existing blocks?
+	 */
+	public void addBlockCollection(SizedBlockCollection collection, int x, int y, int z, boolean override) {
+		addBlockCollection(collection, x, y, z, override, null);
+	}
+	
+	/**
+	 * Place a block collection in the world.
+	 * Collection origin is the most negitive (coordinate wize) corner.
+	 * @param collection Collection to place.
+	 * @param x X position.
+	 * @param y Y position.
+	 * @param z Z position.
 	 */
 	public void addBlockCollection(SizedBlockCollection collection, int x, int y, int z) {
-		addBlockCollection(collection, x, y, z, false);
+		addBlockCollection(collection, x, y, z, false, null);
 	}
 		
 	

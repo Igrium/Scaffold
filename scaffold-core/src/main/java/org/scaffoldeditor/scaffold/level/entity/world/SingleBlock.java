@@ -71,7 +71,7 @@ public class SingleBlock extends Entity implements BlockEntity {
 	@Override
 	public boolean compileWorld(BlockWorld world, boolean full) {
 		Vector gridPos = gridPos();
-		world.setBlock((int) gridPos.X(), (int) gridPos.Y(), (int) gridPos.Z(), getBlock());
+		world.setBlock((int) gridPos.X(), (int) gridPos.Y(), (int) gridPos.Z(), getBlock(), this);
 		
 		return false;
 	}
