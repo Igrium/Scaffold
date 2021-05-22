@@ -14,23 +14,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.io.FileUtils;
 import org.scaffoldeditor.nbt.NBTStrings;
 import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.nbt.block.Chunk;
 import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
 import org.scaffoldeditor.nbt.block.Section;
 import org.scaffoldeditor.nbt.block.BlockWorld.ChunkCoordinate;
+import org.scaffoldeditor.scaffold.compile.Compiler.CompileResult;
 import org.scaffoldeditor.scaffold.core.Project;
 import org.scaffoldeditor.scaffold.level.WorldUpdates.WorldUpdateEvent;
 import org.scaffoldeditor.scaffold.level.WorldUpdates.WorldUpdateListener;
 import org.scaffoldeditor.scaffold.level.entity.BlockEntity;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
+import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
+import org.scaffoldeditor.scaffold.level.entity.attribute.BooleanAttribute;
 import org.scaffoldeditor.scaffold.level.entity.game.TargetSelectable;
 import org.scaffoldeditor.scaffold.logic.Datapack;
 import org.scaffoldeditor.scaffold.logic.MCFunction;
-import org.scaffoldeditor.scaffold.logic.Resourcepack;
 import org.scaffoldeditor.scaffold.math.Vector;
 import org.scaffoldeditor.scaffold.operation.OperationManager;
 import org.scaffoldeditor.scaffold.serialization.LevelReader;
@@ -215,6 +216,24 @@ public class Level {
 		return datapack;
 	}
 	
+	public void setInitFunction(MCFunction initFunction) {
+		this.initFunction = initFunction;
+	}
+	
+	/**
+	 * For use in the compiler only.
+	 */
+	public void setTickFunction(MCFunction tickFunction) {
+		this.tickFunction = tickFunction;
+	}
+	
+	/**
+	 * For use in the compiler only.
+	 */
+	public void setDatapack(Datapack datapack) {
+		this.datapack = datapack;
+	}
+	
 	protected String validateName(String name, String[] ignore) {
 		if (Arrays.asList(ignore).contains(name)) {
 			return name;
@@ -299,7 +318,7 @@ public class Level {
 	}
 	
 	
-	private String summonScoreboardEntity() {
+	public String summonScoreboardEntity() {
 		NBTTagCompound nbt = new NBTTagCompound(new HashMap<String, NBTTag>());
 		nbt.put("CustomName", new NBTTagString("\""+SCOREBOARDNAME+"\""));
 		nbt.put("Duration", new NBTTagInt(2000000000));
@@ -378,6 +397,8 @@ public class Level {
 			}
 		}
 		fireWorldUpdateEvent(new HashSet<>());
+		dirtyChunks.clear();
+		dirtySections.clear();
 		
 		return true;
 	}
@@ -540,62 +561,7 @@ public class Level {
 			listener.run();
 		}
 	}
-	
-	/**
-	 * Compile level logic
-	 * @param dataPath Path to datapack folder
-	 * @return success
-	 */
-	public boolean compileLogic(Path dataPath) {
-		// Create tick and init functions
-		initFunction = new MCFunction("init");
-		tickFunction = new MCFunction("tick");
-		
-		// Create datapack
-		datapack = new Datapack(project, name);
-		datapack.functions.add(initFunction);
-		datapack.functions.add(tickFunction);
-		
-		datapack.loadFunctions.add(datapack.formatFunctionCall(initFunction));
-		datapack.tickFunctions.add(datapack.formatFunctionCall(tickFunction));
-		
-		// Respawn scoreboard entity.
-		initFunction.addCommand("kill "+getScoreboardEntity().getTargetSelector());
-		initFunction.addCommand(summonScoreboardEntity());
-		
-		// Compile entities
-		for (String key : entities.keySet()) {
-			entities.get(key).compileLogic(datapack);
-		}
-		
-		// Compile datapack
-		try {
-			datapack.compile(dataPath.resolve(project.getName()));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		return true;
-	}
-	
-	/**
-	 * Setup appropriate folders and files for world compile.
-	 * @param compileTarget Folder to compile into (saves/name).
-	 * @param cheats Should this level compile with cheats enabled?
-	 * @throws IOException If an IO exception occurs
-	 */
-	private void setupCompile(Path compileTarget, boolean cheats) throws IOException {
-		// Delete folder if exists
-		if (compileTarget.toFile().exists()) {
-			FileUtils.deleteDirectory(compileTarget.toFile());
-		}
 
-		// Make world folder
-		compileTarget.toFile().mkdir();
-		
-		// Compile levelData
-		levelData.compileFile(compileTarget.resolve("level.dat").toFile(), cheats);
-	}
 	
 	/**
 	 * Compile this level into a playable Minecraft world (UNFINISHED).
@@ -604,50 +570,15 @@ public class Level {
 	 * @return Success
 	 */
 	public boolean compile(Path compileTarget, boolean cheats) {
-		try {
-			setupCompile(compileTarget, cheats);
-			
-			// Compile world
-			compileBlockWorld(true);
-			
-			File regionFolder = compileTarget.resolve("region").toFile();
-			regionFolder.mkdir();
-			blockWorld.serialize(regionFolder, org.scaffoldeditor.nbt.Constants.DEFAULT_DATA_VERSION);
-			
-			// Setup and compile logic.
-			Path datapackFolder = compileTarget.resolve("datapacks");
-			datapackFolder.toFile().mkdir();
-			if (!compileLogic(datapackFolder)) {
-				return false;
-			}
-			
-			// Compile resourcepack.
-			Resourcepack resourcepack = new Resourcepack(getProject().assetManager().getAbsolutePath("assets"));
-			resourcepack.setDescription("Resources for "+project.getTitle());
-			resourcepack.compile(compileTarget.resolve("resources"), true);
-			
-			
-			
-			return true;
-		} catch (IOException e) {
-			e.printStackTrace();
-			System.out.println("Unable to compile level!");
-			return false;
-		}
+		Map<String, Attribute<?>> args = new HashMap<>();
+		args.put("cheats", new BooleanAttribute(cheats));
 		
+		CompileResult result = project.getCompiler().compile(this, compileTarget, args, null);
+		return result.success;
 	}
 	
 	public boolean compile(Path compileTarget) {
 		return compile(compileTarget, false);
-	}
-	
-	/**
-	 * Compile level logic
-	 * @param dataPath Path to datapack folder
-	 * @return success
-	 */
-	public boolean compileLogic(String dataPath) {
-		return compileLogic(project.assetManager().getAbsolutePath(dataPath));
 	}
 		
 }

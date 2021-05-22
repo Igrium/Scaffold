@@ -12,6 +12,7 @@ import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ConfigurationBuilder;
+import org.scaffoldeditor.scaffold.compile.Compiler;
 import org.scaffoldeditor.scaffold.plugin_utils.DefaultPlugin;
 import org.scaffoldeditor.scaffold.plugin_utils.PluginInitializer;
 import org.scaffoldeditor.scaffold.plugin_utils.ScaffoldPlugin;
@@ -32,6 +33,8 @@ public class Project {
 	/* The AssetManager associated with this project */
 	private AssetManager assetManager;
 	
+	private Compiler compiler;
+	
 	/**
 	 * Create an empty project with an empty gameinfo
 	 * @param projectFolder Folder to initialize the project in
@@ -40,6 +43,8 @@ public class Project {
 		this.projectFolder = projectFolder;
 		gameInfo = new GameInfo();
 		assetManager = new AssetManager(this);
+		compiler = Compiler.getDefault();
+		
 		new DefaultPlugin().initialize();
 		loadPlugins();
 	}
@@ -158,7 +163,6 @@ public class Project {
 	
 	/**
 	 * Get the project's gameinfo
-	 * @return gameInfo GameInfo
 	 */
 	public GameInfo gameInfo() {
 		return gameInfo;
@@ -166,10 +170,16 @@ public class Project {
 	
 	/**
 	 * Get the project's AssetManager
-	 * @return AssetManager
 	 */
 	public AssetManager assetManager() {
 		return assetManager;
+	}
+	
+	/**
+	 * Get the project's compiler.
+	 */
+	public Compiler getCompiler() {
+		return compiler;
 	}
 	
 	/**
