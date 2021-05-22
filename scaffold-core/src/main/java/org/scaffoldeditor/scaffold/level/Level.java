@@ -20,6 +20,7 @@ import org.scaffoldeditor.nbt.block.Chunk;
 import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
 import org.scaffoldeditor.nbt.block.Section;
 import org.scaffoldeditor.nbt.block.BlockWorld.ChunkCoordinate;
+import org.scaffoldeditor.scaffold.compile.Compiler.CompileEndStatus;
 import org.scaffoldeditor.scaffold.compile.Compiler.CompileResult;
 import org.scaffoldeditor.scaffold.core.Project;
 import org.scaffoldeditor.scaffold.level.WorldUpdates.WorldUpdateEvent;
@@ -576,7 +577,7 @@ public class Level {
 		args.put("cheats", new BooleanAttribute(cheats));
 		
 		CompileResult result = project.getCompiler().compile(this, compileTarget, args, null);
-		return result.success;
+		return result.endStatus == CompileEndStatus.FINISHED;
 	}
 	
 	public boolean compile(Path compileTarget) {

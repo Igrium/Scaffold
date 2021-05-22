@@ -10,17 +10,23 @@ import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 
 public class Compiler {
 	
+	public enum CompileEndStatus { FINISHED, FAILED, CANCELED };
+	
 	public static class CompileResult {
-		public final boolean success;
+		public final CompileEndStatus endStatus;
 		public final String errorMessage;
 		
-		public CompileResult(boolean success, String errorMessage) {
-			this.success = success;
+		public CompileResult(CompileEndStatus endStatus, String errorMessage) {
+			this.endStatus = endStatus;
 			this.errorMessage = errorMessage;
 		}
 		
 		public static CompileResult successfulCompile() {
-			return new CompileResult(true, "");
+			return new CompileResult(CompileEndStatus.FINISHED, "");
+		}
+		
+		public static CompileResult canceled() {
+			return new CompileResult(CompileEndStatus.CANCELED, "");
 		}
 	}
 	
@@ -75,7 +81,7 @@ public class Compiler {
 			
 			if (!success) {
 				if (step.isRequired()) {
-					return new CompileResult(false, "Unable to complete required step: "+step.getID()+". See console for details.");
+					return new CompileResult(CompileEndStatus.FAILED, "Unable to complete required step: "+step.getID()+". See console for details.");
 				} else {
 					listener.onError("Unable to complete step: "+step.getID());
 				}
