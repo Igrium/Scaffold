@@ -39,8 +39,10 @@ public class OperationManager {
 		if (operation.execute()) {
 			redoStack.clear();
 			undoStack.add(operation);
+			level.setHasUnsavedChanges(true);;
 			return true;
 		}
+		level.setHasUnsavedChanges(true);
 		return false;
 	}
 	
@@ -50,6 +52,7 @@ public class OperationManager {
 			operation.undo();
 			undoStack.remove(undoStack.size() - 1);
 			redoStack.add(operation);
+			level.setHasUnsavedChanges(true);
 		}
 	}
 	
@@ -59,6 +62,7 @@ public class OperationManager {
 			operation.redo();
 			redoStack.remove(redoStack.size() - 1);
 			undoStack.add(operation);
+			level.setHasUnsavedChanges(true);
 		}
 	}
 }

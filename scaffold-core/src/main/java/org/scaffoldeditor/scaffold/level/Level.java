@@ -89,6 +89,8 @@ public class Level {
 	/** Whether the level should automatically recompile the relevent chunks when a block entity is updated. */
 	public boolean autoRecompile = true;
 	
+	private boolean hasUnsavedChanges = false;
+	
 	private List<WorldUpdateListener> worldUpdateListeners = new ArrayList<>();
 	private List<Runnable> updateStackListeners = new ArrayList<>();
 	
@@ -336,7 +338,7 @@ public class Level {
 			FileOutputStream out = new FileOutputStream(file);
 			new LevelWriter(out).write(this);
 			out.close();
-			
+			setHasUnsavedChanges(false);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return false;
@@ -579,6 +581,14 @@ public class Level {
 	
 	public boolean compile(Path compileTarget) {
 		return compile(compileTarget, false);
+	}
+	
+	public boolean hasUnsavedChanges() {
+		return hasUnsavedChanges;
+	}
+
+	public void setHasUnsavedChanges(boolean hasUnsavedChanges) {
+		this.hasUnsavedChanges = hasUnsavedChanges;
 	}
 		
 }
