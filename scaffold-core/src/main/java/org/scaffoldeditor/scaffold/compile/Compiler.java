@@ -88,7 +88,9 @@ public class Compiler {
 			boolean success = false;
 			try {
 				success = step.execute(level, target, arguements, listener);
-			} catch (Exception e) {}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 			
 			if (!success) {
 				if (step.isRequired()) {
