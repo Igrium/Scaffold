@@ -1,21 +1,15 @@
 package org.scaffoldeditor.nbt.io;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.Chunk;
 
-import com.github.mryurihi.tbnbt.TagType;
-import com.github.mryurihi.tbnbt.tag.NBTTag;
-import com.github.mryurihi.tbnbt.tag.NBTTagByte;
-import com.github.mryurihi.tbnbt.tag.NBTTagCompound;
-import com.github.mryurihi.tbnbt.tag.NBTTagInt;
-import com.github.mryurihi.tbnbt.tag.NBTTagList;
-import com.github.mryurihi.tbnbt.tag.NBTTagLong;
-import com.github.mryurihi.tbnbt.tag.NBTTagLongArray;
-import com.github.mryurihi.tbnbt.tag.NBTTagString;
+import net.querz.nbt.tag.CompoundTag;
+import net.querz.nbt.tag.ListTag;
+import net.querz.nbt.tag.LongArrayTag;
+import net.querz.nbt.tag.Tag;
 
 /**
  * This class is responsible for parsing (and writing)
@@ -80,43 +74,43 @@ public class ChunkParser {
 		/**
 		 * Create a Section from NBT data.
 		 */
-		public Section(NBTTagCompound nbt) {
+		public Section(CompoundTag nbt) {
 			if (!nbt.containsKey("Palette")) {
 				return;
 			}
-			this.y = nbt.get("Y").getAsTagByte().getValue();
+			this.y = nbt.getByte("Y");
 			
 			// Load palette
-			NBTTagList palette = nbt.get("Palette").getAsTagList();
-			for (NBTTag t : palette.getValue()) {
-				NBTTagCompound block = t.getAsTagCompound();
-				this.palette.add(Block.fromBlockPalleteEntry(block));
+			ListTag<CompoundTag> palette = nbt.getListTag("Palette").asCompoundTagList();
+			for (CompoundTag t : palette) {
+				this.palette.add(Block.fromBlockPalleteEntry(t));
 			}
 			
-			// Load blockstates
-			NBTTagLongArray blockstates = nbt.get("BlockStates").getAsTagLongArray();
+			// Load BlockStates
+			LongArrayTag blockstates = nbt.getLongArrayTag("BlockStates");
 			blockArray = readBlockStates(blockstates.getValue());
 			valid = true;
+			
 		}
 		
 		/**
 		 * Generate NBT data from the section.
 		 * @return NBT data.
 		 */
-		public NBTTagCompound getNBT() {
+		public CompoundTag getNBT() {
 			if (!isValid()) {
 				return null;
 			}
 			
-			NBTTagCompound nbt = new NBTTagCompound(new HashMap<String, NBTTag>());
-			nbt.put("Y", new NBTTagByte(y));
+			CompoundTag nbt = new CompoundTag();
+			nbt.putByte("Y", y);
 			
 			// Insert palette.
-			List<NBTTag> palette = new ArrayList<NBTTag>();
+			ListTag<CompoundTag> palette = new ListTag<>(CompoundTag.class);
 			for (Block b : this.palette) {
 				palette.add(b.toPaletteEntry());
 			}
-			nbt.put("Palette", new NBTTagList(palette));
+			nbt.put("Palette", palette);
 			
 			// Load blockstates from 3d array.
 			int[] blockStateArray = new int[4096];
@@ -129,7 +123,7 @@ public class ChunkParser {
 					}
 				}
 			}
-			NBTTagLongArray blockstates = new NBTTagLongArray(writeBlockStates(palette.size(), blockStateArray));
+			LongArrayTag blockstates = new LongArrayTag(writeBlockStates(palette.size(), blockStateArray));
 			nbt.put("BlockStates", blockstates);
 			
 			return nbt;
@@ -176,15 +170,14 @@ public class ChunkParser {
 	 * @param nbt NBT to parse.
 	 * @return Parsed chunk.
 	 */
-	public static Chunk parseNBT(NBTTagCompound nbt) {
+	public static Chunk parseNBT(CompoundTag nbt) {
 		Chunk chunk = new Chunk();
 		
 		// Get sections from NBT.
-		NBTTagList sectionList = nbt.get("Sections").getAsTagList();
+		ListTag<CompoundTag> sectionList = nbt.getListTag("Sections").asCompoundTagList();
 		
 		// Iterate through sections.
-		for (NBTTag t : sectionList.getValue()) {
-			NBTTagCompound subchunk = t.getAsTagCompound();
+		for (CompoundTag subchunk : sectionList) {
 			
 			Section section = new Section(subchunk);
 			int yOffset = section.y*16;
@@ -204,9 +197,9 @@ public class ChunkParser {
 		
 		// Load entities.
 		if (nbt.containsKey("Entities")) {
-			NBTTagList entities = nbt.get("Entities").getAsTagList();
-			for (NBTTag t : entities.getValue()) {
-				chunk.entities.add(t.getAsTagCompound());
+			CompoundTag entities = nbt.getCompoundTag("Entities");
+			for (Tag<?> t : entities.values()) {
+				chunk.entities.add((CompoundTag) t);
 			}
 		}
 		
@@ -221,70 +214,70 @@ public class ChunkParser {
 	 * @param z Z coordinate of the chunk.
 	 * @return Written NBT.
 	 */
-	public NBTTagCompound writeNBT(Chunk chunk, int x, int z) {
-		NBTTagCompound level = new NBTTagCompound(new HashMap<String, NBTTag>());
+	public CompoundTag writeNBT(Chunk chunk, int x, int z) {
+		CompoundTag level = new CompoundTag();
 		
-		level.put("xPos", new NBTTagInt(x));
-		level.put("zPos", new NBTTagInt(z));
+		level.putInt("xPos", x);
+		level.putInt("zPos", z);
 		
 		// Write sections.
-		List<NBTTag> sections = new ArrayList<NBTTag>();
+		ListTag<CompoundTag> sections = new ListTag<>(CompoundTag.class);
 		for (byte y = 0; y < Chunk.HEIGHT/16; y++) {
 			if (sectionHasBlocks(chunk, y)) {
 				Section section = new Section(chunk, y);
 				sections.add(section.getNBT());
 			}
 		}
-		level.put("Sections", new NBTTagList(sections));
+		level.put("Sections", sections);
 		
 		// Write entities.
-		List<NBTTag> entities = new ArrayList<NBTTag>();
-		for (NBTTagCompound e : chunk.entities) {
+		ListTag<CompoundTag> entities = new ListTag<>(CompoundTag.class);
+		for (CompoundTag e : chunk.entities) {
 			entities.add(e);
 		}
 		
-		if (!entities.isEmpty()) {
-			level.put("Entities", new NBTTagList(entities));
+		if (entities.size() > 0) {
+			level.put("Entities", entities);
 		} else {
-			level.put("Entities", new NBTTagList(TagType.COMPOUND));
+			level.put("Entities", new ListTag<>(CompoundTag.class));
 		}
 		
 		// Write tile entities.
-		List<NBTTag> tileEntities = new ArrayList<NBTTag>();
-		for (NBTTagCompound e : chunk.tileEntities) {
+		ListTag<CompoundTag> tileEntities = new ListTag<>(CompoundTag.class);
+		for (CompoundTag e : chunk.tileEntities) {
 			tileEntities.add(e);
 		}
 		
-		if (!tileEntities.isEmpty()) {
-			level.put("TileEntities", new NBTTagList(tileEntities));
+		if (tileEntities.size() > 0) {
+			level.put("TileEntities", tileEntities);
 		} else {
-			level.put("TileEntities", new NBTTagList(TagType.COMPOUND));
+			level.put("TileEntities", new ListTag<>(CompoundTag.class));
 		}
 		
 		// Write other shit that Minecraft needs to read the file.
-		NBTTagCompound structures = new NBTTagCompound(new HashMap<String, NBTTag>());
-		structures.put("References", new NBTTagCompound(new HashMap<String, NBTTag>()));
-		structures.put("Starts",  new NBTTagCompound(new HashMap<String, NBTTag>()));
+		CompoundTag structures = new CompoundTag();
+		structures.put("References", new CompoundTag());
+		structures.put("Starts",  new CompoundTag());
 		level.put("Structures", structures);
 		
-		NBTTagList postProcessing = new NBTTagList(TagType.LIST);
+		ListTag<ListTag<CompoundTag>> postProcessing = new ListTag<>(ListTag.class);
 		for (int i = 0; i < 16; i++) {
-			postProcessing.add(new NBTTagList(TagType.COMPOUND));
+			postProcessing.add(new ListTag<>(CompoundTag.class));
 		}
 		level.put("PostProcessing", postProcessing);
 		
-		level.put("LiquidTicks", new NBTTagList(TagType.COMPOUND));
-		level.put("TileTicks", new NBTTagList(TagType.COMPOUND));
-		level.put("InhabitedTime", new NBTTagLong(0));
-		level.put("LastUpdate", new NBTTagLong(0));
-		level.put("IsLightOn", new NBTTagByte((byte) 0));
-		level.put("Status", new NBTTagString("full"));
-		level.put("Heightmaps", new NBTTagCompound(new HashMap<>()));
+		level.put("LiquidTicks", new ListTag<>(CompoundTag.class));
+		level.put("TileTicks", new ListTag<>(CompoundTag.class));
+		level.putLong("InhabitedTime", 0);
+		level.putLong("LastUpdate", 0);
+		level.putByte("IsLightOn", (byte) 0);
+		level.putString("Status", "full");
+		level.put("Heightmaps", new CompoundTag());
 		
 		// Finalize with data version.
-		NBTTagCompound root = new NBTTagCompound(new HashMap<String, NBTTag>());
+		CompoundTag root = new CompoundTag();
 		root.put("Level", level);
-		root.put("DataVersion", new NBTTagInt(dataVersion));
+		root.putInt("DataVersion", dataVersion);
 		return root;
 	}
 	

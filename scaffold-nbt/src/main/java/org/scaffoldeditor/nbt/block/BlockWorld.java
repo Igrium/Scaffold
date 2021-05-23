@@ -13,7 +13,7 @@ import org.scaffoldeditor.nbt.io.ChunkParser;
 import org.scaffoldeditor.nbt.io.WorldInputStream;
 import org.scaffoldeditor.nbt.io.WorldOutputStream;
 
-import com.github.mryurihi.tbnbt.tag.NBTTagCompound;
+import net.querz.nbt.tag.CompoundTag;
 
 /**
  * Represents all the blocks in a world.
@@ -277,8 +277,8 @@ public class BlockWorld implements BlockCollection {
 	 * Get a collection of all the entities in the world.
 	 * @return All the entities, represented by compound maps in the <a href="https://minecraft.gamepedia.com/Chunk_format#entity_format">entity format</a>
 	 */
-	public Collection<NBTTagCompound> entities() {
-		Collection<NBTTagCompound> entities = new ArrayList<NBTTagCompound>();
+	public Collection<CompoundTag> entities() {
+		Collection<CompoundTag> entities = new ArrayList<>();
 		for (Chunk c : chunks.values()) {
 			entities.addAll(c.entities);
 		}
@@ -340,7 +340,7 @@ public class BlockWorld implements BlockCollection {
 	 */
 	public void parseRegionFile(File regionFile) throws FileNotFoundException, IOException {
 		System.out.println("Reading "+regionFile);
-		List<NBTTagCompound> chunkMaps = new ArrayList<NBTTagCompound>();
+		List<CompoundTag> chunkMaps = new ArrayList<>();
 		WorldInputStream is = new WorldInputStream(new FileInputStream(regionFile));
 		
 		// Read all chunks from file.
@@ -352,11 +352,11 @@ public class BlockWorld implements BlockCollection {
 		// Add chunks to world.
 		for (int i = 0; i < chunkMaps.size(); i++) {
 			System.out.println("Parsing chunk "+i+"/"+chunkMaps.size());
-			NBTTagCompound c = chunkMaps.get(i);
-			NBTTagCompound level = c.get("Level").getAsTagCompound();
+			CompoundTag c = chunkMaps.get(i);
+			CompoundTag level = c.getCompoundTag("Level");
 			ChunkCoordinate coord = new ChunkCoordinate(
-					level.get("xPos").getAsTagInt().getValue(),
-					level.get("zPos").getAsTagInt().getValue());
+					level.getInt("xPos"),
+					level.getInt("zPos"));
 			
 			chunks.put(coord, ChunkParser.parseNBT(level));
 			
@@ -404,7 +404,7 @@ public class BlockWorld implements BlockCollection {
 		ChunkParser parser = new ChunkParser(dataVersion);
 		
 		// Keep track of all the chunks that belong in this file.
-		Map<ChunkCoordinate, NBTTagCompound> chunks = new HashMap<ChunkCoordinate, NBTTagCompound>();
+		Map<ChunkCoordinate, CompoundTag> chunks = new HashMap<>();
 		for (ChunkCoordinate chunkCoord : this.chunks.keySet()) {
 			int relativeX = chunkCoord.x - xOffset*32;
 			int relativeZ = chunkCoord.z - zOffset*32;

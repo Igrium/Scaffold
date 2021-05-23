@@ -14,13 +14,10 @@ import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.BlockReader;
 import org.scaffoldeditor.nbt.block.SizedBlockCollection;
 
-import com.github.mryurihi.tbnbt.stream.NBTInputStream;
-import com.github.mryurihi.tbnbt.tag.NBTTag;
-import com.github.mryurihi.tbnbt.tag.NBTTagCompound;
-import com.github.mryurihi.tbnbt.tag.NBTTagInt;
-import com.github.mryurihi.tbnbt.tag.NBTTagList;
-import com.github.mryurihi.tbnbt.tag.NBTTagString;
-
+import net.querz.nbt.io.NBTDeserializer;
+import net.querz.nbt.tag.CompoundTag;
+import net.querz.nbt.tag.IntTag;
+import net.querz.nbt.tag.ListTag;
 import java.util.Objects;
 
 /**
@@ -29,9 +26,9 @@ import java.util.Objects;
  */
 public class Structure implements SizedBlockCollection, BlockReader {
 	
-	private NBTTagCompound[] palette;
-	private List<NBTTagCompound> blocks;
-	private List<NBTTagCompound> entities;
+	private CompoundTag[] palette;
+	private List<CompoundTag> blocks;
+	private List<CompoundTag> entities;
 	
 	private int sizeX;
 	private int sizeY;
@@ -65,12 +62,12 @@ public class Structure implements SizedBlockCollection, BlockReader {
 	 * @param block Block to check
 	 * @return Palette index (-1 if non existant)
 	 */
-	private int getState(NBTTagCompound block) {
+	private int getState(CompoundTag block) {
 		if (block == null) {
 			return -1;
 		}
 
-		return ((NBTTagInt) block.get("state")).getValue();
+		return (block.getIntTag("state")).asInt();
 	}
 
 	
@@ -81,18 +78,18 @@ public class Structure implements SizedBlockCollection, BlockReader {
 	 * @param z Z coordinate
 	 * @return Block map (NULL IF BLOCK IS VOID)
 	 */
-	private NBTTagCompound blockMapAt(int x, int y, int z) {
-		for (NBTTagCompound block : blocks) {
-			NBTTagList coordTag = (NBTTagList) block.get("pos");
-
-			List<NBTTagInt> coords = new ArrayList<NBTTagInt>();
-			for (NBTTag t : coordTag.getValue()) {
-				coords.add((NBTTagInt) t);
+	private CompoundTag blockMapAt(int x, int y, int z) {
+		for (CompoundTag block : blocks) {
+			ListTag<IntTag> coordTag = block.getListTag("pos").asIntTagList();
+			List<Integer> coords = new ArrayList<>();
+			
+			for (IntTag t : coordTag) {
+				coords.add(t.asInt());
 			}
 			
-			if (coords.get(0).getValue() == x &&
-					coords.get(1).getValue() == y &&
-					coords.get(2).getValue() == z) {
+			if (coords.get(0) == x &&
+					coords.get(1) == y &&
+					coords.get(2) == z) {
 				return block;
 			}
 		}
@@ -133,23 +130,20 @@ public class Structure implements SizedBlockCollection, BlockReader {
 		}
 		
 		// Make backup of blocks to reference from
-		List<NBTTagCompound> oldBlocks = new ArrayList<NBTTagCompound>();
+		List<CompoundTag> oldBlocks = new ArrayList<>();
 		Collections.copy(oldBlocks, blocks);
 		
 		// Translate all blocks to new location
-		for (NBTTagCompound block : blocks) {
-			NBTTagList coordTag = (NBTTagList) block.get("pos");
-			List<NBTTagInt> coords = new ArrayList<NBTTagInt>();
-			for (NBTTag t : coordTag.getValue()) {
-				coords.add((NBTTagInt) t);
-			}
+		for (CompoundTag block : blocks) {
+			ListTag<IntTag> coords = block.getListTag("pos").asIntTagList();
+	
 						
 			// Rotate around Y axis, affecting x and z coordinates
-			int[] newCoords = rotatePoint(coords.get(0).getValue(), coords.get(2).getValue(),
+			int[] newCoords = rotatePoint(coords.get(0).asInt(), coords.get(2).asInt(),
 					sizeX/2, sizeZ/2, amount);
 			
-			coords.set(0, new NBTTagInt(newCoords[0]));
-			coords.set(2, new NBTTagInt(newCoords[2]));
+			coords.set(0, new IntTag(newCoords[0]));
+			coords.set(2, new IntTag(newCoords[2]));
 		}
 		
 		// Rotate all applicable blocks in palette
@@ -159,13 +153,13 @@ public class Structure implements SizedBlockCollection, BlockReader {
 		rotations.put(2, "south");
 		rotations.put(3, "east");
 		
-		for (NBTTagCompound paletteBlock : palette) {
+		for (CompoundTag paletteBlock : palette) {
 			if (paletteBlock.containsKey("Properties")) {
-				NBTTagCompound properties = (NBTTagCompound) paletteBlock.get("Properties");
+				CompoundTag properties = paletteBlock.getCompoundTag("Properties");
 				if (properties.containsKey("facing")) {
-					NBTTagString facing = (NBTTagString) properties.get("facing");
+					String facing = properties.getString("facing");
 
-					int facingKey = getKeyByValue(rotations, facing.getValue());
+					int facingKey = getKeyByValue(rotations, facing);
 					facingKey += amount;
 					
 					if (facingKey > 3) { // If true, it has gone 360* around.
@@ -174,7 +168,7 @@ public class Structure implements SizedBlockCollection, BlockReader {
 						facingKey += 4;
 					}
 					
-					properties.put("facing", new NBTTagString(rotations.get(facingKey)));
+					properties.putString("facing", rotations.get(facingKey));
 				}
 			}
 		}
@@ -236,7 +230,7 @@ public class Structure implements SizedBlockCollection, BlockReader {
 	 */
 	@SuppressWarnings("unused")
 	private void setBlockAt(int x, int y, int z, int state) {
-		NBTTagCompound blockMap = blockMapAt(x,y,z);
+		CompoundTag blockMap = blockMapAt(x,y,z);
 		
 		// If block  doesn't already exist
 		if (blockMap == null) {
@@ -244,21 +238,21 @@ public class Structure implements SizedBlockCollection, BlockReader {
 				return;
 			}
 			// Create new block
-			blockMap = new NBTTagCompound(new HashMap<String, NBTTag>());
+			blockMap = new CompoundTag();
 			
-			List<NBTTag> coords = new ArrayList<NBTTag>();
-			coords.add(new NBTTagInt(x));
-			coords.add(new NBTTagInt(y));
-			coords.add(new NBTTagInt(z));
-			blockMap.put("pos", new NBTTagList(coords));
+			ListTag<IntTag> coords = new ListTag<>(IntTag.class);
+			coords.add(new IntTag(x));
+			coords.add(new IntTag(y));
+			coords.add(new IntTag(z));
+			blockMap.put("pos", coords);
 			
-			blockMap.put("state", new NBTTagInt(state));
+			blockMap.put("state", new IntTag(state));
 			blocks.add(blockMap);
 			
 			
 		} else { // Block already exists
-			blockMap.getValue().remove("state");
-			blockMap.put("state", new NBTTagInt(state));
+			blockMap.remove("state");
+			blockMap.put("state", new IntTag(state));
 		}
 	}
 	
@@ -281,7 +275,7 @@ public class Structure implements SizedBlockCollection, BlockReader {
 	 * Gets a list of all entities in structure, represented as CompoundMaps
 	 * @return
 	 */
-	public List<NBTTagCompound> getEntities() {
+	public List<CompoundTag> getEntities() {
 		return entities;
 	}
 	
@@ -290,44 +284,41 @@ public class Structure implements SizedBlockCollection, BlockReader {
 	}
 	
 	/**
-	 * Load a structure from a compound map
-	 * @param map Compound map
+	 * Load a structure from a compound tag
+	 * @param map Compound tag
 	 * @return Structure
 	 */
-	public static Structure fromCompoundMap(NBTTagCompound map) {
+	public static Structure fromCompoundMap(CompoundTag map) {
 		Structure structure = new Structure();
 		
 		// Load size
-		NBTTagList sizeTag = (NBTTagList) map.get("size");
-		if (sizeTag == null) {
+		ListTag<IntTag> sizeList = map.getListTag("size").asIntTagList();
+		if (sizeList == null) {
 			System.out.println("Structure missing size tag!");
 			return null;
 		}
-		List<NBTTagInt> sizeList = new ArrayList<NBTTagInt>();
-		for (NBTTag t : sizeTag.getValue()) {
-			sizeList.add((NBTTagInt) t);
-		}
+		
 		
 		if (sizeList.get(0) == null || sizeList.get(1) == null || sizeList.get(2) == null) {
 			System.out.println("Structure has improperly formatted size tag!");
 			return null;
 		}
 		
-		structure.sizeX = sizeList.get(0).getValue();
-		structure.sizeY = sizeList.get(1).getValue();
-		structure.sizeZ = sizeList.get(2).getValue();
+		structure.sizeX = sizeList.get(0).asInt();
+		structure.sizeY = sizeList.get(1).asInt();
+		structure.sizeZ = sizeList.get(2).asInt();
 				
 		// Load palette
-		NBTTagList paletteTag = (NBTTagList) map.get("palette");
+		ListTag<CompoundTag> paletteTag = map.getListTag("palette").asCompoundTagList();
 		if (paletteTag == null) {
 			System.out.println("Structure missing palette tag!");
 			return null;
 		}
-		List<NBTTagCompound> palleteList = getCompoundMaps(paletteTag);
-		structure.palette = (NBTTagCompound[]) palleteList.toArray(new NBTTagCompound[palleteList.size()]);
+		List<CompoundTag> palleteList = getCompoundMaps(paletteTag);
+		structure.palette = palleteList.toArray(new CompoundTag[palleteList.size()]);
 				
 		// Load blocks
-		NBTTagList blocksTag = (NBTTagList) map.get("blocks");
+		ListTag<CompoundTag> blocksTag = map.getListTag("blocks").asCompoundTagList();
 		if (blocksTag == null) {
 			System.out.println("Structure missing blocks tag!");
 			return null;
@@ -335,9 +326,9 @@ public class Structure implements SizedBlockCollection, BlockReader {
 		structure.blocks = getCompoundMaps(blocksTag);
 		
 		// Load entities
-		NBTTagList entitiesTag = (NBTTagList) map.get("entities");
+		ListTag<CompoundTag> entitiesTag = map.getListTag("entities").asCompoundTagList();
 		if (entitiesTag == null) {
-			structure.entities = new ArrayList<NBTTagCompound>();
+			structure.entities = new ArrayList<CompoundTag>();
 		} else {
 			structure.entities = getCompoundMaps(entitiesTag);
 		}
@@ -348,10 +339,10 @@ public class Structure implements SizedBlockCollection, BlockReader {
 	/*
 	 * Convert a ListTag of CompoundTags to a List of CompoundMaps
 	 */
-	private static List<NBTTagCompound> getCompoundMaps(NBTTagList listTag) {
-		List<NBTTagCompound> mapList = new ArrayList<NBTTagCompound>();
-		for (NBTTag t : listTag.getValue()) {
-			mapList.add((NBTTagCompound) t);
+	private static List<CompoundTag> getCompoundMaps(ListTag<CompoundTag> listTag) {
+		List<CompoundTag> mapList = new ArrayList<>();
+		for (CompoundTag t : listTag) {
+			mapList.add(t);
 		}
 		return mapList;
 	}
@@ -379,11 +370,9 @@ public class Structure implements SizedBlockCollection, BlockReader {
 
 	@Override
 	public SizedBlockCollection readBlockCollection(InputStream in) throws IOException {
-		NBTInputStream input = new NBTInputStream(in);
-		NBTTagCompound map = input.readTag().getAsTagCompound();
-		input.close();
+		CompoundTag map = (CompoundTag) new NBTDeserializer(true).fromStream(in).getTag();
 		
-		if (map == null) {
+		if (map == null) {		
 			throw new IOException("Improperly formatted structure file!");
 		}
 		

@@ -38,10 +38,7 @@ import org.scaffoldeditor.scaffold.operation.OperationManager;
 import org.scaffoldeditor.scaffold.serialization.LevelReader;
 import org.scaffoldeditor.scaffold.serialization.LevelWriter;
 
-import com.github.mryurihi.tbnbt.tag.NBTTag;
-import com.github.mryurihi.tbnbt.tag.NBTTagCompound;
-import com.github.mryurihi.tbnbt.tag.NBTTagInt;
-import com.github.mryurihi.tbnbt.tag.NBTTagString;
+import net.querz.nbt.tag.CompoundTag;
 
 /**
  * Represents a single level file
@@ -321,10 +318,11 @@ public class Level {
 	}
 	
 	
+	@SuppressWarnings("deprecation")
 	public String summonScoreboardEntity() {
-		NBTTagCompound nbt = new NBTTagCompound(new HashMap<String, NBTTag>());
-		nbt.put("CustomName", new NBTTagString("\""+SCOREBOARDNAME+"\""));
-		nbt.put("Duration", new NBTTagInt(2000000000));
+		CompoundTag nbt = new CompoundTag();
+		nbt.putString("CustomName","\""+SCOREBOARDNAME+"\"");
+		nbt.putInt("Duration", 2000000000);
 		
 		return "summon "+SCOREBOARDTYPE+" 0 0 0 "+NBTStrings.nbtToString(nbt);
 	}

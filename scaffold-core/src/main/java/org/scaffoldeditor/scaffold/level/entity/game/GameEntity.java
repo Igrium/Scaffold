@@ -1,9 +1,5 @@
 package org.scaffoldeditor.scaffold.level.entity.game;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 import org.scaffoldeditor.nbt.NBTStrings;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
@@ -16,11 +12,9 @@ import org.scaffoldeditor.scaffold.level.entity.attribute.StringAttribute;
 import org.scaffoldeditor.scaffold.logic.Datapack;
 import org.scaffoldeditor.scaffold.math.Vector;
 
-import com.github.mryurihi.tbnbt.tag.NBTTag;
-import com.github.mryurihi.tbnbt.tag.NBTTagCompound;
-import com.github.mryurihi.tbnbt.tag.NBTTagFloat;
-import com.github.mryurihi.tbnbt.tag.NBTTagList;
-import com.github.mryurihi.tbnbt.tag.NBTTagString;
+import net.querz.nbt.tag.CompoundTag;
+import net.querz.nbt.tag.FloatTag;
+import net.querz.nbt.tag.ListTag;
 
 /**
  * Represents a Minecraft entity in the editor
@@ -41,7 +35,7 @@ public class GameEntity extends Rotatable implements TargetSelectable {
 	public GameEntity(Level level, String name) {
 		super(level, name);
 		attributes().put("entityType", new StringAttribute("minecraft:area_effect_cloud"));
-		attributes().put("nbt", new NBTAttribute(new NBTTagCompound(new HashMap<>())));
+		attributes().put("nbt", new NBTAttribute(new CompoundTag()));
 		attributes().put("spawnOnInit", new BooleanAttribute(true));
 	}
 	
@@ -65,7 +59,7 @@ public class GameEntity extends Rotatable implements TargetSelectable {
 	 * Get the CompoundMap with this entity's NBT.
 	 * @return NBT.
 	 */
-	public NBTTagCompound nbt() {
+	public CompoundTag nbt() {
 		return ((NBTAttribute) getAttribute("nbt")).getValue();
 	}
 	
@@ -89,6 +83,7 @@ public class GameEntity extends Rotatable implements TargetSelectable {
 	 * Get the nbt data of the entity in the format {data}.
 	 * @return Nbt data.
 	 */
+	@SuppressWarnings("deprecation")
 	public String getNBTString() {
 		return NBTStrings.nbtToString(nbt());
 	}
@@ -97,21 +92,22 @@ public class GameEntity extends Rotatable implements TargetSelectable {
 	 * Get the command used for spawning the entity
 	 * @return
 	 */
+	@SuppressWarnings("deprecation")
 	public String getSpawnCommand() {
 		Vector position = getPosition();
 		
 		// Set rotation
-		List<NBTTag> rotArray = new ArrayList<NBTTag>();
-		rotArray.add(new NBTTagFloat(rotX()));
-		rotArray.add(new NBTTagFloat(rotY()));
+		ListTag<FloatTag> rotArray = new ListTag<>(FloatTag.class);
+		rotArray.add(new FloatTag(rotX()));
+		rotArray.add(new FloatTag(rotY()));
 		
-		nbt().put("Rotation", new NBTTagList(rotArray));
-		nbt().put("CustomName", new NBTTagString("\""+getName()+"\""));
+		nbt().put("Rotation", rotArray);
+		nbt().putString("CustomName","\""+getName()+"\"");
 		
 		String command = "summon "+getEntityType()+" "+position.X()+" "+position.Y()+" "+position.Z()+" "+NBTStrings.nbtToString(nbt());
 		
-		nbt().getValue().remove("Rotation");
-		nbt().getValue().remove("CustomName");
+		nbt().remove("Rotation");
+		nbt().remove("CustomName");
 
 		return command;
 	}

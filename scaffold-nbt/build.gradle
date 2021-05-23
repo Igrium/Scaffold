@@ -14,7 +14,7 @@ plugins {
 }
 
 mainClassName = 'org.scaffoldeditor.nbt.test.NBTTester'
-version = '0.2.0'
+version = '0.3.0'
 group = 'org.scaffoldeditor'
 
 sourceCompatibility = JavaVersion.VERSION_1_8
@@ -30,6 +30,8 @@ dependencies {
 
     // Use JUnit test framework
     testImplementation 'junit:junit:4.12'
+    compile 'com.github.Querz:NBT:6.1'
+
 }
 
 test {
@@ -76,5 +78,5 @@ repositories {
     // You can declare any Maven/Ivy/file repository here.
     jcenter()
     mavenCentral()
-
+    maven { url 'https://jitpack.io/' }
 }

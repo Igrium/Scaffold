@@ -6,8 +6,9 @@ import java.util.List;
 import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
 
-import com.github.mryurihi.tbnbt.stream.NBTInputStream;
-import com.github.mryurihi.tbnbt.tag.NBTTagCompound;
+import net.querz.nbt.io.NBTInputStream;
+import net.querz.nbt.tag.CompoundTag;
+import net.querz.nbt.tag.Tag;
 
 /**
  * This class can read and parse Minecraft Region files,
@@ -56,7 +57,7 @@ public class WorldInputStream implements Closeable {
 		/**
 		 * The chunk's NBT data.
 		 */
-		public final NBTTagCompound nbt;
+		public final CompoundTag nbt;
 		
 		/**
 		 * How many bytes were read while reading the chunk?
@@ -77,7 +78,7 @@ public class WorldInputStream implements Closeable {
 		 * For internal use only.
 		 * DO NOT CALL MANUALLY.
 		 */
-		public ChunkNBTInfo(NBTTagCompound nbt, int bytesRead, short x, short z) {
+		public ChunkNBTInfo(CompoundTag nbt, int bytesRead, short x, short z) {
 			this.nbt = nbt;
 			this.bytesRead = bytesRead;
 			this.x = x;
@@ -143,9 +144,8 @@ public class WorldInputStream implements Closeable {
 			inflater = new Inflater();
 		}
 		
-		@SuppressWarnings("resource") // Root input stream still needs to be accessed.
-		NBTInputStream nbtIs = new NBTInputStream(new InflaterInputStream(is, inflater, length - 1), false);
-		NBTTagCompound map = (NBTTagCompound) nbtIs.readTag();
+		NBTInputStream nbtIs = new NBTInputStream(new InflaterInputStream(is, inflater, length - 1));
+		CompoundTag map = (CompoundTag) nbtIs.readTag(Tag.DEFAULT_MAX_DEPTH).getTag();
 
 		locationHead++;
 
@@ -155,9 +155,9 @@ public class WorldInputStream implements Closeable {
 			is.skip(nextLocation.offset - (location.offset + (length + 4)));
 		}
 
-		NBTTagCompound levelTag = map.get("Level").getAsTagCompound();
+		CompoundTag levelTag = map.getCompoundTag("Level");
 		
-		return new ChunkNBTInfo(map, length + 4, (short) levelTag.get("xPos").getAsTagInt().getValue(), (short) levelTag.get("zPos").getAsTagInt().getValue());
+		return new ChunkNBTInfo(map, length + 4, (short) levelTag.getShort("xPos"), (short) levelTag.getShort("zPos"));
 	}
 
 	/**

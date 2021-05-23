@@ -1,6 +1,5 @@
 package org.scaffoldeditor.scaffold.level.entity.world;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -19,7 +18,7 @@ import org.scaffoldeditor.scaffold.level.entity.attribute.NBTAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.StringAttribute;
 import org.scaffoldeditor.scaffold.math.Vector;
 
-import com.github.mryurihi.tbnbt.tag.NBTTagCompound;
+import net.querz.nbt.tag.CompoundTag;
 
 /**
  * Places a single block into the world.
@@ -39,7 +38,7 @@ public class SingleBlock extends Entity implements BlockEntity {
 	public SingleBlock(Level level, String name) {
 		super(level, name);
 		attributes().put("blockName", new StringAttribute("minecraft:stone"));
-		attributes().put("blockProperties", new NBTAttribute(new NBTTagCompound(new HashMap<>())));
+		attributes().put("blockProperties", new NBTAttribute(new CompoundTag()));
 	}
 	
 	/**

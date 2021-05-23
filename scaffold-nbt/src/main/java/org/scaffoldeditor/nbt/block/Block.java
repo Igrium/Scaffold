@@ -1,11 +1,8 @@
 package org.scaffoldeditor.nbt.block;
 
-import java.util.HashMap;
 import java.util.Objects;
 
-import com.github.mryurihi.tbnbt.tag.NBTTag;
-import com.github.mryurihi.tbnbt.tag.NBTTagCompound;
-import com.github.mryurihi.tbnbt.tag.NBTTagString;
+import net.querz.nbt.tag.CompoundTag;
 
 /**
  * Represents a single Minecraft block and its data.
@@ -13,7 +10,7 @@ import com.github.mryurihi.tbnbt.tag.NBTTagString;
  */
 public class Block {
 	String name;
-	NBTTagCompound properties;
+	CompoundTag properties;
 	
 	/**
 	 * Create a Block object.
@@ -21,7 +18,7 @@ public class Block {
 	 * @param properties Block properties.
 	 * (must be converted for pre-flattening blocks)
 	 */
-	public Block(String name, NBTTagCompound properties) {
+	public Block(String name, CompoundTag properties) {
 		this.name = name;
 		this.properties = properties;
 	}
@@ -31,14 +28,14 @@ public class Block {
 	 * @param name Namespaced name.
 	 */
 	public Block(String name) {
-		this(name, new NBTTagCompound(new HashMap<String, NBTTag>()));
+		this(name, new CompoundTag());
 	}
 	
 	public String getName() {
 		return name;
 	}
 	
-	public NBTTagCompound getProperties() {
+	public CompoundTag getProperties() {
 		return properties;
 	}
 	
@@ -51,26 +48,24 @@ public class Block {
 	 * @param paletteEntry.
 	 * @return
 	 */
-	public static Block fromBlockPalleteEntry(NBTTagCompound paletteEntry) {
-		if (paletteEntry.get("Properties") == null) { // Properties may be null
-			return new Block(((NBTTagString) paletteEntry.get("Name")).getValue(), new NBTTagCompound(new HashMap<String, NBTTag>()));
+	public static Block fromBlockPalleteEntry(CompoundTag paletteEntry) {
+		if (paletteEntry.get("Properties") == null) {
+			return new Block(paletteEntry.getString("Name"));
 		} else {
-			return new Block(((NBTTagString) paletteEntry.get("Name")).getValue(),
-					(NBTTagCompound) paletteEntry.get("Properties"));
+			return new Block(paletteEntry.getString("Name"), paletteEntry.getCompoundTag("Properties"));
 		}
 	}
 	
 	/**
 	 * Convert this Block into a palette entry.
-	 * @return PaletteEntry.
+	 * @return Palette Entry.
 	 */
-	public NBTTagCompound toPaletteEntry() {
-		NBTTagCompound paletteEntry = new NBTTagCompound(new HashMap<String, NBTTag>());
-		if (this.properties.getValue().keySet().size() != 0) {
+	public CompoundTag toPaletteEntry() {
+		CompoundTag paletteEntry = new CompoundTag();
+		if (this.getProperties().size() > 0) {
 			paletteEntry.put("Properties", properties);
 		}
-		
-		paletteEntry.put("Name", new NBTTagString(this.name));
+		paletteEntry.putString("Name", this.name);
 		return paletteEntry;
 	}
 	

@@ -1,5 +1,6 @@
 package org.scaffoldeditor.nbt;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -17,73 +18,44 @@ import com.github.mryurihi.tbnbt.tag.NBTTagList;
 import com.github.mryurihi.tbnbt.tag.NBTTagLong;
 import com.github.mryurihi.tbnbt.tag.NBTTagString;
 
+import net.querz.nbt.io.SNBTUtil;
+import net.querz.nbt.tag.CompoundTag;
+import net.querz.nbt.tag.Tag;
+
+@SuppressWarnings("unused")
 /**
  * Utility class for common nbt functions
  * @author Sam54123
- *
+ * @deprecated use SNBTUtil instead.
  */
 public class NBTStrings {
 	/**
 	 * Convert nbt to a string.
 	 * @param nbt NBT input.
 	 * @return Generated string.
+	 * @deprecated Use SNBTUtil.toSNBT instead.
 	 */
-	public static String nbtToString(NBTTagCompound nbt) {
-		if (nbt == null) {
-			return "";
+	public static String nbtToString(CompoundTag nbt) {
+		try {
+			return SNBTUtil.toSNBT(nbt);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return "{}";
 		}
-		String finalString = "{";
-		
-		Map<String, NBTTag> tags = nbt.getValue();
-		Iterator<String> iterator = tags.keySet().iterator();
-		
-		while (iterator.hasNext()) {
-			String name = iterator.next();
-			NBTTag tag = tags.get(name);
-			finalString += name+":"+tagToString(tag);
-			
-			if (iterator.hasNext()) {
-				finalString += ',';
-			}
-		}
-		
-		return finalString+'}';
 	}
 	
 	/**
 	 * Convert a tag to a string.
 	 * @return String tag.
+	 * @deprecated use SNBTUtil.toSNBT instead.
 	 */
-	public static String tagToString(NBTTag tag) {
-		String tagString = null;
-		
-		if (tag.getTagType() == TagType.BYTE) {
-			tagString = byteToString(tag.getAsTagByte().getValue());
-		} else if (tag.getTagType() == TagType.BYTE_ARRAY) {
-			tagString = byteArrayToString(tag.getAsTagByteArray().getValue());
-		} else if (tag.getTagType() == TagType.COMPOUND) {
-			tagString = nbtToString(tag.getAsTagCompound());
-		} else if (tag.getTagType() == TagType.DOUBLE) {
-			tagString = doubleToString(tag.getAsTagDouble().getValue());
-		} else if (tag.getTagType() == TagType.FLOAT) {
-			tagString = floatToString(tag.getAsTagFloat().getValue());
-		} else if (tag.getTagType() == TagType.INT) {
-			tagString = intToString(tag.getAsTagInt().getValue());
-		} else if (tag.getTagType() == TagType.INT_ARRAY) {
-			// TODO implement this.
-		} else if (tag.getTagType() == TagType.LIST) {
-			tagString = listToString(tag.getAsTagList().getValue());
-		} else if (tag.getTagType() == TagType.LONG) {
-			tagString = longToString(tag.getAsTagLong().getValue());
-		} else if (tag.getTagType() == TagType.LONG_ARRAY) {
-			// TODO implement this.
-		} else if (tag.getTagType() == TagType.SHORT) {
-			tagString = shortToString(tag.getAsTagShort().getValue());
-		} else if (tag.getTagType() == TagType.STRING) {
-			tagString = formatString(tag.getAsTagString().getValue());
+	public static String tagToString(Tag<?> tag) {
+		try {
+			return SNBTUtil.toSNBT(tag);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return "{}";
 		}
-		
-		return tagString;
 	}
 	
 	private static String byteToString(byte inByte) {
@@ -112,12 +84,12 @@ public class NBTStrings {
 		
 		// Add all elements of list
 		while (listIterator.hasNext()) {
-			NBTTag tag = listIterator.next();
-			
-			listString = listString+tagToString(tag);
-			if (listIterator.hasNext())  {
-				listString = listString+',';
-			}
+//			NBTTag tag = listIterator.next();
+//			
+//			listString = listString+tagToString(tag);
+//			if (listIterator.hasNext())  {
+//				listString = listString+',';
+//			}
 		}
 
 		listString = listString+']';
@@ -143,84 +115,32 @@ public class NBTStrings {
 	 * @param inString String to generate from.
 	 * @return Generated CompoundMap.
 	 * @throws IllegalArgumentException If the string is formatted improperly.
+	 * @deprecated Use SNBTUtil.fromSNBT instead.
 	 */
-	public static NBTTagCompound nbtFromString(String inString) throws IllegalArgumentException {
-		NBTTagCompound map = new NBTTagCompound(new HashMap<String, NBTTag>());
-		
-		if (inString.length() < 2) {
-			return null;
+	public static CompoundTag nbtFromString(String inString) throws IllegalArgumentException {		
+		try {
+			return (CompoundTag) SNBTUtil.fromSNBT(inString);
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new IllegalArgumentException(e);
 		}
-		
-		// Remove newlines and whitespace
-		inString = inString.trim();
-		inString = inString.replace("\n", "");
-		if (!(inString.charAt(0) == '{' && inString.charAt(inString.length()-1) == '}')) {
-			throw new IllegalArgumentException("NBT String is missing brackets! ({})");
-		}
-		// Remove brackets
-		inString = inString.substring(1,inString.length()-1);
-
-		if (inString.length() < 1) {
-			return map;
-		}
-		
-		// Split string into tags
-		String[] stringTags = splitString(inString, ',');
-		for (String s : stringTags) {
-			
-			// Break up into name and value
-			String[] keyValuePair = splitString(s, ':');
-			String name;
-			String value;
-			if (keyValuePair.length == 2) {
-				name = keyValuePair[0];
-				value = keyValuePair[1];
-			} else {
-				name = "";
-				value = s;
-			}
-			map.put(name, parseTag(value));
-		}
-
-		return map;
 	}
 	
 	
 	/**
 	 * Parse a string formatted tag back into a tag.
-	 * @param value String to parse.
+	 * @param inString String to parse.
 	 * @return Parsed tag.
 	 * @throws IllegalArgumentException If the string is formatted improperly.
+	 * @deprecated use SNBTUtil.fromSNBT instead.
 	 */
-	public static NBTTag parseTag(String value) throws IllegalArgumentException {
-
-		// Generate tag
-		NBTTag tag = null;
-		if (value.charAt(0) == '{') {
-			tag = nbtFromString(value);
-		} else if (isInteger(value)) {
-			tag = new NBTTagInt(Integer.parseInt(value));
-		} else if (isNumber(value)) {
-			if (value.charAt(value.length()-1) == 'l') {
-				tag = new NBTTagLong(Long.parseLong(value)); // Check for long
-			}
-			else if (value.charAt(value.length()-1) == 'f' ||
-					value.charAt(value.length()-1) == 'F') { // Check for float
-				tag = new NBTTagFloat(Float.parseFloat(value));
-			} else {
-				tag = new NBTTagDouble(Double.parseDouble(value));
-			}
-		} else if (value.charAt(0) == '[') {
-			tag = parseList(value);
-		} else if (value.charAt(0) == '"') {
-			tag = new NBTTagString(parseString(value));
-		} else if (value.charAt(value.length()-1) == 'b') {
-			tag = new NBTTagByte(parseByte(value));
-		} else {
-			throw new IllegalArgumentException("Unable to parse nbt string: "+value);
+	public static Tag<?> parseTag(String inString) throws IllegalArgumentException {
+		try {
+			return SNBTUtil.fromSNBT(inString);
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new IllegalArgumentException(e);
 		}
-		
-		return tag;
 	}
 	
 	private static NBTTagList parseList(String inString) throws IllegalArgumentException {
@@ -241,7 +161,7 @@ public class NBTStrings {
 		
 		List<NBTTag> tags = new ArrayList<NBTTag>();
 		for (String s : stringTags) {
-			tags.add(parseTag(s));
+//			tags.add(parseTag(s));
 		}
 		
 		return new NBTTagList(tags);
