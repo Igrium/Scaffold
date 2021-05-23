@@ -14,11 +14,10 @@ import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.BlockReader;
 import org.scaffoldeditor.nbt.block.SizedBlockCollection;
 
-import net.querz.nbt.io.NBTInputStream;
+import net.querz.nbt.io.NBTDeserializer;
 import net.querz.nbt.tag.CompoundTag;
 import net.querz.nbt.tag.IntTag;
 import net.querz.nbt.tag.ListTag;
-
 import java.util.Objects;
 
 /**
@@ -371,11 +370,9 @@ public class Structure implements SizedBlockCollection, BlockReader {
 
 	@Override
 	public SizedBlockCollection readBlockCollection(InputStream in) throws IOException {
-		NBTInputStream input = new NBTInputStream(in);
-		CompoundTag map = (CompoundTag) input.readTag(128).getTag();
-		input.close();
+		CompoundTag map = (CompoundTag) new NBTDeserializer(true).fromStream(in).getTag();
 		
-		if (map == null) {
+		if (map == null) {		
 			throw new IOException("Improperly formatted structure file!");
 		}
 		

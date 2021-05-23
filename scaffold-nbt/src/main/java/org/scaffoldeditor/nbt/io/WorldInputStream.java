@@ -6,10 +6,9 @@ import java.util.List;
 import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
 
-import com.github.mryurihi.tbnbt.tag.NBTTagCompound;
-
 import net.querz.nbt.io.NBTInputStream;
 import net.querz.nbt.tag.CompoundTag;
+import net.querz.nbt.tag.Tag;
 
 /**
  * This class can read and parse Minecraft Region files,
@@ -145,10 +144,8 @@ public class WorldInputStream implements Closeable {
 			inflater = new Inflater();
 		}
 		
-		@SuppressWarnings("resource") // Root input stream still needs to be accessed.
-		
 		NBTInputStream nbtIs = new NBTInputStream(new InflaterInputStream(is, inflater, length - 1));
-		CompoundTag map = (CompoundTag) nbtIs.readTag(128).getTag();
+		CompoundTag map = (CompoundTag) nbtIs.readTag(Tag.DEFAULT_MAX_DEPTH).getTag();
 
 		locationHead++;
 
