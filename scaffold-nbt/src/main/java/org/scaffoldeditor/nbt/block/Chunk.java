@@ -8,7 +8,7 @@ import java.util.Objects;
 
 import org.scaffoldeditor.nbt.block.BlockWorld.ChunkCoordinate;
 
-import com.github.mryurihi.tbnbt.tag.NBTTagCompound;
+import net.querz.nbt.tag.CompoundTag;
 
 /**
  * Represents a single chunk in the world.
@@ -104,14 +104,14 @@ public class Chunk implements BlockCollection {
 	 * <br>
 	 * Does not do anything natively. Functionallity must be implemented externally.
 	 */
-	public final List<NBTTagCompound> entities = new ArrayList<NBTTagCompound>();
+	public final List<CompoundTag> entities = new ArrayList<>();
 	
 	/**
 	 * A list of tile entities in the chunk, in <a href="https://minecraft.gamepedia.com/Chunk_format#entity_format">NBT format</a>.
 	 * <br>
 	 * Does not do anything natively. Functionallity must be implemented externally.
 	 */
-	public final List<NBTTagCompound> tileEntities = new ArrayList<NBTTagCompound>();
+	public final List<CompoundTag> tileEntities = new ArrayList<>();
 	
 	/**
 	 * All the sections in the chunk.

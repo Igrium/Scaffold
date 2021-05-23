@@ -1,16 +1,14 @@
 package org.scaffoldeditor.scaffold.level.entity.attribute;
 
-import java.util.HashMap;
-
 import org.scaffoldeditor.scaffold.serialization.NBTSerializer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.github.mryurihi.tbnbt.tag.NBTTagCompound;
+import net.querz.nbt.tag.CompoundTag;
 
-public class NBTAttribute extends Attribute<NBTTagCompound> {
+public class NBTAttribute extends Attribute<CompoundTag> {
 	
 	public static final String REGISTRY_NAME = "nbt_attribute";
 	
@@ -19,7 +17,7 @@ public class NBTAttribute extends Attribute<NBTTagCompound> {
 
 			@Override
 			public NBTAttribute create() {
-				return new NBTAttribute(new NBTTagCompound(new HashMap<>()));
+				return new NBTAttribute(new CompoundTag());
 			}
 
 			@Override
@@ -29,7 +27,7 @@ public class NBTAttribute extends Attribute<NBTTagCompound> {
 					Node child = children.item(i);
 					if (child.getNodeType() == Node.ELEMENT_NODE) {
 						Element nbtElement = (Element) child;
-						return new NBTAttribute(NBTSerializer.deserialize(nbtElement));
+						return new NBTAttribute((CompoundTag) NBTSerializer.deserialize(nbtElement));
 					}
 				}
 				throw new IllegalArgumentException("Improperly formatted NBT attribute!");
@@ -38,20 +36,20 @@ public class NBTAttribute extends Attribute<NBTTagCompound> {
 		});
 	}
 	
-	private NBTTagCompound value;
+	private CompoundTag value;
 	
-	public NBTAttribute(NBTTagCompound value) {
+	public NBTAttribute(CompoundTag value) {
 		this.value = value;
 		this.registryName = REGISTRY_NAME;
 	}
 	
 	@Override
-	public NBTTagCompound getValue() {
+	public CompoundTag getValue() {
 		return value;
 	}
 
 	@Override
-	public void setValue(NBTTagCompound value) {
+	public void setValue(CompoundTag value) {
 		this.value = value;
 	}
 

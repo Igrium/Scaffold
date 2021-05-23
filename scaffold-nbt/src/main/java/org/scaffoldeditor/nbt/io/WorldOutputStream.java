@@ -10,8 +10,9 @@ import java.util.zip.*;
 
 import org.scaffoldeditor.nbt.block.BlockWorld.ChunkCoordinate;
 
-import com.github.mryurihi.tbnbt.stream.NBTOutputStream;
-import com.github.mryurihi.tbnbt.tag.NBTTag;
+import net.querz.nbt.io.NBTOutputStream;
+import net.querz.nbt.io.NamedTag;
+import net.querz.nbt.tag.Tag;
 
 /**
  * An output stream to write Minecraft Region files.
@@ -64,7 +65,7 @@ public class WorldOutputStream implements Closeable {
 	 * @param name Name of NBT tag to write.
 	 * @throws IOException If an IO exception occurs.
 	 */
-	public void write(ChunkCoordinate coord, NBTTag chunk, String name) throws IOException {
+	public void write(ChunkCoordinate coord, Tag<?> chunk, String name) throws IOException {
 		// Make sure coordinates are in file.
 		if (coord.x() < 0 || coord.x() >= SIZEX
 				|| coord.z() < 0 || coord.z() >= SIZEZ) {
@@ -72,9 +73,9 @@ public class WorldOutputStream implements Closeable {
 		}
 
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		NBTOutputStream nbtos = new NBTOutputStream(new DeflaterOutputStream(bos), false);
+		NBTOutputStream nbtos = new NBTOutputStream(new DeflaterOutputStream(bos));
 	
-		nbtos.writeTag(chunk, name);
+		nbtos.writeTag(new NamedTag(name, chunk), 128);
 		nbtos.close();
 		
 		chunks.put(coord, bos.toByteArray());
@@ -86,7 +87,7 @@ public class WorldOutputStream implements Closeable {
 	 * @param chunk Chunk NBT to write.
 	 * @throws IOException If an IO exception occurs.
 	 */
-	public void write(ChunkCoordinate coord, NBTTag chunk) throws IOException {
+	public void write(ChunkCoordinate coord, Tag<?> chunk) throws IOException {
 		write(coord, chunk, "root");
 	}
 	
