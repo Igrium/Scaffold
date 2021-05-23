@@ -58,6 +58,9 @@ public class Compiler {
 	 */
 	public final List<CompileStep> steps = new ArrayList<>();
 	
+	private boolean shouldCancel = false;
+	private boolean isActive = false;
+	
 	/**
 	 * Compile a level.
 	 * @param level Level to compile.
@@ -67,9 +70,17 @@ public class Compiler {
 	 * @return The result of the compile.
 	 */
 	public CompileResult compile(Level level, Path target, Map<String, Attribute<?>> arguements, CompileProgressListener listener) {
+		this.isActive = true;
+		this.shouldCancel = false;
 		System.out.println("Starting compile...");
 		int i = 0;
 		for (CompileStep step : steps) {
+			if (shouldCancel) {
+				this.isActive = false;
+				this.shouldCancel = false;
+				return CompileResult.canceled();
+			}
+			
 			if (listener != null) {
 				listener.onCompileProgress((float) i / steps.size(), step.getDescription());
 			}
@@ -81,6 +92,7 @@ public class Compiler {
 			
 			if (!success) {
 				if (step.isRequired()) {
+					this.isActive = false;
 					return new CompileResult(CompileEndStatus.FAILED, "Unable to complete required step: "+step.getID()+". See console for details.");
 				} else {
 					listener.onError("Unable to complete step: "+step.getID());
@@ -90,6 +102,22 @@ public class Compiler {
 			i++;
 		}
 		
+		this.isActive = false;
 		return CompileResult.successfulCompile();	
+	}
+	
+	/**
+	 * Get whether the compiler is actively compiling something.
+	 */
+	public boolean isActive() {
+		return isActive;
+	}
+	
+	/**
+	 * If the compiler active, cancel the compilation.
+	 * Doesn't cancel compilation steps; just the process as a whole.
+	 */
+	public void cancel() {
+		this.shouldCancel = true;
 	}
 }
