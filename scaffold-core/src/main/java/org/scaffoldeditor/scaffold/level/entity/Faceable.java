@@ -1,7 +1,4 @@
 package org.scaffoldeditor.scaffold.level.entity;
-
-import org.scaffoldeditor.scaffold.level.Level;
-import org.scaffoldeditor.scaffold.level.entity.attribute.StringAttribute;
 /**
  * This type of entity can face any of the four cardinal directions,
  * but cannot have arbitrary rotations
@@ -9,7 +6,7 @@ import org.scaffoldeditor.scaffold.level.entity.attribute.StringAttribute;
  * @author Igrium
  *
  */
-public class Faceable extends Entity {
+public interface Faceable {
 	
 	/**
 	 * Represents a direction a faceable entity can point
@@ -21,14 +18,7 @@ public class Faceable extends Entity {
 		public static String EAST = "east";
 		public static String WEST = "west";
 	}
-
-	public Faceable(Level level, String name) {
-		super(level, name);
-		setDirection(Direction.NORTH);
-	}
 	
-	public void setDirection(String direction) {
-		setAttribute("direction", new StringAttribute(direction), true);
-	}
+	public void setDirection(String direction);
 	
 }

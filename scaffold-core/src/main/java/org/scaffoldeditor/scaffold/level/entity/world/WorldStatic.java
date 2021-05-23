@@ -19,12 +19,13 @@ import org.scaffoldeditor.scaffold.math.Vector;
  * This entity compiles a standard block collection into the world.
  * @author Sam54123
  */
-public class WorldStatic extends Faceable implements BlockEntity {
+public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntity {
 	
 	private SizedBlockCollection model;
 	
-	// Keep track of the model path on our own for optimization.
+	// Keep track of the model path and location on our own for optimization.
 	private String modelpath;
+	private Vector compiledLocation = new Vector(0,0,0);
 	
 	public static void Register() {
 		EntityRegistry.registry.put("world_static", new EntityFactory<Entity>() {		
@@ -41,15 +42,7 @@ public class WorldStatic extends Faceable implements BlockEntity {
 		System.out.println("Constructing world static");
 		setAttribute("model", new StringAttribute("/"), true);
 	}
-	
-	@Override
-	public void onUpdateAttributes() {
-		super.onUpdateAttributes();
-		
-		if (!((StringAttribute) getAttribute("model")).getValue().equals(modelpath)) {
-			reload();	
-		}
-	}
+
 	
 	/**
 	 * Reload model from file.
@@ -85,9 +78,9 @@ public class WorldStatic extends Faceable implements BlockEntity {
 			return true;
 		}
 		
-		Vector gridPos = Vector.floor(getPosition());
-		
+		Vector gridPos = Vector.floor(getPosition());	
 		world.addBlockCollection(model, (int) gridPos.X() , (int) gridPos.Y(), (int) gridPos.Z(), true, this);
+		compiledLocation = getPosition();
 		
 		return true;
 	}
@@ -98,20 +91,29 @@ public class WorldStatic extends Faceable implements BlockEntity {
 		return null;
 	}
 
-
 	@Override
 	public Vector[] getBounds() {
 		Vector position = getPosition();
+		if (model == null) return new Vector[] { position, position };
 		return new Vector[] { position, Vector.add(position, new Vector(model.getWidth(), model.getHeight(), model.getLength())) };
 	}
-	
+
 	@Override
-	public void setPosition(Vector position) {	
-		getLevel().dirtySections.addAll(getOverlappingSections(getLevel().getBlockWorld()));
-		super.setPosition(position);
-		getLevel().dirtySections.addAll(getOverlappingSections(getLevel().getBlockWorld()));
-		if (getLevel().autoRecompile) {
-			getLevel().quickRecompile();
+	public void setDirection(String direction) {
+		this.setAttribute("direction", new StringAttribute(direction));
+	}
+
+
+	@Override
+	public void onUpdateBlockAttributes() {
+		if (!((StringAttribute) getAttribute("model")).getValue().equals(modelpath)) {
+			reload();	
 		}
+	}
+
+
+	@Override
+	public boolean needsRecompiling() {
+		return (!compiledLocation.equals(getPosition()) || !((StringAttribute) getAttribute("model")).getValue().equals(modelpath));
 	}
 }
