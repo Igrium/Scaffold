@@ -277,6 +277,11 @@ public class Level {
 	 * @param name Entity to remove.
 	 */
 	public void removeEntity(String name) {
+		Entity entity = entities.get(name);
+		if (entity instanceof BlockEntity) {
+			dirtySections.addAll(((BlockEntity) entity).getOverlappingSections(blockWorld));
+		}
+		
 		entities.remove(name);
 		entityStack.remove(name);
 		updateEntityStack();
