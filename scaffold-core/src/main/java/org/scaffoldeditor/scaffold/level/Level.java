@@ -272,6 +272,19 @@ public class Level {
 		return entity;
 	}
 	
+	/**
+	 * Remove an entity from the level.
+	 * @param name Entity to remove.
+	 */
+	public void removeEntity(String name) {
+		entities.remove(name);
+		entityStack.remove(name);
+		updateEntityStack();
+		
+		if (autoRecompile) {
+			quickRecompile();
+		}
+	}
 	
 	/**
 	 * Rename an entity in the level.

@@ -41,7 +41,7 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 	public WorldStatic(Level level, String name) {
 		super(level, name);
 		System.out.println("Constructing world static");
-		setAttribute("model", new StringAttribute("/"), true);
+		setAttribute("model", new StringAttribute(""), true);
 	}
 
 	
@@ -49,17 +49,19 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 	 * Reload model from file.
 	 */
 	public void reload() {
+		getLevel().dirtyChunks.addAll(getOverlappingChunks(getLevel().getBlockWorld()));
+		
 		StringAttribute attribute = (StringAttribute) getAttribute("model");
 		String model = attribute.getValue();
 		System.out.println("Loading model " + model);
 		modelpath = model;
-		if (model.contentEquals("")) {
+		if (model.length() == 0) {
+			this.model = null;
 			return;
 		}
-		
+				
 		File modelFile = getProject().assetManager().findAsset(model).toFile();
 		
-		getLevel().dirtyChunks.addAll(getOverlappingChunks(getLevel().getBlockWorld()));
 		try {
 //			this.model = Structure.fromCompoundMap((CompoundTag) NBTUtil.read(modelFile).getTag());
 			this.model = BlockCollectionManager.readFile(modelFile);
