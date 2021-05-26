@@ -56,6 +56,9 @@ public class Entity {
 	/* All this entity's attributes */
 	private Map<String, Attribute<?>> attributes = new HashMap<>();
 	
+	/* Whether non-block visualizations of this entity should render in the editor */
+	private boolean shouldRender = false;
+	
 	/**
 	 * Construct a new entity with a name and a level.
 	 * @param level	Level entity should belong to.
@@ -325,5 +328,19 @@ public class Entity {
 	@Override
 	public String toString() {
 		return getName();
+	}
+	
+	/**
+	 * Whether non-block visualizations of this entity should render in the editor.
+	 */
+	public boolean shouldRender() {
+		return shouldRender;
+	}
+	
+	/**
+	 * Set whether non-block visualizations of this entity should render in the editor.
+	 */
+	public void setShouldRender(boolean shouldRender) {
+		this.shouldRender = shouldRender;
 	}
 }

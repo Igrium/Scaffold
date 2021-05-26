@@ -264,6 +264,7 @@ public class Level {
 		
 		Entity entity = EntityRegistry.createEntity(typeName, this, name);
 		entity.setPosition(position);
+		entity.setShouldRender(true);
 		
 		entities.put(name, entity);
 		entityStack.add(name);
@@ -273,11 +274,56 @@ public class Level {
 	}
 	
 	/**
+	 * Add an existing entity object to the level.
+	 * <br>
+	 * <b>Warning: </b> Only call if you know what you're doing! Can lead to illegal states!
+	 * <code>newEntity</code> should be used most of the time.
+	 * @param entity Entity to add.
+	 */
+	public void addEntity(Entity entity) {
+		addEntity(entity, entityStack.size(), false);
+	}
+	
+	/**
+	 * Add an existing entity object to the level.
+	 * <br>
+	 * <b>Warning: </b> Only call if you know what you're doing! Can lead to illegal states!
+	 * <code>newEntity</code> should be used most of the time.
+	 * @param entity Entity to add.
+	 * @param stackIndex Index to add it to in the entity stack.
+	 * @param noRecompile Don't recompile the level afterward.
+	 */
+	public void addEntity(Entity entity, int stackIndex, boolean noRecompile) {
+		entities.put(entity.getName(), entity);
+		entityStack.add(stackIndex, entity.getName());
+		updateEntityStack();
+		entity.setShouldRender(true);
+		
+		if (entity instanceof BlockEntity) {
+			dirtySections.addAll(((BlockEntity) entity).getOverlappingSections(blockWorld));
+		}
+		
+		if (!noRecompile && autoRecompile) {
+			quickRecompile();
+		}
+	}
+	
+	/**
 	 * Remove an entity from the level.
 	 * @param name Entity to remove.
 	 */
 	public void removeEntity(String name) {
+		removeEntity(name, false);
+	}
+	
+	/**
+	 * Remove an entity from the level.
+	 * @param name Entity to remove.
+	 * @param noRecompile Don't recompile the level after removal.
+	 */
+	public void removeEntity(String name, boolean noRecompile) {
 		Entity entity = entities.get(name);
+		entity.setShouldRender(false);
 		if (entity instanceof BlockEntity) {
 			dirtySections.addAll(((BlockEntity) entity).getOverlappingSections(blockWorld));
 		}
@@ -286,7 +332,7 @@ public class Level {
 		entityStack.remove(name);
 		updateEntityStack();
 		
-		if (autoRecompile) {
+		if (!noRecompile && autoRecompile) {
 			quickRecompile();
 		}
 	}

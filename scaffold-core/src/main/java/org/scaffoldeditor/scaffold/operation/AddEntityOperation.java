@@ -40,12 +40,7 @@ public class AddEntityOperation implements Operation {
 
 	@Override
 	public void redo() {
-		level.getEntities().put(entity.getName(), entity);
-		level.getEntityStack().add(name);
-		level.updateEntityStack();
-		if (level.autoRecompile) {
-			level.quickRecompile();
-		}
+		level.addEntity(entity);
 	}
 
 	@Override
