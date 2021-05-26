@@ -557,6 +557,14 @@ public class Level {
 			entity.compileWorld(tempWorld, false);
 		}
 		
+		// Make sure each chunk with sections marked for update is present in the temp world
+		for (SectionCoordinate coord : sections) {
+			ChunkCoordinate chunk = new ChunkCoordinate(coord);
+			if (!tempWorld.getChunks().containsKey(chunk)) {
+				tempWorld.getChunks().put(chunk, new Chunk());
+			}
+		}
+		
 		for (ChunkCoordinate coord : tempWorld.getChunks().keySet()) {
 			// Only save if the chunk is marked for update or it's not present in the main world.
 			if (!getBlockWorld().getChunks().keySet().contains(coord)) {
@@ -581,10 +589,11 @@ public class Level {
 	 * Compile all the chunks marked as dirty.
 	 */
 	public void quickRecompile() {
-		compileChunks(dirtyChunks);
 		compileSections(dirtySections);
+		compileChunks(dirtyChunks);
 		fireWorldUpdateEvent(dirtySections);
 		dirtyChunks.clear();
+		dirtySections.clear();
 	}
 	
 	/**
