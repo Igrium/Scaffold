@@ -234,12 +234,19 @@ public class Level {
 		this.datapack = datapack;
 	}
 	
-	protected String validateName(String name, String[] ignore) {
+	/**
+	 * Make sure an entity name is valid (there are no duplicates), and return a new,
+	 * valid name if it isn't.
+	 * @param name Name to test.
+	 * @param ignore If the name is in this list, return it as-is.
+	 * @return Valid name.
+	 */
+	public String validateName(String name, String[] ignore) {
 		if (Arrays.asList(ignore).contains(name)) {
 			return name;
 		}
 		
-		while (entities.get(name) != null) {
+		while (entities.containsKey(name)){
 			// Attempt to increment number
 			if (Character.isDigit(name.charAt(name.length() - 1))) {
 				int lastNum = Character.getNumericValue(name.charAt(name.length() - 1)) + 1;
@@ -294,6 +301,8 @@ public class Level {
 	 * @param noRecompile Don't recompile the level afterward.
 	 */
 	public void addEntity(Entity entity, int stackIndex, boolean noRecompile) {
+		entity.setName(validateName(entity.getName(), new String[] {}));
+		
 		entities.put(entity.getName(), entity);
 		entityStack.add(stackIndex, entity.getName());
 		updateEntityStack();

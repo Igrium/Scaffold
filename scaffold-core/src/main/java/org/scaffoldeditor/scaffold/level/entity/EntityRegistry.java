@@ -42,7 +42,7 @@ public final class EntityRegistry {
 		Entity entity = registry.get(registryName).create(level, name);
 		entity.registryName = registryName;
 		if (!supressUpdate) {
-			entity.onUpdateAttributes();
+			entity.onUpdateAttributes(false);
 		}
 		return entity;
 	}

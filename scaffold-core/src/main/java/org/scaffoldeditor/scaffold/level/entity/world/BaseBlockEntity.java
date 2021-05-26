@@ -15,7 +15,7 @@ public abstract class BaseBlockEntity extends Entity implements BlockEntity {
 	}
 	
 	/**
-	 * Whether a recent change to attributes requires the block set to recompile.
+	 * Whether a recent change to attributes requires the block collection to recompile.
 	 * <br>
 	 * If unsure, just return true. This should only be called if the attributes have actually
 	 * been updated.
@@ -26,14 +26,14 @@ public abstract class BaseBlockEntity extends Entity implements BlockEntity {
 	public abstract boolean needsRecompiling();
 	
 	@Override
-	public void onUpdateAttributes() {
+	public void onUpdateAttributes(boolean noRecompile) {
 		// Changing the attributes
 		getLevel().dirtySections.addAll(getOverlappingSections(getWorld()));
-		super.onUpdateAttributes();
+		super.onUpdateAttributes(noRecompile);
 		onUpdateBlockAttributes();
 		getLevel().dirtySections.addAll(getOverlappingSections(getWorld()));
 		
-		if (getLevel().autoRecompile) {
+		if (getLevel().autoRecompile && !noRecompile) {
 			getLevel().quickRecompile();
 		}
 	};

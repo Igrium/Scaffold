@@ -187,7 +187,7 @@ public class Entity {
 	public void setAttribute(String name, Attribute<?> value, boolean supressUpdate) {
 		attributes.put(name, value);
 		if (!supressUpdate) {
-			onUpdateAttributes();
+			onUpdateAttributes(false);
 		}
 	}
 	
@@ -278,6 +278,8 @@ public class Entity {
 	}
 	/**
 	 * Called when entity is deserialized for subclasses to act on.
+	 * <br>
+	 * <b>Note:</b> This may be called before the entity is added to the level.
 	 * @param xml XML element that it was deserialized from.
 	 */
 	public void onUnserialized(Element xml) {}
@@ -285,8 +287,10 @@ public class Entity {
 	/**
 	 * Called whenever any attributes are updated for subclasses to act on.
 	 * This is called once on unserialization, before onUnserialized, and again whenever setAttribute() is called.
+	 * @param noRecompile If this is true, this entity shouldn't recompile the world. Usually set when the calling
+	 * function plans to recompile the world later.
 	 */
-	public void onUpdateAttributes() {}
+	public void onUpdateAttributes(boolean noRecompile) {}
 	
 	/**
 	 * Compile this entity's logic.

@@ -100,8 +100,8 @@ public class TimelineEntity extends Entity {
 	}
 	
 	@Override
-	public void onUpdateAttributes() {
-		super.onUpdateAttributes();
+	public void onUpdateAttributes(boolean noRecompile) {
+		super.onUpdateAttributes(noRecompile);
 		
 		if (!((StringAttribute) getAttribute("file")).getValue().matches(oldFile)) {
 			

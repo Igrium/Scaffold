@@ -50,16 +50,15 @@ public class EntitySerializer implements XMLSerializable<Entity> {
 	}
 	
 	/**
-	 * Load an entity from XML and add it to the level.
+	 * Load an entity without adding it to the level.
 	 * @param xml XML element to load from.
-	 * @param level Level to load into.
+	 * @param level Level to tell the entity it belongs to.
 	 * @return Loaded entity.
 	 */
-	public static Entity deserialize(Element xml, Level level) {
+	public static Entity loadEntity(Element xml, Level level) {
 		String typeName = xml.getTagName();
 		String name = xml.getAttribute("name");	
-		Entity entity = EntityRegistry.createEntity(typeName, level, name, true);	
-
+		Entity entity = EntityRegistry.createEntity(typeName, level, name, true);
 		NodeList children = xml.getChildNodes();
 		for (int i = 0; i < children.getLength(); i++) {
 			Node child = children.item(i);
@@ -71,13 +70,23 @@ public class EntitySerializer implements XMLSerializable<Entity> {
 					loadAttributes(element, entity);
 				}
 			}
-		}	
-		
-		level.getEntities().put(name, entity);
-		level.getEntityStack().add(name);
-		
+		}
 		entity.onUnserialized(xml);
-		entity.onUpdateAttributes();
+		entity.onUpdateAttributes(true);
+		return entity;	
+	}
+	
+	/**
+	 * Load an entity from XML and add it to the level.
+	 * @param xml XML element to load from.
+	 * @param level Level to load into.
+	 * @return Loaded entity.
+	 */
+	public static Entity deserialize(Element xml, Level level) {
+		Entity entity = loadEntity(xml, level);
+		
+		level.addEntity(entity, level.getEntityStack().size(), true);
+		
 		return entity;
 	}
 	

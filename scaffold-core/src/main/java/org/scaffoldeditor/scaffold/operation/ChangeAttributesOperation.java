@@ -45,7 +45,7 @@ public class ChangeAttributesOperation implements Operation {
 			old.put(name, target.getAttribute(name));
 			target.setAttribute(name, attributes.get(name), true);
 		}
-		target.onUpdateAttributes();
+		target.onUpdateAttributes(false);
 		return true;
 	}
 
@@ -57,7 +57,7 @@ public class ChangeAttributesOperation implements Operation {
 		if (oldPosition != null) {
 			target.setPosition(oldPosition);
 		}
-		target.onUpdateAttributes();
+		target.onUpdateAttributes(false);
 	}
 
 	@Override
@@ -68,7 +68,7 @@ public class ChangeAttributesOperation implements Operation {
 		for (String name : attributes.keySet()) {
 			target.setAttribute(name, attributes.get(name), true);
 		}
-		target.onUpdateAttributes();
+		target.onUpdateAttributes(false);
 	}
 
 	@Override
