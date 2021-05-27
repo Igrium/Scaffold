@@ -2,6 +2,7 @@ package org.scaffoldeditor.scaffold.level.entity.logic;
 
 import java.io.IOException;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.attribute.StringAttribute;
@@ -10,7 +11,6 @@ import org.scaffoldeditor.scaffold.logic.Datapack;
 import org.scaffoldeditor.scaffold.logic.MCFunction;
 import org.scaffoldeditor.scaffold.logic.timeline.Timeline;
 import org.scaffoldeditor.scaffold.logic.timeline.TimelineEvent;
-import org.scaffoldeditor.scaffold.util.JSONUtils;
 
 public class TimelineEntity extends Entity {
 	
@@ -107,8 +107,8 @@ public class TimelineEntity extends Entity {
 			
 			// Load timeline from file.
 			try {
-				timeline = Timeline.unserialize(JSONUtils
-						.loadJSON(getLevel().getProject().assetManager().findAsset(((StringAttribute) getAttribute("file")).getValue())));
+				String modelpath = ((StringAttribute) getAttribute("file")).getValue();
+				timeline = Timeline.unserialize((JSONObject) getLevel().getProject().assetManager().loadAsset(modelpath, false));
 				System.out.println("Loaded timeline: "+getAttribute("file"));
 			} catch (JSONException | IOException e) {
 				System.out.println("Unable to load timeline: "+getAttribute("file"));

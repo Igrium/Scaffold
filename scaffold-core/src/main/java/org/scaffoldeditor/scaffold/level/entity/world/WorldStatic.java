@@ -1,12 +1,13 @@
 package org.scaffoldeditor.scaffold.level.entity.world;
 
-import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import org.apache.commons.io.FilenameUtils;
 import org.scaffoldeditor.nbt.block.Block;
-import org.scaffoldeditor.nbt.block.BlockCollectionManager;
 import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.nbt.block.SizedBlockCollection;
+import org.scaffoldeditor.scaffold.io.AssetType;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.BlockEntity;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
@@ -59,16 +60,24 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 			this.model = null;
 			return;
 		}
-				
-		File modelFile = getProject().assetManager().findAsset(model).toFile();
 		
-		try {
-//			this.model = Structure.fromCompoundMap((CompoundTag) NBTUtil.read(modelFile).getTag());
-			this.model = BlockCollectionManager.readFile(modelFile);
-			getLevel().dirtyChunks.addAll(getOverlappingChunks(getLevel().getBlockWorld()));
-		} catch (IOException e) {
-			System.out.println("Unable to load model " + model);
-			e.printStackTrace();
+		AssetType<?> loader = getProject().assetManager().getLoader(model);
+		if (loader != null && SizedBlockCollection.class.isAssignableFrom(loader.assetClass)) {
+			try {
+//				this.model = Structure.fromCompoundMap((CompoundTag) NBTUtil.read(modelFile).getTag());
+				this.model = (SizedBlockCollection) getProject().assetManager().loadAsset(model, false);
+				getLevel().dirtyChunks.addAll(getOverlappingChunks(getLevel().getBlockWorld()));
+			} catch (FileNotFoundException e) {
+				System.err.println(e.getMessage());
+			} catch (IOException e) {
+				System.err.println("Unable to load model " + model);
+				e.printStackTrace();
+			}
+			
+			
+		} else {
+			System.out.println(FilenameUtils.getExtension(model));
+			System.err.println("Unable to load model " + model + " because it is not a valid model format.");
 		}
 	}
 

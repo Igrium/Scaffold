@@ -425,7 +425,7 @@ public class Level {
 	 * @return Success
 	 */
 	public boolean saveFile(String file) {
-		return saveFile(project.assetManager().getAbsolutePath(file).toFile());
+		return saveFile(project.assetManager().getAbsoluteFile(file));
 	}
 	
 	/**
@@ -451,7 +451,7 @@ public class Level {
 	 * @return Loaded level
 	 */
 	public static Level loadFile(Project project, String file) {
-		return loadFile(project, project.assetManager().getAbsolutePath(file).toFile());
+		return loadFile(project, project.assetManager().getAbsoluteFile(file));
 	}
 	
 	/**

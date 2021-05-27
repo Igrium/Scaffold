@@ -1,6 +1,7 @@
 package org.scaffoldeditor.scaffold.plugin_utils;
 
 import org.scaffoldeditor.nbt.block.BlockCollectionManager;
+import org.scaffoldeditor.scaffold.io.StructureAsset;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BooleanAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.DoubleAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.FloatAttribute;
@@ -36,6 +37,8 @@ public class DefaultPlugin implements PluginInitializer {
 		LongAttribute.register();
 		BooleanAttribute.register();
 		VectorAttribute.register();
+		
+		StructureAsset.register();
 		
 //		WriteWorldStep.setWorldWriter(new QuerzWorldWriter());
 	}

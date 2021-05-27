@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.apache.commons.io.FilenameUtils;
 import org.scaffoldeditor.scaffold.compile.Compiler;
+import org.scaffoldeditor.scaffold.io.AssetManager;
 import org.scaffoldeditor.scaffold.plugin_utils.DefaultPlugin;
 import org.scaffoldeditor.scaffold.plugin_utils.PluginManager;
 
@@ -29,7 +30,7 @@ public class Project {
 	private GameInfo gameInfo;
 	
 	/* The AssetManager associated with this project */
-	private AssetManager assetManager = new AssetManager(this);
+	private AssetManager assetManager;
 	
 	private Compiler compiler;
 	
@@ -42,6 +43,7 @@ public class Project {
 	public Project(Path projectFolder) {
 		this.projectFolder = projectFolder;
 		gameInfo = new GameInfo();
+		assetManager = new AssetManager(this);
 		compiler = Compiler.getDefault();
 		pluginManager = new PluginManager();
 		
@@ -58,7 +60,7 @@ public class Project {
 			if (!FilenameUtils.getExtension(plugin).equals("jar")) {
 				plugin = plugin + ".jar";
 			}
-			File file = assetManager().findAsset(Paths.get("plugins", plugin)).toFile();
+			File file = projectFolder.resolve(Paths.get("plugins", plugin)).toFile();
 			if (file.isFile()) {
 				try {
 					urls.add(file.toURI().toURL());
