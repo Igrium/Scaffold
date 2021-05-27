@@ -55,6 +55,10 @@ public class PluginManager {
 				throw new IllegalStateException("An error occured in the init function of "+name, e);
 			}
 		}
+		
+		public PluginInitializer getInitializer() {
+			return initializer;
+		}
 
 		public String getName() {
 			return name;
@@ -93,5 +97,11 @@ public class PluginManager {
 	 */
 	public ClassLoader getClassLoader() {
 		return classLoader;
+	}
+	
+	public void closePlugins() {
+		for (Plugin plugin : plugins) {
+			plugin.getInitializer().close();
+		}
 	}
 }

@@ -13,7 +13,11 @@ import java.util.List;
 import org.apache.commons.io.FilenameUtils;
 import org.scaffoldeditor.scaffold.compile.Compiler;
 import org.scaffoldeditor.scaffold.io.AssetManager;
+import org.scaffoldeditor.scaffold.io.AssetTypeRegistry;
+import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
+import org.scaffoldeditor.scaffold.level.entity.attribute.AttributeRegistry;
 import org.scaffoldeditor.scaffold.plugin_utils.DefaultPlugin;
+import org.scaffoldeditor.scaffold.plugin_utils.PluginInitializer;
 import org.scaffoldeditor.scaffold.plugin_utils.PluginManager;
 
 /**
@@ -35,6 +39,7 @@ public class Project {
 	private Compiler compiler;
 	
 	private PluginManager pluginManager;
+	private PluginInitializer defaultPlugin;
 	
 	/**
 	 * Create an empty project with an empty gameinfo
@@ -47,7 +52,8 @@ public class Project {
 		compiler = Compiler.getDefault();
 		pluginManager = new PluginManager();
 		
-		new DefaultPlugin().initialize();
+		defaultPlugin = new DefaultPlugin();
+		defaultPlugin.initialize();
 	}
 	
 	/**
@@ -200,5 +206,17 @@ public class Project {
 
 	public PluginManager getPluginManager() {
 		return pluginManager;
+	}
+	
+	/**
+	 * Clean up any mess created by the project (entries in registries, etc)
+	 */
+	public void close() {
+		defaultPlugin.close();
+		pluginManager.closePlugins();
+		
+		EntityRegistry.registry.clear();
+		AttributeRegistry.registry.clear();
+		AssetTypeRegistry.registry.clear();
 	}
 }
