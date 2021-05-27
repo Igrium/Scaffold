@@ -8,6 +8,7 @@ import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.nbt.block.SizedBlockCollection;
 import org.scaffoldeditor.scaffold.io.AssetType;
+import org.scaffoldeditor.scaffold.io.AssetTypeRegistry;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.BlockEntity;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
@@ -61,8 +62,7 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 			return;
 		}
 		
-		AssetType<?> loader = getProject().assetManager().getLoader(model);
-		if (loader != null && SizedBlockCollection.class.isAssignableFrom(loader.assetClass)) {
+		if (AssetTypeRegistry.isTypeAssignableTo(FilenameUtils.getExtension(model), SizedBlockCollection.class)) {
 			try {
 //				this.model = Structure.fromCompoundMap((CompoundTag) NBTUtil.read(modelFile).getTag());
 				this.model = (SizedBlockCollection) getProject().assetManager().loadAsset(model, false);
