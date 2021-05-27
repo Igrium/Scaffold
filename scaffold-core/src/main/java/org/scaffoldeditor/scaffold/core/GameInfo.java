@@ -23,6 +23,8 @@ public class GameInfo {
 	/* All the loaded folders of this project */
 	private ArrayList<String> loadedPaths = new ArrayList<String>();
 	
+	private List<String> plugins = new ArrayList<String>();
+	
 	/* The title of the project */
 	private String title = "Default Title";
 	
@@ -54,6 +56,15 @@ public class GameInfo {
 	 */
 	public ArrayList<String> getLoadedPaths() {
 		return loadedPaths;
+	}
+	
+	/**
+	 * Get a mutable list of all this project's plugins.
+	 * <br>
+	 * Note: only applies once editor restarts.
+	 */
+	public List<String> getPlugins() {
+		return plugins;
 	}
 	
 	/**
@@ -117,9 +128,17 @@ public class GameInfo {
 		gameInfo.loadedPaths = new ArrayList<String>();
 		
 		for (int i = 0; i < pathsArray.length(); i++) {
-			String element = pathsArray.getString(i);
+			String element = pathsArray.optString(i);
 			if (element != null) {
 				gameInfo.loadedPaths.add(element);
+			}
+		}
+		
+		JSONArray pluginsArray = jsonObject.getJSONArray("plugins");
+		for (int i = 0; i < pluginsArray.length(); i++) {
+			String element = pluginsArray.optString(i);
+			if (element != null) {
+				gameInfo.plugins.add(element);
 			}
 		}
 		
@@ -155,9 +174,14 @@ public class GameInfo {
 				}
 				writer.newLine();
 			}
-			writer.write("    ]");
+			writer.write("    ].");
 			
 			writer.newLine();
+			writer.write(
+					  "   \"plugins\": [" + System.lineSeparator()
+					+ "        " + System.lineSeparator()
+					+ "    ]" + System.lineSeparator());
+			
 			writer.write("}");
 			
 			writer.flush();

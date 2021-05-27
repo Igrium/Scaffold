@@ -2,20 +2,18 @@ package org.scaffoldeditor.scaffold.core;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.scanners.TypeAnnotationsScanner;
-import org.reflections.util.ConfigurationBuilder;
+import org.apache.commons.io.FilenameUtils;
 import org.scaffoldeditor.scaffold.compile.Compiler;
 import org.scaffoldeditor.scaffold.plugin_utils.DefaultPlugin;
-import org.scaffoldeditor.scaffold.plugin_utils.PluginInitializer;
-import org.scaffoldeditor.scaffold.plugin_utils.ScaffoldPlugin;
+import org.scaffoldeditor.scaffold.plugin_utils.PluginManager;
 
 /**
  * A Project is an object that defines all the main attributes of a project
@@ -31,9 +29,11 @@ public class Project {
 	private GameInfo gameInfo;
 	
 	/* The AssetManager associated with this project */
-	private AssetManager assetManager;
+	private AssetManager assetManager = new AssetManager(this);
 	
 	private Compiler compiler;
+	
+	private PluginManager pluginManager;
 	
 	/**
 	 * Create an empty project with an empty gameinfo
@@ -42,35 +42,32 @@ public class Project {
 	public Project(Path projectFolder) {
 		this.projectFolder = projectFolder;
 		gameInfo = new GameInfo();
-		assetManager = new AssetManager(this);
 		compiler = Compiler.getDefault();
+		pluginManager = new PluginManager();
 		
 		new DefaultPlugin().initialize();
-		loadPlugins();
 	}
 	
-	protected void loadPlugins() {
-		System.out.println("Loading plugins...");
-		
-		
-		Reflections reflections = new Reflections(new ConfigurationBuilder()
-				.setScanners(new TypeAnnotationsScanner(), new SubTypesScanner(false)));
-		
-		Set<Class<?>> classes = reflections.getTypesAnnotatedWith(ScaffoldPlugin.class);
-		System.out.println(classes.toString());
-		
-		for (Class<?> c : classes) {
-			if (c.isAssignableFrom(PluginInitializer.class)) {
+	/**
+	 * Load all the plugins in the project. Can only be called once, so it
+	 * obviously can't be called from a plugin.
+	 */
+	public void loadPlugins() {
+		List<URL> urls = new ArrayList<>();
+		for (String plugin : gameInfo().getPlugins()) {
+			if (!FilenameUtils.getExtension(plugin).equals("jar")) {
+				plugin = plugin + ".jar";
+			}
+			File file = assetManager().findAsset(Paths.get("plugins", plugin)).toFile();
+			if (file.isFile()) {
 				try {
-					System.out.println("Initializing plugin: "+c.getName());
-					PluginInitializer plugin = (PluginInitializer) c.getConstructors()[0].newInstance();
-					plugin.initialize();
-				} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
-						| InvocationTargetException | SecurityException e) {
-					System.err.println("Unable to instantiate plugin: "+c.getName());
+					urls.add(file.toURI().toURL());
+				} catch (MalformedURLException e) {
+					throw new AssertionError(e);
 				}
 			}
 		}
+		pluginManager.loadPlugins(urls.toArray(new URL[0]));
 	}
 
 	
@@ -105,6 +102,7 @@ public class Project {
 			System.out.println("Unable to load gameinfo file!");
 			return null;
 		}
+		project.loadPlugins();
 		
 		return project;
 	}
@@ -196,5 +194,9 @@ public class Project {
 	 */
 	public String getTitle() {
 		return gameInfo.getTitle();
+	}
+
+	public PluginManager getPluginManager() {
+		return pluginManager;
 	}
 }

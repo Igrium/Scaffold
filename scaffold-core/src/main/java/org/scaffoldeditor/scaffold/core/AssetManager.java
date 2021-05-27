@@ -1,6 +1,5 @@
 package org.scaffoldeditor.scaffold.core;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -24,6 +23,7 @@ public class AssetManager {
 	 */
 	public AssetManager(Project project) {
 		this.project = project;
+		getClass().getClassLoader().getResource("test");
 	}
 	
 	/**
@@ -69,19 +69,28 @@ public class AssetManager {
 	 * @param assetPath Relative path to asset to find.
 	 * @return Absolute path to asset
 	 */
-	public Path findAsset(String assetPath) {
+	public Path findAsset(Path assetPath) {
 		
 		ArrayList<Path> loadedPaths = getLoadedPaths();
 		
 		// Look in order from first to last in list
 		for (int i = 0; i < loadedPaths.size(); i++) {
-			if (new File(loadedPaths.get(i).toString(),assetPath).exists()) { 
-				return Paths.get(loadedPaths.get(i).toString(), assetPath);
+			if (loadedPaths.get(i).resolve(assetPath).toFile().exists()) { 
+				return loadedPaths.get(i).resolve(assetPath);
 			}
 		}
 		
 		System.out.println("Unable to find asset "+assetPath);
 		return null;
+	}
+	
+	/**
+	 * Search in loaded paths for an asset. Returns null if asset cannot be found.
+	 * @param assetPath Relative path to asset to find.
+	 * @return Absolute path to asset
+	 */
+	public Path findAsset(String assetPath) {
+		return findAsset(Paths.get(assetPath));
 	}
 	
 }
