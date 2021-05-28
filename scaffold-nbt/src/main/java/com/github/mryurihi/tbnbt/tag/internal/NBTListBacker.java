@@ -31,6 +31,7 @@ import java.util.Objects;
 import com.github.mryurihi.tbnbt.TagType;
 import com.github.mryurihi.tbnbt.tag.NBTTag;
 
+@SuppressWarnings("serial")
 public class NBTListBacker extends ArrayList<NBTTag> implements List<NBTTag> {
 	
 	private TagType type = TagType.END;

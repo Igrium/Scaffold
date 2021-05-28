@@ -24,7 +24,7 @@ import java.util.Objects;
  * Represents a Minecraft structure schematic (.nbt)
  * @author Sam54123
  */
-public class Structure implements SizedBlockCollection, BlockReader {
+public class Structure implements SizedBlockCollection, BlockReader<Structure>, Iterable<Block> {
 	
 	private CompoundTag[] palette;
 	private List<CompoundTag> blocks;
@@ -369,7 +369,7 @@ public class Structure implements SizedBlockCollection, BlockReader {
 	}
 
 	@Override
-	public SizedBlockCollection readBlockCollection(InputStream in) throws IOException {
+	public Structure readBlockCollection(InputStream in) throws IOException {
 		CompoundTag map = (CompoundTag) new NBTDeserializer(true).fromStream(in).getTag();
 		
 		if (map == null) {		

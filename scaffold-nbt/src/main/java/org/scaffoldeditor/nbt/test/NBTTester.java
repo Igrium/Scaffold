@@ -20,7 +20,7 @@ public class NBTTester {
 		Path regionFolder = worldFolder.resolve("region");
 		
 		try {
-			BlockWorld world = BlockWorld.deserialize(regionFolder.toFile());
+			BlockWorld.deserialize(regionFolder.toFile());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -14,7 +14,7 @@ import net.querz.nbt.tag.CompoundTag;
  * Represents a single chunk in the world.
  *
  */
-public class Chunk implements BlockCollection {
+public class Chunk implements BlockCollection, Iterable<Block> {
 	
 	public static final int WIDTH = 16;
 	public static final int LENGTH = 16;

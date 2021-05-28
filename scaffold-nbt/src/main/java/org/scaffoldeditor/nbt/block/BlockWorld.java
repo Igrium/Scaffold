@@ -286,7 +286,6 @@ public class BlockWorld implements BlockCollection {
 	}
 	
 	// Iterates over all chunks, and all blocks in the chunks.
-	@Override
 	public Iterator<Block> iterator() {
 		return new Iterator<Block>() {
 			

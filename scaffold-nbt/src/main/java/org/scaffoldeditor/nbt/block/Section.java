@@ -8,7 +8,7 @@ import java.util.List;
  * Represents a subchunk
  * @author Igrium
  */
-public class Section implements SizedBlockCollection {
+public class Section implements SizedBlockCollection, Iterable<Block> {
 	
 	public static final int HEIGHT = 16;
 	

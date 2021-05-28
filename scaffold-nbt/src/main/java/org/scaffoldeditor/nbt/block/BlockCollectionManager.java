@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.io.FilenameUtils;
+import org.scaffoldeditor.nbt.io.ConstructionFormat;
 import org.scaffoldeditor.nbt.schematic.Structure;
 
 /**
@@ -14,14 +15,14 @@ import org.scaffoldeditor.nbt.schematic.Structure;
  * @author Sam54123
  */
 public final class BlockCollectionManager {
-	private static Map<String, BlockReader> registeredReaders = new HashMap<String, BlockReader>();
+	private static Map<String, BlockReader<?>> registeredReaders = new HashMap<>();
 	
 	/**
 	 * Register a new block reader.
 	 * @param reader The block reader to register.
 	 * @param ext The file extension of the files to use this reader for.
 	 */
-	public static void registerReader(BlockReader reader, String ext) {
+	public static void registerReader(BlockReader<?> reader, String ext) {
 		registeredReaders.put(ext, reader);
 	}
 	
@@ -38,7 +39,7 @@ public final class BlockCollectionManager {
 	 * @param ext Extension to look for.
 	 * @return Block reader for extension. Null of nonexistant.
 	 */
-	public static BlockReader getReader(String ext) {
+	public static BlockReader<?> getReader(String ext) {
 		return registeredReaders.get(ext);
 	}
 	
@@ -50,7 +51,7 @@ public final class BlockCollectionManager {
 	 */
 	public static SizedBlockCollection readFile(File file) throws IOException {
 		
-		BlockReader reader = getReader(FilenameUtils.getExtension(file.getName()));
+		BlockReader<?> reader = getReader(FilenameUtils.getExtension(file.getName()));
 		if (reader == null) {
 			throw new IOException("No block collection reader exists for file extension " + FilenameUtils.getExtension(file.getName()) + "!");
 		}
@@ -64,5 +65,6 @@ public final class BlockCollectionManager {
 	 */
 	public static void registerDefaults() {
 		registerReader(new Structure(), "nbt");
+		registerReader(new ConstructionFormat(), "construction");
 	}
 }

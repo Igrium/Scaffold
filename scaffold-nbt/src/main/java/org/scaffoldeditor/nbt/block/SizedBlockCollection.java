@@ -1,7 +1,7 @@
 package org.scaffoldeditor.nbt.block;
 
 /**
- * Represents a block collection that has a finite amount of blocks and size
+ * Represents an immutable block collection that has a finite amount of blocks and size
  * @author Sam54123
  */
 public interface SizedBlockCollection extends BlockCollection {
