@@ -7,12 +7,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.io.FilenameUtils;
-import org.scaffoldeditor.nbt.io.ConstructionFormat;
 import org.scaffoldeditor.nbt.schematic.Structure;
 
 /**
  * Manages all the block readers.
- * @author Sam54123
+ * @author Igrium
  */
 public final class BlockCollectionManager {
 	private static Map<String, BlockReader<?>> registeredReaders = new HashMap<>();
@@ -65,6 +64,5 @@ public final class BlockCollectionManager {
 	 */
 	public static void registerDefaults() {
 		registerReader(new Structure(), "nbt");
-		registerReader(new ConstructionFormat(), "construction");
 	}
 }
