@@ -11,13 +11,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.github.mryurihi.tbnbt.stream.NBTInputStream;
-import com.github.mryurihi.tbnbt.tag.NBTTag;
-import com.github.mryurihi.tbnbt.tag.NBTTagByteArray;
-import com.github.mryurihi.tbnbt.tag.NBTTagCompound;
-import com.github.mryurihi.tbnbt.tag.NBTTagList;
-import com.github.mryurihi.tbnbt.tag.NBTTagShort;
-import com.github.mryurihi.tbnbt.tag.NBTTagString;
+import net.querz.nbt.tag.CompoundTag;
+import net.querz.nbt.tag.ListTag;
 
 /**
  * Class responsible for loading and managing Minecraft schematics
@@ -33,10 +28,10 @@ public class Schematic {
 	private byte[] data;
 	
 	/* All entities in the schematic */
-	private List<NBTTagCompound> entities;
+	private List<CompoundTag> entities;
 	
 	/* All tile entities in the schematic */
-	private List<NBTTagCompound> tileEntities;
+	private List<CompoundTag> tileEntities;
 	
 	/* Size along the X axis. */
 	private short width;
@@ -119,7 +114,7 @@ public class Schematic {
 	 * @param map Compound Map to generate from
 	 * @return Newly created Schematic
 	 */
-	public static Schematic fromCompoundMap(NBTTagCompound map) {
+	public static Schematic fromCompoundMap(CompoundTag map) {
 		if (map == null) {
 			System.out.println("Schematic parser was fed null.");
 			return null;
@@ -129,14 +124,9 @@ public class Schematic {
 
 		
 		// Get width and height
-		NBTTagShort widthTag = (NBTTagShort) map.get("Width");
-		schematic.width = widthTag.getValue();
-		
-		NBTTagShort heightTag = (NBTTagShort) map.get("Height");
-		schematic.height = heightTag.getValue();
-		
-		NBTTagShort lengthTag = (NBTTagShort) map.get("Length");
-		schematic.length = lengthTag.getValue();
+		schematic.width = map.getShort("Width");
+		schematic.height = map.getShort("Height");
+		schematic.length = map.getShort("Length");
 		
 		// Schematic may have not had proper tags
 		if (schematic.width == 0 || schematic.height == 0 || schematic.length == 0) {
@@ -145,12 +135,10 @@ public class Schematic {
 		}
 		
 		// Get materials
-		NBTTagString materialTag = (NBTTagString) map.get("Materials");
-		if (materialTag == null) {
+		String materialName = map.getString("Materials");
+		if (materialName == "") {
 			schematic.materials = MaterialType.ALPHA;
-		} else {
-			String materialName = materialTag.getValue();
-			
+		} else {			
 			if (materialName.equals("Alpha")) {
 				schematic.materials = MaterialType.ALPHA;
 			} else if (materialName.equals("Pocket")) {
@@ -164,11 +152,8 @@ public class Schematic {
 		}
 		
 		// Get blocks and data
-		NBTTagByteArray blocksArray = (NBTTagByteArray) map.get("Blocks");
-		schematic.blocks = blocksArray.getValue();
-		
-		NBTTagByteArray dataArray = (NBTTagByteArray) map.get("Data");
-		schematic.data = dataArray.getValue();
+		schematic.blocks = map.getByteArray("Blocks");
+		schematic.data = map.getByteArray("Data");
 		
 		if (schematic.blocks == null || schematic.data == null) {
 			System.out.println("Schematic blocks or data is improperly formatted!");
@@ -176,40 +161,19 @@ public class Schematic {
 		}
 		
 		// Get entities
-		NBTTagList entities = (NBTTagList) map.get("Entities");
-		schematic.entities = new ArrayList<NBTTagCompound>();
-		for (NBTTag t : entities.getValue()) {
-			schematic.entities.add((NBTTagCompound) t);
+		ListTag<CompoundTag> entities = map.getListTag("Entities").asCompoundTagList();
+		schematic.entities = new ArrayList<CompoundTag>();
+		for (CompoundTag t : entities) {
+			schematic.entities.add(t);
 		}
 		
-		NBTTagList tileEntities = (NBTTagList) map.get("TileEntities");
-		schematic.tileEntities = new ArrayList<NBTTagCompound>();
-		for (NBTTag e : tileEntities.getValue()) {
-			schematic.tileEntities.add((NBTTagCompound) e);
+		ListTag<CompoundTag> tileEntities = map.getListTag("TileEntities").asCompoundTagList();
+		for (CompoundTag e : tileEntities) {
+			schematic.tileEntities.add(e);
 		}
 		
 		// Entites are optional, so we don't check for success.
 		
 		return schematic;
 	}
-	
-	/**
-	 * Load a schematic from a file
-	 * @param file File to load
-	 * @return Loaded file
-	 * @throws FileNotFoundException
-	 * @throws IOException
-	 */
-	public static Schematic fromFile(File file) throws FileNotFoundException, IOException {
-		NBTInputStream input = new NBTInputStream(new FileInputStream(file));
-		
-		NBTTagCompound tag = (NBTTagCompound) input.readTag();
-		
-		Schematic schematic = Schematic.fromCompoundMap(tag);
-		
-		input.close();
-		
-		return schematic;
-	}
-	
 }
