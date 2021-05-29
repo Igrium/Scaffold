@@ -22,7 +22,7 @@ import java.util.Objects;
 
 /**
  * Represents a Minecraft structure schematic (.nbt)
- * @author Sam54123
+ * @author Igrium
  */
 public class Structure implements SizedBlockCollection, BlockReader<Structure>, Iterable<Block> {
 	

@@ -17,7 +17,7 @@ import org.scaffoldeditor.scaffold.core.Project;
 
 /**
  * This class takes care of working with paths and loading assets in the guise of the project folder
- * @author Sam54123
+ * @author Igrium
  *
  */
 public class AssetManager {

@@ -11,7 +11,7 @@ import java.util.Map;
 
 /**
  * Represents a Minecraft function, uncompiled.
- * @author Sam54123
+ * @author Igrium
  *
  */
 public class MCFunction {

@@ -5,7 +5,7 @@ import org.scaffoldeditor.scaffold.level.entity.attribute.FloatAttribute;
 
 /**
  * Defines an entity that can be rotated on the X and Y axis
- * @author Sam54123
+ * @author Igrium
  *
  */
 public class Rotatable extends Entity {

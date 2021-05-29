@@ -3,7 +3,7 @@ package org.scaffoldeditor.nbt.block;
 /**
  * This represents an immutable group of blocks and tile entities,
  * like a schematic or structure file.
- * @author Sam54123
+ * @author Igrium
  */
 public interface BlockCollection {
 	

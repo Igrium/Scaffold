@@ -17,13 +17,13 @@ import net.querz.nbt.tag.CompoundTag;
 
 /**
  * Represents all the blocks in a world.
- * @author Sam54123
+ * @author Igrium
  */
 public class BlockWorld implements BlockCollection {
 	
 	/**
 	 * Class to represent chunk coordinate pairs.
-	 * @author Sam54123
+	 * @author Igrium
 	 */
 	public static class ChunkCoordinate implements Comparable<ChunkCoordinate> {
 		public final int x;

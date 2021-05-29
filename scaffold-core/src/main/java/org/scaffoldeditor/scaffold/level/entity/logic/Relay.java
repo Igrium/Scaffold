@@ -12,7 +12,7 @@ import org.scaffoldeditor.scaffold.logic.MCFunction;
 /**
  * This class relays io from it's inputs to it's outputs
  * 
- * @author Sam54123
+ * @author Igrium
  */
 public class Relay extends Entity {
 	

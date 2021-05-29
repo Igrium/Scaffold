@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.scaffoldeditor.nbt.NBTStrings;
 import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.nbt.block.Chunk;
 import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
@@ -38,11 +37,12 @@ import org.scaffoldeditor.scaffold.operation.OperationManager;
 import org.scaffoldeditor.scaffold.serialization.LevelReader;
 import org.scaffoldeditor.scaffold.serialization.LevelWriter;
 
+import net.querz.nbt.io.SNBTUtil;
 import net.querz.nbt.tag.CompoundTag;
 
 /**
  * Represents a single level file
- * @author Sam54123
+ * @author Igrium
  *
  */
 public class Level {
@@ -391,20 +391,18 @@ public class Level {
 	}
 	
 	
-	@SuppressWarnings("deprecation")
 	public String summonScoreboardEntity() {
 		CompoundTag nbt = new CompoundTag();
 		nbt.putString("CustomName","\""+SCOREBOARDNAME+"\"");
 		nbt.putInt("Duration", 2000000000);
 		
-		return "summon "+SCOREBOARDTYPE+" 0 0 0 "+NBTStrings.nbtToString(nbt);
+		try {
+			return "summon "+SCOREBOARDTYPE+" 0 0 0 "+SNBTUtil.toSNBT(nbt);
+		} catch (IOException e) {
+			throw new AssertionError("Unable to spawn scoreboard entity due to an NBT error.", e);
+		}
 	}
 	
-	/**
-	 * Save this level to a file
-	 * @param file File to save to
-	 * @return Success
-	 */
 	public boolean saveFile(File file) {
 		try {
 			FileOutputStream out = new FileOutputStream(file);
@@ -419,11 +417,6 @@ public class Level {
 		return true;
 	}
 	
-	/**
-	 * Save this level to a file
-	 * @param file File to save to
-	 * @return Success
-	 */
 	public boolean saveFile(String file) {
 		return saveFile(project.assetManager().getAbsoluteFile(file));
 	}

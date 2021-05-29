@@ -21,7 +21,7 @@ public class ChunkParser {
 	 * Represents a single sub-chunk.
 	 * <br>
 	 * Used for serialization/unserialization
-	 * @author Sam54123
+	 * @author Igrium
 	 */
 	protected static class Section {
 		

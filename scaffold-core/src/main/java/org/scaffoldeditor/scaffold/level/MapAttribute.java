@@ -6,7 +6,7 @@ import org.json.JSONObject;
 
 /**
  * Represents an attribute that is a map (editor supported)
- * @author Sam54123
+ * @author Igrium
  */
 public class MapAttribute extends HashMap<String, String> {
 

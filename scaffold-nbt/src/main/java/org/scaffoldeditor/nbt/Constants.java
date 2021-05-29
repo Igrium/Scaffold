@@ -6,7 +6,7 @@ import java.util.Map;
 
 /**
  * Handles some constants for NBT files
- * @author Sam54123
+ * @author Igrium
  */
 public final class Constants {
 	/**

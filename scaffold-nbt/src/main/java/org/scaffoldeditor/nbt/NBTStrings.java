@@ -7,7 +7,7 @@ import net.querz.nbt.tag.Tag;
 
 /**
  * Utility class for common nbt functions
- * @author Sam54123
+ * @author Igrium
  * @deprecated use {@link SNBTUtil} instead.
  */
 public class NBTStrings {

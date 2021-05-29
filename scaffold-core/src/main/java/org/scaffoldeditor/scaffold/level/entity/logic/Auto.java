@@ -9,7 +9,7 @@ import org.scaffoldeditor.scaffold.logic.Datapack;
 /**
  * Fires an output on level load.
  * 
- * @author Sam54123
+ * @author Igrium
  */
 public class Auto extends Entity {
 	

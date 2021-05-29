@@ -6,7 +6,7 @@ import org.python.util.PythonInterpreter;
 
 /**
  * This class simplifies interfacing with Jython.
- * @author Sam54123
+ * @author Igrium
  *
  */
 public final class PythonUtils {
@@ -58,6 +58,7 @@ public final class PythonUtils {
 		return interpreter.getSystemState();
 	}
 	
+	@SuppressWarnings("resource")
 	public static void setArgs(String[] args) {
 		getSystemState().argv.clear();
 		for (String arg : args) {

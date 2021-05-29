@@ -11,7 +11,7 @@ import java.util.List;
 
 /**
  * This class represents an ignore file (ex: dataignore.txt)
- * @author Sam54123
+ * @author Igrium
  */
 public abstract class FileIgnore {
 	/**
@@ -46,7 +46,7 @@ public abstract class FileIgnore {
 	
 	/**
 	 * Filter to determine whether a file can be copied
-	 * @author Sam54123
+	 * @author Igrium
 	 *
 	 */
 	public class Filter implements FileFilter {

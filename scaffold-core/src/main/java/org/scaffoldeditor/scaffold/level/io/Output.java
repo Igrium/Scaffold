@@ -11,7 +11,7 @@ import org.scaffoldeditor.scaffold.level.entity.Entity;
 /**
  * Represents an entity output connection
  * 
- * @author Sam54123
+ * @author Igrium
  */
 public class Output {
 	private Entity parent;

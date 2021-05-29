@@ -20,7 +20,7 @@ import org.scaffoldeditor.scaffold.math.Vector;
 
 /**
  * This entity compiles a standard block collection into the world.
- * @author Sam54123
+ * @author Igrium
  */
 public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntity {
 	

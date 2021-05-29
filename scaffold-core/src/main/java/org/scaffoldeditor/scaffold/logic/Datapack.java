@@ -19,7 +19,7 @@ import org.scaffoldeditor.scaffold.core.PythonUtils;
 
 /**
  * Represents the main game datapack
- * @author Sam54123
+ * @author Igrium
  *
  */
 public class Datapack {

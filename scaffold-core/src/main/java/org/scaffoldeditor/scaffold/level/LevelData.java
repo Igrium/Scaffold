@@ -16,7 +16,7 @@ import net.querz.nbt.tag.StringTag;
 
 /**
  * This class stores and represents all the (relevent) data that would normally be in level.dat
- * @author Sam54123
+ * @author Igrium
  *
  */
 public class LevelData {

@@ -18,7 +18,7 @@ import net.querz.nbt.tag.ListTag;
 
 /**
  * Represents a Minecraft entity in the editor
- * @author Sam54123
+ * @author Igrium
  *
  */
 public class GameEntity extends Rotatable implements TargetSelectable {

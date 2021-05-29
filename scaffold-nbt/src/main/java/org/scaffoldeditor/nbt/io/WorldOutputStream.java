@@ -19,7 +19,7 @@ import net.querz.nbt.tag.Tag;
  * This output stream is buffered due to the nature of the header.
  * <br>
  * Read more about Region files on the <a href="https://minecraft.gamepedia.com/Region_file_format">Minecraft Wiki.</a>
- * @author Sam54123
+ * @author Igrium
  */
 public class WorldOutputStream implements Closeable {
 	

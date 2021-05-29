@@ -13,7 +13,7 @@ import org.scaffoldeditor.scaffold.math.Vector;
 
 /**
  * An interface denoting that an entity is able to add blocks to the world upon compilation.
- * @author Sam54123
+ * @author Igrium
  */
 public interface BlockEntity {
 	

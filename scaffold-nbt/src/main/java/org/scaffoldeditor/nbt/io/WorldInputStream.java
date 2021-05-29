@@ -13,7 +13,7 @@ import net.querz.nbt.tag.Tag;
 /**
  * This class can read and parse Minecraft Region files,
  * outputting them into a series of CompoundMaps.
- * @author Sam54123
+ * @author Igrium
  */
 public class WorldInputStream implements Closeable {
 

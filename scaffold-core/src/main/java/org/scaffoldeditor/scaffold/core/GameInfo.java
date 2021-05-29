@@ -15,7 +15,7 @@ import org.json.JSONObject;
 /**
  * This class is responsible for loading and parsing the gameinfo file.
  * Use _projectfolder_ to represent project folder dir.
- * @author Sam54123
+ * @author Igrium
  *
  */
 public class GameInfo {

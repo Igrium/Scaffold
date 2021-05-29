@@ -5,7 +5,7 @@ import java.io.InputStream;
 
 /**
  * A block reader is a class that is able to read a file and return a sized block collection.
- * @author Sam54123
+ * @author Igrium
  */
 public interface BlockReader<T extends SizedBlockCollection> {
 	/**

@@ -16,7 +16,7 @@ import net.querz.nbt.tag.ListTag;
 
 /**
  * Class responsible for loading and managing Minecraft schematics
- * @author Sam54123
+ * @author Igrium
  *
  */
 @SuppressWarnings("unused")
@@ -47,7 +47,7 @@ public class Schematic {
 	
 	/**
 	 * Schematic material types
-	 * @author Sam54123
+	 * @author Igrium
 	 *
 	 */
 	public enum MaterialType {

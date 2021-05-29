@@ -4,7 +4,7 @@ import org.scaffoldeditor.scaffold.level.entity.Entity;
 
 /**
  * Represents an input in the entity IO system.
- * @author Sam54123
+ * @author Igrium
  */
 public abstract class Input {
 	

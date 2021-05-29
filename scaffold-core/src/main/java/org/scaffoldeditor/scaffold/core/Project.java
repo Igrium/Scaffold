@@ -22,7 +22,7 @@ import org.scaffoldeditor.scaffold.plugin_utils.PluginManager;
 
 /**
  * A Project is an object that defines all the main attributes of a project
- * @author Sam54123
+ * @author Igrium
  *
  */
 public class Project {

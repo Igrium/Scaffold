@@ -13,7 +13,7 @@ import org.scaffoldeditor.scaffold.util.ZipUtils;
 
 /**
  * Represents a Minecraft resourecpack.
- * @author Sam54123
+ * @author Igrium
  */
 public class Resourcepack {
 

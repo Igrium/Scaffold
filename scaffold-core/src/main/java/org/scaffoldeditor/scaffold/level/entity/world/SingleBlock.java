@@ -22,7 +22,7 @@ import net.querz.nbt.tag.CompoundTag;
 
 /**
  * Places a single block into the world.
- * @author Sam54123
+ * @author Igrium
  */
 public class SingleBlock extends Entity implements BlockEntity {
 	

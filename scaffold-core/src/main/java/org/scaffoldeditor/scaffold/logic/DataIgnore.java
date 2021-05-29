@@ -5,7 +5,7 @@ import java.nio.file.Paths;
 
 /**
  * This class represents the dataignore.txt file used when compiling datapack
- * @author Sam54123
+ * @author Igrium
  *
  */
 public final class DataIgnore extends FileIgnore {

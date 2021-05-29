@@ -6,7 +6,7 @@ import net.querz.nbt.tag.CompoundTag;
 
 /**
  * Represents a single Minecraft block and its data.
- * @author h205p1
+ * @author Igrium
  */
 public class Block {
 	String name;

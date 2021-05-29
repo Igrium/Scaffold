@@ -12,7 +12,7 @@ import org.json.JSONObject;
 
 /**
  * Represents a game timeline.
- * @author Sam54123
+ * @author Igrium
  */
 public class Timeline implements Iterable<TimelineEvent> {
 

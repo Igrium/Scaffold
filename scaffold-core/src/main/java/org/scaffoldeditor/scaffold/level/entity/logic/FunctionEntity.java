@@ -9,7 +9,7 @@ import org.scaffoldeditor.scaffold.level.io.Input;
 
 /**
  * Runs a function on the input "Run".
- * @author Sam54123
+ * @author Igrium
  */
 public class FunctionEntity extends Entity {
 	
