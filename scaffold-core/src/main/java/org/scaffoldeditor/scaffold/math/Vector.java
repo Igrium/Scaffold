@@ -2,27 +2,28 @@ package org.scaffoldeditor.scaffold.math;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.scaffoldeditor.nbt.math.Vector3f;
 import org.scaffoldeditor.scaffold.serialization.XMLSerializable;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
- * 3D Vector implementation
+ * Wrapper around {@link Vector3f} allowing it to be serialized
+ * and used in attributes.
+ * @author Igrium
  */
-public class Vector implements XMLSerializable<Vector> {
+public class Vector extends Vector3f implements XMLSerializable<Vector> {
 	
 	public static final String REGISTRY_NAME = "vector";
 	
-	public final float x;
-	public final float y;
-	public final float z;
-	
 	public Vector(float x, float y, float z) {
-		this.x = x;
-		this.y = y;
-		this.z = z;
+		super(x, y, z);
 	}
 	
+	public Vector(Vector3f vec) {
+		this(vec.x, vec.y, vec.z);
+	}
+
 	public float X() {
 		return x;
 	}
@@ -39,45 +40,24 @@ public class Vector implements XMLSerializable<Vector> {
 		return (x*x + y*y + z*z);
 	}
 	
-	public float length() {
-		return (float) Math.sqrt(lengthSquared());
-	}
-	
-	
-	@Override
-	public String toString() {
-		return "<"+x+", "+y+", "+z+">";
-	}
-	
-	@Override
-	public boolean equals(Object arg0) {
-		Vector other = (Vector) arg0;
-		if (other != null) {
-			return (this.X() == other.X() && this.Y() == other.Y() && this.Z() == other.Z());
-		} else {
-			return super.equals(arg0);
-		}
-
-	}
-	
 	public static Vector add(Vector vec1, Vector vec2) {
-		return new Vector(vec1.X() + vec2.X(), vec1.Y() + vec2.Y(), vec1.Z() + vec2.Z());
+		return new Vector(vec1.add(vec2));
 	}
 	
 	public static Vector subtract(Vector vec1, Vector vec2) {
-		return new Vector(vec1.X() - vec2.X(), vec1.Y() - vec2.Y(), vec1.Z() - vec2.Z());
+		return new Vector(vec1.subtract(vec2));
 	}
 	
 	public static Vector multiply(Vector vec, float num) {
-		return new Vector(vec.X()*num, vec.Y()*num, vec.Z()*num);
+		return new Vector(vec.multiply(num));
 	}
 	
 	public static Vector divide(Vector vec, float num) {
-		return new Vector(vec.X()/num, vec.Y()/num, vec.Z()/num);
+		return new Vector(vec.divide(num));
 	}
 	
 	public static Vector floor(Vector vec) {
-		return new Vector((float) Math.floor(vec.X()), (float) Math.floor(vec.Y()), (float) Math.floor(vec.Z()));
+		return new Vector(vec.floor().toFloat());
 	}
 	
 	

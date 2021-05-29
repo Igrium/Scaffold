@@ -7,7 +7,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.nbt.block.SizedBlockCollection;
-import org.scaffoldeditor.scaffold.io.AssetType;
 import org.scaffoldeditor.scaffold.io.AssetTypeRegistry;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.BlockEntity;

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Objects;
 
 import org.scaffoldeditor.nbt.block.BlockWorld.ChunkCoordinate;
+import org.scaffoldeditor.nbt.math.Vector3i;
 
 import net.querz.nbt.tag.CompoundTag;
 
@@ -20,24 +21,14 @@ public class Chunk implements BlockCollection, Iterable<Block> {
 	public static final int LENGTH = 16;
 	public static final int HEIGHT = 256;
 	
-	public static class SectionCoordinate {
-		/** X position of the chunk */
-		public final int x;
-		/** Index of the section in the chunk */
-		public final int y;
-		/** Z position of the chunk */
-		public final int z;
+	public static class SectionCoordinate extends Vector3i {
 		
 		public SectionCoordinate(int x, int y, int z) {
-			this.x = x;
-			this.y = y;
-			this.z = z;
+			super(x, y, z);
 		}
 		
 		public SectionCoordinate(ChunkCoordinate chunk, int index) {
-			this.x = chunk.x();
-			this.y = index;
-			this.z = chunk.z();
+			super(chunk.x, index, chunk.z);
 		}
 		
 		public ChunkCoordinate getChunk() {
@@ -66,21 +57,6 @@ public class Chunk implements BlockCollection, Iterable<Block> {
 		
 		public int getEndZ() {
 			return getStartZ() + LENGTH - 1;
-		}
-		
-		
-		@Override
-		public boolean equals(Object obj) {
-			if (!(obj instanceof SectionCoordinate)) {
-				return false;
-			}
-			SectionCoordinate other = (SectionCoordinate) obj;
-			return (x == other.x && y == other.y && z == other.z);	
-		}
-		
-		@Override
-		public int hashCode() {
-			return Objects.hash(x, y, z);
 		}
 		
 		@Override
