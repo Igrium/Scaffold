@@ -12,8 +12,19 @@ import org.scaffoldeditor.nbt.block.SizedBlockCollection;
 
 import net.querz.nbt.tag.CompoundTag;
 
+/**
+ * Represents a block collection in the 
+ * <a href="https://github.com/Amulet-Team/construction-specification">Construction format</a>
+ * @author Igrium
+ */
 public class Construction implements BlockCollection {
-
+	
+	/**
+	 * A 16x16x16 section within the Construction format. Although sections in Construction can take up only
+	 * a section of the 16m³ voxel, this class abstracts all of that away. You only need to worry about block
+	 * coordinates relative to the on-grid root.
+	 * @author Igrium
+	 */
 	public static class Section implements SizedBlockCollection {
 		
 		public final int width;
@@ -21,17 +32,19 @@ public class Construction implements BlockCollection {
 		public final int height;
 		public final int[][][] blocks;
 		public final List<Block> palette;
+		public final int[] relativeStartCoords;
 		
-		public Section(int width, int height, int length, int[][][] blocks, List<Block> palette) {
+		public Section(int width, int height, int length, int[][][] blocks, List<Block> palette, int relativeStartCoords[]) {
 			if (width < 0 || height < 0 || length < 0) {
 				throw new IllegalArgumentException("Width, height, and length of section must be positive!");
 			}
-			
+						
 			this.width = width;
 			this.length = length;
 			this.height = height;
 			this.blocks = blocks;
 			this.palette = palette;
+			this.relativeStartCoords = relativeStartCoords;
 		}
 		
 		public final List<CompoundTag> entities = new ArrayList<>();
@@ -39,8 +52,11 @@ public class Construction implements BlockCollection {
 
 		@Override
 		public Block blockAt(int x, int y, int z) {
-			if (x >= width || y >= height || z >= length) return null;
-			int index = blocks[x][y][z];
+			int startX = relativeStartCoords[0];
+			int startY = relativeStartCoords[1];
+			int startZ = relativeStartCoords[2];
+			if (x >= width + startX || y >= height + startY || z >= length + startZ || x < startX || y < startY || z < startZ) return null;
+			int index = blocks[x - startX][y - startY][z - startZ];
 			return palette.get(index);
 		}
 
@@ -61,6 +77,10 @@ public class Construction implements BlockCollection {
 		
 	}
 	
+	/**
+	 * Stores the coordinates of the areas that were selected in creating a construction file.
+	 * @author Igrium
+	 */
 	public static class SelectionBox {
 		public final int minX;
 		public final int minY;
@@ -81,6 +101,13 @@ public class Construction implements BlockCollection {
 		}
 	}
 	
+	/**
+	 * Like Minecraft worlds, Construction files are inherantly unlimited in size. This wrapper class
+	 * allows you to use a segment of a construction in functions requiring a SizedBlockCollection.
+	 * <br>
+	 * This should be instantiated from {@link Construction#getSegment(SelectionBox)}
+	 * @author Igrium
+	 */
 	public class ConstructionSegment implements SizedBlockCollection {
 		
 		public final int rootX;
@@ -137,23 +164,32 @@ public class Construction implements BlockCollection {
 	public final Map<SectionCoordinate, Section> sections = new HashMap<>();
 	public final List<SelectionBox> selectionBoxes = new ArrayList<>();
 
+	/**
+	 * Obtain a {@link ConstructionSegment} from this Construction.
+	 * @param box Selection box to create the segment from.
+	 * @return A ConstructionSegment of that selection.
+	 */
 	public ConstructionSegment getSegment(SelectionBox box) {
 		return new ConstructionSegment(box);
 	}
 
-	@Override
+	/**
+	 * Get the block at a location within the Construction.
+	 * <br> Note: By default, Construction uses the global coordinates
+	 * at which the schematic was built in Minecraft. Use {@link ConstructionSegment} to
+	 * circumvent this.
+	 */
 	public Block blockAt(int x, int y, int z) {
-		System.out.println(x+", "+y+", "+z);
 		SectionCoordinate section = sectionAt(x, y, z);
+		if (!sections.containsKey(section)) return null;
 		int localX = x - section.getStartX();
 		int localY = y - section.getStartY();
 		int localZ = z - section.getStartZ();
+		
 		return sections.get(section).blockAt(localX, localY, localZ);
 	}
 	
 	public SectionCoordinate sectionAt(int x, int y, int z) {
 		return new SectionCoordinate(Math.floorDiv(x, 16), Math.floorDiv(y, 16), Math.floorDiv(z, 16));
 	}
-
-
 }

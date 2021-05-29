@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.BlockReader;
+import org.scaffoldeditor.nbt.block.SizedBlockCollection;
 import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
 import org.scaffoldeditor.nbt.schematic.Construction;
 import org.scaffoldeditor.nbt.schematic.Construction.ConstructionSegment;
@@ -18,7 +19,6 @@ import org.scaffoldeditor.nbt.schematic.Construction.Section;
 import org.scaffoldeditor.nbt.schematic.Construction.SelectionBox;
 
 import net.querz.nbt.io.NBTDeserializer;
-import net.querz.nbt.io.SNBTUtil;
 import net.querz.nbt.tag.ArrayTag;
 import net.querz.nbt.tag.ByteArrayTag;
 import net.querz.nbt.tag.CompoundTag;
@@ -32,7 +32,14 @@ import net.querz.nbt.tag.LongArrayTag;
 public class ConstructionFormat implements BlockReader<ConstructionSegment> {
 	
 	final NBTDeserializer parser = new NBTDeserializer(true);
-
+	
+	/**
+	 * Parse a Construction file. Note: this caches the entire input stream into a byte array during parsing.
+	 * Make sure the input stream it's fed is capped.
+	 * @param in Input stream to parse.
+	 * @return Loaded Construction.
+	 * @throws IOException If an IO Exception occurs for any reason.
+	 */
 	public Construction parse(InputStream in) throws IOException {
 		// The construction format has a lot of back and forth, so it's better to load it all into memory at once.
 		byte[] bytes = in.readAllBytes();
@@ -58,7 +65,7 @@ public class ConstructionFormat implements BlockReader<ConstructionSegment> {
 		}	
 	}
 	
-	public Construction readVersion0(byte[] bytes) throws IOException {
+	protected Construction readVersion0(byte[] bytes) throws IOException {
 		
 		// Load metadata
 		int meta_offset = (int) readInt(new ByteArrayInputStream(bytes, bytes.length - 12, 4));
@@ -79,13 +86,12 @@ public class ConstructionFormat implements BlockReader<ConstructionSegment> {
 		byte sectionVersion = meta.getByte("section_version"); 
 		DataInputStream sectionIndex = new DataInputStream(
 				new ByteArrayInputStream(meta.getByteArray("section_index_table")));
-		System.out.println(SNBTUtil.toSNBT(meta));	
-		System.out.println(toHex(ByteBuffer.wrap(meta.getByteArray("section_index_table"))));
 		
 		while (sectionIndex.available() > 0) {
-			int x = Math.floorDiv(readInt(sectionIndex, true), 16);
-			int y = Math.floorDiv(readInt(sectionIndex, true), 16);
-			int z = Math.floorDiv(readInt(sectionIndex, true), 16);
+			
+			int x = readInt(sectionIndex, true);
+			int y = readInt(sectionIndex, true);
+			int z = readInt(sectionIndex, true);
 			
 			int width = sectionIndex.readUnsignedByte();
 			int height = sectionIndex.readUnsignedByte();
@@ -93,19 +99,23 @@ public class ConstructionFormat implements BlockReader<ConstructionSegment> {
 			
 			int dataOffset = (int) readInt(sectionIndex, true);
 			int dataLength = (int) readInt(sectionIndex, true);
-			System.out.println("X: "+x+", Y: "+y+", Z: "+z);
-			System.out.println("Length: "+length+", width: "+width+", height: "+height);
-			System.out.println("Section: "+dataOffset+", "+dataLength);
+
 			ByteArrayInputStream sectionReader = new ByteArrayInputStream(bytes, dataOffset, dataLength);
 			CompoundTag sectionNBT = (CompoundTag) parser.fromStream(sectionReader).getTag();
+			
+			SectionCoordinate coord = new SectionCoordinate(
+					Math.floorDiv(x, 16), Math.floorDiv(y, 16), Math.floorDiv(z, 16));
+			
 			Section section;
 			if (sectionVersion == 0) {
-				section = sectionVersion0(sectionNBT, width, height, length, construction.palette);
+				section = sectionVersion0(sectionNBT, width, height, length, x - coord.getStartX(),
+						y - coord.getStartY(), z - coord.getStartZ(), construction.palette);
 			} else {
 				throw new IOException("Unknown section version: "+sectionVersion);
 			}
 			
-			construction.sections.put(new SectionCoordinate(x, y, z), section);
+
+			construction.sections.put(coord, section);
 		}
 		
 		int[] selectionBoxes = meta.getIntArray("selection_boxes");
@@ -120,15 +130,14 @@ public class ConstructionFormat implements BlockReader<ConstructionSegment> {
 			
 			construction.selectionBoxes.add(new SelectionBox(minX, minY, minZ, maxX, maxY, maxZ));
 		}
-		
+
 		return construction;
 	}
 	
-	public Section sectionVersion0(CompoundTag sectionTag, int width, int height, int length, List<Block> palette) throws IOException {
+	protected Section sectionVersion0(CompoundTag sectionTag, int width, int height, int length, int startX, int startY, int startZ, List<Block> palette) throws IOException {
 		int[][][] blocks = new int[width][height][length];
 		byte blockArrayType = sectionTag.getByte("blocks_array_type");
 		BlockArrayWrapper<?> blockArray = new BlockArrayWrapper<ArrayTag<?>>(blockArrayType, (ArrayTag<?>) sectionTag.get("blocks"));
-		System.out.println(SNBTUtil.toSNBT(sectionTag));
 		int index = 0;
 		for (int x = 0; x < width; x++) {
 			for (int y = 0; y < height; y++) {
@@ -138,9 +147,8 @@ public class ConstructionFormat implements BlockReader<ConstructionSegment> {
 				}
 			}
 		}
-		System.out.println("Palette: "+palette);
 		
-		Section section = new Section(width, height, length, blocks, palette);	
+		Section section = new Section(width, height, length, blocks, palette, new int[] { startX, startY, startZ });	
 		if (sectionTag.getListTag("entities").size() > 0) {
 			for (CompoundTag entity : sectionTag.getListTag("entities").asCompoundTagList()) {
 				section.entities.add(entity);
@@ -156,26 +164,16 @@ public class ConstructionFormat implements BlockReader<ConstructionSegment> {
 		return section;
 	}
 	
-	/**
-	 * Converts a 4 byte array of unsigned bytes to an long
-	 * @param b an array of 4 unsigned bytes
-	 * @return a long representing the unsigned int
-	 * @throws IOException 
-	 */
-	public static final int readInt(byte[] b) throws IOException 
-	{
-	   return readInt(ByteBuffer.wrap(b), false);
-	}
 	
-	public static final int readInt(InputStream in) throws IOException {
+	private static final int readInt(InputStream in) throws IOException {
 		return readInt(in, false);
 	}
 	
-	public static final int readInt(InputStream in, boolean littleEndian) throws IOException {
+	private static final int readInt(InputStream in, boolean littleEndian) throws IOException {
 		return readInt(ByteBuffer.wrap(in.readNBytes(4)), littleEndian);
 	}
 	
-	public static final int readInt(ByteBuffer buffer, boolean littleEndian) throws IOException {
+	private static final int readInt(ByteBuffer buffer, boolean littleEndian) throws IOException {
 		if (littleEndian) buffer.order(ByteOrder.LITTLE_ENDIAN);
 		int num = buffer.getInt();
 		return num;
@@ -208,16 +206,10 @@ public class ConstructionFormat implements BlockReader<ConstructionSegment> {
 		}
 	}
 	
-	public static String toHex(ByteBuffer bb) {
-        StringBuilder sb = new StringBuilder("[ ");
-        while (bb.hasRemaining()) {
-            sb.append(String.format("%02X ", bb.get()));
-        }//from  w w  w.  j  a va  2  s .  c  o  m
-        sb.append("]");
-        return sb.toString();
-    }
-
-	@Override
+	/**
+	 * Parse a construction file and get it's first selection box as a {@link SizedBlockCollection}.
+	 * Note: this caches the entire input stream into a byte array during parsing. Make sure the input stream it's fed is capped.
+	 */
 	public ConstructionSegment readBlockCollection(InputStream in) throws IOException {
 		Construction construction = parse(in);
 		if (construction.selectionBoxes.size() == 0) {
