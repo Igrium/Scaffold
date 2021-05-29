@@ -2,6 +2,7 @@ package org.scaffoldeditor.nbt.schematic;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -9,6 +10,7 @@ import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.BlockCollection;
 import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
 import org.scaffoldeditor.nbt.block.SizedBlockCollection;
+import org.scaffoldeditor.nbt.math.Vector3i;
 
 import net.querz.nbt.tag.CompoundTag;
 
@@ -61,19 +63,14 @@ public class Construction implements BlockCollection {
 		}
 
 		@Override
-		public int getWidth() {
-			return width;
+		public Vector3i getMin() {
+			return new Vector3i(relativeStartCoords[0], relativeStartCoords[1], relativeStartCoords[2]);
 		}
 
 		@Override
-		public int getHeight() {
-			return height;
-		}
-
-		@Override
-		public int getLength() {
-			return length;
-		}
+		public Vector3i getMax() {
+			return new Vector3i(relativeStartCoords[0] + width, relativeStartCoords[1] + length, relativeStartCoords[2] + height);
+		} 
 		
 	}
 	
@@ -102,10 +99,13 @@ public class Construction implements BlockCollection {
 	}
 	
 	/**
+	 * <p>
 	 * Like Minecraft worlds, Construction files are inherantly unlimited in size. This wrapper class
-	 * allows you to use a segment of a construction in functions requiring a SizedBlockCollection.
-	 * <br>
-	 * This should be instantiated from {@link Construction#getSegment(SelectionBox)}
+	 * allows you to use a segment of a construction in functions requiring a {@link SizedBlockCollection}. </p>
+	 * <p>Note: segments do not keep their own copy of blocks. Instead, they reference the parent Construction
+	 * and obtain blocks relative to their root position. Width, height, and length are only used to satisfy
+	 * the requirements of SizedBlockCollection.</p>
+	 * <p>This should be instantiated from {@link Construction#getSegment(SelectionBox)}</p>
 	 * @author Igrium
 	 */
 	public class ConstructionSegment implements SizedBlockCollection {
@@ -144,18 +144,13 @@ public class Construction implements BlockCollection {
 		}
 
 		@Override
-		public int getWidth() {
-			return width;
+		public Vector3i getMin() {
+			return new Vector3i(0, 0, 0);
 		}
 
 		@Override
-		public int getHeight() {
-			return height;
-		}
-
-		@Override
-		public int getLength() {
-			return length;
+		public Vector3i getMax() {
+			return new Vector3i(width, height, length);
 		}
 		
 	}
@@ -191,5 +186,10 @@ public class Construction implements BlockCollection {
 	
 	public SectionCoordinate sectionAt(int x, int y, int z) {
 		return new SectionCoordinate(Math.floorDiv(x, 16), Math.floorDiv(y, 16), Math.floorDiv(z, 16));
+	}
+
+	@Override
+	public Iterator<Vector3i> iterator() {
+		return null;
 	}
 }

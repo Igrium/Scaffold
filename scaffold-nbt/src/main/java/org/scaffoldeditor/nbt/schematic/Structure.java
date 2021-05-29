@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -13,6 +12,7 @@ import java.util.Map.Entry;
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.BlockReader;
 import org.scaffoldeditor.nbt.block.SizedBlockCollection;
+import org.scaffoldeditor.nbt.math.Vector3i;
 
 import net.querz.nbt.io.NBTDeserializer;
 import net.querz.nbt.tag.CompoundTag;
@@ -24,7 +24,7 @@ import java.util.Objects;
  * Represents a Minecraft structure schematic (.nbt)
  * @author Igrium
  */
-public class Structure implements SizedBlockCollection, BlockReader<Structure>, Iterable<Block> {
+public class Structure implements SizedBlockCollection, BlockReader<Structure> {
 	
 	private CompoundTag[] palette;
 	private List<CompoundTag> blocks;
@@ -256,21 +256,6 @@ public class Structure implements SizedBlockCollection, BlockReader<Structure>, 
 		}
 	}
 	
-	@Override
-	public int getWidth() {
-		return sizeX;
-	}
-
-	@Override
-	public int getHeight() {
-		return sizeY;
-	}
-
-	@Override
-	public int getLength() {
-		return sizeZ;
-	}
-	
 	/**
 	 * Gets a list of all entities in structure, represented as CompoundMaps
 	 * @return
@@ -347,27 +332,6 @@ public class Structure implements SizedBlockCollection, BlockReader<Structure>, 
 		return mapList;
 	}
 
-
-	@Override
-	public Iterator<Block> iterator() {
-		return new Iterator<Block>() {
-			
-			private int head = 0;
-			
-			@Override
-			public boolean hasNext() {
-				return head < blocks.size();
-			}
-
-			@Override
-			public Block next() {
-				int state = getState(blocks.get(head));
-				head++;
-				return Block.fromBlockPalleteEntry(palette[state]);
-			}
-		};
-	}
-
 	@Override
 	public Structure readBlockCollection(InputStream in) throws IOException {
 		CompoundTag map = (CompoundTag) new NBTDeserializer(true).fromStream(in).getTag();
@@ -377,5 +341,15 @@ public class Structure implements SizedBlockCollection, BlockReader<Structure>, 
 		}
 		
 		return fromCompoundMap(map);
+	}
+
+	@Override
+	public Vector3i getMin() {
+		return new Vector3i(0, 0, 0);
+	}
+
+	@Override
+	public Vector3i getMax() {
+		return new Vector3i(sizeX, sizeY, sizeZ);
 	}
 }

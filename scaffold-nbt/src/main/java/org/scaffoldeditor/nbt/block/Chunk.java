@@ -2,10 +2,7 @@ package org.scaffoldeditor.nbt.block;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
-
 import org.scaffoldeditor.nbt.block.BlockWorld.ChunkCoordinate;
 import org.scaffoldeditor.nbt.math.Vector3i;
 
@@ -15,7 +12,7 @@ import net.querz.nbt.tag.CompoundTag;
  * Represents a single chunk in the world.
  *
  */
-public class Chunk implements BlockCollection, Iterable<Block> {
+public class Chunk implements SizedBlockCollection {
 	
 	public static final int WIDTH = 16;
 	public static final int LENGTH = 16;
@@ -115,6 +112,12 @@ public class Chunk implements BlockCollection, Iterable<Block> {
 		return section.blockAt(x, y % Section.HEIGHT, z);
 	}
 	
+	@Override
+	public boolean hasBlock(int x, int y, int z) {
+		Section section = sections[Math.floorDiv(y, Section.HEIGHT)];
+		return section.hasBlock(x, y & Section.HEIGHT, z);
+	}
+	
 	/**
 	 * Get the owner of a block in this chunk.
 	 * @return The owner, or null if there is no owner.
@@ -150,29 +153,14 @@ public class Chunk implements BlockCollection, Iterable<Block> {
 		Section section = sections[Math.floorDiv(y, Section.HEIGHT)];
 		section.setOwner(x, y % Section.HEIGHT, z, owner);
 	}
-	
+
 	@Override
-	public Iterator<Block> iterator() {
-		return new Iterator<Block>() {
-			
-			int currentSection = 0;
-			Iterator<Block> sectionIterator = sections[0].iterator();
+	public Vector3i getMin() {
+		return new Vector3i(0, 0, 0);
+	}
 
-			@Override
-			public boolean hasNext() {
-				return currentSection < sections.length - 1 || sectionIterator.hasNext();
-			}
-
-			@Override
-			public Block next() {
-				if (sectionIterator.hasNext()) {
-					return sectionIterator.next();
-				} else {
-					currentSection++;
-					sectionIterator = sections[currentSection].iterator();
-					return sectionIterator.next();
-				}
-			}
-		};
+	@Override
+	public Vector3i getMax() {
+		return new Vector3i(Chunk.WIDTH, Chunk.HEIGHT, Chunk.LENGTH);
 	}
 }

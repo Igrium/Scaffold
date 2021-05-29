@@ -168,4 +168,19 @@ public class Matrix {
 		return x;
 
 	}
+	
+	public Vector3d toVector() {
+		if (M != 1 || N != 3) {
+			throw new IllegalStateException("Only 3x1 matrices can be converted to a 3d vector!");
+		}
+		return new Vector3d(data[0][0], data[1][0], data[2][0]);
+	}
+	
+	public static Matrix fromVector(Vector3d in) {
+		return new Matrix(new double[][] {{in.x}, {in.y}, {in.z}});
+	}
+	
+	public static Matrix fromVector(Vector3f in) {
+		return new Matrix(new double[][] {{in.x}, {in.y}, {in.z}});
+	}
 }

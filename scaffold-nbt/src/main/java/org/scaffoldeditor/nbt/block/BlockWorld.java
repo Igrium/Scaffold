@@ -12,6 +12,7 @@ import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
 import org.scaffoldeditor.nbt.io.ChunkParser;
 import org.scaffoldeditor.nbt.io.WorldInputStream;
 import org.scaffoldeditor.nbt.io.WorldOutputStream;
+import org.scaffoldeditor.nbt.math.Vector3i;
 
 import net.querz.nbt.tag.CompoundTag;
 
@@ -190,23 +191,37 @@ public class BlockWorld implements BlockCollection {
 	 * @param override Should override existing blocks?
 	 */
 	public void addBlockCollection(SizedBlockCollection collection, int x, int y, int z, boolean override, Object owner) {
-		for (int Y = 0; Y < collection.getHeight(); Y++) {
-			for (int Z = 0; Z < collection.getLength(); Z++) {
-				for (int X = 0; X < collection.getWidth(); X++) {
-					int globalX = x + X;
-					int globalY = y + Y;
-					int globalZ = z + Z;
-					
-					Block oldBlock = blockAt(globalX, globalY, globalZ); // For if override is disabled.
-					Block newBlock = collection.blockAt(X, Y, Z);
-					
-					if (newBlock != null &&
-							(override || oldBlock == null || oldBlock.getName().matches("minecraft:air"))) {
-						setBlock(globalX, globalY, globalZ, newBlock, owner);
-					}
-				}
+		for (Vector3i coord : collection) {
+			int globalX = x + coord.x;
+			int globalY = y + coord.y;
+			int globalZ = z + coord.z;
+			
+			Block oldBlock = blockAt(globalX, globalY, globalZ); // For if override is disabled.
+			Block newBlock = collection.blockAt(coord);
+			
+			if (newBlock != null &&
+					(override || oldBlock == null || oldBlock.getName().matches("minecraft:air"))) {
+				setBlock(globalX, globalY, globalZ, newBlock, owner);
 			}
 		}
+		
+//		for (int Y = 0; Y < collection.getHeight(); Y++) {
+//			for (int Z = 0; Z < collection.getLength(); Z++) {
+//				for (int X = 0; X < collection.getWidth(); X++) {
+//					int globalX = x + X;
+//					int globalY = y + Y;
+//					int globalZ = z + Z;
+//					
+//					Block oldBlock = blockAt(globalX, globalY, globalZ); // For if override is disabled.
+//					Block newBlock = collection.blockAt(X, Y, Z);
+//					
+//					if (newBlock != null &&
+//							(override || oldBlock == null || oldBlock.getName().matches("minecraft:air"))) {
+//						setBlock(globalX, globalY, globalZ, newBlock, owner);
+//					}
+//				}
+//			}
+//		}
 	}
 	
 	/**
@@ -283,29 +298,6 @@ public class BlockWorld implements BlockCollection {
 			entities.addAll(c.entities);
 		}
 		return entities;
-	}
-	
-	// Iterates over all chunks, and all blocks in the chunks.
-	public Iterator<Block> iterator() {
-		return new Iterator<Block>() {
-			
-			private Iterator<Chunk> chunksIterator = chunks().iterator();
-			private Iterator<Block> chunk = null;
-			
-			@Override
-			public boolean hasNext() {
-				return (chunksIterator.hasNext() || (chunk != null && chunk.hasNext()));
-			}
-
-			@Override
-			public Block next() {
-				if (chunk == null || !chunk.hasNext()) {
-					chunk = chunksIterator.next().iterator();
-				}
-				
-				return chunk.next();
-			}
-		};
 	}
 	
 	/**
@@ -434,5 +426,10 @@ public class BlockWorld implements BlockCollection {
 		}
 		
 		wos.close();
+	}
+
+	@Override
+	public Iterator<Vector3i> iterator() {
+		return null;
 	}
 }

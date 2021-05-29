@@ -1,8 +1,12 @@
 package org.scaffoldeditor.nbt.block.transform;
 
+import java.util.Iterator;
+
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.BlockCollection;
 import org.scaffoldeditor.nbt.math.Matrix;
+import org.scaffoldeditor.nbt.math.Vector3d;
+import org.scaffoldeditor.nbt.math.Vector3i;
 
 /**
  * A block collection that represents another block collection offset by a certian transform.
@@ -13,28 +17,55 @@ import org.scaffoldeditor.nbt.math.Matrix;
 public class TransformBlockCollection implements BlockCollection {
 	
 	private final BlockCollection base;
-	private final Matrix transformMatrix;
+	protected final Matrix transformMatrix;
 	
 	/**
 	 * Create a transform block collection.
-	 * @param base Base block collection.
+	 * @param base Base block collection. If this is also a transform block collection,
+	 * the base of this one will be used and the matrix multiplied by the given transform matrix.
 	 * @param transformMatrix Transformation matrix to use.
 	 */
 	public TransformBlockCollection(BlockCollection base, Matrix transformMatrix) {
-		this.base = base;
-		this.transformMatrix = transformMatrix;
+		// Don't overload memory with a bunch of nested transform block collections. Just generate a new matrix.
+		if (base instanceof TransformBlockCollection) {
+			this.base = ((TransformBlockCollection) base).base;
+			this.transformMatrix = ((TransformBlockCollection) base).transformMatrix.times(transformMatrix);
+		} else {
+			this.base = base;
+			this.transformMatrix = transformMatrix;
+		}	
 	}
 
 	@Override
 	public Block blockAt(int x, int y, int z) {
-		Matrix in = new Matrix(new double[][] {{x}, {y}, {z}});
-		Matrix outMatrix = transformMatrix.times(in);
-		double[][] out = outMatrix.getData();
-		double finalX = out[0][0];
-		double finalY = out[1][0];
-		double finalZ = out[2][0];
-		
-		return base.blockAt((int) Math.floor(finalX), (int) Math.floor(finalY), (int) Math.floor(finalZ));
+		Vector3d inVector = new Vector3d(x, y, z);
+		return getBase().blockAt(transformVector(inVector).floor());
+	}
+	
+	@Override
+	public boolean hasBlock(int x, int y, int z) {
+		Vector3d inVector = new Vector3d(x, y, z);
+		return getBase().hasBlock(transformVector(inVector).floor());
+	}
+	
+	/**
+	 * Transform a vector according to the transform matrix.
+	 * @param in Coordinates in relation to this block collection.
+	 * @return Coordinates in relation to the base block collection.
+	 */
+	public Vector3d transformVector(Vector3d in) {
+		Matrix inMatrix = Matrix.fromVector(in);
+		Matrix outMatrix = transformMatrix.times(inMatrix);
+		return outMatrix.toVector();
+	}
+	
+	/**
+	 * Transform a vector according to the transform matrix.
+	 * @param in Coordinates in relation to this block collection.
+	 * @return Coordinates in relation to the base block collection.
+	 */
+	public Vector3d transformVector(Vector3i in) {
+		return transformVector(in.toDouble());
 	}
 	
 	/**
@@ -50,6 +81,24 @@ public class TransformBlockCollection implements BlockCollection {
 	 */
 	public Matrix getMatrix() {
 		return transformMatrix;
+	}
+
+	@Override
+	public Iterator<Vector3i> iterator() {
+		return new Iterator<Vector3i>() {
+			
+			Iterator<Vector3i> baseIterator = base.iterator();
+			
+			@Override
+			public Vector3i next() {
+				return transformVector(baseIterator.next()).floor();
+			}
+			
+			@Override
+			public boolean hasNext() {
+				return baseIterator.hasNext();
+			}
+		};
 	}
 
 }

@@ -21,6 +21,7 @@ import net.querz.nbt.tag.ListTag;
  * @author Igrium
  *
  */
+@SuppressWarnings("deprecation")
 public class GameEntity extends Rotatable implements TargetSelectable {
 	
 	public static void Register() {
@@ -83,7 +84,6 @@ public class GameEntity extends Rotatable implements TargetSelectable {
 	 * Get the nbt data of the entity in the format {data}.
 	 * @return Nbt data.
 	 */
-	@SuppressWarnings("deprecation")
 	public String getNBTString() {
 		return NBTStrings.nbtToString(nbt());
 	}
@@ -92,7 +92,6 @@ public class GameEntity extends Rotatable implements TargetSelectable {
 	 * Get the command used for spawning the entity
 	 * @return
 	 */
-	@SuppressWarnings("deprecation")
 	public String getSpawnCommand() {
 		Vector position = getPosition();
 		

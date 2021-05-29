@@ -1,14 +1,15 @@
 package org.scaffoldeditor.nbt.block;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+
+import org.scaffoldeditor.nbt.math.Vector3i;
 
 /**
  * Represents a subchunk
  * @author Igrium
  */
-public class Section implements SizedBlockCollection, Iterable<Block> {
+public class Section implements SizedBlockCollection {
 	
 	public static final int HEIGHT = 16;
 	
@@ -60,6 +61,11 @@ public class Section implements SizedBlockCollection, Iterable<Block> {
 			System.out.println("Block "+x+" "+y+" "+z+" is out of range!");
 			return null;
 		}
+	}
+	
+	@Override
+	public boolean hasBlock(int x, int y, int z) {
+		return blocks[x][y][z] >= 0;
 	}
 	
 	/**
@@ -157,83 +163,12 @@ public class Section implements SizedBlockCollection, Iterable<Block> {
 	}
 
 	@Override
-	public Iterator<Block> iterator() {
-		return new Iterator<Block>() {
-			
-			private int headX = 0;
-			private int headY = 0;
-			private int headZ = 0;
-
-			@Override
-			public boolean hasNext() {
-				// Backup the heads.
-				int oldHeadX = this.headX;
-				int oldHeadY = this.headY;
-				int oldHeadZ = this.headZ;
-
-				// Search for additional values
-				boolean success = false;
-				while (headX < Chunk.WIDTH && headY < HEIGHT && headZ < Chunk.LENGTH) {
-					if (blocks[headX][headY][headZ] != -1) {
-						success = true;
-						break;
-					}
-					iterate();
-				}
-
-				headX = oldHeadX;
-				headY = oldHeadY;
-				headZ = oldHeadZ;
-
-				return success;
-			}
-
-			@Override
-			public Block next() {
-				short index = -1;
-				
-				// Iterate until we find a non-void block
-				while (index < 0 && hasNext()) {
-					index = blocks[headX][headY][headZ];
-					iterate();
-				}
-				
-				iterate();
-				return palette.get(index);
-			}
-			
-			/**
-			 * Move the heads to the next available slot.
-			 * Scans in an X -> Z -> Y order
-			 */
-			private void iterate() {
-				if (headX+1 < Chunk.WIDTH) {
-					headX++;
-				} else if (headZ+1 < Chunk.LENGTH) {
-					headX = 0;
-					headZ++;
-				} else if (headY < HEIGHT) {
-					headX = 0;
-					headZ = 0;
-					headY++;
-				}
-			}
-		};
+	public Vector3i getMin() {
+		return new Vector3i(0,0,0);
 	}
 
 	@Override
-	public int getWidth() {
-		return Chunk.WIDTH;
+	public Vector3i getMax() {
+		return new Vector3i(Chunk.WIDTH, Section.HEIGHT, Chunk.LENGTH);
 	}
-
-	@Override
-	public int getHeight() {
-		return HEIGHT;
-	}
-
-	@Override
-	public int getLength() {
-		return Chunk.LENGTH;
-	}
-
 }
