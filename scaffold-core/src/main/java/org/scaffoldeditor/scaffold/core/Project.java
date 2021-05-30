@@ -9,6 +9,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FilenameUtils;
 import org.scaffoldeditor.scaffold.compile.Compiler;
@@ -40,6 +43,7 @@ public class Project {
 	
 	private PluginManager pluginManager;
 	private PluginInitializer defaultPlugin;
+	private final ExecutorService levelService = Executors.newSingleThreadExecutor();
 	
 	/**
 	 * Create an empty project with an empty gameinfo
@@ -215,8 +219,29 @@ public class Project {
 		defaultPlugin.close();
 		pluginManager.closePlugins();
 		
+		try {
+			System.out.println("Shutting down level service.");
+			levelService.shutdown();
+			levelService.awaitTermination(5, TimeUnit.SECONDS);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} finally {
+			if (!levelService.isTerminated()) {
+				System.err.println("Level service failed to close in time!");
+			}
+			levelService.shutdownNow(); 
+		}
+		
 		EntityRegistry.registry.clear();
 		AttributeRegistry.registry.clear();
 		AssetTypeRegistry.registry.clear();
+		
+	}
+	
+	/**
+	 * Get the service that should be used for most level-modifying operations. 
+	 */
+	public ExecutorService getLevelService() {
+		return levelService;
 	}
 }

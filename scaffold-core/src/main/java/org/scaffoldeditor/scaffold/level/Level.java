@@ -450,9 +450,8 @@ public class Level {
 	/**
 	 * Compile the entire blockworld.
 	 * @param full Should this be a full compile? If true, entities may run more complex algorithems.
-	 * @return Success.
 	 */
-	public boolean compileBlockWorld(boolean full) {
+	public void compileBlockWorld(boolean full) {		
 		blockWorld.clear(); // Clear the blockworld of previous compiles.
 		System.out.println("Compiling world...");
 		
@@ -466,8 +465,6 @@ public class Level {
 		fireWorldUpdateEvent(new HashSet<>());
 		dirtyChunks.clear();
 		dirtySections.clear();
-		
-		return true;
 	}
 	
 	/**

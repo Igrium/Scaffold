@@ -2,7 +2,7 @@ package org.scaffoldeditor.scaffold.operation;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.concurrent.CompletableFuture;
 import org.scaffoldeditor.scaffold.level.Level;
 
 /**
@@ -35,34 +35,43 @@ public class OperationManager {
 	 * @param operation Operation to perform.
 	 * @return Operation success.
 	 */
-	public boolean execute(Operation operation) {
-		if (operation.execute()) {
-			redoStack.clear();
-			undoStack.add(operation);
-			level.setHasUnsavedChanges(true);;
-			return true;
-		}
-		level.setHasUnsavedChanges(true);
-		return false;
+	public CompletableFuture<Boolean> execute(Operation operation) {
+		CompletableFuture<Boolean> future = new CompletableFuture<>();
+		level.getProject().getLevelService().execute(() -> {
+			if (operation.execute()) {
+				redoStack.clear();
+				undoStack.add(operation);
+				level.setHasUnsavedChanges(true);
+				future.complete(true);
+				return;
+			}
+			level.setHasUnsavedChanges(true);
+			future.complete(false);
+		});
+		return future;
 	}
 	
 	public void undo() {
-		if (undoStack.size() > 0) {
-			Operation operation = undoStack.get(undoStack.size() - 1);
-			operation.undo();
-			undoStack.remove(undoStack.size() - 1);
-			redoStack.add(operation);
-			level.setHasUnsavedChanges(true);
-		}
+		level.getProject().getLevelService().execute(() -> {
+			if (undoStack.size() > 0) {
+				Operation operation = undoStack.get(undoStack.size() - 1);
+				operation.undo();
+				undoStack.remove(undoStack.size() - 1);
+				redoStack.add(operation);
+				level.setHasUnsavedChanges(true);
+			}
+		});
 	}
 	
 	public void redo() {
-		if (redoStack.size() > 0) {
-			Operation operation = redoStack.get(redoStack.size() - 1);
-			operation.redo();
-			redoStack.remove(redoStack.size() - 1);
-			undoStack.add(operation);
-			level.setHasUnsavedChanges(true);
-		}
+		level.getProject().getLevelService().execute(() -> {
+			if (redoStack.size() > 0) {
+				Operation operation = redoStack.get(redoStack.size() - 1);
+				operation.redo();
+				redoStack.remove(redoStack.size() - 1);
+				undoStack.add(operation);
+				level.setHasUnsavedChanges(true);
+			}
+		});
 	}
 }
