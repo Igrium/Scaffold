@@ -471,54 +471,6 @@ public class Level {
 	}
 	
 	/**
-	 * Compile a specific set of chunks.
-	 * Less efficient than <code>compileBlockWorld()</code> if compiling the entire world.
-	 * @param chunks Chunks to compile.
-	 */
-	public void compileChunks(Set<ChunkCoordinate> chunks) {
-		if (chunks.isEmpty()) {
-			return;
-		}
-		// Compile into a temporary block world so other chunks don't get corrupted.
-		BlockWorld tempWorld = new BlockWorld();
-		
-		List<BlockEntity> updatingEntities = new ArrayList<>();
-		
-		for (String entName : entityStack) {
-			Entity entity = getEntity(entName);
-			if (entity instanceof BlockEntity) {
-				BlockEntity blockEntity = (BlockEntity) entity;
-				// See if entity is within chunkList.
-				for (ChunkCoordinate chunk : chunks) {
-					float[] chunkStart = new float[] { chunk.x() * Chunk.WIDTH, chunk.z() * Chunk.LENGTH };
-					float[] chunkEnd = new float[] { chunkStart[0] + Chunk.WIDTH, chunkStart[1] + Chunk.LENGTH };
-					
-					if (blockEntity.overlapsArea(chunkStart, chunkEnd)) {
-						updatingEntities.add(blockEntity);
-						break;
-					}
-				}
-			}
-		}
-		
-		if (updatingEntities.size() == 0) {
-			return;
-		}
-		
-		for (BlockEntity entity : updatingEntities) {
-			entity.compileWorld(tempWorld, false);
-		}
-		
-		for (ChunkCoordinate coord : tempWorld.getChunks().keySet()) {
-			// Only save if the chunk is marked for update or it's not present in the main world.
-			if (chunks.contains(coord) || !getBlockWorld().getChunks().keySet().contains(coord))
-			blockWorld.getChunks().put(coord, tempWorld.getChunks().get(coord));
-		}
-		
-		return;
-	}
-	
-	/**
 	 * Compile a specific set of sections. Less efficient than
 	 * <code>compileBlockWorld()</code> and <code>compileChunks()</code> if
 	 * compiling the entire world or an entire set of chunks.
@@ -580,8 +532,8 @@ public class Level {
 	 * Compile all the chunks marked as dirty.
 	 */
 	public void quickRecompile() {
-		compileSections(dirtySections);
-		compileChunks(dirtyChunks);
+//		compileSections(dirtySections);
+		compileBlockWorld(false);
 		fireWorldUpdateEvent(dirtySections);
 		dirtyChunks.clear();
 		dirtySections.clear();
