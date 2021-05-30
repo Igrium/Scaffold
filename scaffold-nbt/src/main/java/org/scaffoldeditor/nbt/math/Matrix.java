@@ -7,6 +7,29 @@ package org.scaffoldeditor.nbt.math;
  * I totally didn't steal this from the internet.</a>
  */
 public class Matrix {
+	
+	/**
+	 * Contains standard rotational matrices where NORTH contains no rotation.
+	 */
+	public static class Direction {
+		public static final Matrix NORTH = Matrix.identity(3);
+		public static final Matrix WEST = new Matrix(new double[][] {
+			{ 0, 0, 1 },
+			{ 0, 1, 0 },
+			{ -1, 0, 0 }
+		});
+		public static final Matrix SOUTH = new Matrix(new double[][] {
+			{ -1, 0, 0 },
+			{ 0, 1, 0 },
+			{ 0, 0, -1 }
+		});
+		public static final Matrix EAST = new Matrix(new double[][] {
+			{ 0, 0, -1 },
+			{ 0, 1, 0 },
+			{ 1, 0, 0 }
+		});
+	}
+	
 	private final int M; // number of rows
 	private final int N; // number of columns
 	private final double[][] data; // M-by-N array
@@ -170,7 +193,7 @@ public class Matrix {
 	}
 	
 	public Vector3d toVector() {
-		if (M != 1 || N != 3) {
+		if (M != 3 || N != 1) {
 			throw new IllegalStateException("Only 3x1 matrices can be converted to a 3d vector!");
 		}
 		return new Vector3d(data[0][0], data[1][0], data[2][0]);

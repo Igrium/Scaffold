@@ -19,4 +19,8 @@ public abstract class Attribute<T> implements XMLSerializable<Attribute<T>> {
 		return getValue().toString();
 	}
 	
+	@Override
+	public boolean equals(Object obj) {
+		return (obj instanceof Attribute && getValue().equals(((Attribute<?>) obj).getValue()));
+	}
 }

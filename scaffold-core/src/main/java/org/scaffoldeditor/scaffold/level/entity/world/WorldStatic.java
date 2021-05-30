@@ -7,6 +7,8 @@ import org.apache.commons.io.FilenameUtils;
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.nbt.block.SizedBlockCollection;
+import org.scaffoldeditor.nbt.block.transform.TransformSizedBlockCollection;
+import org.scaffoldeditor.nbt.math.Matrix;
 import org.scaffoldeditor.scaffold.io.AssetTypeRegistry;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.BlockEntity;
@@ -23,11 +25,13 @@ import org.scaffoldeditor.scaffold.math.Vector;
  */
 public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntity {
 	
-	private SizedBlockCollection model;
+	private SizedBlockCollection baseModel;
+	private SizedBlockCollection finalModel;
 	
-	// Keep track of the model path and location on our own for optimization.
+	// Keep track of the model path, location, and directoin on our own for optimization.
 	private String modelpath;
 	private Vector compiledLocation = new Vector(0,0,0);
+	private String direction = "";
 	
 	public static void Register() {
 		EntityRegistry.registry.put("world_static", new EntityFactory<Entity>() {		
@@ -43,9 +47,9 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 		super(level, name);
 		System.out.println("Constructing world static");
 		setAttribute("model", new StringAttribute(""), true);
+		setAttribute("direction", new StringAttribute("NORTH"));
 	}
 
-	
 	/**
 	 * Reload model from file.
 	 */
@@ -57,14 +61,14 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 		System.out.println("Loading model " + model);
 		modelpath = model;
 		if (model.length() == 0) {
-			this.model = null;
+			this.baseModel = null;
 			return;
 		}
 		
 		if (AssetTypeRegistry.isTypeAssignableTo(FilenameUtils.getExtension(model), SizedBlockCollection.class)) {
 			try {
 //				this.model = Structure.fromCompoundMap((CompoundTag) NBTUtil.read(modelFile).getTag());
-				this.model = (SizedBlockCollection) getProject().assetManager().loadAsset(model, false);
+				this.baseModel = (SizedBlockCollection) getProject().assetManager().loadAsset(model, false);
 				getLevel().dirtyChunks.addAll(getOverlappingChunks(getLevel().getBlockWorld()));
 			} catch (FileNotFoundException e) {
 				System.err.println(e.getMessage());
@@ -72,12 +76,38 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 				System.err.println("Unable to load model " + model);
 				e.printStackTrace();
 			}
-			
+			updateDirection();
 			
 		} else {
 			System.out.println(FilenameUtils.getExtension(model));
 			System.err.println("Unable to load model " + model + " because it is not a valid model format.");
 		}
+	}
+	
+	public String getDirection() {
+		if (getAttribute("direction") instanceof StringAttribute) {
+			return ((StringAttribute) getAttribute("direction")).getValue();
+		} else {
+			return "";
+		}
+	}
+	
+	protected void updateDirection() {
+		String direction = getDirection();
+		
+		if (direction.equals("NORTH")) {
+			finalModel = baseModel;
+		} else if (direction.equals("WEST")) {
+			finalModel = new TransformSizedBlockCollection(baseModel, Matrix.Direction.WEST);
+		} else if (direction.equals("SOUTH")) {
+			finalModel = new TransformSizedBlockCollection(baseModel, Matrix.Direction.SOUTH);
+		} else if (direction.equals("EAST")) {
+			finalModel = new TransformSizedBlockCollection(baseModel, Matrix.Direction.EAST);
+		} else {
+			setAttribute("direction", new StringAttribute("NORTH"), true);
+			finalModel = baseModel;
+		}
+		this.direction = direction;
 	}
 
 	@Override
@@ -86,12 +116,16 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 			reload();
 		}
 		
-		if (model == null) {
+		if (finalModel == null) {
 			return true;
 		}
 		
+		if (!((StringAttribute) getAttribute("direction")).getValue().equals(direction)) {
+			updateDirection();
+		}
+		
 		Vector gridPos = Vector.floor(getPosition());	
-		world.addBlockCollection(model, (int) gridPos.X() , (int) gridPos.Y(), (int) gridPos.Z(), true, this);
+		world.addBlockCollection(finalModel, (int) gridPos.X() , (int) gridPos.Y(), (int) gridPos.Z(), true, this);
 		compiledLocation = getPosition();
 		
 		return true;
@@ -106,8 +140,9 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 	@Override
 	public Vector[] getBounds() {
 		Vector position = getPosition();
-		if (model == null) return new Vector[] { position, position };
-		return new Vector[] { position, Vector.add(position, new Vector(model.getWidth(), model.getHeight(), model.getLength())) };
+		if (finalModel == null) return new Vector[] { position, position };
+		System.out.println(finalModel.getMin()+" -> "+finalModel.getMax()); // TESTING ONLY
+		return new Vector[] { new Vector(finalModel.getMin().toFloat()), new Vector(finalModel.getMax().toFloat()) };
 	}
 
 	@Override
@@ -120,12 +155,16 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 	public void onUpdateBlockAttributes() {
 		if (!((StringAttribute) getAttribute("model")).getValue().equals(modelpath)) {
 			reload();	
+		} else if (!getDirection().equals(direction)) {
+			updateDirection();
 		}
 	}
 
 
 	@Override
 	public boolean needsRecompiling() {
-		return (!compiledLocation.equals(getPosition()) || !((StringAttribute) getAttribute("model")).getValue().equals(modelpath));
+		return (!compiledLocation.equals(getPosition())
+				|| !((StringAttribute) getAttribute("model")).getValue().equals(modelpath)
+				|| getDirection().equals(direction));
 	}
 }
