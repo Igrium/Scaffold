@@ -5,10 +5,9 @@ import java.util.Set;
 
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.BlockWorld;
-import org.scaffoldeditor.nbt.block.BlockWorld.ChunkCoordinate;
-import org.scaffoldeditor.nbt.block.Chunk;
 import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
-import org.scaffoldeditor.nbt.block.Section;
+import org.scaffoldeditor.nbt.math.Vector3i;
+import org.scaffoldeditor.scaffold.math.MathUtils;
 import org.scaffoldeditor.scaffold.math.Vector;
 
 /**
@@ -37,7 +36,8 @@ public interface BlockEntity {
 	
 	/**
 	 * Get the bounds of this block entity in world space. Used for determining when it has to be recompiled.
-	 * @return A two-element array denoting the opposite corners of the entity's bounding box.
+	 * @return A two-element array denoting the opposite corners of the entity's bounding box. The first 
+	 * element should be the minimum coordinate and the second element should be the maximum coordinate.
 	 */
 	Vector[] getBounds();
 	
@@ -66,56 +66,24 @@ public interface BlockEntity {
 		// Math reference:
 		// https://developer.mozilla.org/en-US/docs/Games/Techniques/3D_collision_detection
 		Vector[] bounds = getBounds();
-		boolean x = (Math.min(bounds[0].x, bounds[1].x) <= Math.max(point1.x, point2.x)
-				&& Math.max(bounds[0].x, bounds[1].x) >= Math.min(point1.x, point2.x));
-
-		boolean y = (Math.min(bounds[0].y, bounds[1].y) <= Math.max(point1.y, point2.y)
-				&& Math.max(bounds[0].y, bounds[1].y) >= Math.min(point1.y, point2.y));
-
-		boolean z = (Math.min(bounds[0].z, bounds[1].z) <= Math.max(point1.z, point2.z)
-				&& Math.max(bounds[0].z, bounds[1].z) >= Math.min(point1.z, point2.z));
-
-		return (x && y && z);
+		return MathUtils.detectCollision(bounds[0], bounds[1], point1, point2);
 	}
 	
-	/**
-	 * Get a set of all the chunks this entity overlaps with.
-	 * <br>
-	 * <b>Note:</b> Only returns chunks which have been initialized. When setting dirty chunks, this doesn't matter.
-	 * @param world World to search.
-	 */
-	default Set<ChunkCoordinate> getOverlappingChunks(BlockWorld world) {
-		Set<ChunkCoordinate> overlapping = new HashSet<>();
-		
-		for (ChunkCoordinate c : world.getChunks().keySet()) {
-			float[] point1 = new float[] { c.x() * Chunk.WIDTH, c.z() * Chunk.LENGTH };
-			float[] point2 = new float[] { point1[0] + Chunk.WIDTH, point1[1] + Chunk.LENGTH };
-			
-			if (overlapsArea(point1, point2)) {
-				overlapping.add(c);
-			}
-		}
-		
-		return overlapping;
-	}
-	
-	default Set<SectionCoordinate> getOverlappingSections(BlockWorld world) {
-		Set<ChunkCoordinate> chunks = getOverlappingChunks(world);
-		Set<SectionCoordinate> overlapping = new HashSet<>();
+	default Set<SectionCoordinate> getOverlappingSections() {
 		Vector[] bounds = getBounds();
+		Set<SectionCoordinate> overlapping = new HashSet<>();
+		Vector3i min = bounds[0].divide(16).floor();
+		Vector3i max = bounds[1].divide(16).floor();
 		
-		for (ChunkCoordinate c : chunks) {
-			for (int i = 0; i < Chunk.HEIGHT / Section.HEIGHT; i++) {
-				float point1 = (float)(i * Section.HEIGHT);
-				float point2 = point1 + Section.HEIGHT;
-				
-				// Perform the math seperatly from overlapsVolume because we only need the height.
-				if ((Math.min(bounds[0].y, bounds[1].y) <= Math.max(point1, point2) &&
-						Math.max(bounds[0].y, bounds[1].y) >= Math.min(point1, point2))) {
-					overlapping.add(new SectionCoordinate(c, i));
+		for (int x = min.x; x <= max.x; x++) {
+			for (int y = min.y; y <= max.y; y++) {
+				for (int z = min.z; z <= max.z; z++) {
+					overlapping.add(new SectionCoordinate(x, y, z));
 				}
 			}
 		}
+		
 		return overlapping;
 	}
+	
 }

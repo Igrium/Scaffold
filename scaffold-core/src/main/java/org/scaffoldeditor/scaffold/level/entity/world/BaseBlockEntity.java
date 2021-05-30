@@ -28,10 +28,10 @@ public abstract class BaseBlockEntity extends Entity implements BlockEntity {
 	@Override
 	public void onUpdateAttributes(boolean noRecompile) {
 		// Changing the attributes
-		getLevel().dirtySections.addAll(getOverlappingSections(getWorld()));
+		getLevel().dirtySections.addAll(getOverlappingSections());
 		super.onUpdateAttributes(noRecompile);
 		onUpdateBlockAttributes();
-		getLevel().dirtySections.addAll(getOverlappingSections(getWorld()));
+		getLevel().dirtySections.addAll(getOverlappingSections());
 		
 		if (getLevel().autoRecompile && !noRecompile) {
 			getLevel().quickRecompile();

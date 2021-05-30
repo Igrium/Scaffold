@@ -28,6 +28,10 @@ public class Chunk implements SizedBlockCollection {
 			super(chunk.x, index, chunk.z);
 		}
 		
+		public SectionCoordinate(Vector3i vec) {
+			super(vec.x, vec.y, vec.z);
+		}
+		
 		public ChunkCoordinate getChunk() {
 			return new ChunkCoordinate(x, z);
 		}

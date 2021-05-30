@@ -17,7 +17,7 @@ import java.util.Set;
 import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.nbt.block.Chunk;
 import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
-import org.scaffoldeditor.nbt.block.Section;
+import org.scaffoldeditor.nbt.math.Vector3i;
 import org.scaffoldeditor.nbt.block.BlockWorld.ChunkCoordinate;
 import org.scaffoldeditor.scaffold.compile.Compiler.CompileEndStatus;
 import org.scaffoldeditor.scaffold.compile.Compiler.CompileResult;
@@ -309,7 +309,7 @@ public class Level {
 		entity.setShouldRender(true);
 		
 		if (entity instanceof BlockEntity) {
-			dirtySections.addAll(((BlockEntity) entity).getOverlappingSections(blockWorld));
+			dirtySections.addAll(((BlockEntity) entity).getOverlappingSections());
 		}
 		
 		if (!noRecompile && autoRecompile) {
@@ -334,7 +334,7 @@ public class Level {
 		Entity entity = entities.get(name);
 		entity.setShouldRender(false);
 		if (entity instanceof BlockEntity) {
-			dirtySections.addAll(((BlockEntity) entity).getOverlappingSections(blockWorld));
+			dirtySections.addAll(((BlockEntity) entity).getOverlappingSections());
 		}
 		
 		entities.remove(name);
@@ -529,6 +529,7 @@ public class Level {
 		if (sections.isEmpty()) {
 			return;
 		}
+		System.out.println("Compiling sections...");
 		// Compile into a temporary block world so other chunks don't get corrupted.
 		BlockWorld tempWorld = new BlockWorld();
 		
@@ -538,12 +539,14 @@ public class Level {
 			Entity entity = getEntity(entName);
 			if (entity instanceof BlockEntity) {
 				BlockEntity blockEntity = (BlockEntity) entity;
+				Vector[] bounds = blockEntity.getBounds();
+				Vector3i minSection = bounds[0].divide(16).floor();
+				Vector3i maxSection = bounds[1].divide(16).floor();
 				// See if entity is within chunkList.
 				for (SectionCoordinate section : sections) {
-					Vector sectionStart = new Vector(section.x * Chunk.WIDTH, section.y * Section.HEIGHT, section.z * Chunk.LENGTH);
-					Vector sectionEnd = new Vector(sectionStart.x + Chunk.WIDTH, section.y + Section.HEIGHT, section.z + Chunk.HEIGHT);
-					
-					if (blockEntity.overlapsVolume(sectionStart, sectionEnd)) {
+					if (minSection.x <= section.x && section.x <= maxSection.x
+							&& minSection.y <= section.y && section.y <= maxSection.y
+							&& minSection.z <= section.z && section.z <= maxSection.z) {
 						updatingEntities.add(blockEntity);
 						break;
 					}
@@ -554,36 +557,22 @@ public class Level {
 		if (updatingEntities.size() == 0) {
 			return;
 		}
+		System.out.println(updatingEntities);
 		
 		for (BlockEntity entity : updatingEntities) {
 			entity.compileWorld(tempWorld, false);
+			System.out.println("Compiled entity");
 		}
 		
-		// Make sure each chunk with sections marked for update is present in the temp world
 		for (SectionCoordinate coord : sections) {
-			ChunkCoordinate chunk = new ChunkCoordinate(coord);
-			if (!tempWorld.getChunks().containsKey(chunk)) {
-				tempWorld.getChunks().put(chunk, new Chunk());
+			Chunk chunk = blockWorld.chunkAt(coord.x, coord.z);
+			if (chunk == null) {
+				chunk = new Chunk();
+				blockWorld.getChunks().put(coord.getChunk(), chunk);
 			}
+			chunk.sections[coord.y] = tempWorld.chunkAt(coord.x, coord.z).sections[coord.y];
 		}
-		
-		for (ChunkCoordinate coord : tempWorld.getChunks().keySet()) {
-			// Only save if the chunk is marked for update or it's not present in the main world.
-			if (!getBlockWorld().getChunks().keySet().contains(coord)) {
-				blockWorld.getChunks().put(coord, tempWorld.getChunks().get(coord));
-			} else {
-				Chunk chunk = tempWorld.getChunks().get(coord);
-				for (int y = 0; y < chunk.sections.length; y++) {
-					if (sections.contains(new SectionCoordinate(coord.x(), y, coord.z()))) {
-						 getBlockWorld().chunkAt(coord.x(), coord.z()).sections[y] = chunk.sections[y];
-					}
-				}
-				
-			}
-//			if (sections.contains(coord) || !getBlockWorld().getChunks().keySet().contains(coord))
-//			blockWorld.getChunks().put(coord, tempWorld.getChunks().get(coord));
-		}
-		
+		System.out.println("Finished compiling world.");
 		return;
 	}
 	

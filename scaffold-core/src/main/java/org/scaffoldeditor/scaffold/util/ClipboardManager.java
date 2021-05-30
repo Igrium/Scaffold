@@ -101,7 +101,7 @@ public class ClipboardManager {
 
 		for (Entity ent : entities) {
 			if (ent instanceof BlockEntity) {
-				level.dirtySections.addAll(((BlockEntity) ent).getOverlappingSections(level.getBlockWorld()));
+				level.dirtySections.addAll(((BlockEntity) ent).getOverlappingSections());
 			}
 		}
 		if (level.autoRecompile) {

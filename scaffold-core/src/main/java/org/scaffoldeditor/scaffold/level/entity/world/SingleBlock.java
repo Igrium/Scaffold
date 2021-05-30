@@ -5,10 +5,7 @@ import java.util.Set;
 
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.BlockWorld;
-import org.scaffoldeditor.nbt.block.BlockWorld.ChunkCoordinate;
 import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
-import org.scaffoldeditor.nbt.block.Section;
-import org.scaffoldeditor.nbt.block.Chunk;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.BlockEntity;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
@@ -90,24 +87,16 @@ public class SingleBlock extends Entity implements BlockEntity {
 	}
 	
 	@Override
-	public Set<ChunkCoordinate> getOverlappingChunks(BlockWorld world) {
-		Set<ChunkCoordinate> set = new HashSet<>();
-		set.add(new ChunkCoordinate((int) Math.floor(getPosition().X() / Chunk.WIDTH), (int) Math.floor(getPosition().Z() / Chunk.LENGTH)));
-		return set;
-	}
-	
-	@Override
-	public Set<SectionCoordinate> getOverlappingSections(BlockWorld world) {
+	public Set<SectionCoordinate> getOverlappingSections() {
 		Set<SectionCoordinate> set = new HashSet<>();
-		set.add(new SectionCoordinate((int) Math.floor(getPosition().X() / Chunk.WIDTH), (int) Math.floor(getPosition().Y() / Section.HEIGHT), (int) Math.floor(getPosition().Z() / Chunk.LENGTH)));
+		set.add(new SectionCoordinate(getPosition().floor()));
 		return set;
 	}
 	
 	@Override
 	public void setPosition(Vector position) {	
-		getLevel().dirtyChunks.addAll(getOverlappingChunks(getLevel().getBlockWorld()));
+		getLevel().dirtySections.add(new SectionCoordinate(getPosition().floor()));
 		super.setPosition(position);
-		getLevel().dirtyChunks.addAll(getOverlappingChunks(getLevel().getBlockWorld()));
-			
+		getLevel().dirtySections.add(new SectionCoordinate(position.floor()));
 	}
 }
