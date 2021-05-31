@@ -17,7 +17,6 @@ import java.util.Set;
 import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.nbt.block.Chunk;
 import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
-import org.scaffoldeditor.nbt.block.Section;
 import org.scaffoldeditor.nbt.math.Vector3i;
 import org.scaffoldeditor.scaffold.compile.Compiler.CompileEndStatus;
 import org.scaffoldeditor.scaffold.compile.Compiler.CompileResult;
