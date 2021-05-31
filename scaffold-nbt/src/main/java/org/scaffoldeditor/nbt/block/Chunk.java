@@ -49,15 +49,15 @@ public class Chunk implements SizedBlockCollection {
 		}
 		
 		public int getEndX() {
-			return getStartX() + WIDTH - 1;
+			return getStartX() + WIDTH;
 		}
 		
 		public int getEndY() {
-			return getStartY() + Section.HEIGHT - 1;
+			return getStartY() + Section.HEIGHT ;
 		}
 		
 		public int getEndZ() {
-			return getStartZ() + LENGTH - 1;
+			return getStartZ() + LENGTH;
 		}
 		
 		@Override

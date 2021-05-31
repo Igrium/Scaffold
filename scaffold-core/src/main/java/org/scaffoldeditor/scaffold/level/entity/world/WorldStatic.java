@@ -143,9 +143,9 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 	 */
 	public void compileSection(BlockWorld world, SectionCoordinate coord) {
 		Vector3i gridPos = getPosition().floor();
-		for (int x = coord.getStartX(); x <= coord.getEndX(); x++) {
-			for (int y = coord.getStartY(); y <= coord.getEndY(); y++) {
-				for (int z = coord.getStartZ(); z <= coord.getEndZ(); z++) {
+		for (int x = coord.getStartX(); x < coord.getEndX(); x++) {
+			for (int y = coord.getStartY(); y < coord.getEndY(); y++) {
+				for (int z = coord.getStartZ(); z < coord.getEndZ(); z++) {
 					 Block block = finalModel.blockAt(x - gridPos.x, y - gridPos.y, z - gridPos.z);
 					 if (block != null) {
 						 world.setBlock(x, y, z, block, this);
