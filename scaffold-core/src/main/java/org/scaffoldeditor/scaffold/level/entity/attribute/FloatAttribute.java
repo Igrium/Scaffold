@@ -35,15 +35,14 @@ public class FloatAttribute extends Attribute<Float> {
 	}
 
 	@Override
-	public void setValue(Float value) {
-		this.value = value;
-	}
-
-	@Override
 	public Element serialize(Document document) {
 		Element element = document.createElement(registryName);
 		element.setAttribute("value", value.toString());
 		return element;
 	}
-
+	
+	@Override
+	public FloatAttribute copy() {
+		return this;
+	}
 }

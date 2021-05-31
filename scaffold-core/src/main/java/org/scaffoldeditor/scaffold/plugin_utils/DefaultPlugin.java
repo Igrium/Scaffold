@@ -3,10 +3,12 @@ package org.scaffoldeditor.scaffold.plugin_utils;
 import org.scaffoldeditor.nbt.block.BlockCollectionManager;
 import org.scaffoldeditor.scaffold.io.ConstructionAsset;
 import org.scaffoldeditor.scaffold.io.StructureAsset;
+import org.scaffoldeditor.scaffold.level.entity.attribute.BlockAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BooleanAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.DoubleAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.FloatAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.IntAttribute;
+import org.scaffoldeditor.scaffold.level.entity.attribute.ListAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.LongAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.NBTAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.StringAttribute;
@@ -38,6 +40,8 @@ public class DefaultPlugin implements PluginInitializer {
 		LongAttribute.register();
 		BooleanAttribute.register();
 		VectorAttribute.register();
+		ListAttribute.register();
+		BlockAttribute.register();
 		
 		StructureAsset.register();
 		ConstructionAsset.register();

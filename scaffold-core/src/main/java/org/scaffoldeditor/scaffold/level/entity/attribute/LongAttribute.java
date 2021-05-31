@@ -35,15 +35,14 @@ public class LongAttribute extends Attribute<Long> {
 	}
 
 	@Override
-	public void setValue(Long value) {
-		this.value = value;
-	}
-
-	@Override
 	public Element serialize(Document document) {
 		Element element = document.createElement(registryName);
 		element.setAttribute("value", value.toString());
 		return element;
 	}
-
+	
+	@Override
+	public LongAttribute copy() {
+		return this;
+	}
 }

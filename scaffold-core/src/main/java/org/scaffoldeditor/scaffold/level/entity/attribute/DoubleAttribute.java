@@ -35,15 +35,14 @@ public class DoubleAttribute extends Attribute<Double> {
 	}
 
 	@Override
-	public void setValue(Double value) {
-		this.value = value;
-	}
-
-	@Override
 	public Element serialize(Document document) {
 		Element element = document.createElement(registryName);
 		element.setAttribute("value", value.toString());
 		return element;
 	}
-
+	
+	@Override
+	public DoubleAttribute copy() {
+		return this;
+	}
 }

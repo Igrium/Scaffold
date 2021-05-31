@@ -7,7 +7,7 @@ import org.w3c.dom.Node;
  * A class that can be serialized to XML. 
  * @author Igrium
  */
-public interface XMLSerializable<T> {
+public interface XMLSerializable {
 	
 	/**
 	 * Serialize this object into XML.

@@ -1,5 +1,6 @@
 package org.scaffoldeditor.scaffold.level.entity.attribute;
 
+import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.serialization.NBTSerializer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -43,14 +44,13 @@ public class NBTAttribute extends Attribute<CompoundTag> {
 		this.registryName = REGISTRY_NAME;
 	}
 	
-	@Override
+	/**
+	 * Get the compound tag backing this attribute. <br>
+	 * {@link Entity#onUpdateAttributes} should be called after updating if an
+	 * recompilation is desired.
+	 */
 	public CompoundTag getValue() {
 		return value;
-	}
-
-	@Override
-	public void setValue(CompoundTag value) {
-		this.value = value;
 	}
 
 	@Override
@@ -60,5 +60,9 @@ public class NBTAttribute extends Attribute<CompoundTag> {
 		base.appendChild(nbt);
 		return base;
 	}
-
+	
+	@Override
+	public NBTAttribute copy() {
+		return new NBTAttribute(value.clone());
+	}
 }

@@ -35,15 +35,14 @@ public class StringAttribute extends Attribute<String> {
 	}
 
 	@Override
-	public void setValue(String value) {
-		this.value = value;
-	}
-
-	@Override
 	public Element serialize(Document document) {
 		Element element = document.createElement(registryName);
 		element.setAttribute("value", value);
 		return element;
 	}
-
+	
+	@Override
+	public StringAttribute copy() {
+		return null;
+	}
 }

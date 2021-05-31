@@ -11,7 +11,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class LevelSerializer implements XMLSerializable<Level> {
+public class LevelSerializer implements XMLSerializable {
 		
 	private Level level;
 	

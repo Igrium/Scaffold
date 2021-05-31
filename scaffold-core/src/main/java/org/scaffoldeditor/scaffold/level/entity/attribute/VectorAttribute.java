@@ -40,11 +40,6 @@ public class VectorAttribute extends Attribute<Vector> {
 	}
 
 	@Override
-	public void setValue(Vector value) {
-		this.value = value;
-	}
-
-	@Override
 	public Element serialize(Document document) {
 		Element element = document.createElement(registryName);
 		element.setAttribute("x", String.valueOf(value.X()));
@@ -52,5 +47,9 @@ public class VectorAttribute extends Attribute<Vector> {
 		element.setAttribute("z", String.valueOf(value.Z()));
 		return element;
 	}
-
+	
+	@Override
+	public VectorAttribute copy() {
+		return this;
+	}
 }

@@ -16,7 +16,7 @@ import org.w3c.dom.NodeList;
  * Serializes Scaffold entities to XML.
  * @author Igrium
  */
-public class EntitySerializer implements XMLSerializable<Entity> {
+public class EntitySerializer implements XMLSerializable {
 	
 	private Entity entity;
 	

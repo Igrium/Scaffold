@@ -12,7 +12,7 @@ import org.w3c.dom.Element;
  * and used in attributes.
  * @author Igrium
  */
-public class Vector extends Vector3f implements XMLSerializable<Vector> {
+public class Vector extends Vector3f implements XMLSerializable {
 	
 	public static final String REGISTRY_NAME = "vector";
 	

@@ -35,15 +35,14 @@ public class BooleanAttribute extends Attribute<Boolean> {
 	}
 
 	@Override
-	public void setValue(Boolean value) {
-		this.value = value;
-	}
-
-	@Override
 	public Element serialize(Document document) {
 		Element element = document.createElement(registryName);
 		element.setAttribute("value", value.toString());
 		return element;
 	}
-
+	
+	@Override
+	public BooleanAttribute copy() {
+		return this;
+	}
 }

@@ -13,7 +13,7 @@ import net.querz.nbt.io.SNBTUtil;
 import net.querz.nbt.tag.CompoundTag;
 import net.querz.nbt.tag.Tag;
 
-public class NBTSerializer implements XMLSerializable<Tag<?>> {
+public class NBTSerializer implements XMLSerializable {
 	
 	public static final String TAG_NAME = "NBT";
 

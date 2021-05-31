@@ -35,15 +35,14 @@ public class IntAttribute extends Attribute<Integer> {
 	}
 
 	@Override
-	public void setValue(Integer value) {
-		this.value = value;
-	}
-
-	@Override
 	public Element serialize(Document document) {
 		Element element = document.createElement(registryName);
 		element.setAttribute("value", value.toString());
 		return element;
 	}
-
+	
+	@Override
+	public IntAttribute copy() {
+		return this;
+	}
 }
