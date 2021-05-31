@@ -17,8 +17,8 @@ import java.util.Set;
 import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.nbt.block.Chunk;
 import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
+import org.scaffoldeditor.nbt.block.Section;
 import org.scaffoldeditor.nbt.math.Vector3i;
-import org.scaffoldeditor.nbt.block.BlockWorld.ChunkCoordinate;
 import org.scaffoldeditor.scaffold.compile.Compiler.CompileEndStatus;
 import org.scaffoldeditor.scaffold.compile.Compiler.CompileResult;
 import org.scaffoldeditor.scaffold.core.Project;
@@ -77,9 +77,6 @@ public class Level {
 	/* The BlockWorld that this level uses */
 	private BlockWorld blockWorld = new BlockWorld();
 	private OperationManager operationManager = new OperationManager(this);
-	
-	/** Chunks that have uncompiled changes. */
-	public final Set<ChunkCoordinate> dirtyChunks = new HashSet<>();
 	
 	/** Sections that have uncompiled changes. */
 	public final Set<SectionCoordinate> dirtySections = new HashSet<>();
@@ -465,7 +462,6 @@ public class Level {
 			}
 		}
 		fireWorldUpdateEvent(new HashSet<>());
-		dirtyChunks.clear();
 		dirtySections.clear();
 		System.out.println("Finished compiling world.");
 	}
@@ -520,7 +516,12 @@ public class Level {
 				chunk = new Chunk();
 				blockWorld.getChunks().put(coord.getChunk(), chunk);
 			}
-			chunk.sections[coord.y] = tempWorld.chunkAt(coord.x, coord.z).sections[coord.y];
+			Chunk tempChunk = tempWorld.chunkAt(coord.x, coord.z);
+			if (tempChunk == null) {
+				tempChunk = new Chunk();
+			}
+
+			chunk.sections[coord.y] = tempChunk.sections[coord.y];
 		}
 		System.out.println("Finished compiling world.");
 		return;
@@ -533,15 +534,7 @@ public class Level {
 		compileSections(dirtySections);
 //		compileBlockWorld(false);
 		fireWorldUpdateEvent(dirtySections);
-		dirtyChunks.clear();
 		dirtySections.clear();
-	}
-	
-	/**
-	 * Mark a chunk as needing compiling.
-	 */
-	public void markChunkDirty(ChunkCoordinate chunk) {
-		dirtyChunks.add(chunk);
 	}
 	
 	/**

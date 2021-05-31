@@ -19,4 +19,15 @@ public final class MathUtils {
 		boolean z = (a1.z <= b2.z && a2.z >= b1.z);
 		return x && y && z;
 	}
+	
+	/**
+	 * Calculate the volume of a bounding box.
+	 * @param a1 Box min point.
+	 * @param a2 Box max point.
+	 * @return Box volume.
+	 */
+	public static float calculateVolume(Vector3f a1, Vector3f a2) {
+		float volume = ((a2.x - a1.x) * (a2.y - a1.y) * (a2.z - a1.z));
+		return Math.abs(volume);
+	}
 }
