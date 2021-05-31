@@ -412,6 +412,8 @@ public class Level {
 		} catch (IOException e) {
 			e.printStackTrace();
 			return false;
+		} finally {
+			System.out.println("Level saved to "+file);
 		}
 		
 		return true;
@@ -465,6 +467,7 @@ public class Level {
 		fireWorldUpdateEvent(new HashSet<>());
 		dirtyChunks.clear();
 		dirtySections.clear();
+		System.out.println("Finished compiling world.");
 	}
 	
 	/**
@@ -478,6 +481,7 @@ public class Level {
 		if (sections.isEmpty()) {
 			return;
 		}
+		System.out.println(sections);
 		System.out.println("Compiling sections...");
 		// Compile into a temporary block world so other chunks don't get corrupted.
 		BlockWorld tempWorld = new BlockWorld();
@@ -515,6 +519,7 @@ public class Level {
 		
 		for (SectionCoordinate coord : sections) {
 			Chunk chunk = blockWorld.chunkAt(coord.x, coord.z);
+			System.out.println(chunk);
 			if (chunk == null) {
 				chunk = new Chunk();
 				blockWorld.getChunks().put(coord.getChunk(), chunk);
@@ -529,8 +534,8 @@ public class Level {
 	 * Compile all the chunks marked as dirty.
 	 */
 	public void quickRecompile() {
-//		compileSections(dirtySections);
-		compileBlockWorld(false);
+		compileSections(dirtySections);
+//		compileBlockWorld(false);
 		fireWorldUpdateEvent(dirtySections);
 		dirtyChunks.clear();
 		dirtySections.clear();

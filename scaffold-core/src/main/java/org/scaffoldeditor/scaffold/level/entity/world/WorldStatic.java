@@ -139,8 +139,7 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 	public Vector[] getBounds() {
 		Vector position = getPosition();
 		if (finalModel == null) return new Vector[] { position, position };
-		System.out.println(finalModel.getMin()+" -> "+finalModel.getMax()); // TESTING ONLY
-		return new Vector[] { new Vector(finalModel.getMin().toFloat()), new Vector(finalModel.getMax().toFloat()) };
+		return new Vector[] { new Vector(position.add(finalModel.getMin().toFloat())), new Vector(position.add(finalModel.getMax().toFloat())) };
 	}
 
 	@Override

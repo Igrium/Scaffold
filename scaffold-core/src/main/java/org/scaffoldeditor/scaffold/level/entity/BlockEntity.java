@@ -1,5 +1,6 @@
 package org.scaffoldeditor.scaffold.level.entity;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -72,9 +73,10 @@ public interface BlockEntity {
 	default Set<SectionCoordinate> getOverlappingSections() {
 		Vector[] bounds = getBounds();
 		Set<SectionCoordinate> overlapping = new HashSet<>();
+		System.out.println("Bounds: "+Arrays.toString(bounds));
 		Vector3i min = bounds[0].divide(16).floor();
 		Vector3i max = bounds[1].divide(16).floor();
-		
+		System.out.println("min: "+min+", max: "+max);
 		for (int x = min.x; x <= max.x; x++) {
 			for (int y = min.y; y <= max.y; y++) {
 				for (int z = min.z; z <= max.z; z++) {

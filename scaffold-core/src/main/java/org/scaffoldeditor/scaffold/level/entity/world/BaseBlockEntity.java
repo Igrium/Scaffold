@@ -32,7 +32,7 @@ public abstract class BaseBlockEntity extends Entity implements BlockEntity {
 		super.onUpdateAttributes(noRecompile);
 		onUpdateBlockAttributes();
 		getLevel().dirtySections.addAll(getOverlappingSections());
-		
+		System.out.println("Dirty sections: "+getLevel().dirtySections);
 		if (getLevel().autoRecompile && !noRecompile) {
 			getLevel().quickRecompile();
 		}
