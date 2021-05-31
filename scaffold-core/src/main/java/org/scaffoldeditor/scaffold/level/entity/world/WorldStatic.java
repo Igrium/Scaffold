@@ -19,6 +19,7 @@ import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.EntityFactory;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
 import org.scaffoldeditor.scaffold.level.entity.Faceable;
+import org.scaffoldeditor.scaffold.level.entity.attribute.BooleanAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.StringAttribute;
 import org.scaffoldeditor.scaffold.math.Vector;
 
@@ -33,7 +34,6 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 	
 	// Keep track of the model path, location, and directoin on our own for optimization.
 	private String modelpath;
-	private Vector compiledLocation = new Vector(0,0,0);
 	private String direction = "";
 	
 	public static void Register() {
@@ -50,6 +50,7 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 		super(level, name);
 		setAttribute("model", new StringAttribute(""), true);
 		setAttribute("direction", new StringAttribute("NORTH"));
+		setAttribute("place_air", new BooleanAttribute(false));
 	}
 
 	/**
@@ -126,13 +127,13 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 		
 		Vector3i gridPos = getPosition().floor();
 		if (sections == null) { // TODO: Smarter algorithm to determine which compilation method we should use.
-			world.addBlockCollection(finalModel, (int) gridPos.x , (int) gridPos.y, (int) gridPos.z, true, this);
+			world.addBlockCollection(finalModel, (int) gridPos.x , (int) gridPos.y, (int) gridPos.z, true, shouldPlaceAir(), this);
 		} else {
 			for (SectionCoordinate coord : sections) {
 				compileSection(world, coord);
 			}
 		}
-		compiledLocation = getPosition();
+		getPosition();
 		return true;
 	}
 	
@@ -143,16 +144,21 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 	 */
 	public void compileSection(BlockWorld world, SectionCoordinate coord) {
 		Vector3i gridPos = getPosition().floor();
+		boolean placeAir = shouldPlaceAir();
 		for (int x = coord.getStartX(); x < coord.getEndX(); x++) {
 			for (int y = coord.getStartY(); y < coord.getEndY(); y++) {
 				for (int z = coord.getStartZ(); z < coord.getEndZ(); z++) {
 					 Block block = finalModel.blockAt(x - gridPos.x, y - gridPos.y, z - gridPos.z);
-					 if (block != null) {
+					 if (block != null && (placeAir || !block.getName().equals("minecraft:air"))) {
 						 world.setBlock(x, y, z, block, this);
 					 }
 				}
 			}
 		}
+	}
+	
+	protected boolean shouldPlaceAir() {
+		return ((BooleanAttribute) getAttribute("place_air")).getValue();
 	}
 
 	@Override
@@ -186,8 +192,6 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 
 	@Override
 	public boolean needsRecompiling() {
-		return (!compiledLocation.equals(getPosition())
-				|| !((StringAttribute) getAttribute("model")).getValue().equals(modelpath)
-				|| getDirection().equals(direction));
+		return true;
 	}
 }

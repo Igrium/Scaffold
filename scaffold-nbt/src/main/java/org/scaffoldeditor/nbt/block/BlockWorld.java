@@ -182,15 +182,22 @@ public class BlockWorld implements BlockCollection {
 	
 	/**
 	 * Place a block collection in the world.
-	 * Collection origin is the most negitive (coordinate wize) corner.
+	 * 
 	 * @param collection Collection to place.
-	 * @param x X position.
-	 * @param y Y position.
-	 * @param z Z position.
-	 * @param z Owner to assign blocks to.
-	 * @param override Should override existing blocks?
+	 * @param x          X position.
+	 * @param y          Y position.
+	 * @param z          Z position.
+	 * @param override   Should override existing blocks?
+	 * 
+	 * @param placeAir   If this and <code>override</code> are true, air blocks in
+	 *                   the collection will override existing blocks. Note that the
+	 *                   air block must be explicitally defined in the collection.
+	 *                   Places where {@link BlockCollection#blockAt} returns null
+	 *                   rather than <code>minecraft:air</code> will not exhibit
+	 *                   this behavior.
+	 * @param owner      Owner to assign blocks to.
 	 */
-	public void addBlockCollection(SizedBlockCollection collection, int x, int y, int z, boolean override, Object owner) {
+	public void addBlockCollection(BlockCollection collection, int x, int y, int z, boolean override, boolean placeAir, Object owner) {
 		for (Vector3i coord : collection) {
 			int globalX = x + coord.x;
 			int globalY = y + coord.y;
@@ -199,29 +206,12 @@ public class BlockWorld implements BlockCollection {
 			Block oldBlock = blockAt(globalX, globalY, globalZ); // For if override is disabled.
 			Block newBlock = collection.blockAt(coord);
 			
-			if (newBlock != null &&
-					(override || oldBlock == null || oldBlock.getName().matches("minecraft:air"))) {
+			if (newBlock != null
+					&& (override || oldBlock == null || oldBlock.getName().matches("minecraft:air"))
+					&& (placeAir || !newBlock.getName().matches("minecraft:air"))) {
 				setBlock(globalX, globalY, globalZ, newBlock, owner);
 			}
 		}
-		
-//		for (int Y = 0; Y < collection.getHeight(); Y++) {
-//			for (int Z = 0; Z < collection.getLength(); Z++) {
-//				for (int X = 0; X < collection.getWidth(); X++) {
-//					int globalX = x + X;
-//					int globalY = y + Y;
-//					int globalZ = z + Z;
-//					
-//					Block oldBlock = blockAt(globalX, globalY, globalZ); // For if override is disabled.
-//					Block newBlock = collection.blockAt(X, Y, Z);
-//					
-//					if (newBlock != null &&
-//							(override || oldBlock == null || oldBlock.getName().matches("minecraft:air"))) {
-//						setBlock(globalX, globalY, globalZ, newBlock, owner);
-//					}
-//				}
-//			}
-//		}
 	}
 	
 	/**
@@ -234,7 +224,7 @@ public class BlockWorld implements BlockCollection {
 	 * @param override Should override existing blocks?
 	 */
 	public void addBlockCollection(SizedBlockCollection collection, int x, int y, int z, boolean override) {
-		addBlockCollection(collection, x, y, z, override, null);
+		addBlockCollection(collection, x, y, z, override, false, null);
 	}
 	
 	/**
@@ -246,7 +236,7 @@ public class BlockWorld implements BlockCollection {
 	 * @param z Z position.
 	 */
 	public void addBlockCollection(SizedBlockCollection collection, int x, int y, int z) {
-		addBlockCollection(collection, x, y, z, false, null);
+		addBlockCollection(collection, x, y, z, false, false, null);
 	}
 		
 	

@@ -22,11 +22,17 @@ public abstract class BaseBlockEntity extends Entity implements BlockEntity {
 	protected Vector positionCache;
 	
 	/**
-	 * <p>Whether the most recent change to attributes requires the block collection to recompile.</p>
-	 * <p>If unsure, just return true. This should only be called if the attributes have actually
-	 * been updated.</p>
-	 * <b>Note:</b> Calling {@link #getPosition()} or accessing any attributes in this method
-	 * will retrieve the new values. If you need to access the old values, you should maintain a cache.
+	 * <p>
+	 * Whether the most recent change to attributes requires the block collection to
+	 * recompile.
+	 * </p>
+	 * <p>
+	 * If unsure, just return true. This should only be called if the attributes
+	 * have actually been updated.
+	 * </p>
+	 * <b>Note:</b> Calling {@link #getPosition()} or accessing any attributes in
+	 * this method will retrieve the new values. If you need to access the old
+	 * values, you should maintain a cache.
 	 */
 	protected abstract boolean needsRecompiling();
 	
