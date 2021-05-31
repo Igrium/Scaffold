@@ -3,6 +3,8 @@ package org.scaffoldeditor.scaffold.level.entity.world;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.BlockEntity;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
+import org.scaffoldeditor.scaffold.level.entity.attribute.VectorAttribute;
+import org.scaffoldeditor.scaffold.math.Vector;
 
 /**
  * Implements many of the common features of block entities.
@@ -15,23 +17,33 @@ public abstract class BaseBlockEntity extends Entity implements BlockEntity {
 	}
 	
 	/**
-	 * Whether a recent change to attributes requires the block collection to recompile.
-	 * <br>
-	 * If unsure, just return true. This should only be called if the attributes have actually
-	 * been updated.
-	 * <br>
-	 * <b>Note:</b> Calling <code>getPosition()</code> or accessing any attributes in this method
-	 * will retrieve the new values.
+	 * Cache the position of the entity so we can use the old position when attributes are updated.
 	 */
-	public abstract boolean needsRecompiling();
+	protected Vector positionCache;
+	
+	/**
+	 * <p>Whether the most recent change to attributes requires the block collection to recompile.</p>
+	 * <p>If unsure, just return true. This should only be called if the attributes have actually
+	 * been updated.</p>
+	 * <b>Note:</b> Calling {@link #getPosition()} or accessing any attributes in this method
+	 * will retrieve the new values. If you need to access the old values, you should maintain a cache.
+	 */
+	protected abstract boolean needsRecompiling();
 	
 	@Override
 	public void onUpdateAttributes(boolean noRecompile) {
 		// Changing the attributes
-		getLevel().dirtySections.addAll(getOverlappingSections());
-		super.onUpdateAttributes(noRecompile);
+		Vector newPosition = getPosition();
+		if (positionCache != null && !newPosition.equals(positionCache)) {
+			// Temporarily set the position back so we can capture the bounds.
+			setAttribute("position", new VectorAttribute(positionCache), true);
+			getLevel().dirtySections.addAll(getOverlappingSections());
+			setAttribute("position", new VectorAttribute(newPosition), true);
+		}
+		super.onUpdateAttributes(true);
 		onUpdateBlockAttributes();
 		getLevel().dirtySections.addAll(getOverlappingSections());
+		positionCache = newPosition;
 		System.out.println("Dirty sections: "+getLevel().dirtySections);
 		if (getLevel().autoRecompile && !noRecompile) {
 			getLevel().quickRecompile();
