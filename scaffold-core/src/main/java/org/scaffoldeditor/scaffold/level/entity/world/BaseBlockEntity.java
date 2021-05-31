@@ -44,7 +44,6 @@ public abstract class BaseBlockEntity extends Entity implements BlockEntity {
 		onUpdateBlockAttributes();
 		getLevel().dirtySections.addAll(getOverlappingSections());
 		positionCache = newPosition;
-		System.out.println("Dirty sections: "+getLevel().dirtySections);
 		if (getLevel().autoRecompile && !noRecompile) {
 			getLevel().quickRecompile();
 		}

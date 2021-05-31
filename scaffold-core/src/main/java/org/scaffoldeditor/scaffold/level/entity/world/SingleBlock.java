@@ -6,6 +6,7 @@ import java.util.Set;
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
+import org.scaffoldeditor.nbt.math.Vector3i;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.BlockEntity;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
@@ -55,26 +56,18 @@ public class SingleBlock extends Entity implements BlockEntity {
 		setAttribute("blockName", new StringAttribute(block.getName()));
 		setAttribute("blockProperties", new NBTAttribute(block.getProperties()));
 	}
-	
-	/**
-	 * Get the grid position of this block.
-	 * @return Grid position.
-	 */
-	public Vector gridPos() {
-		return Vector.floor(getPosition());
-	}
 
 	@Override
-	public boolean compileWorld(BlockWorld world, boolean full) {
-		Vector gridPos = gridPos();
-		world.setBlock((int) gridPos.X(), (int) gridPos.Y(), (int) gridPos.Z(), getBlock(), this);
+	public boolean compileWorld(BlockWorld world, boolean full, Set<SectionCoordinate> sections) {
+		Vector3i gridPos = getPosition().floor();
+		world.setBlock(gridPos.x, gridPos.y, gridPos.z, getBlock(), this);
 		
 		return false;
 	}
 
 	@Override
 	public Block blockAt(Vector coord) {
-		if (Vector.floor(coord).equals(gridPos())) {
+		if (coord.floor().equals(getPosition().floor())) {
 			return getBlock();
 		} else {
 			return null;

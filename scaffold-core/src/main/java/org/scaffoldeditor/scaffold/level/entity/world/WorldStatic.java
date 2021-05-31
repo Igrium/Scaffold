@@ -2,13 +2,16 @@ package org.scaffoldeditor.scaffold.level.entity.world;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Set;
 
 import org.apache.commons.io.FilenameUtils;
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.nbt.block.SizedBlockCollection;
+import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
 import org.scaffoldeditor.nbt.block.transform.TransformSizedBlockCollection;
 import org.scaffoldeditor.nbt.math.Matrix;
+import org.scaffoldeditor.nbt.math.Vector3i;
 import org.scaffoldeditor.scaffold.io.AssetTypeRegistry;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.BlockEntity;
@@ -45,7 +48,6 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 
 	public WorldStatic(Level level, String name) {
 		super(level, name);
-		System.out.println("Constructing world static");
 		setAttribute("model", new StringAttribute(""), true);
 		setAttribute("direction", new StringAttribute("NORTH"));
 	}
@@ -109,7 +111,7 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 	}
 
 	@Override
-	public boolean compileWorld(BlockWorld world, boolean full) {
+	public boolean compileWorld(BlockWorld world, boolean full, Set<SectionCoordinate> sections) {
 		if (full) {
 			reload();
 		}
@@ -122,11 +124,35 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 			updateDirection();
 		}
 		
-		Vector gridPos = Vector.floor(getPosition());	
-		world.addBlockCollection(finalModel, (int) gridPos.X() , (int) gridPos.Y(), (int) gridPos.Z(), true, this);
+		Vector3i gridPos = getPosition().floor();
+		if (sections == null) { // TODO: Smarter algorithm to determine which compilation method we should use.
+			world.addBlockCollection(finalModel, (int) gridPos.x , (int) gridPos.y, (int) gridPos.z, true, this);
+		} else {
+			for (SectionCoordinate coord : sections) {
+				compileSection(world, coord);
+			}
+		}
 		compiledLocation = getPosition();
-		
 		return true;
+	}
+	
+	/**
+	 * Compile a single section of the model.
+	 * @param world World to compile into.
+	 * @param coord Global section coordinates.
+	 */
+	public void compileSection(BlockWorld world, SectionCoordinate coord) {
+		Vector3i gridPos = getPosition().floor();
+		for (int x = coord.getStartX(); x <= coord.getEndX(); x++) {
+			for (int y = coord.getStartY(); y <= coord.getEndY(); y++) {
+				for (int z = coord.getStartZ(); z <= coord.getEndZ(); z++) {
+					 Block block = finalModel.blockAt(x - gridPos.x, y - gridPos.y, z - gridPos.z);
+					 if (block != null) {
+						 world.setBlock(x, y, z, block, this);
+					 }
+				}
+			}
+		}
 	}
 
 	@Override

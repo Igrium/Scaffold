@@ -478,10 +478,9 @@ public class Level {
 	 * @param sections Sections to compile.
 	 */
 	public void compileSections(Set<SectionCoordinate> sections) {
-		if (sections.isEmpty()) {
+		if (sections == null ||sections.isEmpty()) {
 			return;
 		}
-		System.out.println(sections);
 		System.out.println("Compiling sections...");
 		// Compile into a temporary block world so other chunks don't get corrupted.
 		BlockWorld tempWorld = new BlockWorld();
@@ -510,16 +509,13 @@ public class Level {
 		if (updatingEntities.size() == 0) {
 			return;
 		}
-		System.out.println(updatingEntities);
 		
 		for (BlockEntity entity : updatingEntities) {
-			entity.compileWorld(tempWorld, false);
-			System.out.println("Compiled entity");
+			entity.compileWorld(tempWorld, false, sections);
 		}
 		
 		for (SectionCoordinate coord : sections) {
 			Chunk chunk = blockWorld.chunkAt(coord.x, coord.z);
-			System.out.println(chunk);
 			if (chunk == null) {
 				chunk = new Chunk();
 				blockWorld.getChunks().put(coord.getChunk(), chunk);
