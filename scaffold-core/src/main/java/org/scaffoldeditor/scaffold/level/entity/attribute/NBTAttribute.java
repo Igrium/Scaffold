@@ -46,7 +46,7 @@ public class NBTAttribute extends Attribute<CompoundTag> {
 	
 	/**
 	 * Get the compound tag backing this attribute. <br>
-	 * {@link Entity#onUpdateAttributes} should be called after updating if an
+	 * {@link Entity#onUpdateAttributes} should be called after updating if a
 	 * recompilation is desired.
 	 */
 	public CompoundTag getValue() {

@@ -1,6 +1,7 @@
 package org.scaffoldeditor.scaffold.plugin_utils;
 
 import org.scaffoldeditor.nbt.block.BlockCollectionManager;
+import org.scaffoldeditor.scaffold.io.BlockTextureAsset;
 import org.scaffoldeditor.scaffold.io.ConstructionAsset;
 import org.scaffoldeditor.scaffold.io.StructureAsset;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BlockAttribute;
@@ -45,6 +46,7 @@ public class DefaultPlugin implements PluginInitializer {
 		
 		StructureAsset.register();
 		ConstructionAsset.register();
+		BlockTextureAsset.register();
 		
 //		WriteWorldStep.setWorldWriter(new QuerzWorldWriter());
 	}

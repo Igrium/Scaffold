@@ -24,6 +24,8 @@ public class AssetManager {
 	/* The project this asset manager is associated with */
 	private Project project;
 	
+	private static AssetManager instance;
+	
 	/**
 	 * Directories to search for assets in.
 	 * Directories lower in the list are prioritized.
@@ -42,6 +44,16 @@ public class AssetManager {
 	public AssetManager(Project project) {
 		this.project = project;
 		searchDirectories.add(project.getProjectFolder());
+		instance = this;
+	}
+	
+	/**
+	 * While AssetManager isn't <i>technically</i> a singleton, there will ususally only be
+	 * one instance active at a time. This is simply a utility method to obtain the most
+	 * recently created instance.
+	 */
+	public static AssetManager getInstance() {
+		return instance;
 	}
 	
 	/**
@@ -129,6 +141,25 @@ public class AssetManager {
 	
 	public void clearCache() {
 		cache.clear();
+	}
+	
+	/**
+	 * Force-enter an object into the cache.
+	 * <br>
+	 * <b>WARNING</b> This is very dangerous and is intended only to be used when 
+	 * an asset has been written out to file and has a high likelyhood of being read
+	 * again.
+	 * @param entry Supposed cache to asset.
+	 * @param value Asset value to cache.
+	 */
+	public void forceCache(String entry, Object value) {
+		String ext = FilenameUtils.getExtension(entry);
+		if (!getLoader(entry).isAssignableTo(value.getClass())) {
+			throw new IllegalArgumentException(
+					"A value was attempted forced into the asset cache under the wrong filetype. ." + ext
+							+ " is not compable with " + value.getClass().getCanonicalName());
+		}
+		cache.put(entry, value);
 	}
 	
 	/**
