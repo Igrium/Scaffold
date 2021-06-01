@@ -43,12 +43,11 @@ public class WorldBrush extends BaseBlockEntity implements BrushEntity {
 	@Override
 	public boolean compileWorld(BlockWorld world, boolean full, Set<SectionCoordinate> sections) {
 		Vector3i endLocal = getEndPoint().floor();
-		
 		for (int x = 0; x < endLocal.x; x++) {
 			for (int y = 0; y < endLocal.y; y++) {
 				for (int z = 0; z < endLocal.z; z++) {
 					Vector3i blockPos = getBlockPosition();
-					getWorld().setBlock(blockPos.x + x, blockPos.y + y, blockPos.z + z,
+					world.setBlock(blockPos.x + x, blockPos.y + y, blockPos.z + z,
 							blockAt(new Vector(blockPos.toFloat())), this);
 				}
 			}

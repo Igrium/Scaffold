@@ -18,12 +18,15 @@ public interface BlockEntity {
 	
 	/**
 	 * Compile this entity's blocks into the world.
-	 * @param world The world to compile into.
-	 * @param full Whether or not this is a full compile.
-	 * Long operations are only allowed to run if this is true.
-	 * @param sections Limit compilation to these sections. This is an optimization feature;
-	 * implementation is fully optional. Blocks placed outside the target sections will be discarded.
-	 * MAY BE NULL. If it is null, the entire entity should compile.
+	 * 
+	 * @param world    The world to compile into. Note: this may be different than
+	 *                 the primary world the entity belongs to.
+	 * @param full     Whether or not this is a full compile. Long operations are
+	 *                 only allowed to run if this is true.
+	 * @param sections Limit compilation to these sections. This is an optimization
+	 *                 feature; implementation is fully optional. Blocks placed
+	 *                 outside the target sections will be discarded. MAY BE NULL.
+	 *                 If it is null, the entire entity should compile.
 	 * @return Success.
 	 */
 	boolean compileWorld(BlockWorld world, boolean full, Set<SectionCoordinate> sections);
