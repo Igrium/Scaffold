@@ -43,7 +43,7 @@ public class BlockAttribute extends Attribute<Block> {
 
 	@Override
 	public Element serialize(Document document) {
-		Element element = document.createElement(registryName);
+		Element element = document.createElement(REGISTRY_NAME);
 		element.setAttribute("block_name", value.getName());
 		Element nbt = new NBTSerializer(value.getProperties()).serialize(document);
 		element.appendChild(nbt);

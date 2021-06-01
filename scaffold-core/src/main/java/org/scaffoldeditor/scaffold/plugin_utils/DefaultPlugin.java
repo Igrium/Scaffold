@@ -1,10 +1,12 @@
 package org.scaffoldeditor.scaffold.plugin_utils;
 
 import org.scaffoldeditor.nbt.block.BlockCollectionManager;
+import org.scaffoldeditor.scaffold.block_textures.SingleBlockTexture;
 import org.scaffoldeditor.scaffold.io.BlockTextureAsset;
 import org.scaffoldeditor.scaffold.io.ConstructionAsset;
 import org.scaffoldeditor.scaffold.io.StructureAsset;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BlockAttribute;
+import org.scaffoldeditor.scaffold.level.entity.attribute.BlockTextureAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BooleanAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.DoubleAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.FloatAttribute;
@@ -19,6 +21,7 @@ import org.scaffoldeditor.scaffold.level.entity.logic.FunctionEntity;
 import org.scaffoldeditor.scaffold.level.entity.logic.Relay;
 import org.scaffoldeditor.scaffold.level.entity.world.WorldStatic;
 import org.scaffoldeditor.scaffold.level.entity.world.SingleBlock;
+import org.scaffoldeditor.scaffold.level.entity.world.WorldBrush;
 
 public class DefaultPlugin implements PluginInitializer {
 
@@ -28,6 +31,7 @@ public class DefaultPlugin implements PluginInitializer {
 		BlockCollectionManager.registerDefaults();
 
 		WorldStatic.Register();
+		WorldBrush.register();
 		SingleBlock.Register();
 		Auto.Register();
 		FunctionEntity.Register();
@@ -43,10 +47,13 @@ public class DefaultPlugin implements PluginInitializer {
 		VectorAttribute.register();
 		ListAttribute.register();
 		BlockAttribute.register();
+		BlockTextureAttribute.register();
 		
 		StructureAsset.register();
 		ConstructionAsset.register();
 		BlockTextureAsset.register();
+		
+		SingleBlockTexture.register();
 		
 //		WriteWorldStep.setWorldWriter(new QuerzWorldWriter());
 	}

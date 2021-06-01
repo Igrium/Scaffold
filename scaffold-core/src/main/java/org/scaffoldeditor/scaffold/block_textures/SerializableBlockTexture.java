@@ -3,6 +3,7 @@ package org.scaffoldeditor.scaffold.block_textures;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.serialization.XMLSerializable;
 import org.w3c.dom.Document;
@@ -17,6 +18,8 @@ import org.w3c.dom.Element;
  */
 public abstract class SerializableBlockTexture implements BlockTexture, XMLSerializable {
 	protected final Map<String, Attribute<?>> attributes = new HashMap<>();
+	
+	public static SerializableBlockTexture DEFAULT = new SingleBlockTexture(new Block("minecraft:stone"));
 	
 	/**
 	 * Get the name this block texture should use in its registry.

@@ -16,8 +16,8 @@ public final class BlockTextureRegistry {
 	public static SerializableBlockTexture createBlockTexture(String registryName) {
 		if (!registry.containsKey(registryName)) {
 			System.err.println("Unknown block texture type: " + registryName);
+			return SerializableBlockTexture.DEFAULT;
 		}
-		
 		return registry.get(registryName).create();
 	}
 	

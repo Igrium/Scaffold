@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.scaffoldeditor.nbt.block.BlockWorld;
+import org.scaffoldeditor.nbt.math.Vector3i;
 import org.scaffoldeditor.scaffold.core.Project;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
@@ -118,6 +119,14 @@ public class Entity {
 	 */
 	public Vector getPosition() {
 		return ((VectorAttribute) getAttribute("position")).getValue();
+	}
+	
+	/**
+	 * Get the position of this entity on the block grid.
+	 * @return Block position.
+	 */
+	public Vector3i getBlockPosition() {
+		return getPosition().floor();
 	}
 	
 	/**

@@ -119,7 +119,7 @@ public class BlockTextureAttribute extends Attribute<SerializableBlockTexture> {
 
 	@Override
 	public Element serialize(Document document) {
-		Element element = document.createElement(registryName);
+		Element element = document.createElement(REGISTRY_NAME);
 		element.setAttribute("external", Boolean.toString(isExternal()));
 		if (isExternal()) {
 			element.setAttribute("externalPath", getExternalPath());

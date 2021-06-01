@@ -1,7 +1,6 @@
 package org.scaffoldeditor.scaffold.block_textures;
 
 import org.scaffoldeditor.nbt.block.Block;
-import org.scaffoldeditor.nbt.math.Vector3d;
 
 /**
  * <p>
@@ -22,14 +21,15 @@ public interface BlockTexture {
 	/**
 	 * Get the block that this texture determines should be at particular location.
 	 * The coordinate space of the input vector is undefined, but it should be
-	 * consistant accross multiple calls to the function.
+	 * consistant accross multiple calls to the function. Doubles are used to give
+	 * extra resolution to functions that upscale the texture.
 	 * 
 	 * @param x X coordinate.
 	 * @param y Y coordinate.
 	 * @param z Z coordinate.
 	 * @return The block at this position, according to the texture.
 	 */
-	Block blockAt(int x, int y, int z);
+	Block blockAt(double x, double y, double z);
 
 	/**
 	 * Get whether this texture supports scaling. This should be true for procedural
@@ -37,26 +37,4 @@ public interface BlockTexture {
 	 * pre-determined assets.
 	 */
 	boolean supportsScaling();
-	
-	/**
-	 * Get the current texture scale.
-	 * @return The current texture scale on all three axes.
-	 */
-	Vector3d getScale();
-	
-	/**
-	 * Set the texture scale. If the texture doesn't support scaling, this does nothing.
-	 * @param scale The new texture scale on all three axes.
-	 */
-	void setScale(Vector3d scale);
-	
-	/**
-	 * Set the texture scale unilaterally. If the texture doesn't support scaling, this does nothing.
-	 * <br>
-	 * Shortcut for {@link #setScale(Vector3d)}
-	 * @param scale The new texture scale.
-	 */
-	default void setScale(double scale) {
-		setScale(new Vector3d(scale, scale, scale));
-	}
 }

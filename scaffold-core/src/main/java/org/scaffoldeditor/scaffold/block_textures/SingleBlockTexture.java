@@ -1,7 +1,6 @@
 package org.scaffoldeditor.scaffold.block_textures;
 
 import org.scaffoldeditor.nbt.block.Block;
-import org.scaffoldeditor.nbt.math.Vector3d;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BlockAttribute;
 
 /**
@@ -36,7 +35,7 @@ public class SingleBlockTexture extends SerializableBlockTexture {
 	}
 
 	@Override
-	public Block blockAt(int x, int y, int z) {
+	public Block blockAt(double x, double y, double z) {
 		return getBlock();
 	}
 
@@ -44,14 +43,6 @@ public class SingleBlockTexture extends SerializableBlockTexture {
 	public boolean supportsScaling() {
 		return false;
 	}
-
-	@Override
-	public Vector3d getScale() {
-		return new Vector3d(1,1,1);
-	}
-
-	@Override
-	public void setScale(Vector3d scale) {}
 
 	@Override
 	public String getRegistryName() {
