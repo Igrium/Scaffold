@@ -22,8 +22,12 @@ public class ChangeAttributesOperation implements Operation {
 	private Vector oldPosition = null;
 	
 	/**
-	 * Create a change attributes operation.
-	 * @param target Entity to change the attributes of.
+	 * Create a change attributes operation. <br>
+	 * <b>Important:</b> if the changes include changes to mutable attributes, a
+	 * copy of the attribute should be made. Do not change the attribute that's
+	 * already assigned to the entity!
+	 * 
+	 * @param target     Entity to change the attributes of.
 	 * @param attributes Attributes to change.
 	 */
 	public ChangeAttributesOperation(Entity target, Map<String, Attribute<?>> attributes) {
