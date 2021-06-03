@@ -57,6 +57,17 @@ public class AssetManager {
 	}
 	
 	/**
+	 * Check weather an asset exists within the primary project folder.
+	 * 
+	 * @param in Asset path.
+	 * @return Whether it's writable. Always <code>true</code> if the asset doesn't exist.
+	 */
+	public boolean isWritable(String in) {
+		File file = project.getProjectFolder().resolve(in).toFile();
+		return file.exists() || getAsset(in) == null;
+	}
+	
+	/**
 	 * Search all the loaded asset sources for a file.
 	 * <br>
 	 * Begins by searching the project folder and other search directories. If the file is not found there,
@@ -83,6 +94,16 @@ public class AssetManager {
 		}
 		
 		return getClass().getClassLoader().getResource(in);		
+	}
+	
+	/**
+	 * Get a file as an asset path relative to the project folder.
+	 * @param file File to relativise.
+	 * @return Local asset path. As with all asset paths, uses '/' as a seperator.
+	 */
+	public String relativise(File file) {
+		String path = project.getProjectFolder().relativize(file.toPath()).toString();
+		return path.replace("\\", "/"); // Some systems don't play nice with backslashes.
 	}
 	
 	/**
@@ -122,7 +143,11 @@ public class AssetManager {
 	}
 	
 	/**
-	 * Get an absolute file path.
+	 * Get an absolute file of an asset path.
+	 * <br>
+	 * <b>Note:</b> This should not be used for obtaining references to existing assets.
+	 * For that use {@link #getAsset} or {@link #loadAsset}. It is intended as a utility
+	 * function for identifying files to save.
 	 * @param in Pathname of the file, which may or may not be relative to the project root.
 	 * @return Absolute file path.
 	 */
@@ -154,7 +179,7 @@ public class AssetManager {
 	 */
 	public void forceCache(String entry, Object value) {
 		String ext = FilenameUtils.getExtension(entry);
-		if (!getLoader(entry).isAssignableTo(value.getClass())) {
+		if (!getLoader(entry).assetClass.isAssignableFrom(value.getClass())) {
 			throw new IllegalArgumentException(
 					"A value was attempted forced into the asset cache under the wrong filetype. ." + ext
 							+ " is not compable with " + value.getClass().getCanonicalName());

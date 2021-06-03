@@ -10,6 +10,7 @@ import org.scaffoldeditor.scaffold.block_textures.BlockTextureRegistry;
 import org.scaffoldeditor.scaffold.block_textures.SerializableBlockTexture;
 import org.scaffoldeditor.scaffold.block_textures.SingleBlockTexture;
 import org.scaffoldeditor.scaffold.io.AssetManager;
+import org.scaffoldeditor.scaffold.io.AssetType;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.serialization.BlockTextureWriter;
 import org.w3c.dom.Document;
@@ -32,7 +33,7 @@ public class BlockTextureAttribute extends Attribute<SerializableBlockTexture> {
 			@Override
 			public BlockTextureAttribute deserialize(Element element) {
 				if (Boolean.parseBoolean(element.getAttribute("external"))) {
-					return new BlockTextureAttribute("externalPath");
+					return new BlockTextureAttribute(element.getAttribute("externalPath"));
 				} else {
 					NodeList children = element.getChildNodes();
 					for (int i = 0; i < children.getLength(); i++) {
@@ -60,6 +61,7 @@ public class BlockTextureAttribute extends Attribute<SerializableBlockTexture> {
 	public BlockTextureAttribute(SerializableBlockTexture value) {
 		this.value = value;
 		external = false;
+		this.registryName = REGISTRY_NAME;
 	}
 	
 	/**
@@ -68,18 +70,20 @@ public class BlockTextureAttribute extends Attribute<SerializableBlockTexture> {
 	 */
 	public BlockTextureAttribute(String path) {
 		AssetManager assetManager = AssetManager.getInstance();
-		if (!assetManager.getLoader(path).isAssignableTo(SerializableBlockTexture.class)) {
+		AssetType<?> loader = assetManager.getLoader(path);
+		if (loader == null || !loader.isAssignableTo(SerializableBlockTexture.class)) {
 			handleLoadFailed();
 		}
 		
 		try {
 			this.value = (SerializableBlockTexture) assetManager.loadAsset(path, false);
 			this.external = true;
+			externalPath = path;
 		} catch (IOException e) {
 			e.printStackTrace();
 			handleLoadFailed();
 		}
-		
+		this.registryName = REGISTRY_NAME;
 	}
 	
 	/**
@@ -116,6 +120,29 @@ public class BlockTextureAttribute extends Attribute<SerializableBlockTexture> {
 	public SerializableBlockTexture getValue() {
 		return value;
 	}
+	
+	/**
+	 * Re-sync this attribute with the asset manager. May reload from file.
+	 * @return Updated value.
+	 */
+	public SerializableBlockTexture reload() {
+		if (isExternal()) {
+			AssetManager assetManager = AssetManager.getInstance();
+			AssetType<?> loader = assetManager.getLoader(externalPath);
+			if (loader == null || !loader.isAssignableTo(SerializableBlockTexture.class)) {
+				return value;
+			}
+			
+			try {
+				this.value = (SerializableBlockTexture) assetManager.loadAsset(externalPath, false);
+				this.external = true;
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return value;
+	}
 
 	@Override
 	public Element serialize(Document document) {
@@ -130,11 +157,11 @@ public class BlockTextureAttribute extends Attribute<SerializableBlockTexture> {
 	}
 
 	@Override
-	public Attribute<SerializableBlockTexture> clone() {
+	public BlockTextureAttribute clone() {
 		if (external) {
-			return this;
+			return new BlockTextureAttribute(externalPath);
 		} else {
-			return this;
+			return new BlockTextureAttribute(value.clone());
 		}
 	}
 	
@@ -171,4 +198,6 @@ public class BlockTextureAttribute extends Attribute<SerializableBlockTexture> {
 			assetManager.forceCache(externalPath, getValue());
 		}
 	}
+	
+	
 }

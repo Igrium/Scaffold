@@ -42,6 +42,7 @@ public class WorldBrush extends BaseBlockEntity implements BrushEntity {
 
 	@Override
 	public boolean compileWorld(BlockWorld world, boolean full, Set<SectionCoordinate> sections) {
+		reloadTexture();
 		Vector3i endLocal = getEndPoint().floor();
 		for (int x = 0; x < endLocal.x; x++) {
 			for (int y = 0; y < endLocal.y; y++) {
@@ -86,6 +87,10 @@ public class WorldBrush extends BaseBlockEntity implements BrushEntity {
 	 */
 	public BlockTexture getTexture() {
 		return ((BlockTextureAttribute) getAttribute("texture")).getValue();
+	}
+	
+	public void reloadTexture() {
+		((BlockTextureAttribute) getAttribute("texture")).reload();
 	}
 	
 	public Vector getTextureScale() {

@@ -63,6 +63,8 @@ public class NBTAttribute extends Attribute<CompoundTag> {
 	
 	@Override
 	public NBTAttribute clone() {
-		return new NBTAttribute(value.clone());
+		NBTAttribute update = new NBTAttribute(value.clone());
+		update.registryName = this.registryName;
+		return update;
 	}
 }

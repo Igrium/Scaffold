@@ -29,7 +29,7 @@ public abstract class AssetType<T> {
 	public abstract T loadAsset(InputStream in) throws IOException;
 	
 	/**
-	 * Check if this asset type will load an asset that's assignable to this class.
+	 * Check if the class this loader will load is a subclass of the passed class.
 	 */
 	public boolean isAssignableTo(Class<?> cls) {
 		return cls.isAssignableFrom(assetClass);
