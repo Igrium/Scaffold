@@ -51,7 +51,7 @@ public class BlockAttribute extends Attribute<Block> {
 	}
 
 	@Override
-	public BlockAttribute copy() {
+	public BlockAttribute clone() {
 		return new BlockAttribute(new Block(value.getName(), value.getProperties().clone()));
 	}
 

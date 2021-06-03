@@ -42,7 +42,7 @@ public class FloatAttribute extends Attribute<Float> {
 	}
 	
 	@Override
-	public FloatAttribute copy() {
+	public FloatAttribute clone() {
 		return this;
 	}
 }

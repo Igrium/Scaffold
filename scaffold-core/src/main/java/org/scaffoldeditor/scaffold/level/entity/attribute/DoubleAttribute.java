@@ -42,7 +42,7 @@ public class DoubleAttribute extends Attribute<Double> {
 	}
 	
 	@Override
-	public DoubleAttribute copy() {
+	public DoubleAttribute clone() {
 		return this;
 	}
 }

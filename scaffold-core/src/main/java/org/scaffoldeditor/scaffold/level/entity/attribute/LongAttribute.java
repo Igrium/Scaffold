@@ -42,7 +42,7 @@ public class LongAttribute extends Attribute<Long> {
 	}
 	
 	@Override
-	public LongAttribute copy() {
+	public LongAttribute clone() {
 		return this;
 	}
 }

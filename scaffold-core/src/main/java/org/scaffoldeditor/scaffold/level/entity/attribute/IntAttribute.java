@@ -42,7 +42,7 @@ public class IntAttribute extends Attribute<Integer> {
 	}
 	
 	@Override
-	public IntAttribute copy() {
+	public IntAttribute clone() {
 		return this;
 	}
 }

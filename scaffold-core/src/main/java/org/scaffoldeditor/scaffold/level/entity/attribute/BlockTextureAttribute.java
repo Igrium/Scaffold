@@ -130,7 +130,7 @@ public class BlockTextureAttribute extends Attribute<SerializableBlockTexture> {
 	}
 
 	@Override
-	public Attribute<SerializableBlockTexture> copy() {
+	public Attribute<SerializableBlockTexture> clone() {
 		if (external) {
 			return this;
 		} else {

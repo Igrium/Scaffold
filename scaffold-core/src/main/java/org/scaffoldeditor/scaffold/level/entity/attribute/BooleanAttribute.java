@@ -42,7 +42,7 @@ public class BooleanAttribute extends Attribute<Boolean> {
 	}
 	
 	@Override
-	public BooleanAttribute copy() {
+	public BooleanAttribute clone() {
 		return this;
 	}
 }

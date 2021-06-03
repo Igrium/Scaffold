@@ -49,7 +49,7 @@ public class VectorAttribute extends Attribute<Vector> {
 	}
 	
 	@Override
-	public VectorAttribute copy() {
+	public VectorAttribute clone() {
 		return this;
 	}
 }

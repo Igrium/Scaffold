@@ -42,7 +42,7 @@ public class StringAttribute extends Attribute<String> {
 	}
 	
 	@Override
-	public StringAttribute copy() {
+	public StringAttribute clone() {
 		return null;
 	}
 }

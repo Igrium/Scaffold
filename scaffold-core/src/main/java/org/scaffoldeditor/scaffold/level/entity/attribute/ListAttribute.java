@@ -63,10 +63,10 @@ public class ListAttribute extends Attribute<List<? extends Attribute<?>>> {
 	}
 	
 	@Override
-	public ListAttribute copy() {
+	public ListAttribute clone() {
 		List<Attribute<?>> newList = new ArrayList<>();
 		for (Attribute<?> att : value) {
-			newList.add(att.copy());
+			newList.add(att.clone());
 		}
 		
 		return new ListAttribute(newList);

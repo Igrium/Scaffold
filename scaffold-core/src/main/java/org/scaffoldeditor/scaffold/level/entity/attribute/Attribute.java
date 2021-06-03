@@ -4,7 +4,7 @@ import org.scaffoldeditor.scaffold.serialization.XMLSerializable;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public abstract class Attribute<T> implements XMLSerializable {
+public abstract class Attribute<T> implements XMLSerializable, Cloneable {
 	/**
 	 * The type name this attribute is serialized and deserialized with.
 	 */
@@ -19,7 +19,7 @@ public abstract class Attribute<T> implements XMLSerializable {
 	 * <br>
 	 * Non-mutable attributes can simply return <code>this</code>
 	 */
-	public abstract Attribute<T> copy();
+	public abstract Attribute<T> clone();
 	
 	@Override
 	public String toString() {

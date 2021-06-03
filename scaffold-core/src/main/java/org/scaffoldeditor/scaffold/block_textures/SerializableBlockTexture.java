@@ -16,7 +16,7 @@ import org.w3c.dom.Element;
  * 
  * @author Igrium
  */
-public abstract class SerializableBlockTexture implements BlockTexture, XMLSerializable {
+public abstract class SerializableBlockTexture implements BlockTexture, XMLSerializable, Cloneable {
 	protected final Map<String, Attribute<?>> attributes = new HashMap<>();
 	
 	public static SerializableBlockTexture DEFAULT = new SingleBlockTexture(new Block("minecraft:stone"));
@@ -47,10 +47,10 @@ public abstract class SerializableBlockTexture implements BlockTexture, XMLSeria
 		return element;
 	}
 	
-	public SerializableBlockTexture copy() {
+	public SerializableBlockTexture clone() {
 		SerializableBlockTexture other = BlockTextureRegistry.createBlockTexture(getRegistryName());
 		for (String name : attributes.keySet()) {
-			other.attributes.put(name, attributes.get(name));
+			other.attributes.put(name, attributes.get(name).clone());
 		}
 		return other;
 	}

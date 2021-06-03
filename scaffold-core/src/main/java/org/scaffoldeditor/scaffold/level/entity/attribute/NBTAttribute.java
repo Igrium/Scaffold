@@ -62,7 +62,7 @@ public class NBTAttribute extends Attribute<CompoundTag> {
 	}
 	
 	@Override
-	public NBTAttribute copy() {
+	public NBTAttribute clone() {
 		return new NBTAttribute(value.clone());
 	}
 }
