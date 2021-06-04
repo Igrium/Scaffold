@@ -50,7 +50,6 @@ public class NoiseBlockTexture extends SerializableBlockTexture {
 		}
 		
 		int index = (int) Math.floor(Math.abs(value) * blocks.size());
-		System.out.println(value+", "+index);
 		Attribute<?> target = blocks.get(index);
 		if (!(target instanceof BlockAttribute)) {
 			return new Block("minecraft:stone");
