@@ -49,8 +49,8 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 	public WorldStatic(Level level, String name) {
 		super(level, name);
 		setAttribute("model", new StringAttribute(""), true);
-		setAttribute("direction", new StringAttribute("NORTH"));
-		setAttribute("place_air", new BooleanAttribute(false));
+		setAttribute("direction", new StringAttribute("NORTH"), true);
+		setAttribute("place_air", new BooleanAttribute(false), true);
 	}
 
 	/**

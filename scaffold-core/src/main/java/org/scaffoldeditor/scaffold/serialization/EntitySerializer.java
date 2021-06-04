@@ -5,7 +5,6 @@ import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.AttributeRegistry;
-import org.scaffoldeditor.scaffold.math.Vector;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -66,16 +65,14 @@ public class EntitySerializer implements XMLSerializable {
 			Node child = children.item(i);
 			if (child.getNodeType() == Node.ELEMENT_NODE) {
 				Element element = (Element) child;
-				if (element.getTagName().equals(Vector.REGISTRY_NAME)) {
-					entity.setPosition(Vector.deserialize(element));
-				} else if (element.getTagName().equals("attributes")) {
+				if (element.getTagName().equals("attributes")) {
 					loadAttributes(element, entity);
 				}
 			}
 		}
 		entity.onUnserialized(xml);
 		entity.onUpdateAttributes(true);
-		return entity;	
+		return entity;
 	}
 	
 	/**
