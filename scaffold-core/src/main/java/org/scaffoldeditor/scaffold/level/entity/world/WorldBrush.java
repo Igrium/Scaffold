@@ -47,8 +47,8 @@ public class WorldBrush extends BaseBlockEntity implements BrushEntity {
 		for (int x = 0; x < endLocal.x; x++) {
 			for (int y = 0; y < endLocal.y; y++) {
 				for (int z = 0; z < endLocal.z; z++) {
-					Vector3i blockPos = getBlockPosition();
-					world.setBlock(blockPos.x + x, blockPos.y + y, blockPos.z + z,
+					Vector3i blockPos = getBlockPosition().add(new Vector3i(x,y,z));
+					world.setBlock(blockPos.x, blockPos.y, blockPos.z,
 							blockAt(new Vector(blockPos.toFloat())), this);
 				}
 			}

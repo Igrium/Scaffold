@@ -38,6 +38,7 @@ public abstract class SerializableBlockTexture implements BlockTexture, XMLSeria
 	
 	public void setAttribute(String name, Attribute<?> value) {
 		attributes.put(name, value);
+		onUpdateAttribute(name);
 	}
 	
 	/**
@@ -75,4 +76,12 @@ public abstract class SerializableBlockTexture implements BlockTexture, XMLSeria
 		}
 		return other;
 	}
+	
+	/**
+	 * Called when an attribute is updated. Called when an attribute is set from the
+	 * constructor or any other time.
+	 * 
+	 * @param attribute The attribute that was updated.
+	 */
+	protected void onUpdateAttribute(String attribute) {}
 }

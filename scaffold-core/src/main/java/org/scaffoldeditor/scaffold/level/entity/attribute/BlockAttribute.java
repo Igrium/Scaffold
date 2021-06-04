@@ -34,6 +34,7 @@ public class BlockAttribute extends Attribute<Block> {
 	
 	public BlockAttribute(Block value) {
 		this.value = value;
+		this.registryName = REGISTRY_NAME;
 	}
 
 	@Override

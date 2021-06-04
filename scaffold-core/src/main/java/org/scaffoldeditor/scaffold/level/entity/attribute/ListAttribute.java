@@ -41,6 +41,7 @@ public class ListAttribute extends Attribute<List<? extends Attribute<?>>> {
 	
 	public ListAttribute(List<? extends Attribute<?>> value) {
 		this.value = value;
+		this.registryName = REGISTRY_NAME;
 	}
 
 	/**

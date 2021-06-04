@@ -1,6 +1,7 @@
 package org.scaffoldeditor.scaffold.plugin_utils;
 
 import org.scaffoldeditor.nbt.block.BlockCollectionManager;
+import org.scaffoldeditor.scaffold.block_textures.NoiseBlockTexture;
 import org.scaffoldeditor.scaffold.block_textures.SingleBlockTexture;
 import org.scaffoldeditor.scaffold.io.BlockTextureAsset;
 import org.scaffoldeditor.scaffold.io.ConstructionAsset;
@@ -54,6 +55,7 @@ public class DefaultPlugin implements PluginInitializer {
 		BlockTextureAsset.register();
 		
 		SingleBlockTexture.register();
+		NoiseBlockTexture.register();
 		
 //		WriteWorldStep.setWorldWriter(new QuerzWorldWriter());
 	}
