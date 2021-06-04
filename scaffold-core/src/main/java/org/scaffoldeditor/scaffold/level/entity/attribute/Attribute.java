@@ -1,5 +1,6 @@
 package org.scaffoldeditor.scaffold.level.entity.attribute;
 
+import org.scaffoldeditor.scaffold.operation.ChangeAttributesOperation;
 import org.scaffoldeditor.scaffold.serialization.XMLSerializable;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -9,8 +10,15 @@ public abstract class Attribute<T> implements XMLSerializable, Cloneable {
 	 * The type name this attribute is serialized and deserialized with.
 	 */
 	public String registryName;
-	
+
+	/**
+	 * Get the value this attribute represents. <br>
+	 * <b>Note:</b> Mutable values break the undo/redo system. If this attribute is
+	 * mutable, make a copy of it to edit and then insert the edited version with a
+	 * {@link ChangeAttributesOperation}.
+	 */
 	public abstract T getValue();
+
 	public abstract Element serialize(Document document);
 	
 	/**

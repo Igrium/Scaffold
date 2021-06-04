@@ -2,6 +2,7 @@ package org.scaffoldeditor.scaffold.block_textures;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
@@ -26,12 +27,32 @@ public abstract class SerializableBlockTexture implements BlockTexture, XMLSeria
 	 */
 	public abstract String getRegistryName();
 	
+	/**
+	 * Get the names of all the attributes that this texture utilizes.
+	 */
+	public abstract Set<String> getDefaultAttributes();
+	
 	public Attribute<?> getAttribute(String name) {
 		return attributes.get(name);
 	}
 	
 	public void setAttribute(String name, Attribute<?> value) {
 		attributes.put(name, value);
+	}
+	
+	/**
+	 * Get a set of this texture's attributes.
+	 */
+	public Set<String> getAttributes() {
+		return attributes.keySet();
+	}
+	
+	/**
+	 * Remove an attribute from the attribute set. COULD CAUSE INSTABILITY!
+	 * @param name Attribute to remove.
+	 */
+	public void deleteAttribute(String name) {
+		attributes.remove(name);
 	}
 	
 	@Override

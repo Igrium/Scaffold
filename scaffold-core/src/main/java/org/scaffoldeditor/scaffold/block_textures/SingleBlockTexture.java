@@ -1,5 +1,8 @@
 package org.scaffoldeditor.scaffold.block_textures;
 
+import java.util.Collections;
+import java.util.Set;
+
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BlockAttribute;
 
@@ -47,6 +50,11 @@ public class SingleBlockTexture extends SerializableBlockTexture {
 	@Override
 	public String getRegistryName() {
 		return REGISTRY_NAME;
+	}
+
+	@Override
+	public Set<String> getDefaultAttributes() {
+		return Collections.singleton("block");
 	}
 
 }
