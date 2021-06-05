@@ -7,6 +7,7 @@ import org.scaffoldeditor.scaffold.io.BlockTextureAsset;
 import org.scaffoldeditor.scaffold.io.ConstructionAsset;
 import org.scaffoldeditor.scaffold.io.ConstructionWorldAsset;
 import org.scaffoldeditor.scaffold.io.StructureAsset;
+import org.scaffoldeditor.scaffold.level.entity.attribute.AssetAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BlockAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BlockTextureAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BooleanAttribute;
@@ -52,6 +53,7 @@ public class DefaultPlugin implements PluginInitializer {
 		ListAttribute.register();
 		BlockAttribute.register();
 		BlockTextureAttribute.register();
+		AssetAttribute.register();
 		
 		StructureAsset.register();
 		ConstructionAsset.register();

@@ -43,6 +43,6 @@ public class StringAttribute extends Attribute<String> {
 	
 	@Override
 	public StringAttribute clone() {
-		return null;
+		return this;
 	}
 }

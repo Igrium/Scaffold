@@ -4,7 +4,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Set;
 
-import org.apache.commons.io.FilenameUtils;
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.nbt.block.SizedBlockCollection;
@@ -19,6 +18,7 @@ import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.EntityFactory;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
 import org.scaffoldeditor.scaffold.level.entity.Faceable;
+import org.scaffoldeditor.scaffold.level.entity.attribute.AssetAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BooleanAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.StringAttribute;
 import org.scaffoldeditor.scaffold.math.Vector;
@@ -48,7 +48,7 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 
 	public WorldStatic(Level level, String name) {
 		super(level, name);
-		setAttribute("model", new StringAttribute(""), true);
+		setAttribute("model", new AssetAttribute("schematic", ""), true);
 		setAttribute("direction", new StringAttribute("NORTH"), true);
 		setAttribute("place_air", new BooleanAttribute(false), true);
 	}
@@ -58,7 +58,7 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 	 */
 	public void reload() {
 		
-		StringAttribute attribute = (StringAttribute) getAttribute("model");
+		AssetAttribute attribute = (AssetAttribute) getAttribute("model");
 		String model = attribute.getValue();
 		System.out.println("Loading model " + model);
 		modelpath = model;
@@ -67,7 +67,7 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 			return;
 		}
 		
-		if (AssetLoaderRegistry.isTypeAssignableTo(FilenameUtils.getExtension(model), SizedBlockCollection.class)) {
+		if (AssetLoaderRegistry.getAssetLoader(model).isAssignableTo(SizedBlockCollection.class)) {
 			try {
 //				this.model = Structure.fromCompoundMap((CompoundTag) NBTUtil.read(modelFile).getTag());
 				this.baseModel = (SizedBlockCollection) getProject().assetManager().loadAsset(model, false);
@@ -80,7 +80,6 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 			updateDirection();
 			
 		} else {
-			System.out.println(FilenameUtils.getExtension(model));
 			System.err.println("Unable to load model " + model + " because it is not a valid model format.");
 		}
 	}
@@ -182,7 +181,7 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 
 	@Override
 	public void onUpdateBlockAttributes() {
-		if (!((StringAttribute) getAttribute("model")).getValue().equals(modelpath)) {
+		if (!((AssetAttribute) getAttribute("model")).getValue().equals(modelpath)) {
 			reload();	
 		} else if (!getDirection().equals(direction)) {
 			updateDirection();
