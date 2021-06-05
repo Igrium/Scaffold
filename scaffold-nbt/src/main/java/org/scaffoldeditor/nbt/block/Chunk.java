@@ -36,26 +36,44 @@ public class Chunk implements SizedBlockCollection {
 			return new ChunkCoordinate(x, z);
 		}
 		
+		/**
+		 * Get the global starting X of the section.
+		 */
 		public int getStartX() {
 			return x * WIDTH;
 		}
 		
+		/**
+		 * Get the global starting Y of the section.
+		 */
 		public int getStartY() {
 			return y * Section.HEIGHT;
 		}
 		
+		/**
+		 * Get the global starting Z of the section.
+		 */
 		public int getStartZ() {
 			return z * LENGTH;
 		}
 		
+		/**
+		 * Get the global ending X of the section, non-inclusive.
+		 */
 		public int getEndX() {
 			return getStartX() + WIDTH;
 		}
 		
+		/**
+		 * Get the global ending Y of the section, non-inclusive.
+		 */
 		public int getEndY() {
 			return getStartY() + Section.HEIGHT ;
 		}
 		
+		/**
+		 * Get the global ending Z of the section, non-inclusive.
+		 */
 		public int getEndZ() {
 			return getStartZ() + LENGTH;
 		}

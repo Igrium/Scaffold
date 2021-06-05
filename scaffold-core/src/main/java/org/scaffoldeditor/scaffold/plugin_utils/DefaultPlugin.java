@@ -5,6 +5,7 @@ import org.scaffoldeditor.scaffold.block_textures.NoiseBlockTexture;
 import org.scaffoldeditor.scaffold.block_textures.SingleBlockTexture;
 import org.scaffoldeditor.scaffold.io.BlockTextureAsset;
 import org.scaffoldeditor.scaffold.io.ConstructionAsset;
+import org.scaffoldeditor.scaffold.io.ConstructionWorldAsset;
 import org.scaffoldeditor.scaffold.io.StructureAsset;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BlockAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BlockTextureAttribute;
@@ -23,6 +24,7 @@ import org.scaffoldeditor.scaffold.level.entity.logic.Relay;
 import org.scaffoldeditor.scaffold.level.entity.world.WorldStatic;
 import org.scaffoldeditor.scaffold.level.entity.world.SingleBlock;
 import org.scaffoldeditor.scaffold.level.entity.world.WorldBrush;
+import org.scaffoldeditor.scaffold.level.entity.world.WorldChunked;
 
 public class DefaultPlugin implements PluginInitializer {
 
@@ -32,6 +34,7 @@ public class DefaultPlugin implements PluginInitializer {
 		BlockCollectionManager.registerDefaults();
 
 		WorldStatic.Register();
+		WorldChunked.register();
 		WorldBrush.register();
 		SingleBlock.Register();
 		Auto.Register();
@@ -52,6 +55,7 @@ public class DefaultPlugin implements PluginInitializer {
 		
 		StructureAsset.register();
 		ConstructionAsset.register();
+		ConstructionWorldAsset.register();
 		BlockTextureAsset.register();
 		
 		SingleBlockTexture.register();

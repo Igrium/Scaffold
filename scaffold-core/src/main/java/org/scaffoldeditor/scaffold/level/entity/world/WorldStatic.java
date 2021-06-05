@@ -127,7 +127,7 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 		
 		Vector3i gridPos = getPosition().floor();
 		if (sections == null) { // TODO: Smarter algorithm to determine which compilation method we should use.
-			world.addBlockCollection(finalModel, (int) gridPos.x , (int) gridPos.y, (int) gridPos.z, true, shouldPlaceAir(), this);
+			world.addBlockCollection(finalModel, gridPos.x , gridPos.y, gridPos.z, true, shouldPlaceAir(), this);
 		} else {
 			for (SectionCoordinate coord : sections) {
 				compileSection(world, coord);
@@ -163,8 +163,8 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 
 	@Override
 	public Block blockAt(Vector coord) {
-		// TODO Implement this.
-		return null;
+		Vector3i localCoord = coord.subtract(getPosition()).floor();
+		return finalModel.blockAt(localCoord);
 	}
 
 	@Override

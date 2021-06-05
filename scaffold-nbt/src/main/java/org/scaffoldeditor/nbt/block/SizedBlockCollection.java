@@ -16,7 +16,7 @@ public interface SizedBlockCollection extends BlockCollection {
 	public Vector3i getMin();
 	
 	/**
-	 * Get the maximim point of the block collection (in local space)
+	 * Get the non-inclusive maximim point of the block collection (in local space)
 	 */
 	public Vector3i getMax();
 	

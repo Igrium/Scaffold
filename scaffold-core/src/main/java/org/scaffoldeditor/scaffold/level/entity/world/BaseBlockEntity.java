@@ -45,6 +45,8 @@ public abstract class BaseBlockEntity extends Entity implements BlockEntity {
 			setAttribute("position", new VectorAttribute(positionCache), true);
 			getLevel().dirtySections.addAll(getOverlappingSections());
 			setAttribute("position", new VectorAttribute(newPosition), true);
+		} else {
+			getLevel().dirtySections.addAll(getOverlappingSections());
 		}
 		super.onUpdateAttributes(true);
 		onUpdateBlockAttributes();

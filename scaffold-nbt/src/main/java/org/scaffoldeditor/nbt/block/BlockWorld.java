@@ -20,7 +20,7 @@ import net.querz.nbt.tag.CompoundTag;
  * Represents all the blocks in a world.
  * @author Igrium
  */
-public class BlockWorld implements BlockCollection {
+public class BlockWorld implements ChunkedBlockCollection {
 	
 	/**
 	 * Class to represent chunk coordinate pairs.
@@ -421,5 +421,32 @@ public class BlockWorld implements BlockCollection {
 	@Override
 	public Iterator<Vector3i> iterator() {
 		return null;
+	}
+
+	@Override
+	public int getSectionWidth() {
+		return Chunk.WIDTH;
+	}
+
+	@Override
+	public int getSectionLength() {
+		return Chunk.LENGTH;
+	}
+
+	@Override
+	public int getSectionHeight() {
+		return Section.HEIGHT;
+	}
+
+	@Override
+	public Set<Vector3i> getSections() {
+		Set<Vector3i> sections = new HashSet<>();
+		for (ChunkCoordinate c : chunks.keySet()) {
+			for (int i = 0; i < Chunk.HEIGHT / Section.HEIGHT; i++) {
+				sections.add(new SectionCoordinate(c, i));
+			}
+		}
+		
+		return sections;
 	}
 }

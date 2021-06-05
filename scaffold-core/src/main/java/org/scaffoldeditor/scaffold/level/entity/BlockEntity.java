@@ -78,6 +78,8 @@ public interface BlockEntity {
 	
 	/**
 	 * Check if this block entity overlaps a certian volume.
+	 * @param point1 Min point of the volume.
+	 * @param point2 Max point of the volume.
 	 */
 	default boolean overlapsVolume(Vector point1, Vector point2) {
 		// Math reference:
@@ -86,6 +88,10 @@ public interface BlockEntity {
 		return MathUtils.detectCollision(bounds[0], bounds[1], point1, point2);
 	}
 	
+	/**
+	 * Get the sections that this entity overlaps with.
+	 * @return A set of all overlapping sections.
+	 */
 	default Set<SectionCoordinate> getOverlappingSections() {
 		Vector[] bounds = getBounds();
 		Set<SectionCoordinate> overlapping = new HashSet<>();

@@ -2,12 +2,14 @@ package org.scaffoldeditor.nbt.schematic;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.scaffoldeditor.nbt.block.Block;
-import org.scaffoldeditor.nbt.block.BlockCollection;
+import org.scaffoldeditor.nbt.block.ChunkedBlockCollection;
 import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
 import org.scaffoldeditor.nbt.block.SizedBlockCollection;
 import org.scaffoldeditor.nbt.math.Vector3i;
@@ -19,7 +21,7 @@ import net.querz.nbt.tag.CompoundTag;
  * <a href="https://github.com/Amulet-Team/construction-specification">Construction format</a>
  * @author Igrium
  */
-public class Construction implements BlockCollection {
+public class Construction implements ChunkedBlockCollection {
 	
 	/**
 	 * A 16x16x16 section within the Construction format. Although sections in Construction can take up only
@@ -69,7 +71,7 @@ public class Construction implements BlockCollection {
 
 		@Override
 		public Vector3i getMax() {
-			return new Vector3i(relativeStartCoords[0] + width, relativeStartCoords[1] + length, relativeStartCoords[2] + height);
+			return new Vector3i(relativeStartCoords[0] + width, relativeStartCoords[1] + height, relativeStartCoords[2] + length);
 		} 
 		
 	}
@@ -175,7 +177,7 @@ public class Construction implements BlockCollection {
 	 * circumvent this.
 	 */
 	public Block blockAt(int x, int y, int z) {
-		SectionCoordinate section = sectionAt(x, y, z);
+		SectionCoordinate section = sectionCoordAt(x, y, z);
 		if (!sections.containsKey(section)) return null;
 		int localX = x - section.getStartX();
 		int localY = y - section.getStartY();
@@ -184,12 +186,41 @@ public class Construction implements BlockCollection {
 		return sections.get(section).blockAt(localX, localY, localZ);
 	}
 	
-	public SectionCoordinate sectionAt(int x, int y, int z) {
+	public SectionCoordinate sectionCoordAt(int x, int y, int z) {
 		return new SectionCoordinate(Math.floorDiv(x, 16), Math.floorDiv(y, 16), Math.floorDiv(z, 16));
 	}
 
 	@Override
 	public Iterator<Vector3i> iterator() {
 		return null;
+	}
+
+	@Override
+	public int getSectionWidth() {
+		return 16;
+	}
+
+	@Override
+	public int getSectionLength() {
+		return 16;
+	}
+
+	@Override
+	public int getSectionHeight() {
+		return 16;
+	}
+
+	@Override
+	public SizedBlockCollection sectionAt(int x, int y, int z) {
+		return sections.get(new SectionCoordinate(x, y, z));
+	}
+
+	@Override
+	public Set<Vector3i> getSections() {
+		Set<Vector3i> set = new HashSet<>();
+		for (SectionCoordinate c : sections.keySet()) {
+			set.add(c);
+		}
+		return set;
 	}
 }
