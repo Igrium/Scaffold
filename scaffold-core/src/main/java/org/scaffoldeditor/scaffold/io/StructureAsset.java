@@ -15,7 +15,7 @@ public class StructureAsset extends BlockCollectionAsset<Structure> {
 	}
 	
 	public static void register() {
-		AssetTypeRegistry.registry.put("nbt", new StructureAsset());
+		AssetLoaderRegistry.registry.put("nbt", new StructureAsset());
 	}
  
 	@Override

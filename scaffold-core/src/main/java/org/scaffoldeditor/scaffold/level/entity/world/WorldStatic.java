@@ -12,7 +12,7 @@ import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
 import org.scaffoldeditor.nbt.block.transform.TransformSizedBlockCollection;
 import org.scaffoldeditor.nbt.math.Matrix;
 import org.scaffoldeditor.nbt.math.Vector3i;
-import org.scaffoldeditor.scaffold.io.AssetTypeRegistry;
+import org.scaffoldeditor.scaffold.io.AssetLoaderRegistry;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.BlockEntity;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
@@ -67,7 +67,7 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 			return;
 		}
 		
-		if (AssetTypeRegistry.isTypeAssignableTo(FilenameUtils.getExtension(model), SizedBlockCollection.class)) {
+		if (AssetLoaderRegistry.isTypeAssignableTo(FilenameUtils.getExtension(model), SizedBlockCollection.class)) {
 			try {
 //				this.model = Structure.fromCompoundMap((CompoundTag) NBTUtil.read(modelFile).getTag());
 				this.baseModel = (SizedBlockCollection) getProject().assetManager().loadAsset(model, false);

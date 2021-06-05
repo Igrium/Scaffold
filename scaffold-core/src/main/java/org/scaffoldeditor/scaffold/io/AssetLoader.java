@@ -9,14 +9,14 @@ import java.io.InputStream;
  *
  * @param <T> Type of object that will be loaded.
  */
-public abstract class AssetType<T> {
+public abstract class AssetLoader<T> {
 	
 	/**
 	 * The class of the object this asset load will return.
 	 */
 	public final Class<T> assetClass;
 	
-	public AssetType(Class<T> assetClass) {
+	public AssetLoader(Class<T> assetClass) {
 		this.assetClass = assetClass;
 	}
 	

@@ -13,7 +13,7 @@ import org.scaffoldeditor.nbt.block.ChunkedBlockCollection;
 import org.scaffoldeditor.nbt.block.SizedBlockCollection;
 import org.scaffoldeditor.nbt.math.Vector3i;
 import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
-import org.scaffoldeditor.scaffold.io.AssetTypeRegistry;
+import org.scaffoldeditor.scaffold.io.AssetLoaderRegistry;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.EntityFactory;
@@ -68,7 +68,7 @@ public class WorldChunked extends BaseBlockEntity {
 			return;
 		}
 		
-		if (AssetTypeRegistry.isTypeAssignableTo(FilenameUtils.getExtension(model), ChunkedBlockCollection.class)) {
+		if (AssetLoaderRegistry.isTypeAssignableTo(FilenameUtils.getExtension(model), ChunkedBlockCollection.class)) {
 			try {
 //				this.model = Structure.fromCompoundMap((CompoundTag) NBTUtil.read(modelFile).getTag());
 				this.model = (ChunkedBlockCollection) getProject().assetManager().loadAsset(model, false);

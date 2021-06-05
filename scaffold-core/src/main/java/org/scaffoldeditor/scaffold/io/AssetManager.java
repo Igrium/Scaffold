@@ -133,7 +133,7 @@ public class AssetManager {
 		}
 		InputStream is = getAssetAsStream(in);
 		try {
-			Object asset = AssetTypeRegistry.loadAsset(is, FilenameUtils.getExtension(in));
+			Object asset = AssetLoaderRegistry.loadAsset(is, FilenameUtils.getExtension(in));
 			cache.put(in, asset);
 			return asset;
 		} catch (Exception e) {
@@ -190,7 +190,7 @@ public class AssetManager {
 	/**
 	 * Get the asset loader that would be used to load an asset.
 	 */
-	public AssetType<?> getLoader(String asset) {
-		return AssetTypeRegistry.registry.get(FilenameUtils.getExtension(asset));
+	public AssetLoader<?> getLoader(String asset) {
+		return AssetLoaderRegistry.registry.get(FilenameUtils.getExtension(asset));
 	}
 }

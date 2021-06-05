@@ -6,10 +6,10 @@ import java.io.InputStream;
 import org.scaffoldeditor.nbt.io.ConstructionFormat;
 import org.scaffoldeditor.nbt.schematic.Construction;
 
-public class ConstructionWorldAsset extends AssetType<Construction> {
+public class ConstructionWorldAsset extends AssetLoader<Construction> {
 	
 	public static void register() {
-		AssetTypeRegistry.registry.put("cworld", new ConstructionWorldAsset());
+		AssetLoaderRegistry.registry.put("cworld", new ConstructionWorldAsset());
 	}
 
 	public ConstructionWorldAsset() {

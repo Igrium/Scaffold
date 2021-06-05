@@ -10,7 +10,7 @@ import org.scaffoldeditor.scaffold.block_textures.BlockTextureRegistry;
 import org.scaffoldeditor.scaffold.block_textures.SerializableBlockTexture;
 import org.scaffoldeditor.scaffold.block_textures.SingleBlockTexture;
 import org.scaffoldeditor.scaffold.io.AssetManager;
-import org.scaffoldeditor.scaffold.io.AssetType;
+import org.scaffoldeditor.scaffold.io.AssetLoader;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.serialization.BlockTextureWriter;
 import org.w3c.dom.Document;
@@ -70,7 +70,7 @@ public class BlockTextureAttribute extends Attribute<SerializableBlockTexture> {
 	 */
 	public BlockTextureAttribute(String path) {
 		AssetManager assetManager = AssetManager.getInstance();
-		AssetType<?> loader = assetManager.getLoader(path);
+		AssetLoader<?> loader = assetManager.getLoader(path);
 		if (loader == null || !loader.isAssignableTo(SerializableBlockTexture.class)) {
 			handleLoadFailed();
 		}
@@ -128,7 +128,7 @@ public class BlockTextureAttribute extends Attribute<SerializableBlockTexture> {
 	public SerializableBlockTexture reload() {
 		if (isExternal()) {
 			AssetManager assetManager = AssetManager.getInstance();
-			AssetType<?> loader = assetManager.getLoader(externalPath);
+			AssetLoader<?> loader = assetManager.getLoader(externalPath);
 			if (loader == null || !loader.isAssignableTo(SerializableBlockTexture.class)) {
 				return value;
 			}

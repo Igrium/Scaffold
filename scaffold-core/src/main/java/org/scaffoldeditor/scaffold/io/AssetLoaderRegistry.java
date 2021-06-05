@@ -7,14 +7,16 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class AssetTypeRegistry {
+import org.apache.commons.io.FilenameUtils;
+
+public class AssetLoaderRegistry {
 	
 	/**
 	 * The registry of asset types.
 	 * <br>
 	 * {file extension, asset type entry}
 	 */
-	public static final Map<String, AssetType<?>> registry = new HashMap<>();
+	public static final Map<String, AssetLoader<?>> registry = new HashMap<>();
 	
 	/**
 	 * Load an asset from an input stream.
@@ -23,11 +25,21 @@ public class AssetTypeRegistry {
 	 * @return Loaded asset.
 	 */
 	public static Object loadAsset(InputStream in, String extension) throws IOException {
-		AssetType<?> type = registry.get(extension);
+		AssetLoader<?> type = registry.get(extension);
 		if (type == null) {
 			throw new IOException("Unknown file extension: "+extension);
 		}
 		return type.loadAsset(in);
+	}
+	
+	/**
+	 * Get the asset loader that would be used to load a particular file.
+	 * 
+	 * @param file Pathname of file.
+	 * @return The asset loader, or <code>null</code> if it doesn't exist.
+	 */
+	public static AssetLoader<?> getAssetLoader(String file) {
+		return registry.get(FilenameUtils.getExtension(file));
 	}
 	
 	/**
@@ -36,7 +48,7 @@ public class AssetTypeRegistry {
 	 * @param cls Class to check against.
 	 */
 	public static boolean isTypeAssignableTo(String extension, Class<?> cls) {
-		AssetType<?> type = registry.get(extension);
+		AssetLoader<?> type = registry.get(extension);
 		return (type != null && cls.isAssignableFrom(type.assetClass));
 	}
 	

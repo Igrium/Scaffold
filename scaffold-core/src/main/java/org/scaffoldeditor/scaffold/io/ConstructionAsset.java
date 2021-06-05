@@ -9,7 +9,7 @@ import org.scaffoldeditor.nbt.schematic.Construction.ConstructionSegment;
 public class ConstructionAsset extends BlockCollectionAsset<ConstructionSegment> {
 	
 	public static void register() {
-		AssetTypeRegistry.registry.put("construction", new ConstructionAsset());
+		AssetLoaderRegistry.registry.put("construction", new ConstructionAsset());
 	}
 	
 	public ConstructionAsset() {

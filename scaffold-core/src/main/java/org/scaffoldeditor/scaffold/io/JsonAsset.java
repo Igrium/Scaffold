@@ -6,14 +6,14 @@ import java.io.InputStream;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-public class JsonAsset extends AssetType<JSONObject> {
+public class JsonAsset extends AssetLoader<JSONObject> {
 	
 	public JsonAsset() {
 		super(JSONObject.class);
 	}
 	
 	public static void register() {
-		AssetTypeRegistry.registry.put("json", new JsonAsset());
+		AssetLoaderRegistry.registry.put("json", new JsonAsset());
 	}
 
 	@Override

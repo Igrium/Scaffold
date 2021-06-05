@@ -6,10 +6,10 @@ import java.io.InputStream;
 import org.scaffoldeditor.scaffold.block_textures.SerializableBlockTexture;
 import org.scaffoldeditor.scaffold.serialization.BlockTextureReader;
 
-public class BlockTextureAsset extends AssetType<SerializableBlockTexture> {
+public class BlockTextureAsset extends AssetLoader<SerializableBlockTexture> {
 	
 	public static void register() {
-		AssetTypeRegistry.registry.put("texture", new BlockTextureAsset());
+		AssetLoaderRegistry.registry.put("texture", new BlockTextureAsset());
 	}
 
 	public BlockTextureAsset() {

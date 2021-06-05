@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.io.FilenameUtils;
 import org.scaffoldeditor.scaffold.compile.Compiler;
 import org.scaffoldeditor.scaffold.io.AssetManager;
-import org.scaffoldeditor.scaffold.io.AssetTypeRegistry;
+import org.scaffoldeditor.scaffold.io.AssetLoaderRegistry;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
 import org.scaffoldeditor.scaffold.level.entity.attribute.AttributeRegistry;
 import org.scaffoldeditor.scaffold.plugin_utils.DefaultPlugin;
@@ -234,7 +234,7 @@ public class Project {
 		
 		EntityRegistry.registry.clear();
 		AttributeRegistry.registry.clear();
-		AssetTypeRegistry.registry.clear();
+		AssetLoaderRegistry.registry.clear();
 		
 	}
 	
