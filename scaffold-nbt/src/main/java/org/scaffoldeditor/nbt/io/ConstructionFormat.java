@@ -9,6 +9,7 @@ import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.BlockReader;
 import org.scaffoldeditor.nbt.block.SizedBlockCollection;
@@ -42,17 +43,17 @@ public class ConstructionFormat implements BlockReader<ConstructionSegment> {
 	 */
 	public Construction parse(InputStream in) throws IOException {
 		// The construction format has a lot of back and forth, so it's better to load it all into memory at once.
-		byte[] bytes = in.readAllBytes();
+		byte[] bytes = IOUtils.toByteArray(in);
 		ByteArrayInputStream buffer = new ByteArrayInputStream(bytes);
 		DataInputStream data = new DataInputStream(buffer);
 		
 		// Header
-		String magicNum = new String(buffer.readNBytes(8), StandardCharsets.UTF_8);
+		String magicNum = new String(readNBytes(buffer,8), StandardCharsets.UTF_8);
 		int version = data.readUnsignedByte();
 		
 		// Verify magic number
 		data.skip(data.available() - 8);
-		String magicNum2 = new String(buffer.readNBytes(8), StandardCharsets.UTF_8);
+		String magicNum2 = new String(readNBytes(buffer,8), StandardCharsets.UTF_8);
 		if (!magicNum.equals(magicNum2)) {
 			throw new IOException("It looks like this file is corrupt. It probably wasn't saved properly");
 		}
@@ -170,7 +171,7 @@ public class ConstructionFormat implements BlockReader<ConstructionSegment> {
 	}
 	
 	private static final int readInt(InputStream in, boolean littleEndian) throws IOException {
-		return readInt(ByteBuffer.wrap(in.readNBytes(4)), littleEndian);
+		return readInt(ByteBuffer.wrap(readNBytes(in, 4)), littleEndian);
 	}
 	
 	private static final int readInt(ByteBuffer buffer, boolean littleEndian) throws IOException {
@@ -216,5 +217,11 @@ public class ConstructionFormat implements BlockReader<ConstructionSegment> {
 			throw new IOException("Can only read construction segment if there's a selection box in the construction.");
 		}
 		return construction.getSegment(construction.selectionBoxes.get(0));
+	}
+	
+	private static byte[] readNBytes(InputStream in, int length) throws IOException {
+		byte[] bytes = new byte[length];
+		in.read(bytes);
+		return bytes;
 	}
 }

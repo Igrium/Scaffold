@@ -13,9 +13,7 @@ import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.python.core.PyException;
 import org.scaffoldeditor.scaffold.core.Project;
-import org.scaffoldeditor.scaffold.core.PythonUtils;
 
 /**
  * Represents the main game datapack
@@ -166,7 +164,7 @@ public class Datapack {
 		System.out.println();
 		
 		// Run pre-compile script
-		preCompileScript();
+//		preCompileScript();
 		
 		// Reset folder
 		if (compilePath.toFile().exists()) {
@@ -254,7 +252,7 @@ public class Datapack {
 		tick.write(tickWriter, 4, 0);
 		tickWriter.close();
 		
-		postCompileScript(compilePath);
+//		postCompileScript(compilePath);
 		
 		return true;
 	}
@@ -262,82 +260,82 @@ public class Datapack {
 	/**
 	 * Run pre-compile scipt
 	 */
-	private void preCompileScript() {
-		try {
-			if (dataFolder.resolve("compile.json").toFile().exists()) {
-				JSONObject compile = loadJSON(dataFolder.resolve("compile.json"));
-				if (!compile.has("preCompileScript")) { // May not have a pre-compile script
-					return;
-				}
-				String scriptName = compile.getString("preCompileScript");
-				String absName = project.assetManager().getAbsolutePath(scriptName).toString();
-				
-				if (!new File(absName).exists()) {
-					System.out.println("Unable to find pre-compile script: "+absName);
-					return;
-				}
-				
-				// Setup and run script
-				PythonUtils.setArgs(new String[] {dataFolder.toString()});
-				
-				System.out.println("Running python script: "+absName);
-				
-				try {
-					PythonUtils.getInterpreter().execfile(absName);
-				} catch (PyException e) { // User may write python file incorrectly
-					if (e.traceback == null) {
-						System.out.println("Improperly formatted Python file: "+absName);
-					} else {
-						System.out.println(e.traceback.dumpStack());
-					}
-				}
-				System.out.println();
-				
-			}
-		} catch (IOException e) {
-			System.out.println("Unable to run pre-compile script!");
-		}
-		
-	}
+//	private void preCompileScript() {
+//		try {
+//			if (dataFolder.resolve("compile.json").toFile().exists()) {
+//				JSONObject compile = loadJSON(dataFolder.resolve("compile.json"));
+//				if (!compile.has("preCompileScript")) { // May not have a pre-compile script
+//					return;
+//				}
+//				String scriptName = compile.getString("preCompileScript");
+//				String absName = project.assetManager().getAbsolutePath(scriptName).toString();
+//				
+//				if (!new File(absName).exists()) {
+//					System.out.println("Unable to find pre-compile script: "+absName);
+//					return;
+//				}
+//				
+//				// Setup and run script
+//				PythonUtils.setArgs(new String[] {dataFolder.toString()});
+//				
+//				System.out.println("Running python script: "+absName);
+//				
+//				try {
+//					PythonUtils.getInterpreter().execfile(absName);
+//				} catch (PyException e) { // User may write python file incorrectly
+//					if (e.traceback == null) {
+//						System.out.println("Improperly formatted Python file: "+absName);
+//					} else {
+//						System.out.println(e.traceback.dumpStack());
+//					}
+//				}
+//				System.out.println();
+//				
+//			}
+//		} catch (IOException e) {
+//			System.out.println("Unable to run pre-compile script!");
+//		}
+//		
+//	}
 	
 	/**
 	 * Run post-compile script
 	 */
-	private void postCompileScript(Path compilePath) {
-		try {
-			if (dataFolder.resolve("compile.json").toFile().exists()) {
-				JSONObject compile = loadJSON(dataFolder.resolve("compile.json"));
-				if (!compile.has("postCompileScript")) { // May not have a post-compile script
-					return;
-				}
-				String scriptName = compile.getString("postCompileScript");
-				String absName = project.assetManager().getAbsolutePath(scriptName).toString();
-				
-				if (!new File(absName).exists()) {
-					System.out.println("Unable to find post-compile script: "+absName);
-					return;
-				}
-				
-				// Setup and run script
-				PythonUtils.setArgs(new String[] {compilePath.toString()});
-				
-				System.out.println("Running python script: "+absName);
-				
-				try {
-					PythonUtils.getInterpreter().execfile(absName);
-				} catch (PyException e) { // User may write python file incorrectly
-					if (e.traceback == null) {
-						System.out.println("Improperly formatted Python file: "+absName);
-					} else {
-						System.out.println(e.traceback.dumpStack());
-					}
-				}
-				System.out.println();
-			}
-		} catch (IOException e) {
-			System.out.println("Unable to run pre-compile script!");
-		}
-	}
+//	private void postCompileScript(Path compilePath) {
+//		try {
+//			if (dataFolder.resolve("compile.json").toFile().exists()) {
+//				JSONObject compile = loadJSON(dataFolder.resolve("compile.json"));
+//				if (!compile.has("postCompileScript")) { // May not have a post-compile script
+//					return;
+//				}
+//				String scriptName = compile.getString("postCompileScript");
+//				String absName = project.assetManager().getAbsolutePath(scriptName).toString();
+//				
+//				if (!new File(absName).exists()) {
+//					System.out.println("Unable to find post-compile script: "+absName);
+//					return;
+//				}
+//				
+//				// Setup and run script
+//				PythonUtils.setArgs(new String[] {compilePath.toString()});
+//				
+//				System.out.println("Running python script: "+absName);
+//				
+//				try {
+//					PythonUtils.getInterpreter().execfile(absName);
+//				} catch (PyException e) { // User may write python file incorrectly
+//					if (e.traceback == null) {
+//						System.out.println("Improperly formatted Python file: "+absName);
+//					} else {
+//						System.out.println(e.traceback.dumpStack());
+//					}
+//				}
+//				System.out.println();
+//			}
+//		} catch (IOException e) {
+//			System.out.println("Unable to run pre-compile script!");
+//		}
+//	}
 	
 	/**
 	 * Generate the pack.mcmeta file
