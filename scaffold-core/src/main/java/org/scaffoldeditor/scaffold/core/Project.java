@@ -30,6 +30,8 @@ import org.scaffoldeditor.scaffold.plugin_utils.PluginManager;
  */
 public class Project {
 	
+	public static final String CACHE_FOLDER_NAME = ".scaffold";
+	
 	/* The project folder of this project */
 	private Path projectFolder;
 	
@@ -54,8 +56,21 @@ public class Project {
 		gameInfo = new GameInfo();
 		assetManager = new AssetManager(this);
 		compiler = Compiler.getDefault();
-		pluginManager = new PluginManager();
 		
+		File cache = getCacheFolder().toFile();
+		if (!cache.isDirectory()) {
+			cache.mkdir();
+			// If on Windows.
+			if (System.getProperty("os.name").toLowerCase().indexOf("win") >= 0) {
+				try {
+					Files.setAttribute(cache.toPath(), "dos:hidden", true);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		pluginManager = new PluginManager();
 		defaultPlugin = new DefaultPlugin();
 		defaultPlugin.initialize();
 	}
@@ -115,7 +130,6 @@ public class Project {
 			return null;
 		}
 		project.loadPlugins();
-		
 		return project;
 	}
 	
@@ -137,7 +151,6 @@ public class Project {
 		
 		// Setup gameinfo
 		project.gameInfo().setTitle(title);
-		project.gameInfo().addPath("_projectfolder_");
 		
 		if (!project.gameInfo().saveJSON(Paths.get(folder,Constants.GAMEINFONAME))) {
 			return null;
@@ -146,19 +159,20 @@ public class Project {
 		
 		// Create subfolders
 		try {
-			Files.createDirectories(Paths.get(folder,"assets"));
-			Files.createDirectories(Paths.get(folder,"data"));
-			Files.createDirectories(Paths.get(folder,"game"));
-			Files.createDirectories(Paths.get(folder,"maps"));
-			
-			Files.createDirectories(Paths.get(folder,"scripts"));
+			Files.createDirectories(Paths.get(folder, "assets"));
+			Files.createDirectories(Paths.get(folder, "data"));
+			Files.createDirectories(Paths.get(folder, "game"));
+			Files.createDirectories(Paths.get(folder, "maps"));
+			Files.createDirectories(Paths.get(folder, "schematics"));
+			Files.createDirectories(Paths.get(folder, CACHE_FOLDER_NAME));
+//			Files.createDirectories(Paths.get(folder,"scripts"));
 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			System.err.println("Unable to create folder structure!");
 		}
-		
+		project.loadPlugins();
 		return project;
 		
 	}
@@ -169,6 +183,16 @@ public class Project {
 	 */
 	public Path getProjectFolder() {
 		return projectFolder;
+	}
+	
+	/**
+	 * Get the folder intended to store temporary files (such as recently opened)
+	 * without saving them to version control.
+	 * 
+	 * @return Path to cache folder.
+	 */
+	public Path getCacheFolder() {
+		return projectFolder.resolve(CACHE_FOLDER_NAME);
 	}
 	
 	/**
