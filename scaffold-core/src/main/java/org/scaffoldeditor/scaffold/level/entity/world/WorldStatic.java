@@ -20,6 +20,8 @@ import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
 import org.scaffoldeditor.scaffold.level.entity.Faceable;
 import org.scaffoldeditor.scaffold.level.entity.attribute.AssetAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BooleanAttribute;
+import org.scaffoldeditor.scaffold.level.entity.attribute.EnumAttribute;
+import org.scaffoldeditor.scaffold.level.entity.attribute.EnumAttribute.DefaultEnums.Direction;
 import org.scaffoldeditor.scaffold.level.entity.attribute.StringAttribute;
 import org.scaffoldeditor.scaffold.math.Vector;
 
@@ -34,7 +36,7 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 	
 	// Keep track of the model path, location, and directoin on our own for optimization.
 	private String modelpath;
-	private String direction = "";
+	private Direction direction = Direction.NORTH;
 	
 	public static void Register() {
 		EntityRegistry.registry.put("world_static", new EntityFactory<Entity>() {		
@@ -49,7 +51,7 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 	public WorldStatic(Level level, String name) {
 		super(level, name);
 		setAttribute("model", new AssetAttribute("schematic", ""), true);
-		setAttribute("direction", new StringAttribute("NORTH"), true);
+		setAttribute("direction", new EnumAttribute<>(Direction.NORTH), true);
 		setAttribute("place_air", new BooleanAttribute(false), true);
 	}
 
@@ -84,29 +86,32 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 		}
 	}
 	
-	public String getDirection() {
-		if (getAttribute("direction") instanceof StringAttribute) {
-			return ((StringAttribute) getAttribute("direction")).getValue();
+	public Direction getDirection() {
+		if (getAttribute("direction") instanceof EnumAttribute
+				&& ((EnumAttribute<?>) getAttribute("direction")).getValue() instanceof Direction) {
+			return (Direction) ((EnumAttribute<?>) getAttribute("direction")).getValue();
 		} else {
-			return "";
+			return Direction.NORTH;
 		}
 	}
 	
 	protected void updateDirection() {
-		String direction = getDirection();
+		Direction direction = getDirection();
 		
-		if (direction.equals("NORTH")) {
+		switch (direction) {
+		case NORTH:
 			finalModel = baseModel;
-		} else if (direction.equals("WEST")) {
+			break;
+		case WEST:
 			finalModel = new TransformSizedBlockCollection(baseModel, Matrix.Direction.WEST);
-		} else if (direction.equals("SOUTH")) {
+			break;
+		case SOUTH:
 			finalModel = new TransformSizedBlockCollection(baseModel, Matrix.Direction.SOUTH);
-		} else if (direction.equals("EAST")) {
+			break;
+		case EAST:
 			finalModel = new TransformSizedBlockCollection(baseModel, Matrix.Direction.EAST);
-		} else {
-			setAttribute("direction", new StringAttribute("NORTH"), true);
-			finalModel = baseModel;
 		}
+
 		this.direction = direction;
 	}
 
@@ -120,7 +125,7 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 			return true;
 		}
 		
-		if (!((StringAttribute) getAttribute("direction")).getValue().equals(direction)) {
+		if (((EnumAttribute<?>) getAttribute("direction")).getValue() != direction) {
 			updateDirection();
 		}
 		
@@ -174,8 +179,8 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 	}
 
 	@Override
-	public void setDirection(String direction) {
-		this.setAttribute("direction", new StringAttribute(direction));
+	public void setDirection(Direction direction) {
+		this.setAttribute("direction", new EnumAttribute<>(direction));
 	}
 
 

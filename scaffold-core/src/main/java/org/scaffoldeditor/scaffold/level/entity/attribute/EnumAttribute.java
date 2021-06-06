@@ -4,7 +4,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.scaffoldeditor.scaffold.level.entity.attribute.EnumAttribute.DefaultEnums.PlaceholderEnum;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -14,6 +13,16 @@ public class EnumAttribute<T extends Enum<T>> extends Attribute<T> {
 		public enum PlaceholderEnum {
 			VALUE1,
 			VALUE2
+		}
+		
+		/**
+		 * Represents a cardinal direction that a (usually block) entity can face.
+		 */
+		public enum Direction {
+			NORTH,
+			SOUTH,
+			EAST,
+			WEST
 		}
 	}
 	
@@ -25,7 +34,7 @@ public class EnumAttribute<T extends Enum<T>> extends Attribute<T> {
 
 			@Override
 			public EnumAttribute<?> create() {
-				return new EnumAttribute<PlaceholderEnum>(PlaceholderEnum.VALUE1);
+				return new EnumAttribute<>(DefaultEnums.PlaceholderEnum.VALUE1);
 			}
 
 			// We're not actually doing anything with the value before returning it under
@@ -50,7 +59,8 @@ public class EnumAttribute<T extends Enum<T>> extends Attribute<T> {
 			}
 		});
 
-		enumRegistry.put("placeholder", PlaceholderEnum.class);
+		enumRegistry.put("placeholder", DefaultEnums.PlaceholderEnum.class);
+		enumRegistry.put("direction", DefaultEnums.Direction.class);
 	}
 
 	private T value;
