@@ -33,7 +33,6 @@ public class EnumAttribute<T extends Enum<T>> extends Attribute<T> {
 			@SuppressWarnings({ "rawtypes", "unchecked" })
 			@Override
 			public EnumAttribute<?> deserialize(Element element) {
-				System.out.println("Loading enum: "+element.getAttribute("value"));
 				String className = element.getAttribute("enum_class");
 				if (!enumRegistry.containsKey(className)) {
 					throw new IllegalArgumentException("Unknown enum class: " + className);
@@ -47,7 +46,6 @@ public class EnumAttribute<T extends Enum<T>> extends Attribute<T> {
 						| NoSuchMethodException | SecurityException e) {
 					throw new AssertionError("Unable to load enum.", e);
 				}
-				System.out.println(enm);
 				return new EnumAttribute(enm);
 			}
 		});
@@ -87,7 +85,6 @@ public class EnumAttribute<T extends Enum<T>> extends Attribute<T> {
 		}
 		
 		element.setAttribute("enum_class", enumClass);
-		element.setAttribute(enumClass, enumClass);
 		element.setAttribute("value", value.name());
 		
 		return element;
