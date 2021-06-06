@@ -12,6 +12,7 @@ import org.scaffoldeditor.scaffold.level.entity.attribute.BlockAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BlockTextureAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BooleanAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.DoubleAttribute;
+import org.scaffoldeditor.scaffold.level.entity.attribute.EnumAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.FloatAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.IntAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.ListAttribute;
@@ -54,6 +55,7 @@ public class DefaultPlugin implements PluginInitializer {
 		BlockAttribute.register();
 		BlockTextureAttribute.register();
 		AssetAttribute.register();
+		EnumAttribute.register();
 		
 		StructureAsset.register();
 		ConstructionAsset.register();
