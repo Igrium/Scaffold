@@ -20,6 +20,7 @@ import org.scaffoldeditor.scaffold.level.entity.attribute.LongAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.NBTAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.StringAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.VectorAttribute;
+import org.scaffoldeditor.scaffold.level.entity.game.GameEntity;
 import org.scaffoldeditor.scaffold.level.entity.logic.Auto;
 import org.scaffoldeditor.scaffold.level.entity.logic.FunctionEntity;
 import org.scaffoldeditor.scaffold.level.entity.logic.Relay;
@@ -42,6 +43,7 @@ public class DefaultPlugin implements PluginInitializer {
 		Auto.Register();
 		FunctionEntity.Register();
 		Relay.Register();
+		GameEntity.register();
 		
 		StringAttribute.register();
 		NBTAttribute.register();

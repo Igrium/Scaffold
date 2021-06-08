@@ -21,6 +21,7 @@ import org.scaffoldeditor.nbt.math.Vector3i;
 import org.scaffoldeditor.scaffold.compile.Compiler.CompileEndStatus;
 import org.scaffoldeditor.scaffold.compile.Compiler.CompileResult;
 import org.scaffoldeditor.scaffold.core.Project;
+import org.scaffoldeditor.scaffold.level.WorldUpdates.UpdateRenderEntitiesEvent;
 import org.scaffoldeditor.scaffold.level.WorldUpdates.WorldUpdateEvent;
 import org.scaffoldeditor.scaffold.level.WorldUpdates.WorldUpdateListener;
 import org.scaffoldeditor.scaffold.level.entity.BlockEntity;
@@ -29,12 +30,15 @@ import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BooleanAttribute;
 import org.scaffoldeditor.scaffold.level.entity.game.TargetSelectable;
+import org.scaffoldeditor.scaffold.level.render.RenderEntity;
 import org.scaffoldeditor.scaffold.logic.Datapack;
 import org.scaffoldeditor.scaffold.logic.MCFunction;
 import org.scaffoldeditor.scaffold.math.Vector;
 import org.scaffoldeditor.scaffold.operation.OperationManager;
 import org.scaffoldeditor.scaffold.serialization.LevelReader;
 import org.scaffoldeditor.scaffold.serialization.LevelWriter;
+import org.scaffoldeditor.scaffold.util.event.EventDispatcher;
+import org.scaffoldeditor.scaffold.util.event.EventListener;
 
 import net.querz.nbt.io.SNBTUtil;
 import net.querz.nbt.tag.CompoundTag;
@@ -87,6 +91,7 @@ public class Level {
 	
 	private List<WorldUpdateListener> worldUpdateListeners = new ArrayList<>();
 	private List<Runnable> updateStackListeners = new ArrayList<>();
+	private EventDispatcher<UpdateRenderEntitiesEvent> updateRenderEntitiesDispatcher = new EventDispatcher<>();
 	
 	/**
 	 * Create a new level
@@ -267,11 +272,7 @@ public class Level {
 		
 		Entity entity = EntityRegistry.createEntity(typeName, this, name);
 		entity.setPosition(position);
-		entity.setShouldRender(true);
-		
-		entities.put(name, entity);
-		entityStack.add(name);
-		updateEntityStack();
+		addEntity(entity);
 		
 		return entity;
 	}
@@ -303,6 +304,7 @@ public class Level {
 		entityStack.add(stackIndex, entity.getName());
 		updateEntityStack();
 		entity.setShouldRender(true);
+		entity.onAdded();
 		
 		if (entity instanceof BlockEntity) {
 			dirtySections.addAll(((BlockEntity) entity).getOverlappingSections());
@@ -336,6 +338,7 @@ public class Level {
 		entities.remove(name);
 		entityStack.remove(name);
 		updateEntityStack();
+		entity.onRemoved();
 		
 		if (!noRecompile && autoRecompile) {
 			quickRecompile();
@@ -567,6 +570,21 @@ public class Level {
 		for (Runnable listener : updateStackListeners) {
 			listener.run();
 		}
+	}
+	
+	/**
+	 * Register a listener to be called when one {@link RenderEntity} or more have
+	 * updated. If a render entity that previously existed isn't present in the
+	 * list, it should be removed.
+	 * 
+	 * @param listener Event listener.
+	 */
+	public void onUpdateRenderEntities(EventListener<UpdateRenderEntitiesEvent> listener) {
+		updateRenderEntitiesDispatcher.addListener(listener);
+	}
+	
+	public void fireUpdateRenderEntitiesEvent(UpdateRenderEntitiesEvent event) {
+		updateRenderEntitiesDispatcher.fire(event);
 	}
 
 	

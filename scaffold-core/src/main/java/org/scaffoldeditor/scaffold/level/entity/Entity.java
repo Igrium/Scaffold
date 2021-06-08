@@ -1,6 +1,7 @@
 package org.scaffoldeditor.scaffold.level.entity;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -11,12 +12,15 @@ import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.nbt.math.Vector3i;
 import org.scaffoldeditor.scaffold.core.Project;
 import org.scaffoldeditor.scaffold.level.Level;
+import org.scaffoldeditor.scaffold.level.WorldUpdates.UpdateRenderEntitiesEvent;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.VectorAttribute;
 import org.scaffoldeditor.scaffold.level.io.Input;
 import org.scaffoldeditor.scaffold.level.io.Output;
+import org.scaffoldeditor.scaffold.level.render.RenderEntity;
 import org.scaffoldeditor.scaffold.logic.Datapack;
 import org.scaffoldeditor.scaffold.math.Vector;
+import org.scaffoldeditor.scaffold.util.event.EventListener;
 import org.w3c.dom.Element;
 
 /**
@@ -59,7 +63,7 @@ public class Entity {
 	
 	/* Whether non-block visualizations of this entity should render in the editor */
 	private boolean shouldRender = false;
-	
+		
 	/**
 	 * Construct a new entity with a name and a level.
 	 * @param level	Level entity should belong to.
@@ -110,7 +114,7 @@ public class Entity {
 	 * @return Default name.
 	 */
 	public String getDefaultName() {
-		return getClass().getSimpleName().toLowerCase();
+		return registryName;
 	}
 	
 	/**
@@ -285,21 +289,70 @@ public class Entity {
 		}
 		return null;
 	}
+
 	/**
-	 * Called when entity is deserialized for subclasses to act on.
-	 * <br>
+	 * Called when entity is deserialized for subclasses to act on. <br>
 	 * <b>Note:</b> This may be called before the entity is added to the level.
+	 * 
 	 * @param xml XML element that it was deserialized from.
 	 */
 	public void onUnserialized(Element xml) {}
 	
 	/**
-	 * Called whenever any attributes are updated for subclasses to act on.
-	 * This is called once on unserialization, before onUnserialized, and again whenever setAttribute() is called.
-	 * @param noRecompile If this is true, this entity shouldn't recompile the world. Usually set when the calling
-	 * function plans to recompile the world later.
+	 * Called whenever any attributes are updated for subclasses to act on. This is
+	 * called once on unserialization, before onUnserialized, and again whenever
+	 * setAttribute() is called.
+	 * 
+	 * @param noRecompile If this is true, this entity shouldn't recompile the
+	 *                    world. Usually set when the calling function plans to
+	 *                    recompile the world later.
 	 */
-	public void onUpdateAttributes(boolean noRecompile) {}
+	public void onUpdateAttributes(boolean noRecompile) {
+	}
+	
+	/**
+	 * Called when the entity has finished initialization and is added (or re-added)
+	 * to the level. This is when you should update your render entities.
+	 */
+	public void onAdded() {}
+	
+	/**
+	 * <p>
+	 * Called when the entity is removed from the level for any reason. This is NOT
+	 * called when the level is closed. <br>
+	 * <b>Note:</b> The entity may be re-added at any time, for instance, if the
+	 * operation that removed it is undone.
+	 * </p>
+	 * <p>
+	 * The default implementation fires the <code>onUpdateRenderEntities</code> event,
+	 * causing the editor to remove its render entities.
+	 */
+	public void onRemoved() {
+		updateRenderEntities(Collections.emptySet());
+	}
+	
+	/**
+	 * Tell the editor to update this entity's (non-block) visual representation.
+	 * @param newRenderEntities New set of render entities.
+	 */
+	protected void updateRenderEntities(Set<RenderEntity> newRenderEntities) {
+		level.fireUpdateRenderEntitiesEvent(new UpdateRenderEntitiesEvent(newRenderEntities, this));
+	}
+	
+	/**
+	 * Register a listener to be called when one {@link RenderEntity} or more have
+	 * updated. If a render entity that previously existed isn't present in the
+	 * list, it should be removed.
+	 * 
+	 * @param listener Event listener.
+	 */
+	public void onUpdateRenderEntities(EventListener<UpdateRenderEntitiesEvent> listener) {
+		level.onUpdateRenderEntities(event -> {
+			if (event.subject == this) {
+				listener.eventFired(event);
+			}
+		});
+	}
 	
 	/**
 	 * Compile this entity's logic.

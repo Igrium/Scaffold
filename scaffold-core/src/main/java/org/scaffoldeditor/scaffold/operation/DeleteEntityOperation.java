@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.scaffoldeditor.scaffold.level.Level;
+import org.scaffoldeditor.scaffold.level.entity.BlockEntity;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 
 public class DeleteEntityOperation implements Operation {
@@ -13,6 +14,7 @@ public class DeleteEntityOperation implements Operation {
 	private Level level;
 	private Set<Entity> entities;
 	private Map<String, Integer> stackCache = new HashMap<>();
+	private boolean recompile = false;
 	
 	public DeleteEntityOperation(Level level, Set<Entity> entities) {
 		this.level = level;
@@ -24,8 +26,9 @@ public class DeleteEntityOperation implements Operation {
 		for (Entity ent : entities) {
 			stackCache.put(ent.getName(), level.getEntityStack().indexOf(ent.getName()));
 			level.removeEntity(ent.getName(), true);
+			if (ent instanceof BlockEntity) recompile = true;
 		}
-		if (level.autoRecompile) {
+		if (recompile && level.autoRecompile) {
 			level.quickRecompile();
 		}
 		return true;
@@ -36,7 +39,7 @@ public class DeleteEntityOperation implements Operation {
 		for (Entity ent : entities) {
 			level.addEntity(ent, stackCache.get(ent.getName()), true);
 		}
-		if (level.autoRecompile) {
+		if (recompile && level.autoRecompile) {
 			level.quickRecompile();
 		}
 	}
@@ -46,7 +49,7 @@ public class DeleteEntityOperation implements Operation {
 		for (Entity ent : entities) {
 			level.removeEntity(ent.getName());
 		}
-		if (level.autoRecompile) {
+		if (recompile && level.autoRecompile) {
 			level.quickRecompile();
 		}
 	}

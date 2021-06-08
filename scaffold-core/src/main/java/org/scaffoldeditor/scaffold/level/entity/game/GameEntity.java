@@ -1,6 +1,9 @@
 package org.scaffoldeditor.scaffold.level.entity.game;
 
-import org.scaffoldeditor.nbt.NBTStrings;
+import java.io.IOException;
+import java.util.Collections;
+
+import org.scaffoldeditor.nbt.math.Vector3f;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.EntityFactory;
@@ -9,9 +12,12 @@ import org.scaffoldeditor.scaffold.level.entity.Rotatable;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BooleanAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.NBTAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.StringAttribute;
+import org.scaffoldeditor.scaffold.level.render.MCRenderEntity;
 import org.scaffoldeditor.scaffold.logic.Datapack;
+import org.scaffoldeditor.scaffold.logic.MCEntity;
 import org.scaffoldeditor.scaffold.math.Vector;
 
+import net.querz.nbt.io.SNBTUtil;
 import net.querz.nbt.tag.CompoundTag;
 import net.querz.nbt.tag.FloatTag;
 import net.querz.nbt.tag.ListTag;
@@ -21,10 +27,9 @@ import net.querz.nbt.tag.ListTag;
  * @author Igrium
  *
  */
-@SuppressWarnings("deprecation")
 public class GameEntity extends Rotatable implements TargetSelectable {
 	
-	public static void Register() {
+	public static void register() {
 		EntityRegistry.registry.put("game_entity", new EntityFactory<Entity>() {		
 			@Override
 			public Entity create(Level level, String name) {
@@ -38,6 +43,25 @@ public class GameEntity extends Rotatable implements TargetSelectable {
 		attributes().put("entityType", new StringAttribute("minecraft:area_effect_cloud"));
 		attributes().put("nbt", new NBTAttribute(new CompoundTag()));
 		attributes().put("spawnOnInit", new BooleanAttribute(true));
+	}
+	
+	@Override
+	public void onAdded() {
+		super.onAdded();
+		updateRenderEntity();
+	}
+	
+	private void updateRenderEntity() {
+		System.out.println("Updating render entity!");
+		MCRenderEntity entity = new MCRenderEntity(this, getPosition(), new Vector3f(0, 0, 0),
+				new MCEntity(getEntityType(), getNBT()), "entity");
+		updateRenderEntities(Collections.singleton(entity));
+	}
+	
+	@Override
+	public void onUpdateAttributes(boolean noRecompile) {
+		super.onUpdateAttributes(noRecompile);
+		updateRenderEntity();
 	}
 	
 	/**
@@ -60,7 +84,7 @@ public class GameEntity extends Rotatable implements TargetSelectable {
 	 * Get the CompoundMap with this entity's NBT.
 	 * @return NBT.
 	 */
-	public CompoundTag nbt() {
+	public CompoundTag getNBT() {
 		return ((NBTAttribute) getAttribute("nbt")).getValue();
 	}
 	
@@ -85,7 +109,12 @@ public class GameEntity extends Rotatable implements TargetSelectable {
 	 * @return Nbt data.
 	 */
 	public String getNBTString() {
-		return NBTStrings.nbtToString(nbt());
+		try {
+			return SNBTUtil.toSNBT(getNBT());
+		} catch (IOException e) {
+			e.printStackTrace();
+			return "{}";
+		}
 	}
 	
 	/**
@@ -100,13 +129,20 @@ public class GameEntity extends Rotatable implements TargetSelectable {
 		rotArray.add(new FloatTag(rotX()));
 		rotArray.add(new FloatTag(rotY()));
 		
-		nbt().put("Rotation", rotArray);
-		nbt().putString("CustomName","\""+getName()+"\"");
+		getNBT().put("Rotation", rotArray);
+		getNBT().putString("CustomName","\""+getName()+"\"");
 		
-		String command = "summon "+getEntityType()+" "+position.X()+" "+position.Y()+" "+position.Z()+" "+NBTStrings.nbtToString(nbt());
+		String nbt = "{}";
+		try {
+			nbt = SNBTUtil.toSNBT(getNBT());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		
-		nbt().remove("Rotation");
-		nbt().remove("CustomName");
+		String command = "summon "+getEntityType()+" "+position.X()+" "+position.Y()+" "+position.Z()+" "+nbt;
+		
+		getNBT().remove("Rotation");
+		getNBT().remove("CustomName");
 
 		return command;
 	}
