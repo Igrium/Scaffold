@@ -460,7 +460,11 @@ public class Level {
 			Entity entity = getEntity(name);
 			if (entity instanceof BlockEntity) {
 				BlockEntity blockEntity = (BlockEntity) entity;
-				blockEntity.compileWorld(blockWorld, full);
+				try {
+					blockEntity.compileWorld(blockWorld, full);
+				} catch (Throwable e) {
+					e.printStackTrace();
+				}
 			}
 		}
 		fireWorldUpdateEvent(new HashSet<>());
@@ -509,7 +513,11 @@ public class Level {
 		}
 		
 		for (BlockEntity entity : updatingEntities) {
-			entity.compileWorld(tempWorld, false, sections);
+			try {
+				entity.compileWorld(tempWorld, false, sections);
+			} catch (Throwable e) {
+				e.printStackTrace();
+			}
 		}
 		
 		for (SectionCoordinate coord : sections) {
