@@ -586,7 +586,15 @@ public class Level {
 	public void fireUpdateRenderEntitiesEvent(UpdateRenderEntitiesEvent event) {
 		updateRenderEntitiesDispatcher.fire(event);
 	}
-
+	
+	/**
+	 * Manually update the visual representations of all the entities in the level.
+	 */
+	public void updateRenderEntities() {
+		for (Entity entity : getEntities().values()) {
+			entity.updateRenderEntities();
+		}
+	}
 	
 	/**
 	 * Compile this level into a playable Minecraft world (UNFINISHED).

@@ -355,6 +355,11 @@ public class Entity {
 	}
 	
 	/**
+	 * Update this entity's visual representation in the editor.
+	 */
+	public void updateRenderEntities() {}
+	
+	/**
 	 * Compile this entity's logic.
 	 * @param datapack Datapack to compile entity into
 	 * @return Success
@@ -363,14 +368,6 @@ public class Entity {
 		return true;
 	}
 	
-	/**
-	 * Get the block pass of this entity.
-	 * Entities with higher block passes will compile over entities with lower block passes.
-	 * @return Block pass.
-	 */
-	public int getBlockPass() {
-		return 0;
-	}
 	
 	/**
 	 * Compile an entity output into commands.

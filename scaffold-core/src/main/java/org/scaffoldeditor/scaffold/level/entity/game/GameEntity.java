@@ -48,10 +48,11 @@ public class GameEntity extends Rotatable implements TargetSelectable {
 	@Override
 	public void onAdded() {
 		super.onAdded();
-		updateRenderEntity();
+		updateRenderEntities();
 	}
 	
-	private void updateRenderEntity() {
+	@Override
+	public void updateRenderEntities() {
 		System.out.println("Updating render entity!");
 		MCRenderEntity entity = new MCRenderEntity(this, getPosition(), new Vector3f(0, 0, 0),
 				new MCEntity(getEntityType(), getNBT()), "entity");
@@ -61,7 +62,7 @@ public class GameEntity extends Rotatable implements TargetSelectable {
 	@Override
 	public void onUpdateAttributes(boolean noRecompile) {
 		super.onUpdateAttributes(noRecompile);
-		updateRenderEntity();
+		updateRenderEntities();
 	}
 	
 	/**
