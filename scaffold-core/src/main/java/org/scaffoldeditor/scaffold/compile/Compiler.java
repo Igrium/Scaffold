@@ -45,10 +45,12 @@ public class Compiler {
 		Compiler compiler = new Compiler();
 		
 		compiler.steps.add(new SetupStep());
+		compiler.steps.add(new PreCompileScripts());
 		compiler.steps.add(new CompileWorldStep());
 		compiler.steps.add(new WriteWorldStep());
 		compiler.steps.add(new CompileLogicStep());
 		compiler.steps.add(new CompileResourcepackStep());
+		compiler.steps.add(new PostCompileScripts());
 		
 		return compiler;
 	}

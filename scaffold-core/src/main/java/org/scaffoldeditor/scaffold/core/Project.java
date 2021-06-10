@@ -1,6 +1,7 @@
 package org.scaffoldeditor.scaffold.core;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -14,6 +15,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FilenameUtils;
+import org.json.JSONException;
 import org.scaffoldeditor.scaffold.compile.Compiler;
 import org.scaffoldeditor.scaffold.io.AssetManager;
 import org.scaffoldeditor.scaffold.io.AssetLoaderRegistry;
@@ -28,7 +30,7 @@ import org.scaffoldeditor.scaffold.plugin_utils.PluginManager;
  * @author Igrium
  *
  */
-public class Project {
+public class Project implements AutoCloseable {
 	
 	public static final String CACHE_FOLDER_NAME = ".scaffold";
 	
@@ -123,12 +125,14 @@ public class Project {
 		Project project = new Project(Paths.get(folder));
 		
 		// Load the gameinfo
-		project.gameInfo = GameInfo.fromFile(Paths.get(folder, Constants.GAMEINFONAME));
-		
-		if (project.gameInfo == null) {
+		try {
+			project.gameInfo = GameInfo.fromFile(Paths.get(folder, Constants.GAMEINFONAME).toFile());
+		} catch (FileNotFoundException | JSONException e) {
+			e.printStackTrace();
 			System.out.println("Unable to load gameinfo file!");
 			return null;
 		}
+
 		project.loadPlugins();
 		return project;
 	}
@@ -151,8 +155,12 @@ public class Project {
 		
 		// Setup gameinfo
 		project.gameInfo().setTitle(title);
+		project.gameInfo().getLoadedPaths().add("_projectfolder_");
 		
-		if (!project.gameInfo().saveJSON(Paths.get(folder,Constants.GAMEINFONAME))) {
+		try {
+			project.gameInfo().saveJSON(Paths.get(folder,Constants.GAMEINFONAME).toFile());
+		} catch (IOException e1) {
+			e1.printStackTrace();
 			return null;
 		}
 		
@@ -165,12 +173,13 @@ public class Project {
 			Files.createDirectories(Paths.get(folder, "maps"));
 			Files.createDirectories(Paths.get(folder, "schematics"));
 			Files.createDirectories(Paths.get(folder, CACHE_FOLDER_NAME));
-//			Files.createDirectories(Paths.get(folder,"scripts"));
+			Files.createDirectories(Paths.get(folder,"scripts"));
 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			System.err.println("Unable to create folder structure!");
+			return null;
 		}
 		project.loadPlugins();
 		return project;

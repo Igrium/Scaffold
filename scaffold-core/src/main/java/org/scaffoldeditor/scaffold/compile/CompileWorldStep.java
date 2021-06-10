@@ -5,13 +5,14 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import org.scaffoldeditor.scaffold.compile.Compiler.CompileProgressListener;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 
 public class CompileWorldStep implements CompileStep {
 
 	@Override
-	public boolean execute(Level level, Path target, Map<String, Attribute<?>> args) {
+	public boolean execute(Level level, Path target, Map<String, Attribute<?>> args, CompileProgressListener listener) {
 		Future<Boolean> future = level.getProject().getLevelService().submit(() -> {
 			try {
 				level.compileBlockWorld(true);

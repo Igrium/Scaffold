@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Map;
 
+import org.scaffoldeditor.scaffold.compile.Compiler.CompileProgressListener;
 import org.scaffoldeditor.scaffold.compile.world.NativeWorldWriter;
 import org.scaffoldeditor.scaffold.compile.world.WorldWriter;
 import org.scaffoldeditor.scaffold.level.Level;
@@ -15,7 +16,7 @@ public class WriteWorldStep implements CompileStep {
 	private static WorldWriter worldWriter = new NativeWorldWriter();
 
 	@Override
-	public boolean execute(Level level, Path target, Map<String, Attribute<?>> args) {
+	public boolean execute(Level level, Path target, Map<String, Attribute<?>> args, CompileProgressListener listener) {
 		File regionFolder = target.resolve("region").toFile();
 		regionFolder.mkdir();
 		

@@ -1,16 +1,18 @@
 package org.scaffoldeditor.scaffold.core;
 
 import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONTokener;
 
 /**
  * This class is responsible for loading and parsing the gameinfo file.
@@ -21,7 +23,7 @@ import org.json.JSONObject;
 public class GameInfo {
 	
 	/* All the loaded folders of this project */
-	private ArrayList<String> loadedPaths = new ArrayList<String>();
+	private List<String> loadedPaths = new ArrayList<String>();
 	
 	private List<String> plugins = new ArrayList<String>();
 	
@@ -29,7 +31,10 @@ public class GameInfo {
 	private String title = "Default Title";
 	
 	/* Does this gameinfo object match the file in the directory? */
-	private boolean isPure = false;
+	private boolean isSaved = false;
+	
+	public final List<String> preCompileScripts = new ArrayList<String>();
+	public final List<String> postCompileScripts = new ArrayList<String>();
 	
 	
 	/**
@@ -54,7 +59,7 @@ public class GameInfo {
 	 * Get the absolute loaded asset paths
 	 * @return Loaded paths (mutable)
 	 */
-	public ArrayList<String> getLoadedPaths() {
+	public List<String> getLoadedPaths() {
 		return loadedPaths;
 	}
 	
@@ -71,8 +76,8 @@ public class GameInfo {
 	 * Does this GameInfo object match the gameinfo file?
 	 * @return Is pure?
 	 */
-	public boolean isPure() {
-		return isPure;
+	public boolean isSaved() {
+		return isSaved;
 	}
 	
 	
@@ -80,7 +85,7 @@ public class GameInfo {
 	 * Set this gameinfo to be unpure
 	 */
 	public void unpure() {
-		isPure = false;
+		isSaved = false;
 	}
 	
 	/**
@@ -97,32 +102,20 @@ public class GameInfo {
 	 * Load gameinfo from a gameinfo file
 	 * @param file File to load from
 	 * @return Loaded GameInfo
+	 * @throws FileNotFoundException If the JSON file can't be found.
+	 * @throws JSONException If there's an error parsing the json file.
 	 */
-	public static GameInfo fromFile(Path file) {
-		
-		
+	public static GameInfo fromFile(File file) throws FileNotFoundException, JSONException {
 		GameInfo gameInfo = new GameInfo();
 		
 		// Load json file from disk
 		JSONObject jsonObject = null;
-		try {
-			jsonObject = loadJSON(file);
-		} catch (JSONException e) {
-			System.out.println("Invalid gameinfo.json file!");
-			return null;
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
+		JSONTokener tokener = new JSONTokener(new FileInputStream(file));
+		jsonObject = new JSONObject(tokener);
 		
 		// Set title
 		gameInfo.title = jsonObject.getString("title");
-		if (gameInfo.title == null) {
-			System.out.println("gameinfo.json is missing \"title\" key!");
-			return null;
-		}
-		
+
 		// Load paths
 		JSONArray pathsArray = jsonObject.getJSONArray("loadedFolders");
 		gameInfo.loadedPaths = new ArrayList<String>();
@@ -142,66 +135,46 @@ public class GameInfo {
 			}
 		}
 		
-		gameInfo.isPure = true;
+		// Scripts
+		JSONObject scriptsObject = jsonObject.getJSONObject("scripts");
+		JSONArray preCompile = scriptsObject.optJSONArray("preCompile");
+		if (preCompile != null) {
+			for (Object obj : preCompile) {
+				gameInfo.preCompileScripts.add(obj.toString());
+			}
+		}
+		JSONArray postCompile = scriptsObject.optJSONArray("postCompile");
+		if (postCompile != null) {
+			for (Object obj : postCompile) {
+				gameInfo.postCompileScripts.add(obj.toString());
+			}
+		}
+		
+		gameInfo.isSaved = true;
 		
 		return gameInfo;
 	}
 	
 	/**
-	 * Save this gameInfo to a json file
-	 * @param saveFile File to save to
-	 * @return Success
+	 * Save this gameInfo to a json file.
+	 * @param saveFile File to save to.
+	 * @throws IOException If an IO exception occurs.
 	 */
-	public boolean saveJSON(Path saveFile) {
+	public void saveJSON(File saveFile) throws IOException {
 		
-		/* Use a custom write script for nice formatting */
-		try {
-			BufferedWriter writer = new BufferedWriter(new FileWriter(saveFile.toString()));
-			
-			// Write title
-			writer.write("{");
-			writer.newLine();
-			writer.write("    \"title\":\""+title+"\",");
-			writer.newLine();
-			
-			// Write loaded folders
-			writer.write("    \"loadedFolders\":[");
-			writer.newLine();
-			for (int i = 0; i < loadedPaths.size(); i++) {
-				writer.write("        \""+loadedPaths.get(i)+"\"");
-				if (i != loadedPaths.size() - 1) {
-					writer.write(",");
-				}
-				writer.newLine();
-			}
-			writer.write("    ].");
-			
-			writer.newLine();
-			writer.write(
-					  "   \"plugins\": [" + System.lineSeparator()
-					+ "        " + System.lineSeparator()
-					+ "    ]" + System.lineSeparator());
-			
-			writer.write("}");
-			
-			writer.flush();
-			writer.close();
-			
-			isPure = true;
-			return true;
-		} catch (IOException e) {
-			System.out.println("Unable to save gameinfo.json!");
-			e.printStackTrace();
-			return false;
-		}
-	}
-	
-	private static JSONObject loadJSON(Path inputPath) throws IOException, JSONException {
+		JSONObject out = new JSONObject();
+		out.put("title", title);
+		out.put("loadedFolders", new JSONArray(loadedPaths));
+		out.put("plugins", new JSONArray(plugins));
 		
-		List<String> jsonFile = Files.readAllLines(inputPath);
+		JSONObject scripts = new JSONObject();
+		scripts.put("preCompile", preCompileScripts);
+		scripts.put("postCompile", postCompileScripts);
+		out.put("scripts", scripts);
 		
-		JSONObject jsonObject = new JSONObject(String.join("", jsonFile));
-		
-		return jsonObject;
+		BufferedWriter writer = new BufferedWriter(new FileWriter(saveFile));
+		writer.write(out.toString(4));
+		writer.flush();
+		writer.close();
 	}
 }

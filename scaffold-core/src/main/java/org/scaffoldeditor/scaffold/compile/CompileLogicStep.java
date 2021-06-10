@@ -67,10 +67,4 @@ public class CompileLogicStep implements CompileStep {
 	public String getID() {
 		return "compile_logic";
 	}
-
-	@Override
-	public boolean execute(Level level, Path target, Map<String, Attribute<?>> args) {
-		return execute(level, target, args, null);
-	}
-
 }

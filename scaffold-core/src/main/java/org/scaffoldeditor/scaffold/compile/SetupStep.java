@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
+import org.scaffoldeditor.scaffold.compile.Compiler.CompileProgressListener;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BooleanAttribute;
@@ -12,7 +13,7 @@ import org.scaffoldeditor.scaffold.level.entity.attribute.BooleanAttribute;
 public class SetupStep implements CompileStep {
 
 	@Override
-	public boolean execute(Level level, Path target, Map<String, Attribute<?>> args) {
+	public boolean execute(Level level, Path target, Map<String, Attribute<?>> args, CompileProgressListener listener) {
 		System.out.println("Target path: "+target);
 		if (target.toFile().exists()) {
 			try {

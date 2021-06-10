@@ -13,14 +13,7 @@ import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
  */
 public interface CompileStep {
 	
-	/**
-	 * Execute this compilation step.
-	 * @param level Level to compile.
-	 * @param target Target world directory.
-	 * @param args Additional arguements.
-	 * @return Success.
-	 */
-	public boolean execute(Level level, Path target, Map<String, Attribute<?>> args);
+
 	
 	/**
 	 * Execute this compilation step.
@@ -30,9 +23,7 @@ public interface CompileStep {
 	 * @param listener Progress listener.
 	 * @return Success.
 	 */
-	public default boolean execute(Level level, Path target, Map<String, Attribute<?>> args, CompileProgressListener listener) {
-		return execute(level, target, args);
-	}
+	public boolean execute(Level level, Path target, Map<String, Attribute<?>> args, CompileProgressListener listener);
 
 	
 	/**
