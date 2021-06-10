@@ -60,7 +60,7 @@ public class Project implements AutoCloseable {
 		this.projectFolder = projectFolder;
 		gameInfo = new GameInfo();
 		assetManager = new AssetManager(this);
-		compiler = Compiler.getDefault();
+		compiler = Compiler.getDefault(this);
 		
 		File cache = getCacheFolder().toFile();
 		if (!cache.isDirectory()) {
@@ -143,7 +143,7 @@ public class Project implements AutoCloseable {
 			LogManager.getLogger().error("Unable to load gameinfo file!");
 			return null;
 		}
-
+		project.compiler = Compiler.getDefault(project); // The compiler needs info from the gameinfo.
 		project.loadPlugins();
 		return project;
 	}

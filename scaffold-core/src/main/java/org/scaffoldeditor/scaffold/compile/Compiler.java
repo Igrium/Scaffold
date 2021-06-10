@@ -6,8 +6,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
+import org.scaffoldeditor.scaffold.core.Project;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
+import org.scaffoldeditor.scaffold.util.PythonUtils;
 
 public class Compiler {
 	
@@ -38,20 +40,22 @@ public class Compiler {
 		 * @param description Text to show in the UI.
 		 */
 		void onCompileProgress(float percent, String description);
-		
+		void println(String string);
 		void onError(String description);
 	}
 	
-	public static Compiler getDefault() {
+	public static Compiler getDefault(Project project) {
 		Compiler compiler = new Compiler();
 		
 		compiler.steps.add(new SetupStep());
-		compiler.steps.add(new PreCompileScripts());
+		compiler.steps.add(new ScriptStep(project.gameInfo().preCompileScripts, PythonUtils.PRE_COMPILE_SCRIPT,
+				"preCompileScripts"));
 		compiler.steps.add(new CompileWorldStep());
 		compiler.steps.add(new WriteWorldStep());
 		compiler.steps.add(new CompileLogicStep());
 		compiler.steps.add(new CompileResourcepackStep());
-		compiler.steps.add(new PostCompileScripts());
+		compiler.steps.add(new ScriptStep(project.gameInfo().postCompileScripts, PythonUtils.POST_COMPILE_SCRIPT,
+				"postCompileScripts"));
 		
 		return compiler;
 	}
@@ -92,7 +96,7 @@ public class Compiler {
 			try {
 				success = step.execute(level, target, arguements, listener);
 			} catch (Exception e) {
-				e.printStackTrace();
+				LogManager.getLogger().error("Unable to complete step: "+step.getID(), e);
 			}
 			
 			if (!success) {
@@ -100,7 +104,7 @@ public class Compiler {
 					this.isActive = false;
 					return new CompileResult(CompileEndStatus.FAILED, "Unable to complete required step: "+step.getID()+". See console for details.");
 				} else {
-					listener.onError("Unable to complete step: "+step.getID());
+					listener.onError("Unable to complete step: "+step.getID()+". See console for details.");
 				}
 			}
 			

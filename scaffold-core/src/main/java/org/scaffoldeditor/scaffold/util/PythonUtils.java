@@ -4,11 +4,14 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.logging.log4j.LogManager;
 import org.scaffoldeditor.scaffold.core.Project;
 
 /**
@@ -34,15 +37,18 @@ public final class PythonUtils {
 	/**
 	 * Runs a Python script, causing this thread to hold untill it's complete.
 	 * 
-	 * @param script    Source code of script.
-	 * @param directory Directory to run in.
-	 * @param args      Arguements to send to Python. Note: their index will be
-	 *                  offset by 1, as the first arguement is always
-	 *                  <code>-c</code>.
+	 * @param script     Source code of script.
+	 * @param directory  Directory to run in.
+	 * @param onReadLine A function that gets called whenever the script outputs
+	 *                   text to the console (like during a <code>print()</code>
+	 *                   statement.)
+	 * @param args       Arguements to send to Python. Note: their index will be
+	 *                   offset by 1, as the first arguement is always
+	 *                   <code>-c</code>.
 	 * @return Exit code of the script.
 	 * @throws IOException If an IO exception occurs trying to run the script.
 	 */
-	public static int runScript(String script, File directory, String ...args) throws IOException {
+	public static int runScript(String script, File directory, Consumer<String> onReadLine, String ...args) throws IOException {
 		if (!isPythonInstalled()) {
 			throw new IOException("Unable to run script because Python is not installed!");
 		}
@@ -55,16 +61,47 @@ public final class PythonUtils {
 		params.add("-c");
 		params.add(script);
 		params.addAll(Arrays.asList(args));
-		ProcessBuilder pb = new ProcessBuilder(params).directory(directory).inheritIO();
+		ProcessBuilder pb = new ProcessBuilder(params).directory(directory);
 		
-		Process p = pb.start();
-		try {
-			return p.waitFor();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-			p.destroy();
-			return p.exitValue();
+		Process process = pb.start();
+		BufferedReader stdInput = new BufferedReader(new InputStreamReader(process.getInputStream()));
+		BufferedReader stdError = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+		
+		String s = null;
+		while ((s = stdInput.readLine()) != null) {
+			onReadLine.accept(s);
 		}
+		
+		StringWriter writer = new StringWriter();
+		stdError.transferTo(writer);
+		String error = writer.toString();
+		
+		if (error.length() > 0) {
+			LogManager.getLogger().error("Error executing Python script" + System.lineSeparator() + error);
+		}
+		
+		try {
+			return process.waitFor();
+		} catch (InterruptedException e) {
+			throw new AssertionError(e);
+		}
+	}
+	
+	/**
+	 * Runs a Python script, causing this thread to hold untill it's complete.
+	 * 
+	 * @param script    Source code of script.
+	 * @param directory Directory to run in.
+	 * @param args      Arguements to send to Python. Note: their index will be
+	 *                  offset by 1, as the first arguement is always
+	 *                  <code>-c</code>.
+	 * @return Exit code of the script.
+	 * @throws IOException If an IO exception occurs trying to run the script.
+	 */
+	public static int runScript(String script, File directory, String ...args) throws IOException {
+		return runScript(script, directory, (string) -> {
+			LogManager.getLogger().info("[python] "+string);
+		}, args);
 	}
 	
 	/**

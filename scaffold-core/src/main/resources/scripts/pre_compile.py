@@ -4,7 +4,6 @@ import importlib
 from pathlib import Path
 filename = sys.argv[1]
 modulename = inspect.getmodulename(filename)
-
 sys.path.append(str(Path(filename).parent.absolute()))
 module = importlib.import_module(modulename)
 
