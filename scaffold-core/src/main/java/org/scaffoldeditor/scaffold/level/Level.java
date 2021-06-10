@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.logging.log4j.LogManager;
 import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.nbt.block.Chunk;
 import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
@@ -412,7 +413,7 @@ public class Level {
 			e.printStackTrace();
 			return false;
 		} finally {
-			System.out.println("Level saved to "+file);
+			LogManager.getLogger().info("Level saved to "+file);
 		}
 		
 		return true;
@@ -454,7 +455,7 @@ public class Level {
 	 */
 	public void compileBlockWorld(boolean full) {		
 		blockWorld.clear(); // Clear the blockworld of previous compiles.
-		System.out.println("Compiling world...");
+		LogManager.getLogger().info("Compiling world...");
 		
 		for (String name : entityStack) {
 			Entity entity = getEntity(name);
@@ -469,7 +470,7 @@ public class Level {
 		}
 		fireWorldUpdateEvent(new HashSet<>());
 		dirtySections.clear();
-		System.out.println("Finished compiling world.");
+		LogManager.getLogger().info("Finished compiling world.");
 	}
 	
 	/**
@@ -483,7 +484,7 @@ public class Level {
 		if (sections == null ||sections.isEmpty()) {
 			return;
 		}
-		System.out.println("Compiling sections...");
+		LogManager.getLogger().info("Compiling sections...");
 		// Compile into a temporary block world so other chunks don't get corrupted.
 		BlockWorld tempWorld = new BlockWorld();
 		
@@ -533,7 +534,7 @@ public class Level {
 
 			chunk.sections[coord.y] = tempChunk.sections[coord.y];
 		}
-		System.out.println("Finished compiling world.");
+		LogManager.getLogger().info("Finished compiling world.");
 		return;
 	}
 	

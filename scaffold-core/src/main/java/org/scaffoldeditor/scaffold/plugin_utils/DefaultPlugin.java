@@ -1,5 +1,6 @@
 package org.scaffoldeditor.scaffold.plugin_utils;
 
+import org.apache.logging.log4j.LogManager;
 import org.scaffoldeditor.nbt.block.BlockCollectionManager;
 import org.scaffoldeditor.scaffold.block_textures.NoiseBlockTexture;
 import org.scaffoldeditor.scaffold.block_textures.SingleBlockTexture;
@@ -34,7 +35,7 @@ public class DefaultPlugin implements PluginInitializer {
 
 	@Override
 	public void initialize() {
-		System.out.println("Initializing default plugin...");
+		LogManager.getLogger().info("Initializing default plugin...");
 		BlockCollectionManager.registerDefaults();
 
 		WorldStatic.Register();

@@ -3,6 +3,7 @@ package org.scaffoldeditor.nbt.block;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
 import org.scaffoldeditor.nbt.math.Vector3i;
 
 /**
@@ -58,7 +59,7 @@ public class Section implements SizedBlockCollection {
 			}
 			
 		} catch (IndexOutOfBoundsException e) {
-			System.out.println("Block "+x+" "+y+" "+z+" is out of range!");
+			LogManager.getLogger().error("Block "+x+" "+y+" "+z+" is out of range!");
 			return null;
 		}
 	}
@@ -82,7 +83,7 @@ public class Section implements SizedBlockCollection {
 			}
 			
 		} catch (IndexOutOfBoundsException e) {
-			System.out.println("Block "+x+" "+y+" "+z+" is out of range!");
+			LogManager.getLogger().error("Block "+x+" "+y+" "+z+" is out of range!");
 			return null;
 		}
 	}

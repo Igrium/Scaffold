@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.logging.log4j.LogManager;
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.nbt.block.Chunk;
@@ -61,7 +62,7 @@ public class WorldChunked extends BaseBlockEntity {
 		
 		StringAttribute attribute = (StringAttribute) getAttribute("model");
 		String model = attribute.getValue();
-		System.out.println("Loading model " + model);
+		LogManager.getLogger().info("Loading model " + model);
 		modelpath = model;
 		if (model.length() == 0) {
 			this.model = null;
@@ -74,15 +75,14 @@ public class WorldChunked extends BaseBlockEntity {
 				this.model = (ChunkedBlockCollection) getProject().assetManager().loadAsset(model, false);
 				onLoadModel();
 			} catch (FileNotFoundException e) {
-				System.err.println(e.getMessage());
+				LogManager.getLogger().error(e.getMessage());
 			} catch (IOException e) {
-				System.err.println("Unable to load model " + model);
+				LogManager.getLogger().error("Unable to load model " + model);
 				e.printStackTrace();
 			}
 			
 		} else {
-			System.out.println(FilenameUtils.getExtension(model));
-			System.err.println("Unable to load model " + model + " because it is not a valid model format.");
+			LogManager.getLogger().error("Unable to load model " + model + " because it is not a valid model format.");
 		}
 	}
 	

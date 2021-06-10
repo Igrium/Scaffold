@@ -279,14 +279,12 @@ public class Structure implements SizedBlockCollection, BlockReader<Structure> {
 		// Load size
 		ListTag<IntTag> sizeList = map.getListTag("size").asIntTagList();
 		if (sizeList == null) {
-			System.out.println("Structure missing size tag!");
-			return null;
+			throw new IllegalArgumentException("Structure missing size tag!");
 		}
 		
 		
 		if (sizeList.get(0) == null || sizeList.get(1) == null || sizeList.get(2) == null) {
-			System.out.println("Structure has improperly formatted size tag!");
-			return null;
+			throw new IllegalArgumentException("Structure has improperly formatted size tag!");
 		}
 		
 		structure.sizeX = sizeList.get(0).asInt();
@@ -296,8 +294,7 @@ public class Structure implements SizedBlockCollection, BlockReader<Structure> {
 		// Load palette
 		ListTag<CompoundTag> paletteTag = map.getListTag("palette").asCompoundTagList();
 		if (paletteTag == null) {
-			System.out.println("Structure missing palette tag!");
-			return null;
+			throw new IllegalArgumentException("Structure missing palette tag!");
 		}
 		List<CompoundTag> palleteList = getCompoundMaps(paletteTag);
 		structure.palette = palleteList.toArray(new CompoundTag[palleteList.size()]);
@@ -305,8 +302,7 @@ public class Structure implements SizedBlockCollection, BlockReader<Structure> {
 		// Load blocks
 		ListTag<CompoundTag> blocksTag = map.getListTag("blocks").asCompoundTagList();
 		if (blocksTag == null) {
-			System.out.println("Structure missing blocks tag!");
-			return null;
+			throw new IllegalArgumentException("Structure missing blocks tag!");
 		}
 		structure.blocks = getCompoundMaps(blocksTag);
 		

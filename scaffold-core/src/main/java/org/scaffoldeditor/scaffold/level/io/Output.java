@@ -3,6 +3,7 @@ package org.scaffoldeditor.scaffold.level.io;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -110,7 +111,7 @@ public class Output {
 			return output;
 			
 		} catch (JSONException e) {
-			System.out.println("Unable to parse output: "+object);
+			LogManager.getLogger().error("Unable to parse output: "+object);
 			return null;
 		}
 	}

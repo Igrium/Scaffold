@@ -13,7 +13,6 @@ public class AddEntityOperation implements Operation {
 	private Entity entity;
 	
 	public AddEntityOperation(Level level, String registryName, String name, Vector position) {
-		System.out.println("Creating operation"); // TESTING ONLY
 		this.registryName = registryName;
 		this.level = level;
 		this.name = name;
@@ -22,7 +21,6 @@ public class AddEntityOperation implements Operation {
 	
 	@Override
 	public boolean execute() {
-		System.out.println("Running add entity operation"); // TESTING ONLY
 		try {
 			entity = level.newEntity(registryName, name, position);
 		} catch (Exception e) {

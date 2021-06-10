@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 
@@ -74,7 +75,7 @@ public class Compiler {
 	public CompileResult compile(Level level, Path target, Map<String, Attribute<?>> arguements, CompileProgressListener listener) {
 		this.isActive = true;
 		this.shouldCancel = false;
-		System.out.println("Starting compile...");
+		LogManager.getLogger().info("Starting compile...");
 		int i = 0;
 		for (CompileStep step : steps) {
 			if (shouldCancel) {

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.nbt.block.BlockWorld.ChunkCoordinate;
@@ -55,7 +56,7 @@ public class QuerzWorldWriter implements WorldWriter {
 			MCAFile regionFile = mcaFiles.get(regionCoord);
 			regionFile.cleanupPalettesAndBlockStates();
 			File file = regionFolder.toPath().resolve(MCAUtil.createNameFromRegionLocation(regionCoord.x, regionCoord.z)).toFile();
-			System.out.println("Writing region file: "+file.toString());
+			LogManager.getLogger().info("Writing region file: "+file.toString());
 			MCAUtil.write(regionFile, file, true);
 		}
 	}

@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.logging.log4j.LogManager;
 import org.scaffoldeditor.scaffold.compile.Compiler.CompileProgressListener;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
@@ -14,7 +15,7 @@ public class SetupStep implements CompileStep {
 
 	@Override
 	public boolean execute(Level level, Path target, Map<String, Attribute<?>> args, CompileProgressListener listener) {
-		System.out.println("Target path: "+target);
+		LogManager.getLogger().info("Target path: "+target);
 		if (target.toFile().exists()) {
 			try {
 				FileUtils.deleteDirectory(target.toFile());

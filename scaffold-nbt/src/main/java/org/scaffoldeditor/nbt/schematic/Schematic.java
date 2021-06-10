@@ -116,8 +116,7 @@ public class Schematic {
 	 */
 	public static Schematic fromCompoundMap(CompoundTag map) {
 		if (map == null) {
-			System.out.println("Schematic parser was fed null.");
-			return null;
+			throw new IllegalArgumentException("Schematic NBT can't be null!");
 		}
 		
 		Schematic schematic = new Schematic();
@@ -130,8 +129,7 @@ public class Schematic {
 		
 		// Schematic may have not had proper tags
 		if (schematic.width == 0 || schematic.height == 0 || schematic.length == 0) {
-			System.out.println("Schematic is missing dimensions!");
-			return null;
+			throw new IllegalArgumentException("Schematic is missing dimensions!");
 		}
 		
 		// Get materials
@@ -146,8 +144,7 @@ public class Schematic {
 			} else if (materialName.equals("Classic")) {
 				schematic.materials = MaterialType.CLASSIC;
 			} else {
-				System.out.println("Schematic materials tag is improperly formatted!");
-				return null;
+				throw new IllegalArgumentException("Schematic materials tag is improperly formatted!");
 			}
 		}
 		
@@ -156,8 +153,7 @@ public class Schematic {
 		schematic.data = map.getByteArray("Data");
 		
 		if (schematic.blocks == null || schematic.data == null) {
-			System.out.println("Schematic blocks or data is improperly formatted!");
-			return null;
+			throw new IllegalArgumentException("Schematic blocks or data is improperly formatted!");
 		}
 		
 		// Get entities

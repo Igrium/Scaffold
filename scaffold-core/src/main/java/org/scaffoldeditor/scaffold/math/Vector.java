@@ -1,5 +1,6 @@
 package org.scaffoldeditor.scaffold.math;
 
+import org.apache.logging.log4j.LogManager;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.scaffoldeditor.nbt.math.Vector3f;
@@ -84,7 +85,7 @@ public class Vector extends Vector3f implements XMLSerializable {
 			return new Vector(x,y,z);
 			
 		} catch (JSONException e) {
-			System.out.println("Unable to load Vector from JSONArray "+array);
+			LogManager.getLogger().error("Unable to load Vector from JSONArray "+array);
 			return null;
 		}
 

@@ -5,6 +5,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import javax.xml.transform.TransformerException;
+
+import org.apache.logging.log4j.LogManager;
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.scaffold.block_textures.BlockTextureRegistry;
 import org.scaffoldeditor.scaffold.block_textures.SerializableBlockTexture;
@@ -102,7 +104,7 @@ public class BlockTextureAttribute extends Attribute<SerializableBlockTexture> {
 				save();
 			} catch (IOException e) {
 				e.printStackTrace();
-				System.err.println("Unable to save new block texture.");
+				LogManager.getLogger().error("Unable to save new block texture.");
 			}
 		}
 	}

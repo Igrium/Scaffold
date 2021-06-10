@@ -1,6 +1,8 @@
 package org.scaffoldeditor.scaffold.level.entity.logic;
 
 import java.io.IOException;
+
+import org.apache.logging.log4j.LogManager;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.scaffoldeditor.scaffold.level.Level;
@@ -109,9 +111,9 @@ public class TimelineEntity extends Entity {
 			try {
 				String modelpath = ((StringAttribute) getAttribute("file")).getValue();
 				timeline = Timeline.unserialize((JSONObject) getLevel().getProject().assetManager().loadAsset(modelpath, false));
-				System.out.println("Loaded timeline: "+getAttribute("file"));
+				LogManager.getLogger().info("Loaded timeline: "+getAttribute("file"));
 			} catch (JSONException | IOException e) {
-				System.out.println("Unable to load timeline: "+getAttribute("file"));
+				LogManager.getLogger().info("Unable to load timeline: "+getAttribute("file"));
 			}
 		}
 	}

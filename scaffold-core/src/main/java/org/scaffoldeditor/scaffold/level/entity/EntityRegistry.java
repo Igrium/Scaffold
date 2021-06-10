@@ -3,6 +3,7 @@ package org.scaffoldeditor.scaffold.level.entity;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
 import org.scaffoldeditor.scaffold.level.Level;
 
 public final class EntityRegistry {
@@ -35,7 +36,7 @@ public final class EntityRegistry {
 	 */
 	public static Entity createEntity(String registryName, Level level, String name, boolean supressUpdate) {
 		if (!registry.containsKey(registryName)) {
-			System.err.println("Unknown entity type: "+registryName);
+			LogManager.getLogger().error("Unknown entity type: "+registryName);
 			return null;
 		}
 		

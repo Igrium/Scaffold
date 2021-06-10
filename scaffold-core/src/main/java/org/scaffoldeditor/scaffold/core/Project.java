@@ -13,9 +13,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.logging.log4j.LogManager;
 import org.json.JSONException;
 import org.scaffoldeditor.scaffold.compile.Compiler;
 import org.scaffoldeditor.scaffold.io.AssetManager;
@@ -48,7 +50,7 @@ public class Project implements AutoCloseable {
 	
 	private PluginManager pluginManager;
 	private PluginInitializer defaultPlugin;
-	private final ExecutorService levelService = Executors.newSingleThreadExecutor();
+	private final ExecutorService levelService;
 	
 	/**
 	 * Create an empty project with an empty gameinfo
@@ -72,6 +74,14 @@ public class Project implements AutoCloseable {
 				}
 			}
 		}
+		
+		levelService = Executors.newSingleThreadExecutor(new ThreadFactory() {
+			
+			@Override
+			public Thread newThread(Runnable r) {
+				return new Thread(r, "Scaffold Level Thread");
+			}
+		});
 		
 		pluginManager = new PluginManager();
 		defaultPlugin = new DefaultPlugin();
@@ -113,13 +123,13 @@ public class Project implements AutoCloseable {
 		
 		// Make sure path exists
 		if (Files.notExists(Paths.get(folder))) {
-			System.out.println(folder+" does not exist!");
+			LogManager.getLogger().error(folder+" does not exist!");
 			return null;
 		}
 		
 		// Check for gameinfo file
 		if (Files.notExists(Paths.get(folder, Constants.GAMEINFONAME))) {
-			System.out.println(folder+" does not contain a gameinfo file!");
+			LogManager.getLogger().error(folder+" does not contain a gameinfo file!");
 			return null;
 		}
 		
@@ -130,7 +140,7 @@ public class Project implements AutoCloseable {
 			project.gameInfo = GameInfo.fromFile(Paths.get(folder, Constants.GAMEINFONAME).toFile());
 		} catch (FileNotFoundException | JSONException e) {
 			e.printStackTrace();
-			System.out.println("Unable to load gameinfo file!");
+			LogManager.getLogger().error("Unable to load gameinfo file!");
 			return null;
 		}
 
@@ -147,7 +157,7 @@ public class Project implements AutoCloseable {
 	public static Project init(String folder, String title) {
 		// Check if file already exists
 		if (new File(folder,Constants.GAMEINFONAME).exists()) {
-			System.out.println("Project already exists in "+folder+"!");
+			LogManager.getLogger().warn("Project already exists in "+folder+"!");
 			return loadProject(folder);
 		}
 		
@@ -178,7 +188,7 @@ public class Project implements AutoCloseable {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			System.err.println("Unable to create folder structure!");
+			LogManager.getLogger().error("Unable to create folder structure!");
 			return null;
 		}
 		
@@ -189,7 +199,7 @@ public class Project implements AutoCloseable {
 			out.close();
 		} catch (IOException e) {
 			e.printStackTrace();
-			System.err.println("Unable to create .gitignopre!");
+			LogManager.getLogger().error("Unable to create .gitignopre!");
 		}
 		
 		project.loadPlugins();
@@ -264,14 +274,14 @@ public class Project implements AutoCloseable {
 		pluginManager.closePlugins();
 		
 		try {
-			System.out.println("Shutting down level service.");
+			LogManager.getLogger().info("Shutting down level service.");
 			levelService.shutdown();
 			levelService.awaitTermination(5, TimeUnit.SECONDS);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		} finally {
 			if (!levelService.isTerminated()) {
-				System.err.println("Level service failed to close in time!");
+				LogManager.getLogger().error("Level service failed to close in time!");
 			}
 			levelService.shutdownNow(); 
 		}
@@ -289,3 +299,4 @@ public class Project implements AutoCloseable {
 		return levelService;
 	}
 }
+	

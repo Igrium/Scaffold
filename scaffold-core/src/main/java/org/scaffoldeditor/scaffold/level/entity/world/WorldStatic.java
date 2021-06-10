@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Set;
 
+import org.apache.logging.log4j.LogManager;
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.nbt.block.SizedBlockCollection;
@@ -61,7 +62,7 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 		
 		AssetAttribute attribute = (AssetAttribute) getAttribute("model");
 		String model = attribute.getValue();
-		System.out.println("Loading model " + model);
+		LogManager.getLogger().info("Loading model " + model);
 		modelpath = model;
 		if (model.length() == 0) {
 			this.baseModel = null;
@@ -73,15 +74,15 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 //				this.model = Structure.fromCompoundMap((CompoundTag) NBTUtil.read(modelFile).getTag());
 				this.baseModel = (SizedBlockCollection) getProject().assetManager().loadAsset(model, false);
 			} catch (FileNotFoundException e) {
-				System.err.println(e.getMessage());
+				LogManager.getLogger().error(e.getMessage());
 			} catch (IOException e) {
-				System.err.println("Unable to load model " + model);
+				LogManager.getLogger().error("Unable to load model " + model);
 				e.printStackTrace();
 			}
 			updateDirection();
 			
 		} else {
-			System.err.println("Unable to load model " + model + " because it is not a valid model format.");
+			LogManager.getLogger().error("Unable to load model " + model + " because it is not a valid model format.");
 		}
 	}
 	

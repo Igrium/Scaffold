@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.logging.log4j.LogManager;
 import org.json.JSONObject;
 import org.scaffoldeditor.nbt.block.ChunkedBlockCollection;
 import org.scaffoldeditor.nbt.block.SizedBlockCollection;
@@ -79,7 +80,7 @@ public class AssetAttribute extends Attribute<String> {
 		if (assetTypes.containsKey(assetType)) {
 			this.type = assetType;
 		} else {
-			System.err.println("Unknown asset attribute type: '" + assetType + "'. Defaulting to 'any'.");
+			LogManager.getLogger().error("Unknown asset attribute type: '" + assetType + "'. Defaulting to 'any'.");
 			this.type = "any";
 		}
 		

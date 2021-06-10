@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.util.*;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
 import org.scaffoldeditor.nbt.io.ChunkParser;
 import org.scaffoldeditor.nbt.io.WorldInputStream;
@@ -21,6 +23,8 @@ import net.querz.nbt.tag.CompoundTag;
  * @author Igrium
  */
 public class BlockWorld implements ChunkedBlockCollection {
+	
+	private static Logger LOGGER = LogManager.getLogger();
 	
 	/**
 	 * Class to represent chunk coordinate pairs.
@@ -298,18 +302,18 @@ public class BlockWorld implements ChunkedBlockCollection {
 	 * @throws FileNotFoundException If any of the files are not found.
 	 */
 	public static BlockWorld deserialize(File regionFolder) throws FileNotFoundException, IOException {
-		System.out.println("Reading world at "+regionFolder);
+		LOGGER.info("Reading world at "+regionFolder);
 		BlockWorld world = new BlockWorld();
 		
 		File[] regionFiles = regionFolder.listFiles();
 		for (File f : regionFiles) {
 			if (FilenameUtils.getExtension(f.toString()).matches("mca")) {
-				System.out.println("Parsing region file "+f.toString());
+				LOGGER.info("Parsing region file "+f.toString());
 				world.parseRegionFile(f);
 			}
 		}
 		
-		System.out.println("World read successfully!");
+		LOGGER.info("World read successfully!");
 		return world;
 	}
 	
@@ -320,7 +324,7 @@ public class BlockWorld implements ChunkedBlockCollection {
 	 * @throws FileNotFoundException If the file is not found.
 	 */
 	public void parseRegionFile(File regionFile) throws FileNotFoundException, IOException {
-		System.out.println("Reading "+regionFile);
+		LOGGER.info("Reading "+regionFile);
 		List<CompoundTag> chunkMaps = new ArrayList<>();
 		WorldInputStream is = new WorldInputStream(new FileInputStream(regionFile));
 		
@@ -332,7 +336,7 @@ public class BlockWorld implements ChunkedBlockCollection {
 		
 		// Add chunks to world.
 		for (int i = 0; i < chunkMaps.size(); i++) {
-			System.out.println("Parsing chunk "+i+"/"+chunkMaps.size());
+			LOGGER.info("Parsing chunk "+i+"/"+chunkMaps.size());
 			CompoundTag c = chunkMaps.get(i);
 			CompoundTag level = c.getCompoundTag("Level");
 			ChunkCoordinate coord = new ChunkCoordinate(
@@ -351,7 +355,7 @@ public class BlockWorld implements ChunkedBlockCollection {
 	 * @throws IOException If an IO Exception occurs.
 	 */
 	public void serialize(File regionFolder, int dataVersion) throws IOException {
-		System.out.println("Writing world...");
+		LOGGER.info("Writing world...");
 		
 		List<ChunkCoordinate> regions = new ArrayList<ChunkCoordinate>();
 		
@@ -380,7 +384,7 @@ public class BlockWorld implements ChunkedBlockCollection {
 	 */
 	public void writeRegionFile(File regionFile, int xOffset, int zOffset, int dataVersion) throws IOException {
 		
-		System.out.println("Writing region file " + regionFile.getName());
+		LOGGER.info("Writing region file " + regionFile.getName());
 		
 		ChunkParser parser = new ChunkParser(dataVersion);
 		

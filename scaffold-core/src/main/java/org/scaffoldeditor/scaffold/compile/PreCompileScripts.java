@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
 import org.scaffoldeditor.scaffold.compile.Compiler.CompileProgressListener;
 import org.scaffoldeditor.scaffold.core.Project;
 import org.scaffoldeditor.scaffold.level.Level;
@@ -28,7 +29,7 @@ public class PreCompileScripts implements CompileStep {
 			try {
 				int exitCode = PythonUtils.runScript(PythonUtils.PRE_COMPILE_SCRIPT, project.getProjectFolder().toFile(), absoluteScript.toString(),
 						target.toString(), project.getProjectFolder().toString(), level.getName());
-				System.out.println("Script "+scriptName+" exited with code "+exitCode);
+				LogManager.getLogger().info("Script "+scriptName+" exited with code "+exitCode);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

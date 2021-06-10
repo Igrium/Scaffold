@@ -100,9 +100,7 @@ public abstract class FileIgnore {
 	 * Load an ignore file
 	 * @throws IOException
 	 */
-	protected void load() throws IOException {
-//		System.out.println("Loading dataignore: "+file);
-		
+	protected void load() throws IOException {		
 		// If file doesn't exist, return empty file
 		if (!Files.exists(filePath)) {
 			return;

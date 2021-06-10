@@ -3,6 +3,7 @@ package org.scaffoldeditor.scaffold.block_textures;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
 import org.scaffoldeditor.scaffold.level.entity.attribute.AttributeRegistry;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -15,7 +16,7 @@ public final class BlockTextureRegistry {
 	
 	public static SerializableBlockTexture createBlockTexture(String registryName) {
 		if (!registry.containsKey(registryName)) {
-			System.err.println("Unknown block texture type: " + registryName);
+			LogManager.getLogger().error("Unknown block texture type: " + registryName);
 			return SerializableBlockTexture.DEFAULT;
 		}
 		return registry.get(registryName).create();

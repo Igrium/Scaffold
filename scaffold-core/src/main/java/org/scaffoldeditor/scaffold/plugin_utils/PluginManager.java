@@ -7,6 +7,7 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
@@ -27,20 +28,20 @@ public class PluginManager {
 		
 		public boolean initialize() {
 			String className = definition.getString("initializer");
-			System.out.println("Initializing plugin: "+name);
+			LogManager.getLogger().info("Initializing plugin: "+name);
 			
 			try {
 				Class<?> initClass = Class.forName(className, true, classLoader);
 				Constructor<?> constructor = initClass.getConstructor();
 				Object init = constructor.newInstance();
 				if (!(init instanceof PluginInitializer)) {
-					System.err.println("Initializer for "+name+" does not implement PluginInitializer!");
+					LogManager.getLogger().error("Initializer for "+name+" does not implement PluginInitializer!");
 					return false;
 				}
 				initializer = (PluginInitializer) init;
 				
 			} catch (ClassNotFoundException e) {
-				System.err.println("Unable to find plugin initializer class: "+className);
+				LogManager.getLogger().error("Unable to find plugin initializer class: "+className);
 				return false;
 			} catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException |
 					IllegalArgumentException | InvocationTargetException e) {
@@ -72,7 +73,7 @@ public class PluginManager {
 		if (classLoader != null) {
 			throw new IllegalStateException("Plugins can only be loaded once per session!");
 		}
-		System.out.println("Loading plugins...");
+		LogManager.getLogger().info("Loading plugins...");
 		
 		classLoader = new URLClassLoader(plugins, getClass().getClassLoader());
 		

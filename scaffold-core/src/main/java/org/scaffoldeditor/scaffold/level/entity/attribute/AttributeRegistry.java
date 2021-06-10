@@ -3,6 +3,7 @@ package org.scaffoldeditor.scaffold.level.entity.attribute;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
 import org.w3c.dom.Element;
 
 public final class AttributeRegistry {
@@ -22,7 +23,7 @@ public final class AttributeRegistry {
 	 */
 	public static Attribute<?> createAttribute(String typeName) {
 		if (!registry.containsKey(typeName)) {
-			System.err.println("Unknown attribute type: "+typeName);
+			LogManager.getLogger().error("Unknown attribute type: "+typeName);
 			return null;
 		}
 		
@@ -39,7 +40,7 @@ public final class AttributeRegistry {
 	public static Attribute<?> deserializeAttribute(Element element) {
 		String typeName = element.getTagName();
 		if (!registry.containsKey(typeName)) {
-			System.err.println("Unknown attribute type: "+typeName);
+			LogManager.getLogger().error("Unknown attribute type: "+typeName);
 			return null;
 		}
 		
