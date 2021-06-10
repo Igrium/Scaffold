@@ -16,7 +16,7 @@ public class PostCompileScripts implements CompileStep {
 	@Override
 	public boolean execute(Level level, Path target, Map<String, Attribute<?>> args, CompileProgressListener listener) {
 		Project project = level.getProject();
-		if (project.gameInfo().preCompileScripts.isEmpty()) {
+		if (project.gameInfo().postCompileScripts.isEmpty()) {
 			return true;
 		}
 		if (!PythonUtils.isPythonInstalled()) {
@@ -24,7 +24,7 @@ public class PostCompileScripts implements CompileStep {
 			return false;
 		}
 		for (String scriptName : project.gameInfo().postCompileScripts) {
-			File absoluteScript = project.assetManager().getAbsoluteFile(scriptName);
+			File absoluteScript = PythonUtils.resolveScript(project, scriptName);
 			try {
 				int exitCode = PythonUtils.runScript(PythonUtils.POST_COMPILE_SCRIPT, project.getProjectFolder().toFile(), absoluteScript.toString(),
 						target.toString(), project.getProjectFolder().toString(), level.getName());

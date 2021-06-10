@@ -24,7 +24,7 @@ public class PreCompileScripts implements CompileStep {
 			return false;
 		}
 		for (String scriptName : project.gameInfo().preCompileScripts) {
-			File absoluteScript = project.assetManager().getAbsoluteFile(scriptName);
+			File absoluteScript = PythonUtils.resolveScript(project, scriptName);
 			try {
 				int exitCode = PythonUtils.runScript(PythonUtils.PRE_COMPILE_SCRIPT, project.getProjectFolder().toFile(), absoluteScript.toString(),
 						target.toString(), project.getProjectFolder().toString(), level.getName());

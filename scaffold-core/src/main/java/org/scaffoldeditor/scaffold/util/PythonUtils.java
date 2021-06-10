@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+import org.scaffoldeditor.scaffold.core.Project;
 
 /**
  * A utility function for executing Python code.
@@ -46,6 +47,9 @@ public final class PythonUtils {
 			throw new IOException("Unable to run script because Python is not installed!");
 		}
 		
+		// For some reason, processbuilder freaks out with quotes. We need to escape them.
+		script = script.replace("\"", "\\\"");
+		
 		List<String> params = new ArrayList<String>();
 		params.add("python");
 		params.add("-c");
@@ -61,6 +65,19 @@ public final class PythonUtils {
 			p.destroy();
 			return p.exitValue();
 		}
+	}
+	
+	/**
+	 * Locate a script file by its name.
+	 * 
+	 * @param project    Project to look in.
+	 * @param scriptName Name of script. If it doesn't end in <code>.py</code> it
+	 *                   will automatically be appended.
+	 * @return Absolute script file.
+	 */
+	public static File resolveScript(Project project, String scriptName) {
+		if (!scriptName.endsWith(".py")) scriptName = scriptName+".py";
+		return project.getProjectFolder().resolve("scripts").resolve(scriptName).toFile();
 	}
 
 	

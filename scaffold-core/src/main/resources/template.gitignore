@@ -1,0 +1,24 @@
+### Scaffold ###
+
+# Per-developer project and build files
+game/
+.scaffold/
+plugins/project.jar # Locally compiled project jar
+
+# Python build files
+*.py[cod]
+*$py.class
+scripts/__pycache__/
+
+### VisualStudioCode ###
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+### VisualStudioCode Patch ###
+# Ignore all local history of files
+.history
+.ionide
