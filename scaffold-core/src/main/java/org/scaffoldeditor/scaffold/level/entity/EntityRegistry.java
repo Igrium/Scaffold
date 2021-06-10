@@ -12,7 +12,7 @@ public final class EntityRegistry {
 	 * <br>
 	 * (type name, entity factory)
 	 */
-	public static final Map<String, EntityFactory<Entity>> registry = new HashMap<>();
+	public static final Map<String, EntityFactory<?>> registry = new HashMap<>();
 	
 	/**
 	 * Spawn an entity.

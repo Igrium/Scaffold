@@ -24,6 +24,7 @@ import org.scaffoldeditor.scaffold.level.entity.game.GameEntity;
 import org.scaffoldeditor.scaffold.level.entity.logic.Auto;
 import org.scaffoldeditor.scaffold.level.entity.logic.FunctionEntity;
 import org.scaffoldeditor.scaffold.level.entity.logic.Relay;
+import org.scaffoldeditor.scaffold.level.entity.util.ModelTest;
 import org.scaffoldeditor.scaffold.level.entity.world.WorldStatic;
 import org.scaffoldeditor.scaffold.level.entity.world.SingleBlock;
 import org.scaffoldeditor.scaffold.level.entity.world.WorldBrush;
@@ -44,6 +45,7 @@ public class DefaultPlugin implements PluginInitializer {
 		FunctionEntity.Register();
 		Relay.Register();
 		GameEntity.register();
+		ModelTest.register();
 		
 		StringAttribute.register();
 		NBTAttribute.register();

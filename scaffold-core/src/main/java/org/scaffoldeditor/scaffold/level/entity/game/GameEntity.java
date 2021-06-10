@@ -53,7 +53,6 @@ public class GameEntity extends Rotatable implements TargetSelectable {
 	
 	@Override
 	public void updateRenderEntities() {
-		System.out.println("Updating render entity!");
 		MCRenderEntity entity = new MCRenderEntity(this, getPosition(), new Vector3f(0, 0, 0),
 				new MCEntity(getEntityType(), getNBT()), "entity");
 		updateRenderEntities(Collections.singleton(entity));
