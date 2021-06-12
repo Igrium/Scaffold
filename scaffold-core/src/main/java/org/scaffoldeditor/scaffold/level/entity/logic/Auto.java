@@ -1,9 +1,12 @@
 package org.scaffoldeditor.scaffold.level.entity.logic;
 
+import java.util.Collections;
+
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.EntityFactory;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
+import org.scaffoldeditor.scaffold.level.render.BillboardRenderEntity;
 import org.scaffoldeditor.scaffold.logic.Datapack;
 
 /**
@@ -24,6 +27,25 @@ public class Auto extends Entity {
 
 	public Auto(Level level, String name) {
 		super(level, name);
+	}
+	
+	@Override
+	public void onAdded() {
+		super.onAdded();
+		updateRenderEntities();
+	}
+	
+	@Override
+	public void onUpdateAttributes(boolean noRecompile) {
+		super.onUpdateAttributes(noRecompile);
+		updateRenderEntities();
+	}
+
+	@Override
+	public void updateRenderEntities() {
+		super.updateRenderEntities();
+		updateRenderEntities(Collections.singleton(
+				new BillboardRenderEntity(this, getPosition(), "billboard", "scaffold:textures/editor/auto.png")));
 	}
 
 	@Override
