@@ -14,9 +14,12 @@ import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
 import org.scaffoldeditor.nbt.io.ChunkParser;
 import org.scaffoldeditor.nbt.io.WorldInputStream;
 import org.scaffoldeditor.nbt.io.WorldOutputStream;
+import org.scaffoldeditor.nbt.math.Vector3d;
 import org.scaffoldeditor.nbt.math.Vector3i;
 
 import net.querz.nbt.tag.CompoundTag;
+import net.querz.nbt.tag.DoubleTag;
+import net.querz.nbt.tag.ListTag;
 
 /**
  * Represents all the blocks in a world.
@@ -50,6 +53,30 @@ public class BlockWorld implements ChunkedBlockCollection {
 		
 		public int z() {
 			return z;
+		}
+		
+		public int getStartX() {
+			return x * Chunk.WIDTH;
+		}
+		
+		public int getStartZ() {
+			return z * Chunk.LENGTH;
+		}
+		
+		public int getEndX() {
+			return getStartX() + Chunk.WIDTH;
+		}
+		
+		public int getEndZ() {
+			return getStartZ() + Chunk.LENGTH;
+		}
+		
+		public Vector3i relativize(Vector3i vec) {
+			return new Vector3i(vec.x - getStartX(), vec.y, vec.z - getStartZ());
+		}
+		
+		public Vector3i resolve(Vector3i vec) {
+			return new Vector3i(vec.x + getStartX(), vec.y, vec.z + getStartZ());
 		}
 		
 		@Override
@@ -185,6 +212,18 @@ public class BlockWorld implements ChunkedBlockCollection {
 	}
 	
 	/**
+	 * Remove a section and all the blocks in it from the world. Also removes tile
+	 * entities.
+	 * 
+	 * @param coord Section to remove.
+	 */
+	public void clearSection(SectionCoordinate coord) {
+		Chunk chunk = chunkAt(coord.x, coord.z);
+		if (chunk == null) return;
+		chunk.clearSection(coord.y);
+	}
+	
+	/**
 	 * Place a block collection in the world.
 	 * 
 	 * @param collection Collection to place.
@@ -202,6 +241,8 @@ public class BlockWorld implements ChunkedBlockCollection {
 	 * @param owner      Owner to assign blocks to.
 	 */
 	public void addBlockCollection(BlockCollection collection, int x, int y, int z, boolean override, boolean placeAir, Object owner) {
+		Vector3i targetCoord = new Vector3i(x, y, z);
+		LogManager.getLogger().debug("Adding block collection...");
 		for (Vector3i coord : collection) {
 			int globalX = x + coord.x;
 			int globalY = y + coord.y;
@@ -215,6 +256,11 @@ public class BlockWorld implements ChunkedBlockCollection {
 					&& (placeAir || !newBlock.getName().matches("minecraft:air"))) {
 				setBlock(globalX, globalY, globalZ, newBlock, owner);
 			}
+		}
+		
+		// Block entities
+		for (Vector3i ent : collection.getBlockEntities()) {
+			addBlockEntity(targetCoord.add(ent), collection.blockEntityAt(ent));
 		}
 	}
 	
@@ -260,6 +306,18 @@ public class BlockWorld implements ChunkedBlockCollection {
 	}
 	
 	/**
+	 * Get the chunk coordinate of the chunk at a set of block coordinates.
+	 * @param x Block X.
+	 * @param z Block Z.
+	 * @return
+	 */
+	public ChunkCoordinate chunkAtCoord(int x, int z) {
+		return new ChunkCoordinate(
+				(int) Math.floor(x / (double) Chunk.WIDTH),
+				(int) Math.floor(z / (double) Chunk.LENGTH));
+	}
+	
+	/**
 	 * Get a collection of all this world's chunks.
 	 * @return Chunks.
 	 */
@@ -280,6 +338,7 @@ public class BlockWorld implements ChunkedBlockCollection {
 	 */
 	public void clear() {
 		chunks.clear();
+		entities();
 	}
 	
 	/**
@@ -292,6 +351,64 @@ public class BlockWorld implements ChunkedBlockCollection {
 			entities.addAll(c.entities);
 		}
 		return entities;
+	}
+	
+	public void addEntity(CompoundTag entity) {
+		ListTag<DoubleTag> posList = entity.getListTag("Pos").asDoubleTagList();
+		Vector3i pos = new Vector3d(posList.get(0).asDouble(), posList.get(1).asDouble(), posList.get(2).asDouble()).floor();
+		
+		ChunkCoordinate chunkKey = chunkAtCoord(pos.x, pos.z);
+		Chunk chunk = chunks.get(chunkKey);
+		if (chunk == null) {
+			chunk = new Chunk();
+			chunks.put(chunkKey, chunk);
+		}
+		
+		chunk.entities.add(entity);
+	}
+	
+	public void removeEntity(CompoundTag entity) {
+		ListTag<DoubleTag> posList = entity.getListTag("Pos").asDoubleTagList();
+		Vector3i pos = new Vector3d(posList.get(0).asDouble(), posList.get(1).asDouble(), posList.get(2).asDouble()).floor();
+		
+		Chunk chunk = chunks.get(chunkAtCoord(pos.x, pos.z));
+		if (chunk != null) chunk.entities.remove(entity);
+	}
+	
+	/**
+	 * Add a block entity to the world. Note: block entities continue to exist as
+	 * long as the section in which they reside is recompiled.
+	 * 
+	 * @param pos Global position.
+	 * @param nbt NBT of block entity.
+	 */
+	public void addBlockEntity(Vector3i pos, CompoundTag nbt) {
+		ChunkCoordinate chunkCoord = chunkAtCoord(pos.x, pos.z);
+		Chunk chunk = chunks.get(chunkCoord);
+		if (chunk == null) {
+			chunk = new Chunk();
+			chunks.put(chunkCoord, chunk);
+		}
+		chunk.blockEntities.put(new Vector3i(pos.x - chunkCoord.getStartX(), pos.y, pos.z - chunkCoord.getStartZ()),
+				nbt);
+	}
+
+	/**
+	 * Get the block entity at a certian location.
+	 * 
+	 * @param x X coordinate.
+	 * @param y Y coordinate.
+	 * @param z Z coordinate.
+	 * @return The block entity nbt, or <code>null</code> of none exists at this
+	 *         location.
+	 */
+	public CompoundTag blockEntityAt(int x, int y, int z) {
+		ChunkCoordinate chunkKey = chunkAtCoord(x, z);
+		Chunk chunk = chunks.get(chunkKey);
+		if (chunk == null) return null;
+		
+		Vector3i localCoords = chunkKey.relativize(new Vector3i(x, y, z));
+		return chunk.blockEntityAt(localCoords);
 	}
 	
 	/**
@@ -351,10 +468,11 @@ public class BlockWorld implements ChunkedBlockCollection {
 	/**
 	 * Write this BlockWorld to a Minecraft save file.
 	 * @param regionFolder Region folder of Minecraft world to write to.
+	 * @param entitiesFolder Entities folder of Minecraft world to write to.
 	 * @param dataVersion The <a href="https://minecraft.gamepedia.com/Data_version">data version</a> to use.
 	 * @throws IOException If an IO Exception occurs.
 	 */
-	public void serialize(File regionFolder, int dataVersion) throws IOException {
+	public void serialize(File regionFolder, File entitiesFolder, int dataVersion) throws IOException {
 		LOGGER.info("Writing world...");
 		
 		List<ChunkCoordinate> regions = new ArrayList<ChunkCoordinate>();
@@ -370,17 +488,30 @@ public class BlockWorld implements ChunkedBlockCollection {
 		
 		for (ChunkCoordinate region : regions) {
 			File regionFile = new File(regionFolder, "r."+region.x+"."+region.z+".mca");
+			File entityFile = new File(entitiesFolder, "r."+region.x+"."+region.z+".mca");
 			writeRegionFile(regionFile, region.x, region.z, dataVersion);
+			writeEntityFile(entityFile, region.x, region.z, dataVersion);
 		}
 	}
 	
 	/**
+	 * Write this BlockWorld to a Minecraft save file.
+	 * @param regionFolder Region folder of Minecraft world to write to.
+	 * @param dataVersion The <a href="https://minecraft.gamepedia.com/Data_version">data version</a> to use.
+	 * @throws IOException If an IO Exception occurs.
+	 */
+	public void serialize(File regionFolder, int dataVersion) throws IOException {
+		serialize(regionFolder, new File(regionFolder.getParent(), "entities"), dataVersion);
+	}
+	
+	/**
 	 * Write the appropriate chunks from this world into a region file. (.mca)
-	 * @param regionFile File to write to. Will replace if already exists.
-	 * @param xOffset X coordinate of the region file.
-	 * @param xOffset Z coordinate of the region file.
+	 * 
+	 * @param regionFile  File to write to. Will replace if already exists.
+	 * @param xOffset     X coordinate of the region file.
+	 * @param xOffset     Z coordinate of the region file.
 	 * @param dataVersion Data version of Minecraft version to save to.
-	 * @throws IOException 
+	 * @throws IOException If an IO Exception occurs.
 	 */
 	public void writeRegionFile(File regionFile, int xOffset, int zOffset, int dataVersion) throws IOException {
 		
@@ -411,12 +542,57 @@ public class BlockWorld implements ChunkedBlockCollection {
 		WorldOutputStream wos = new WorldOutputStream(new FileOutputStream(regionFile), new ChunkCoordinate(xOffset, zOffset));
 		
 		for (ChunkCoordinate coord : chunks.keySet()) {
-			
 			// Convert the coordinates into region space.
 			int relativeX = coord.x - xOffset*32;
 			int relativeZ = coord.z - zOffset*32;
 			
 			wos.write(new ChunkCoordinate(relativeX, relativeZ), chunks.get(coord));
+		}
+		
+		wos.close();
+	}
+
+	/**
+	 * Write the entities from the appropriate chunks in this world into a
+	 * <code>.mca</code> found within the <code>entities</code> folder.
+	 * 
+	 * @param entityFile  File to write to. Will replace if already exists.
+	 * @param xOffset     X coordinate of the region file.
+	 * @param xOffset     Z coordinate of the region file.
+	 * @param dataVersion Data version of Minecraft version to save to.
+	 * @throws IOException If an IO Exception occurs.
+	 */
+	public void writeEntityFile(File entityFile, int xOffset, int zOffset, int dataVersion) throws IOException {
+		LOGGER.info("Writing entity file: " + entityFile.getName());
+		ChunkParser parser = new ChunkParser(dataVersion);
+
+		// Keep track of all the chunks that belong in this file.
+		Map<ChunkCoordinate, CompoundTag> entityChunks = new HashMap<>();
+		for (ChunkCoordinate chunkCoord : this.chunks.keySet()) {
+			int relativeX = chunkCoord.x - xOffset * 32;
+			int relativeZ = chunkCoord.z - zOffset * 32;
+
+			if (0 <= relativeX && relativeX < 32 && 0 <= relativeZ && relativeZ < 32) {
+				// Serialize chunk to NBT.
+				entityChunks.put(chunkCoord, parser.writeEntities(this.chunks.get(chunkCoord), chunkCoord.x, chunkCoord.z));
+			}
+		}
+		// Don't write file if there are no chunks.
+		if (entityChunks.size() < 1) {
+			return;
+		}
+		if (entityFile.exists()) {
+			entityFile.delete();
+		}
+		
+		WorldOutputStream wos = new WorldOutputStream(new FileOutputStream(entityFile), new ChunkCoordinate(xOffset, zOffset));
+		
+		for (ChunkCoordinate coord : entityChunks.keySet()) {
+			// Convert the coordinates into region space.
+			int relativeX = coord.x - xOffset*32;
+			int relativeZ = coord.z - zOffset*32;
+			
+			wos.write(new ChunkCoordinate(relativeX, relativeZ), entityChunks.get(coord));
 		}
 		
 		wos.close();

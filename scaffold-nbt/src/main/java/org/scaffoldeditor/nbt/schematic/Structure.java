@@ -19,6 +19,7 @@ import net.querz.nbt.tag.CompoundTag;
 import net.querz.nbt.tag.IntTag;
 import net.querz.nbt.tag.ListTag;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Represents a Minecraft structure schematic (.nbt)
@@ -29,6 +30,7 @@ public class Structure implements SizedBlockCollection, BlockReader<Structure> {
 	private CompoundTag[] palette;
 	private List<CompoundTag> blocks;
 	private List<CompoundTag> entities;
+	private Map<Vector3i, CompoundTag> blockEntities = new HashMap<>();
 	
 	private int sizeX;
 	private int sizeY;
@@ -256,13 +258,25 @@ public class Structure implements SizedBlockCollection, BlockReader<Structure> {
 		}
 	}
 	
-	/**
-	 * Gets a list of all entities in structure, represented as CompoundMaps
-	 * @return
-	 */
+	@Override
 	public List<CompoundTag> getEntities() {
 		return entities;
 	}
+	
+	@Override
+	public Set<Vector3i> getBlockEntities() {
+		return blockEntities.keySet();
+	}
+	
+	@Override
+	public CompoundTag blockEntityAt(Vector3i vec) {
+		return blockEntities.get(vec);
+	}
+	
+	private static Vector3i decodeLocation(ListTag<IntTag> tag) {
+		return new Vector3i(tag.get(0).asInt(), tag.get(1).asInt(), tag.get(2).asInt());
+	}
+		
 	
 	public String toString() {
 		return "Structure with size: "+sizeX+", "+sizeY+", "+sizeZ;
@@ -312,6 +326,13 @@ public class Structure implements SizedBlockCollection, BlockReader<Structure> {
 			structure.entities = new ArrayList<CompoundTag>();
 		} else {
 			structure.entities = getCompoundMaps(entitiesTag);
+		}
+		
+		// Load block entities
+		for (CompoundTag block : structure.blocks) {
+			if (block.containsKey("nbt")) {
+				structure.blockEntities.put(decodeLocation(block.getListTag("pos").asIntTagList()), block.getCompoundTag("nbt"));
+			}
 		}
 		
 		return structure;

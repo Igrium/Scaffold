@@ -3,8 +3,12 @@ package org.scaffoldeditor.nbt.io;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.Chunk;
+import org.scaffoldeditor.nbt.math.Vector3i;
+import org.scaffoldeditor.nbt.util.BlockEntityUtils;
+import org.scaffoldeditor.nbt.block.BlockWorld.ChunkCoordinate;
 
 import net.querz.nbt.tag.CompoundTag;
 import net.querz.nbt.tag.ListTag;
@@ -230,29 +234,15 @@ public class ChunkParser {
 		}
 		level.put("Sections", sections);
 		
-		// Write entities.
-		ListTag<CompoundTag> entities = new ListTag<>(CompoundTag.class);
-		for (CompoundTag e : chunk.entities) {
-			entities.add(e);
-		}
-		
-		if (entities.size() > 0) {
-			level.put("Entities", entities);
-		} else {
-			level.put("Entities", new ListTag<>(CompoundTag.class));
-		}
-		
 		// Write tile entities.
 		ListTag<CompoundTag> tileEntities = new ListTag<>(CompoundTag.class);
-		for (CompoundTag e : chunk.tileEntities) {
-			tileEntities.add(e);
+		for (Vector3i coord : chunk.blockEntities.keySet()) {
+			CompoundTag nbt = chunk.blockEntities.get(coord).clone();
+			BlockEntityUtils.injectCoordinates(nbt, new ChunkCoordinate(x, z).resolve(coord));
+			tileEntities.add(nbt);
 		}
-		
-		if (tileEntities.size() > 0) {
-			level.put("TileEntities", tileEntities);
-		} else {
-			level.put("TileEntities", new ListTag<>(CompoundTag.class));
-		}
+		LogManager.getLogger().debug("Writing chunk tile entities: "+tileEntities);
+		level.put("TileEntities", tileEntities);
 		
 		// Write other shit that Minecraft needs to read the file.
 		CompoundTag structures = new CompoundTag();
@@ -279,6 +269,18 @@ public class ChunkParser {
 		root.put("Level", level);
 		root.putInt("DataVersion", dataVersion);
 		return root;
+	}
+	
+	public CompoundTag writeEntities(Chunk chunk, int x, int z) {
+		CompoundTag data = new CompoundTag();
+		ListTag<CompoundTag> entities = new ListTag<>(CompoundTag.class);
+		entities.addAll(chunk.entities);
+		data.put("Entities", entities);
+		
+		data.putInt("DataVersion", dataVersion);
+		data.putIntArray("Position", new int[] { x, z });
+		
+		return data;
 	}
 	
 	/**

@@ -1,8 +1,11 @@
 package org.scaffoldeditor.nbt.block;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 import org.scaffoldeditor.nbt.block.BlockWorld.ChunkCoordinate;
 import org.scaffoldeditor.nbt.math.Vector3i;
 
@@ -78,35 +81,60 @@ public class Chunk implements SizedBlockCollection {
 			return getStartZ() + LENGTH;
 		}
 		
+		/**
+		 * Get a coordinate in local space relative to this section in global space.
+		 * @param in Local space coordinate.
+		 * @return Global space coordinate.
+		 * @see #relativize
+		 */
+		public Vector3i resolve(Vector3i in) {
+			return new Vector3i(in.x + getStartX(), in.y + getStartY(), in.z + getStartZ());
+		}
+		
+		/**
+		 * Get a coordinate in global space relative to this section in local space.
+		 * @param in Global space coordinate.
+		 * @return Local space coordinate.
+		 * @see #resolve
+		 */
+		public Vector3i relativize(Vector3i in) {
+			return new Vector3i(in.x - getStartX(), in.y - getStartY(), in.z - getStartZ());
+		}
+		
 		@Override
 		public String toString() {
 			return "SectionCoordinate: ["+x+", "+y+", "+z+"]";
 		}
 	}
-	
-	/**
-	 * A list of all the block types that are in the chunk.
-	 */
-	private List<Block> palette = new ArrayList<Block>();
-	
-	/**
-	 * All blocks in the chunk, listed by their palette index.
-	 */
-	private short[][][] blocks;
-	
+
 	/**
 	 * A list of entities in the chunk, in <a href="https://minecraft.gamepedia.com/Chunk_format#entity_format">NBT format</a>.
 	 * <br>
 	 * Does not do anything natively. Functionallity must be implemented externally.
 	 */
-	public final List<CompoundTag> entities = new ArrayList<>();
+	public final Collection<CompoundTag> entities = new ArrayList<>();
 	
 	/**
-	 * A list of tile entities in the chunk, in <a href="https://minecraft.gamepedia.com/Chunk_format#entity_format">NBT format</a>.
+	 * A map of tile entities in the chunk, in <a href="https://minecraft.gamepedia.com/Chunk_format#entity_format">NBT format</a>.
 	 * <br>
 	 * Does not do anything natively. Functionallity must be implemented externally.
 	 */
-	public final List<CompoundTag> tileEntities = new ArrayList<>();
+	public final Map<Vector3i, CompoundTag> blockEntities = new HashMap<>();
+	
+	@Override
+	public Set<Vector3i> getBlockEntities() {
+		return blockEntities.keySet();
+	}
+	
+	@Override
+	public CompoundTag blockEntityAt(Vector3i vec) {
+		return blockEntities.get(vec);
+	}
+	
+	@Override
+	public Collection<CompoundTag> getEntities() {
+		return entities;
+	}
 	
 	/**
 	 * All the sections in the chunk.
@@ -117,15 +145,6 @@ public class Chunk implements SizedBlockCollection {
 		for (int i = 0; i < sections.length; i++) {
 			sections[i] = new Section();
 		}
-		
-		blocks = new short[WIDTH][HEIGHT][LENGTH];
-		for (short[][] row : blocks) {
-			for (short[] column : row) {
-				Arrays.fill(column, (short) -1);
-			}
-		}
-		
-		palette.add(new Block("minecraft:air")); // 0 in the palette is always air.
 	}
 	
 	@Override
@@ -149,6 +168,20 @@ public class Chunk implements SizedBlockCollection {
 		return section.getOwner(x, y % Section.HEIGHT, z);
 	}
 	
+	public void clearSection(int index) {
+		if (index < 0 || index > sections.length) {
+			throw new IllegalArgumentException("Section index not within range!");
+		}
+		int min = index * Section.HEIGHT;
+		int max = min + Section.HEIGHT;
+		
+		for (Vector3i coord : getBlockEntities()) {
+			if (min <= coord.y && max > coord.y) blockEntities.remove(coord);
+		}
+		
+		sections[index] = null;
+	}
+	
 	/**
 	 * Check for a non-air block at the given chunk coordinates. (More efficiant than blockAt).
 	 * @param x X coordinate.
@@ -159,7 +192,6 @@ public class Chunk implements SizedBlockCollection {
 	public boolean blockExists(int x, int y, int z) {
 		Section section = sections[Math.floorDiv(y, Section.HEIGHT)];
 		return section.blockExists(x, y % Section.HEIGHT, z);
-//		return (blocks[x][y][z] > 0);
 	}
 	
 	public void setBlock(int x, int y, int z, Block block) {

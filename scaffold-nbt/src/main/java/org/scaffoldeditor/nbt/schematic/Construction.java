@@ -12,6 +12,7 @@ import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.ChunkedBlockCollection;
 import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
 import org.scaffoldeditor.nbt.block.SizedBlockCollection;
+import org.scaffoldeditor.nbt.math.Vector3d;
 import org.scaffoldeditor.nbt.math.Vector3i;
 
 import net.querz.nbt.tag.CompoundTag;
@@ -52,7 +53,7 @@ public class Construction implements ChunkedBlockCollection {
 		}
 		
 		public final List<CompoundTag> entities = new ArrayList<>();
-		public final List<CompoundTag> blockEntities = new ArrayList<>();
+		public final Map<Vector3i, CompoundTag> blockEntities = new HashMap<>();
 
 		@Override
 		public Block blockAt(int x, int y, int z) {
@@ -72,8 +73,21 @@ public class Construction implements ChunkedBlockCollection {
 		@Override
 		public Vector3i getMax() {
 			return new Vector3i(relativeStartCoords[0] + width, relativeStartCoords[1] + height, relativeStartCoords[2] + length);
-		} 
+		}
 		
+		public List<CompoundTag> getEntities() {
+			return entities;
+		}
+		
+		@Override
+		public Set<Vector3i> getBlockEntities() {
+			return blockEntities.keySet();
+		}
+		
+		@Override
+		public CompoundTag blockEntityAt(Vector3i vec) {
+			return blockEntities.get(vec);
+		}
 	}
 	
 	/**
@@ -102,12 +116,21 @@ public class Construction implements ChunkedBlockCollection {
 	
 	/**
 	 * <p>
-	 * Like Minecraft worlds, Construction files are inherantly unlimited in size. This wrapper class
-	 * allows you to use a segment of a construction in functions requiring a {@link SizedBlockCollection}. </p>
-	 * <p>Note: segments do not keep their own copy of blocks. Instead, they reference the parent Construction
-	 * and obtain blocks relative to their root position. Width, height, and length are only used to satisfy
-	 * the requirements of SizedBlockCollection.</p>
-	 * <p>This should be instantiated from {@link Construction#getSegment(SelectionBox)}</p>
+	 * Like Minecraft worlds, Construction files are inherantly unlimited in size.
+	 * This wrapper class allows you to use a segment of a construction in functions
+	 * requiring a {@link SizedBlockCollection}.
+	 * </p>
+	 * <p>
+	 * Note: segments do not keep their own copy of blocks. Instead, they reference
+	 * the parent Construction and obtain blocks relative to their root position.
+	 * Width, height, and length are only used to satisfy the requirements of
+	 * SizedBlockCollection.
+	 * </p>
+	 * <p>
+	 * This should be instantiated from
+	 * {@link Construction#getSegment(SelectionBox)}
+	 * </p>
+	 * 
 	 * @author Igrium
 	 */
 	public class ConstructionSegment implements SizedBlockCollection {
@@ -155,6 +178,41 @@ public class Construction implements ChunkedBlockCollection {
 			return new Vector3i(width, height, length);
 		}
 		
+		@Override
+		public CompoundTag blockEntityAt(Vector3i vec) {
+			return Construction.this.blockEntityAt(new Vector3i(vec.x + rootX, vec.y + rootY, vec.z + rootZ));
+		}
+		
+		@Override
+		public Set<Vector3i> getBlockEntities() {
+			Set<Vector3i> ents = new HashSet<>();
+			for (SectionCoordinate secCoord : getOverlappingSections()) {
+				Section section = sections.get(secCoord);
+				if (section != null) {
+					for (Vector3i coord : section.getBlockEntities()) {
+						Vector3i globalCoord = secCoord.resolve(coord);
+						ents.add(globalCoord.subtract(new Vector3i(rootX, rootY, rootZ)));
+					}
+				}
+			}
+			
+			return ents;
+		}
+		
+		protected Set<SectionCoordinate> getOverlappingSections() {
+			Set<SectionCoordinate> overlapping = new HashSet<>();
+			Vector3i min = new Vector3d(rootX, rootY, rootZ).divide(16).floor();
+			Vector3i max = new Vector3d(rootX + width, rootY + height, rootZ + length).divide(16).floor();
+			
+			for (int x = min.x; x <= max.x; x++) {
+				for (int y = min.y; y <= max.y; y++) {
+					for (int z = min.z; z <= max.z; z++) {
+						overlapping.add(new SectionCoordinate(x, y, z));
+					}
+				}
+			}
+			return overlapping;
+		}	
 	}
 	
 	public final List<Block> palette = new ArrayList<>();
@@ -209,9 +267,32 @@ public class Construction implements ChunkedBlockCollection {
 	public int getSectionHeight() {
 		return 16;
 	}
+	
+	@Override
+	public Set<Vector3i> getBlockEntities() {
+		Set<Vector3i> locations = new HashSet<>();
+		for (SectionCoordinate secCoord : sections.keySet()) {
+			Section section = sections.get(secCoord);
+			if (section != null) {
+				for (Vector3i entCoord : section.blockEntities.keySet()) {
+					locations.add(secCoord.resolve(entCoord));
+				}
+			}
+		}
+		
+		return locations;
+	}
+	
+	@Override
+	public CompoundTag blockEntityAt(Vector3i vec) {
+		SectionCoordinate secCoord = sectionCoordAt(vec.x, vec.y, vec.getZ());
+		Section section = sections.get(secCoord);
+		if (section == null) return null;
+		return section.blockEntityAt(secCoord.relativize(vec));
+	}
 
 	@Override
-	public SizedBlockCollection sectionAt(int x, int y, int z) {
+	public Section sectionAt(int x, int y, int z) {
 		return sections.get(new SectionCoordinate(x, y, z));
 	}
 

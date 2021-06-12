@@ -2,6 +2,7 @@ package org.scaffoldeditor.scaffold.compile.world;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,7 +24,10 @@ public class QuerzWorldWriter implements WorldWriter {
 	private Map<ChunkCoordinate, MCAFile> mcaFiles = new HashMap<>();
 
 	@Override
-	public void writeWorld(File regionFolder, BlockWorld world) throws IOException {
+	public void writeWorld(Path worldFolder, BlockWorld world) throws IOException {
+		File regionFolder = worldFolder.resolve("region").toFile();
+		regionFolder.mkdir();
+		
 		for (ChunkCoordinate chunkCoord : world.getChunks().keySet()) {
 			ChunkCoordinate regionCoord = new ChunkCoordinate(MCAUtil.chunkToRegion(chunkCoord.x),
 					MCAUtil.chunkToRegion(chunkCoord.z()));

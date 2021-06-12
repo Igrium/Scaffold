@@ -1,6 +1,5 @@
 package org.scaffoldeditor.scaffold.compile;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Map;
@@ -17,11 +16,9 @@ public class WriteWorldStep implements CompileStep {
 
 	@Override
 	public boolean execute(Level level, Path target, Map<String, Attribute<?>> args, CompileProgressListener listener) {
-		File regionFolder = target.resolve("region").toFile();
-		regionFolder.mkdir();
-		
+
 		try {
-			worldWriter.writeWorld(regionFolder, level.getBlockWorld());
+			worldWriter.writeWorld(target, level.getBlockWorld());
 			return true;
 		} catch (IOException e) {
 			e.printStackTrace();
