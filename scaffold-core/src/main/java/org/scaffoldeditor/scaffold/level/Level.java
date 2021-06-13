@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.nbt.block.Chunk;
 import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
@@ -27,6 +28,7 @@ import org.scaffoldeditor.scaffold.level.WorldUpdates.WorldUpdateEvent;
 import org.scaffoldeditor.scaffold.level.WorldUpdates.WorldUpdateListener;
 import org.scaffoldeditor.scaffold.level.entity.BlockEntity;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
+import org.scaffoldeditor.scaffold.level.entity.EntityAdder;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BooleanAttribute;
@@ -93,6 +95,8 @@ public class Level {
 	private List<WorldUpdateListener> worldUpdateListeners = new ArrayList<>();
 	private List<Runnable> updateStackListeners = new ArrayList<>();
 	private EventDispatcher<UpdateRenderEntitiesEvent> updateRenderEntitiesDispatcher = new EventDispatcher<>();
+	
+	private static final Logger LOGGER = LogManager.getLogger();
 	
 	/**
 	 * Create a new level
@@ -450,7 +454,7 @@ public class Level {
 	}
 	
 	/**
-	 * Compile the entire blockworld.
+	 * Compile the entire blockworld (and game entities within the blockworld).
 	 * @param full Should this be a full compile? If true, entities may run more complex algorithems.
 	 */
 	public void compileBlockWorld(boolean full) {		
@@ -464,7 +468,15 @@ public class Level {
 				try {
 					blockEntity.compileWorld(blockWorld, full);
 				} catch (Throwable e) {
-					e.printStackTrace();
+					LOGGER.error("Unable to compile block entity: "+name, e);
+				}
+			}
+			if (entity instanceof EntityAdder) {
+				EntityAdder adder = (EntityAdder) entity;
+				try {
+					adder.compileGameEntities(blockWorld);
+				} catch (Throwable e) {
+					LOGGER.error("Unable to compile game entities for: "+name, e);
 				}
 			}
 		}
@@ -474,9 +486,31 @@ public class Level {
 	}
 	
 	/**
+	 * Compile all the game entities in the level.
+	 */
+	public void compileGameEntities() {
+		for (Chunk c : blockWorld.chunks()) {
+			c.entities.clear();
+		}
+		
+		for (String name : entityStack) {
+			Entity entity = getEntity(name);
+			if (entity instanceof EntityAdder) {
+				EntityAdder adder = (EntityAdder) entity;
+				try {
+					adder.compileGameEntities(blockWorld);
+				} catch (Throwable e) {
+					LOGGER.error("Unable to compile game entities for: "+name, e);
+				}
+			}
+		}
+	}
+	
+	/**
 	 * Compile a specific set of sections. Less efficient than
 	 * <code>compileBlockWorld()</code> and <code>compileChunks()</code> if
-	 * compiling the entire world or an entire set of chunks.
+	 * compiling the entire world or an entire set of chunks. DOES NOT COMPILE GAME
+	 * ENTITIES!
 	 * 
 	 * @param sections Sections to compile.
 	 */

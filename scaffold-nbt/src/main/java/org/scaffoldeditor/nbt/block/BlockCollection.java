@@ -4,7 +4,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
+import org.scaffoldeditor.nbt.math.Vector3d;
 import org.scaffoldeditor.nbt.math.Vector3i;
+import org.scaffoldeditor.nbt.util.Pair;
 
 import net.querz.nbt.tag.CompoundTag;
 
@@ -57,13 +59,16 @@ public interface BlockCollection extends Iterable<Vector3i> {
 	}
 	
 	/**
-	 * Obtain all of this collection's entities.
-	 * THIS COLLECTION IS NOT GUARANTEED TO BE MUTABLE!
+	 * Obtain all of this collection's entities. THIS COLLECTION IS NOT GUARANTEED
+	 * TO BE MUTABLE!
 	 * 
-	 * @return Entities (with their <code>pos</code> tags in local coordinate
-	 *         space).
+	 * @return A collection of pairs, where the first entry is the entity's NBT, and
+	 *         the second entry is its position in local space relative to this
+	 *         block collection. We keep them seperately because entity positions
+	 *         are stored relative to their parent block collection, and it would be
+	 *         too difficult to try and keep the NBT data updated.
 	 */
-	default Collection<CompoundTag> getEntities() {
+	default Collection<Pair<CompoundTag, Vector3d>> getEntities() {
 		return Collections.emptySet();
 	}
 	

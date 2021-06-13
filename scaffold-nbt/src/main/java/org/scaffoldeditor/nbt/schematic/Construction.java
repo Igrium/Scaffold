@@ -1,6 +1,7 @@
 package org.scaffoldeditor.nbt.schematic;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -14,6 +15,7 @@ import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
 import org.scaffoldeditor.nbt.block.SizedBlockCollection;
 import org.scaffoldeditor.nbt.math.Vector3d;
 import org.scaffoldeditor.nbt.math.Vector3i;
+import org.scaffoldeditor.nbt.util.Pair;
 
 import net.querz.nbt.tag.CompoundTag;
 
@@ -52,7 +54,7 @@ public class Construction implements ChunkedBlockCollection {
 			this.relativeStartCoords = relativeStartCoords;
 		}
 		
-		public final List<CompoundTag> entities = new ArrayList<>();
+		public final List<Pair<CompoundTag, Vector3d>> entities = new ArrayList<>();
 		public final Map<Vector3i, CompoundTag> blockEntities = new HashMap<>();
 
 		@Override
@@ -75,10 +77,6 @@ public class Construction implements ChunkedBlockCollection {
 			return new Vector3i(relativeStartCoords[0] + width, relativeStartCoords[1] + height, relativeStartCoords[2] + length);
 		}
 		
-		public List<CompoundTag> getEntities() {
-			return entities;
-		}
-		
 		@Override
 		public Set<Vector3i> getBlockEntities() {
 			return blockEntities.keySet();
@@ -87,6 +85,11 @@ public class Construction implements ChunkedBlockCollection {
 		@Override
 		public CompoundTag blockEntityAt(Vector3i vec) {
 			return blockEntities.get(vec);
+		}
+		
+		@Override
+		public Collection<Pair<CompoundTag, Vector3d>> getEntities() {
+			return entities;
 		}
 	}
 	
@@ -199,6 +202,22 @@ public class Construction implements ChunkedBlockCollection {
 			return ents;
 		}
 		
+		@Override
+		public Collection<Pair<CompoundTag, Vector3d>> getEntities() {
+			List<Pair<CompoundTag, Vector3d>> ents = new ArrayList<>();
+			for (SectionCoordinate secCoord : getOverlappingSections()) {
+				Section section = sections.get(secCoord);
+				if (section != null) {
+					for (Pair<CompoundTag, Vector3d> ent : section.getEntities()) {
+						Vector3d globalCoord = ent.getSecond().add(secCoord.getStartPos().toDouble());
+						ents.add(new Pair<>(ent.getFirst(), globalCoord.subtract(new Vector3d(rootX, rootY, rootZ))));
+					}
+				}
+			}
+			
+			return ents;
+		}
+		
 		protected Set<SectionCoordinate> getOverlappingSections() {
 			Set<SectionCoordinate> overlapping = new HashSet<>();
 			Vector3i min = new Vector3d(rootX, rootY, rootZ).divide(16).floor();
@@ -289,6 +308,19 @@ public class Construction implements ChunkedBlockCollection {
 		Section section = sections.get(secCoord);
 		if (section == null) return null;
 		return section.blockEntityAt(secCoord.relativize(vec));
+	}
+	
+	@Override
+	public Collection<Pair<CompoundTag, Vector3d>> getEntities() {
+		List<Pair<CompoundTag, Vector3d>> entities = new ArrayList<>();
+		
+		for (SectionCoordinate secCoord : sections.keySet()) {
+			for (Pair<CompoundTag, Vector3d> ent : sections.get(secCoord).getEntities()) {
+				entities.add(new Pair<>(ent.getFirst(), ent.getSecond().add(secCoord.getStartPos().toDouble())));
+			}
+		}
+		
+		return entities;
 	}
 
 	@Override

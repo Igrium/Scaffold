@@ -3,10 +3,12 @@ package org.scaffoldeditor.scaffold.level.entity.game;
 import java.io.IOException;
 import java.util.Collections;
 
+import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.nbt.math.Vector3f;
 import org.scaffoldeditor.nbt.util.MCEntity;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
+import org.scaffoldeditor.scaffold.level.entity.EntityAdder;
 import org.scaffoldeditor.scaffold.level.entity.EntityFactory;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
 import org.scaffoldeditor.scaffold.level.entity.Rotatable;
@@ -27,7 +29,7 @@ import net.querz.nbt.tag.ListTag;
  * @author Igrium
  *
  */
-public class GameEntity extends Rotatable implements TargetSelectable {
+public class GameEntity extends Rotatable implements TargetSelectable, EntityAdder {
 	
 	public static void register() {
 		EntityRegistry.registry.put("game_entity", new EntityFactory<Entity>() {		
@@ -42,7 +44,7 @@ public class GameEntity extends Rotatable implements TargetSelectable {
 		super(level, name);
 		attributes().put("entityType", new StringAttribute("minecraft:area_effect_cloud"));
 		attributes().put("nbt", new NBTAttribute(new CompoundTag()));
-		attributes().put("spawnOnInit", new BooleanAttribute(true));
+		attributes().put("template", new BooleanAttribute(false));
 	}
 	
 	@Override
@@ -89,19 +91,23 @@ public class GameEntity extends Rotatable implements TargetSelectable {
 	}
 	
 	/**
-	 * Should this entity spawn on level init?
-	 * @return Should spawn on init.
+	 * Get whether this is a template entity. If this is a template entity, it will
+	 * not compile into the world. Instead, it will wait to be spawned via an input.
+	 * 
+	 * @return Is template?
 	 */
-	public boolean spawnOnInit() {
-		return ((BooleanAttribute) getAttribute("spawnOnInit")).getValue();
+	public boolean isTemplate() {
+		return (boolean) this.attributes().get("template").getValue();
 	}
 	
 	/**
-	 * Set whether this entity should spawn on level init.
-	 * @param spawn Should spawn on init.
+	 * Set whether this is a template entity. If this is a template entity, it will
+	 * not compile into the world. Instead, it will wait to be spawned via an input.
+	 * 
+	 * @param isTemplate Is template?
 	 */
-	public void setSpawnOnInit(boolean spawn) {
-		setAttribute("spawnOnInit", new BooleanAttribute(spawn));
+	public void setTemplate(boolean isTemplate) {
+		setAttribute("template", new BooleanAttribute(isTemplate));
 	}
 	
 	/**
@@ -115,6 +121,16 @@ public class GameEntity extends Rotatable implements TargetSelectable {
 			e.printStackTrace();
 			return "{}";
 		}
+	}
+	
+	@Override
+	public boolean compileGameEntities(BlockWorld world) {
+		if (!isTemplate()) {
+			CompoundTag nbt = getNBT().clone();
+			nbt.putString("id", getEntityType());
+			world.addEntity(nbt, this.getPosition().toDouble());
+		}
+		return true;
 	}
 	
 	/**
@@ -152,11 +168,6 @@ public class GameEntity extends Rotatable implements TargetSelectable {
 	@Override
 	public boolean compileLogic(Datapack datapack) {
 		super.compileLogic(datapack);
-		
-		if (spawnOnInit()) {
-			getLevel().initFunction().commands().add(getSpawnCommand());
-		}
-		
 		return true;
 	}
 
@@ -169,4 +180,5 @@ public class GameEntity extends Rotatable implements TargetSelectable {
 	public String getDefaultName() {
 		return "entity";
 	}
+
 }

@@ -16,6 +16,7 @@ import org.scaffoldeditor.nbt.io.WorldInputStream;
 import org.scaffoldeditor.nbt.io.WorldOutputStream;
 import org.scaffoldeditor.nbt.math.Vector3d;
 import org.scaffoldeditor.nbt.math.Vector3i;
+import org.scaffoldeditor.nbt.util.Pair;
 
 import net.querz.nbt.tag.CompoundTag;
 import net.querz.nbt.tag.DoubleTag;
@@ -69,6 +70,14 @@ public class BlockWorld implements ChunkedBlockCollection {
 		
 		public int getEndZ() {
 			return getStartZ() + Chunk.LENGTH;
+		}
+		
+		public Vector3i getStartPos() {
+			return new Vector3i(getStartX(), 0, getStartZ());
+		}
+		
+		public Vector3i getEndPos() {
+			return new Vector3i(getEndX(), Chunk.HEIGHT, getEndZ());
 		}
 		
 		public Vector3i relativize(Vector3i vec) {
@@ -338,33 +347,17 @@ public class BlockWorld implements ChunkedBlockCollection {
 	 */
 	public void clear() {
 		chunks.clear();
-		entities();
 	}
+
 	
-	/**
-	 * Get a collection of all the entities in the world.
-	 * @return All the entities, represented by compound maps in the <a href="https://minecraft.gamepedia.com/Chunk_format#entity_format">entity format</a>
-	 */
-	public Collection<CompoundTag> entities() {
-		Collection<CompoundTag> entities = new ArrayList<>();
-		for (Chunk c : chunks.values()) {
-			entities.addAll(c.entities);
-		}
-		return entities;
-	}
-	
-	public void addEntity(CompoundTag entity) {
-		ListTag<DoubleTag> posList = entity.getListTag("Pos").asDoubleTagList();
-		Vector3i pos = new Vector3d(posList.get(0).asDouble(), posList.get(1).asDouble(), posList.get(2).asDouble()).floor();
-		
-		ChunkCoordinate chunkKey = chunkAtCoord(pos.x, pos.z);
+	public void addEntity(CompoundTag entity, Vector3d pos) {
+		ChunkCoordinate chunkKey = chunkAtCoord((int) pos.x, (int) pos.z);
 		Chunk chunk = chunks.get(chunkKey);
 		if (chunk == null) {
 			chunk = new Chunk();
 			chunks.put(chunkKey, chunk);
 		}
-		
-		chunk.entities.add(entity);
+		chunk.entities.add(new Pair<CompoundTag, Vector3d>(entity, new Vector3d(pos.x - chunkKey.getStartX(), pos.y, pos.z - chunkKey.getStartZ())));
 	}
 	
 	public void removeEntity(CompoundTag entity) {
@@ -372,7 +365,17 @@ public class BlockWorld implements ChunkedBlockCollection {
 		Vector3i pos = new Vector3d(posList.get(0).asDouble(), posList.get(1).asDouble(), posList.get(2).asDouble()).floor();
 		
 		Chunk chunk = chunks.get(chunkAtCoord(pos.x, pos.z));
-		if (chunk != null) chunk.entities.remove(entity);
+		Pair<CompoundTag, Vector3d> removal = null;
+		if (chunk != null) {
+			for (Pair<CompoundTag, Vector3d> p : chunk.entities) {
+				if (p.getFirst().equals(entity)) {
+					removal = p;
+					break;
+				}
+			}
+			if (removal != null) chunk.entities.remove(removal);
+		}
+
 	}
 	
 	/**

@@ -3,6 +3,7 @@ package org.scaffoldeditor.nbt.schematic;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -12,10 +13,13 @@ import java.util.Map.Entry;
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.BlockReader;
 import org.scaffoldeditor.nbt.block.SizedBlockCollection;
+import org.scaffoldeditor.nbt.math.Vector3d;
 import org.scaffoldeditor.nbt.math.Vector3i;
+import org.scaffoldeditor.nbt.util.Pair;
 
 import net.querz.nbt.io.NBTDeserializer;
 import net.querz.nbt.tag.CompoundTag;
+import net.querz.nbt.tag.DoubleTag;
 import net.querz.nbt.tag.IntTag;
 import net.querz.nbt.tag.ListTag;
 import java.util.Objects;
@@ -29,7 +33,7 @@ public class Structure implements SizedBlockCollection, BlockReader<Structure> {
 	
 	private CompoundTag[] palette;
 	private List<CompoundTag> blocks;
-	private List<CompoundTag> entities;
+	private List<Pair<CompoundTag, Vector3d>> entities = new ArrayList<>();
 	private Map<Vector3i, CompoundTag> blockEntities = new HashMap<>();
 	
 	private int sizeX;
@@ -259,11 +263,6 @@ public class Structure implements SizedBlockCollection, BlockReader<Structure> {
 	}
 	
 	@Override
-	public List<CompoundTag> getEntities() {
-		return entities;
-	}
-	
-	@Override
 	public Set<Vector3i> getBlockEntities() {
 		return blockEntities.keySet();
 	}
@@ -271,6 +270,11 @@ public class Structure implements SizedBlockCollection, BlockReader<Structure> {
 	@Override
 	public CompoundTag blockEntityAt(Vector3i vec) {
 		return blockEntities.get(vec);
+	}
+	
+	@Override
+	public Collection<Pair<CompoundTag, Vector3d>> getEntities() {
+		return entities;
 	}
 	
 	private static Vector3i decodeLocation(ListTag<IntTag> tag) {
@@ -322,10 +326,11 @@ public class Structure implements SizedBlockCollection, BlockReader<Structure> {
 		
 		// Load entities
 		ListTag<CompoundTag> entitiesTag = map.getListTag("entities").asCompoundTagList();
-		if (entitiesTag == null) {
-			structure.entities = new ArrayList<CompoundTag>();
-		} else {
-			structure.entities = getCompoundMaps(entitiesTag);
+		if (entitiesTag != null) {
+			for (CompoundTag entTag : entitiesTag) {
+				structure.entities.add(new Pair<>(entTag.getCompoundTag("nbt"),
+						readPosTag(entTag.getListTag("pos").asDoubleTagList())));
+			}
 		}
 		
 		// Load block entities
@@ -336,6 +341,10 @@ public class Structure implements SizedBlockCollection, BlockReader<Structure> {
 		}
 		
 		return structure;
+	}
+	
+	private static Vector3d readPosTag(ListTag<DoubleTag> tag) {
+		return new Vector3d(tag.get(0).asDouble(), tag.get(1).asDouble(), tag.get(2).asDouble());
 	}
 	
 	/*

@@ -13,11 +13,14 @@ import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.BlockReader;
 import org.scaffoldeditor.nbt.block.SizedBlockCollection;
 import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
+import org.scaffoldeditor.nbt.math.Vector3d;
 import org.scaffoldeditor.nbt.math.Vector3i;
 import org.scaffoldeditor.nbt.schematic.Construction;
 import org.scaffoldeditor.nbt.schematic.Construction.ConstructionSegment;
 import org.scaffoldeditor.nbt.schematic.Construction.Section;
 import org.scaffoldeditor.nbt.schematic.Construction.SelectionBox;
+import org.scaffoldeditor.nbt.util.Pair;
+
 import net.querz.nbt.io.NBTDeserializer;
 import net.querz.nbt.tag.ArrayTag;
 import net.querz.nbt.tag.ByteArrayTag;
@@ -151,7 +154,11 @@ public class ConstructionFormat implements BlockReader<ConstructionSegment> {
 		Section section = new Section(width, height, length, blocks, palette, new int[] { startX, startY, startZ });	
 		if (sectionTag.getListTag("entities").size() > 0) {
 			for (CompoundTag entity : sectionTag.getListTag("entities").asCompoundTagList()) {
-				section.entities.add(entity);
+				Vector3d localPos = new Vector3d(entity.getDouble("x"), entity.getDouble("y"), entity.getDouble("z"));
+				localPos = localPos.subtract(sectionPos.getStartPos().toDouble());
+				CompoundTag nbt = entity.getCompoundTag("nbt").clone();
+				nbt.putString("id", entity.getString("namespace")+":"+entity.getString("base_name"));
+				section.entities.add(new Pair<>(nbt, localPos));
 			}
 		}
 		if (sectionTag.getListTag("block_entities").size() > 0) {

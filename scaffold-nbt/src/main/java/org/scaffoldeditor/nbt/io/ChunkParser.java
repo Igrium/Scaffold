@@ -6,14 +6,16 @@ import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.Chunk;
+import org.scaffoldeditor.nbt.math.Vector3d;
 import org.scaffoldeditor.nbt.math.Vector3i;
 import org.scaffoldeditor.nbt.util.BlockEntityUtils;
+import org.scaffoldeditor.nbt.util.Pair;
 import org.scaffoldeditor.nbt.block.BlockWorld.ChunkCoordinate;
 
 import net.querz.nbt.tag.CompoundTag;
+import net.querz.nbt.tag.DoubleTag;
 import net.querz.nbt.tag.ListTag;
 import net.querz.nbt.tag.LongArrayTag;
-import net.querz.nbt.tag.Tag;
 
 /**
  * This class is responsible for parsing (and writing)
@@ -198,16 +200,7 @@ public class ChunkParser {
 				}
 			}
 		}
-		
-		// Load entities.
-		if (nbt.containsKey("Entities")) {
-			CompoundTag entities = nbt.getCompoundTag("Entities");
-			for (Tag<?> t : entities.values()) {
-				chunk.entities.add((CompoundTag) t);
-			}
-		}
-		
-		
+			
 		return chunk;
 	}
 	
@@ -273,14 +266,29 @@ public class ChunkParser {
 	
 	public CompoundTag writeEntities(Chunk chunk, int x, int z) {
 		CompoundTag data = new CompoundTag();
+		ChunkCoordinate coord = new ChunkCoordinate(x, z);
 		ListTag<CompoundTag> entities = new ListTag<>(CompoundTag.class);
-		entities.addAll(chunk.entities);
+		for (Pair<CompoundTag, Vector3d> ent : chunk.entities) {
+			CompoundTag nbt = ent.getFirst().clone();
+			nbt.put("Pos", writeEntPos(ent.getSecond().add(coord.getStartPos().toDouble())));
+			entities.add(nbt);
+		}
+		
 		data.put("Entities", entities);
 		
 		data.putInt("DataVersion", dataVersion);
 		data.putIntArray("Position", new int[] { x, z });
 		
 		return data;
+	}
+	
+	private static ListTag<DoubleTag> writeEntPos(Vector3d vec) {
+		ListTag<DoubleTag> list = new ListTag<>(DoubleTag.class);
+		list.addDouble(vec.x);
+		list.addDouble(vec.y);
+		list.addDouble(vec.z);
+		
+		return list;
 	}
 	
 	/**

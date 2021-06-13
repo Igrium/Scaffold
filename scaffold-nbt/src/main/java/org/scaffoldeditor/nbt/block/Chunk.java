@@ -7,7 +7,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.scaffoldeditor.nbt.block.BlockWorld.ChunkCoordinate;
+import org.scaffoldeditor.nbt.math.Vector3d;
 import org.scaffoldeditor.nbt.math.Vector3i;
+import org.scaffoldeditor.nbt.util.Pair;
 
 import net.querz.nbt.tag.CompoundTag;
 
@@ -101,6 +103,22 @@ public class Chunk implements SizedBlockCollection {
 			return new Vector3i(in.x - getStartX(), in.y - getStartY(), in.z - getStartZ());
 		}
 		
+		/**
+		 * Get this section's start position.
+		 * @return Start position (inclusive).
+		 */
+		public Vector3i getStartPos() {
+			return new Vector3i(getStartX(), getStartY(), getStartZ());
+		}
+		
+		/**
+		 * Get this section's end position (non-inclusive).
+		 * @return End position (non-inclusive).
+		 */
+		public Vector3i getEntPosition() {
+			return new Vector3i(getEndX(), getEndY(), getEndZ());
+		}
+		
 		@Override
 		public String toString() {
 			return "SectionCoordinate["+x+", "+y+", "+z+"]";
@@ -109,11 +127,12 @@ public class Chunk implements SizedBlockCollection {
 	}
 
 	/**
-	 * A list of entities in the chunk, in <a href="https://minecraft.gamepedia.com/Chunk_format#entity_format">NBT format</a>.
-	 * <br>
+	 * All of the entities in the chunk in pairs where the first item is the entity
+	 * in <a href="https://minecraft.gamepedia.com/Chunk_format#entity_format">NBT
+	 * format</a>, and the second item is the entity's position. <br>
 	 * Does not do anything natively. Functionallity must be implemented externally.
 	 */
-	public final Collection<CompoundTag> entities = new ArrayList<>();
+	public final Collection<Pair<CompoundTag, Vector3d>> entities = new ArrayList<>();
 	
 	/**
 	 * A map of tile entities in the chunk, in <a href="https://minecraft.gamepedia.com/Chunk_format#entity_format">NBT format</a>.
@@ -133,8 +152,8 @@ public class Chunk implements SizedBlockCollection {
 	}
 	
 	@Override
-	public Collection<CompoundTag> getEntities() {
-		return entities;
+	public Collection<Pair<CompoundTag, Vector3d>> getEntities() {
+		return this.entities;
 	}
 	
 	/**
