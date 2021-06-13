@@ -285,7 +285,7 @@ public class Construction implements ChunkedBlockCollection {
 	
 	@Override
 	public CompoundTag blockEntityAt(Vector3i vec) {
-		SectionCoordinate secCoord = sectionCoordAt(vec.x, vec.y, vec.getZ());
+		SectionCoordinate secCoord = sectionCoordAt(vec.x, vec.y, vec.z);
 		Section section = sections.get(secCoord);
 		if (section == null) return null;
 		return section.blockEntityAt(secCoord.relativize(vec));

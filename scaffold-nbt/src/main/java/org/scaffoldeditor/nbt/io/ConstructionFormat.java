@@ -8,7 +8,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-
 import org.apache.commons.io.IOUtils;
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.BlockReader;
@@ -110,7 +109,7 @@ public class ConstructionFormat implements BlockReader<ConstructionSegment> {
 			Section section;
 			if (sectionVersion == 0) {
 				section = sectionVersion0(sectionNBT, width, height, length, x - coord.getStartX(),
-						y - coord.getStartY(), z - coord.getStartZ(), construction.palette);
+						y - coord.getStartY(), z - coord.getStartZ(), coord, construction.palette);
 			} else {
 				throw new IOException("Unknown section version: "+sectionVersion);
 			}
@@ -135,7 +134,7 @@ public class ConstructionFormat implements BlockReader<ConstructionSegment> {
 		return construction;
 	}
 	
-	protected Section sectionVersion0(CompoundTag sectionTag, int width, int height, int length, int startX, int startY, int startZ, List<Block> palette) throws IOException {
+	protected Section sectionVersion0(CompoundTag sectionTag, int width, int height, int length, int startX, int startY, int startZ, SectionCoordinate sectionPos, List<Block> palette) throws IOException {
 		int[][][] blocks = new int[width][height][length];
 		byte blockArrayType = sectionTag.getByte("blocks_array_type");
 		BlockArrayWrapper<?> blockArray = new BlockArrayWrapper<ArrayTag<?>>(blockArrayType, (ArrayTag<?>) sectionTag.get("blocks"));
@@ -155,11 +154,10 @@ public class ConstructionFormat implements BlockReader<ConstructionSegment> {
 				section.entities.add(entity);
 			}
 		}
-		
 		if (sectionTag.getListTag("block_entities").size() > 0) {
 			for (CompoundTag entity : sectionTag.getListTag("block_entities").asCompoundTagList()) {
 				Vector3i localPos = new Vector3i(entity.getInt("x"), entity.getInt("y"), entity.getInt("z"));
-				localPos = localPos.add(new Vector3i(startX, startY, startZ));
+				localPos = sectionPos.relativize(localPos);
 				CompoundTag nbt = entity.getCompoundTag("nbt").clone();
 				nbt.putString("id", entity.getString("namespace")+":"+entity.getString("base_name"));
 				section.blockEntities.put(localPos, nbt);

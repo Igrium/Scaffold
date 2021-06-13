@@ -80,6 +80,6 @@ public class Vector3i {
 	
 	@Override
 	public int hashCode() {
-		return Objects.hash(x, y, z);
+		return Objects.hash(Integer.valueOf(x), Integer.valueOf(y), Integer.valueOf(z));
 	}
 }
