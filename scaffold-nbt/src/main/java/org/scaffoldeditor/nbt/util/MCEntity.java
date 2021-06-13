@@ -1,4 +1,4 @@
-package org.scaffoldeditor.scaffold.logic;
+package org.scaffoldeditor.nbt.util;
 
 import net.querz.nbt.tag.CompoundTag;
 

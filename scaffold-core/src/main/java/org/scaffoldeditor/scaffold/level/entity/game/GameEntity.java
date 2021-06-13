@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Collections;
 
 import org.scaffoldeditor.nbt.math.Vector3f;
+import org.scaffoldeditor.nbt.util.MCEntity;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.EntityFactory;
@@ -14,7 +15,6 @@ import org.scaffoldeditor.scaffold.level.entity.attribute.NBTAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.StringAttribute;
 import org.scaffoldeditor.scaffold.level.render.MCRenderEntity;
 import org.scaffoldeditor.scaffold.logic.Datapack;
-import org.scaffoldeditor.scaffold.logic.MCEntity;
 import org.scaffoldeditor.scaffold.math.Vector;
 
 import net.querz.nbt.io.SNBTUtil;

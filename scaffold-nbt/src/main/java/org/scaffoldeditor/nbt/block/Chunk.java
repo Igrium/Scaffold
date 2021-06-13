@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 import org.scaffoldeditor.nbt.block.BlockWorld.ChunkCoordinate;
@@ -104,7 +103,7 @@ public class Chunk implements SizedBlockCollection {
 		
 		@Override
 		public String toString() {
-			return "SectionCoordinate: ["+x+", "+y+", "+z+"]";
+			return "SectionCoordinate["+x+", "+y+", "+z+"]";
 		}
 		
 	}
