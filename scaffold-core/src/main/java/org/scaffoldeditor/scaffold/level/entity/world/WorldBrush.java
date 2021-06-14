@@ -1,5 +1,7 @@
 package org.scaffoldeditor.scaffold.level.entity.world;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import org.scaffoldeditor.nbt.block.Block;
@@ -15,6 +17,7 @@ import org.scaffoldeditor.scaffold.level.entity.BrushEntity;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.EntityFactory;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
+import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BlockTextureAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.VectorAttribute;
 import org.scaffoldeditor.scaffold.math.Vector;
@@ -34,10 +37,17 @@ public class WorldBrush extends BaseBlockEntity implements BrushEntity {
 
 	public WorldBrush(Level level, String name) {
 		super(level, name);
-		setAttribute("end_point", new VectorAttribute(new Vector(4,4,4)), true);
-		setAttribute("texture", new BlockTextureAttribute(new SingleBlockTexture(new Block("minecraft:stone"))), true);
-		setAttribute("texture_scale", new VectorAttribute(new Vector(1,1,1)), true);
-		setAttribute("texture_offset", new VectorAttribute(new Vector(0,0,0)), true);
+	}
+	
+	@Override
+	public Map<String, Attribute<?>> getDefaultAttributes() {
+		Map<String, Attribute<?>> map = new HashMap<>();
+		map.put("end_point", new VectorAttribute(new Vector(4,4,4)));
+		map.put("texture", new BlockTextureAttribute(new SingleBlockTexture(new Block("minecraft:stone"))));
+		map.put("texture_scale", new VectorAttribute(new Vector(1,1,1)));
+		map.put("texture_offset", new VectorAttribute(new Vector(0,0,0)));
+		
+		return map;
 	}
 
 	@Override

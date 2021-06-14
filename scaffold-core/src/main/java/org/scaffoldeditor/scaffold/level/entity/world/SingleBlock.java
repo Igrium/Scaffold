@@ -1,6 +1,8 @@
 package org.scaffoldeditor.scaffold.level.entity.world;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.scaffoldeditor.nbt.block.Block;
@@ -12,6 +14,7 @@ import org.scaffoldeditor.scaffold.level.entity.BlockEntity;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.EntityFactory;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
+import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.NBTAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.StringAttribute;
 import org.scaffoldeditor.scaffold.math.Vector;
@@ -35,8 +38,14 @@ public class SingleBlock extends Entity implements BlockEntity {
 	
 	public SingleBlock(Level level, String name) {
 		super(level, name);
-		attributes().put("blockName", new StringAttribute("minecraft:stone"));
-		attributes().put("blockProperties", new NBTAttribute(new CompoundTag()));
+	}
+	
+	@Override
+	public Map<String, Attribute<?>> getDefaultAttributes() {
+		Map<String, Attribute<?>> map = new HashMap<>();
+		map.put("blockName", new StringAttribute("minecraft:stone"));
+		map.put("blockProperties", new NBTAttribute(new CompoundTag()));
+		return map;
 	}
 	
 	/**

@@ -1,6 +1,10 @@
 package org.scaffoldeditor.scaffold.level.entity;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.scaffoldeditor.scaffold.level.Level;
+import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.FloatAttribute;
 
 /**
@@ -8,12 +12,18 @@ import org.scaffoldeditor.scaffold.level.entity.attribute.FloatAttribute;
  * @author Igrium
  *
  */
-public class Rotatable extends Entity {
+public abstract class Rotatable extends Entity {
 
 	public Rotatable(Level level, String name) {
 		super(level, name);
-		attributes().put("rotX", new FloatAttribute(0f));
-		attributes().put("rotY", new FloatAttribute(0f));
+	}
+	
+	@Override
+	public Map<String, Attribute<?>> getDefaultAttributes() {
+		Map<String, Attribute<?>> map = new HashMap<>();
+		map.put("rotX", new FloatAttribute(0));
+		map.put("rotY", new FloatAttribute(0));
+		return map;
 	}
 	
 	/**

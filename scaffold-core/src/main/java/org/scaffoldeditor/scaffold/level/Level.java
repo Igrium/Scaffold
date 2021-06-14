@@ -310,7 +310,6 @@ public class Level {
 		entities.put(entity.getName(), entity);
 		entityStack.add(stackIndex, entity.getName());
 		updateEntityStack();
-		entity.setShouldRender(true);
 		entity.onAdded();
 		
 		if (entity instanceof BlockEntity) {
@@ -337,7 +336,6 @@ public class Level {
 	 */
 	public void removeEntity(String name, boolean noRecompile) {
 		Entity entity = entities.get(name);
-		entity.setShouldRender(false);
 		if (entity instanceof BlockEntity) {
 			dirtySections.addAll(((BlockEntity) entity).getOverlappingSections());
 		}

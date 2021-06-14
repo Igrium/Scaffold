@@ -1,11 +1,13 @@
 package org.scaffoldeditor.scaffold.level.entity.logic;
 
+import java.util.Map;
+
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.EntityFactory;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
+import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.StringAttribute;
-import org.scaffoldeditor.scaffold.level.io.Input;
 
 /**
  * Runs a function on the input "Run".
@@ -24,35 +26,14 @@ public class FunctionEntity extends Entity {
 	
 	public FunctionEntity(Level level, String name) {
 		super(level, name);
-		setAttribute("function", new StringAttribute(name), true);
-		
-		registerInput(new Input(this) {
-
-			@Override
-			public String getName() {
-				return "Run";
-			}
-
-			@Override
-			public boolean takesArgs() {
-				return false;
-			}
-
-			@Override
-			public String getCommand(Entity instigator, Entity caller, String[] args) {
-				return "function "+getFunction();
-			}
-			
-		});
 	}
 	
 	public String getFunction() {
 		return ((StringAttribute) getAttribute("function")).getValue();
 	}
-	
-	@Override
-	public String getRenderAsset() {
-		return "scaffold/textures/editor/function.png";
-	}
 
+	@Override
+	public Map<String, Attribute<?>> getDefaultAttributes() {
+		return Map.of("function", new StringAttribute(""));
+	}
 }

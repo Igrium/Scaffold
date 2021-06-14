@@ -2,6 +2,7 @@ package org.scaffoldeditor.scaffold.level.entity.game;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Map;
 
 import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.nbt.math.Vector3f;
@@ -12,6 +13,7 @@ import org.scaffoldeditor.scaffold.level.entity.EntityAdder;
 import org.scaffoldeditor.scaffold.level.entity.EntityFactory;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
 import org.scaffoldeditor.scaffold.level.entity.Rotatable;
+import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BooleanAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.NBTAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.StringAttribute;
@@ -43,10 +45,16 @@ public class GameEntity extends Rotatable implements TargetSelectable, EntityAdd
 
 	public GameEntity(Level level, String name) {
 		super(level, name);
-		attributes().put("entityType", new StringAttribute("minecraft:area_effect_cloud"));
-		attributes().put("nbt", new NBTAttribute(new CompoundTag()));
-		attributes().put("template", new BooleanAttribute(false));
 	}
+	
+	@Override
+		public Map<String, Attribute<?>> getDefaultAttributes() {
+			Map<String, Attribute<?>> map = super.getDefaultAttributes();
+			map.put("entityType", new StringAttribute("minecraft:marker"));
+			map.put("nbt", new NBTAttribute(new CompoundTag()));
+			map.put("template", new BooleanAttribute(false));
+			return map;
+		}
 	
 	@Override
 	public void onAdded() {

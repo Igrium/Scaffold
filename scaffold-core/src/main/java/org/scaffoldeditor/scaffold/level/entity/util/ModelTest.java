@@ -1,12 +1,14 @@
 package org.scaffoldeditor.scaffold.level.entity.util;
 
 import java.util.Collections;
+import java.util.Map;
 
 import org.scaffoldeditor.nbt.math.Vector3f;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.EntityFactory;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
+import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.StringAttribute;
 import org.scaffoldeditor.scaffold.level.render.ModelRenderEntity;
 
@@ -26,7 +28,11 @@ public class ModelTest extends Entity {
 
 	public ModelTest(Level level, String name) {
 		super(level, name);
-		setAttribute("model", new StringAttribute(""), true);
+	}
+	
+	@Override
+	public Map<String, Attribute<?>> getDefaultAttributes() {
+		return Map.of("model", new StringAttribute(""));
 	}
 	
 	@Override

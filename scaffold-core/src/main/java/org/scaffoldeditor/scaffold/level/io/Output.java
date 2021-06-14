@@ -3,117 +3,148 @@ package org.scaffoldeditor.scaffold.level.io;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.logging.log4j.LogManager;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
+import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
+import org.scaffoldeditor.scaffold.level.entity.attribute.AttributeRegistry;
+import org.scaffoldeditor.scaffold.logic.datapack.Command;
+import org.scaffoldeditor.scaffold.serialization.XMLSerializable;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
-/**
- * Represents an entity output connection
- * 
- * @author Igrium
- */
-public class Output {
-	private Entity parent;
-
-	/**
-	 * Create a new output connection.
-	 * 
-	 * @param parent Parent entity.
-	 */
-	public Output(Entity parent) {
-		this.parent = parent;
+public class Output implements XMLSerializable {
+	
+	private Entity owner;
+	private String trigger = "";
+	private String target = "";
+	private String inputName = "";
+	private List<Attribute<?>> args = new ArrayList<>();
+	
+	public Output(Entity owner) {
+		this.owner = owner;
 	}
-
-	/**
-	 * The name of the output to trigger on.
-	 */
-	public String name = "";
 	
-	/**
-	 * Name of the entity to target.
-	 */
-	public String target = "";
+	public Output(Entity owner, String trigger, String target, String inputName) {
+		this.owner = owner;
+		this.trigger = trigger;
+		this.target = target;
+		this.inputName = inputName;
+	}
 	
-	/**
-	 * Name of the input to trigger.
-	 */
-	public String input = "";
-
-	/**
-	 * Arguements to call the input with.
-	 */
-	public List<String> args = new ArrayList<String>();
-	
-	/**
-	 * Check if the output is valid to call.
-	 * @return Validity.
-	 */
-	public boolean isValid() {
-		return (!name.matches("") && !target.matches("") && !input.matches(""));
+	public Output(Entity owner, String trigger, String target, String inputName, List<Attribute<?>> args) {
+		this(owner, trigger, target, inputName);
+		this.args = args;
 	}
 	
 	/**
-	 * Compile this output into a Minecraft command.
-	 * @param instigator Instigator entity.
-	 * @return Compiled command.
+	 * Get this output's owning entity (the entity that fires the output).
 	 */
-	public String compile(Entity instigator) {
-		Entity target = parent.getLevel().getEntity(this.target);
-		if (target == null) {
-			return "";
+	public Entity getOwner() {
+		return owner;
+	}
+	
+	/**
+	 * Get the string the owning entity can use to determine when to fire this output.
+	 * @return The output's trigger string.
+	 */
+	public String getTrigger() {
+		return trigger;
+	}
+	
+	/**
+	 * Set the string the owning entity uses to determine when to fire this output. 
+	 * @param trigger The output's trigger string.
+	 */
+	public void setTrigger(String trigger) {
+		this.trigger = trigger;
+	}
+
+	/**
+	 * Get the name of the target entity.
+	 */
+	public String getTarget() {
+		return target;
+	}
+
+	/**
+	 * Set the target entity.
+	 * @param target New target entity's name.
+	 */
+	public void setTarget(String target) {
+		this.target = target;
+	}
+
+	/**
+	 * Get the target input name.
+	 * @return The input on the target entity that will be fired.
+	 */
+	public String getInputName() {
+		return inputName;
+	}
+
+	/**
+	 * Set the target input name.
+	 * @param inputName The input on the target entity that will be fired.
+	 */
+	public void setInputName(String inputName) {
+		this.inputName = inputName;
+	}
+
+	/**
+	 * Get the arguements that this output will pass to the target at compile time.
+	 * @return A mutable list of arguements.
+	 */
+	public List<Attribute<?>> getArgs() {
+		return args;
+	}
+	
+	/**
+	 * Compile this output.
+	 * @return The list of commands that should be called when this output is triggered.
+	 */
+	public List<Command> compile() {
+		Entity entity = owner.getLevel().getEntity(target);
+		if (entity == null) {
+			throw new IllegalStateException("Tried to compile an output with a target entity that does not exist: "+target);
 		}
-		Input connection = target.getInput(input);
-
 		
-		if (connection != null) {
-			return connection.getCommand(instigator, parent, args.toArray(new String[0]));
-		} else {
-			return "";
+		return entity.compileInput(inputName, args, getOwner());
+	}
+	
+	@Override
+	public Element serialize(Document document) {
+		Element element = document.createElement("output");
+		element.setAttribute("trigger", trigger);		
+		element.setAttribute("target", target);
+		element.setAttribute("inputName", inputName);
+		
+		for (Attribute<?> attribute : getArgs()) {
+			element.appendChild(attribute.serialize(document));
 		}
+		
+		return element;
 	}
 	
 	/**
-	 * Serialize this output into a JSONObject.
-	 * @return Serialized output.
+	 * Deserialize an output from XML.
+	 * @param element Element to deserialize.
+	 * @param owner Owning entity.
+	 * @return Deserialized output.
 	 */
-	public JSONObject serialize() {
-		JSONObject object = new JSONObject();
+	public static Output deserialize(Element element, Entity owner) {
+		String trigger = element.getAttribute("trigger");
+		String target = element.getAttribute("target");
+		String inputName = element.getAttribute("inputName");
+		Output output = new Output(owner, trigger, target, inputName);
 		
-		object.put("name", name);
-		object.put("target", target);
-		object.put("input", input);
-		object.put("args", args);
-		
-		return object;
-	}
-	
-	/**
-	 * Unserialize an output from a JSONObject.
-	 * @param object JSONObject to unserialize.
-	 * @param parent Output's parent entity.
-	 * @return Unserialized object.
-	 */
-	public static Output unserialize(JSONObject object, Entity parent) {
-		try {
-			Output output = new Output(parent);
-			
-			output.name = object.getString("name");
-			output.target = object.getString("target");
-			output.input = object.getString("input");
-			
-			JSONArray argArray = object.getJSONArray("args");
-			for (Object s : argArray) {
-				output.args.add((String) s);
+		NodeList children = element.getChildNodes();
+		for (int i = 0; i < children.getLength(); i++) {
+			if (children.item(i).getNodeType() == Node.ELEMENT_NODE) {
+				output.getArgs().add(AttributeRegistry.deserializeAttribute((Element) children.item(i)));
 			}
-			
-			return output;
-			
-		} catch (JSONException e) {
-			LogManager.getLogger().error("Unable to parse output: "+object);
-			return null;
 		}
+		
+		return output;
 	}
-
 }

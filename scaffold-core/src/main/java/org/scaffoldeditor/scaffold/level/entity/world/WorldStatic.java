@@ -2,6 +2,8 @@ package org.scaffoldeditor.scaffold.level.entity.world;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
@@ -20,8 +22,10 @@ import org.scaffoldeditor.scaffold.level.entity.EntityFactory;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
 import org.scaffoldeditor.scaffold.level.entity.Faceable;
 import org.scaffoldeditor.scaffold.level.entity.attribute.AssetAttribute;
+import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BooleanAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.EnumAttribute;
+import org.scaffoldeditor.scaffold.level.entity.attribute.StringAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.EnumAttribute.DefaultEnums.Direction;
 import org.scaffoldeditor.scaffold.math.Vector;
 
@@ -50,9 +54,15 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 
 	public WorldStatic(Level level, String name) {
 		super(level, name);
-		setAttribute("model", new AssetAttribute("schematic", ""), true);
-		setAttribute("direction", new EnumAttribute<>(Direction.NORTH), true);
-		setAttribute("place_air", new BooleanAttribute(false), true);
+	}
+	
+	@Override
+	public Map<String, Attribute<?>> getDefaultAttributes() {
+		Map<String, Attribute<?>> map = new HashMap<>();
+		map.put("model", new StringAttribute(""));
+		map.put("direction", new EnumAttribute<>(Direction.NORTH));
+		map.put("place_air", new BooleanAttribute(false));
+		return map;
 	}
 
 	/**

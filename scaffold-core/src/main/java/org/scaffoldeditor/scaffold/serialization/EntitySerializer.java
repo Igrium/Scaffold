@@ -5,6 +5,7 @@ import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.AttributeRegistry;
+import org.scaffoldeditor.scaffold.level.io.Output;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -38,12 +39,19 @@ public class EntitySerializer implements XMLSerializable {
 				attribute.setAttribute("name", name);
 				attributes.appendChild(attribute);	
 			} catch (DOMException e) {
-				e.printStackTrace();
+				throw new AssertionError("Unable to serialize attributes!", e);
 			}
 
 		}
 		
+		Element outputs = document.createElement("outputs");
+		for (Output output : entity.getOutputs()) {
+			Element out = output.serialize(document);
+			outputs.appendChild(out);
+		}
+		
 		root.appendChild(attributes);
+		root.appendChild(outputs);
 		
 		return root;
 	}
@@ -67,6 +75,8 @@ public class EntitySerializer implements XMLSerializable {
 				Element element = (Element) child;
 				if (element.getTagName().equals("attributes")) {
 					loadAttributes(element, entity);
+				} else if (element.getTagName().equals("outputs")) {
+					loadOutputs(element, entity);
 				}
 			}
 		}
@@ -97,6 +107,18 @@ public class EntitySerializer implements XMLSerializable {
 				Element element = (Element) child;
 				Attribute<?> attribute = AttributeRegistry.deserializeAttribute(element);
 				entity.setAttribute(element.getAttribute("name"), attribute, true);
+			}
+		}
+	}
+	
+	private static void loadOutputs(Element xml, Entity entity) {
+		NodeList children = xml.getChildNodes();
+		for (int i = 0; i < children.getLength(); i++) {
+			Node child = children.item(i);
+			if (child.getNodeType() == Node.ELEMENT_NODE) {
+				Element element = (Element) child;
+				Output output = Output.deserialize(element, entity);
+				entity.getOutputs().add(output);
 			}
 		}
 	}

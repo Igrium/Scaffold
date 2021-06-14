@@ -156,7 +156,13 @@ public class Datapack {
 			FileUtils.deleteDirectory(compilePath.toFile());
 		}
 		
-		String dataIgnoreContent = Files.readString(compilePath.resolve(".ignore"));
+		String dataIgnoreContent;
+		if (dataFolder.resolve(".ignore").toFile().isFile()) {
+			dataIgnoreContent = Files.readString(dataFolder.resolve(".ignore"));
+		} else {
+			dataIgnoreContent = "";
+		}
+		
 		Gitignore dataIgnore = GitignoreUtils.load(dataIgnoreContent);
 		
 		FileUtils.copyDirectory(dataFolder.toFile(), compilePath.resolve("data").toFile(), (pathName) -> {

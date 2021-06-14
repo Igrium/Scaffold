@@ -1,9 +1,9 @@
 package org.scaffoldeditor.scaffold.level.entity;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -15,10 +15,11 @@ import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.WorldUpdates.UpdateRenderEntitiesEvent;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.VectorAttribute;
-import org.scaffoldeditor.scaffold.level.io.Input;
+import org.scaffoldeditor.scaffold.level.io.InputDeclaration;
 import org.scaffoldeditor.scaffold.level.io.Output;
 import org.scaffoldeditor.scaffold.level.render.RenderEntity;
 import org.scaffoldeditor.scaffold.logic.Datapack;
+import org.scaffoldeditor.scaffold.logic.datapack.Command;
 import org.scaffoldeditor.scaffold.math.Vector;
 import org.scaffoldeditor.scaffold.util.event.EventListener;
 import org.w3c.dom.Element;
@@ -28,7 +29,7 @@ import org.w3c.dom.Element;
  * @author Igrium
  *
  */
-public class Entity {
+public abstract class Entity {
 	
 	/**
 	 * Special case used to declare file paths as attributes.
@@ -61,8 +62,7 @@ public class Entity {
 	/* All this entity's attributes */
 	private Map<String, Attribute<?>> attributes = new HashMap<>();
 	
-	/* Whether non-block visualizations of this entity should render in the editor */
-	private boolean shouldRender = false;
+	private List<Output> outputs = new ArrayList<>();
 		
 	/**
 	 * Construct a new entity with a name and a level.
@@ -73,6 +73,40 @@ public class Entity {
 		this.name = name;
 		this.level = level;
 		attributes().put("position", new VectorAttribute(new Vector(0, 0, 0)));
+		attributes.putAll(getDefaultAttributes());
+	}
+	
+	/**
+	 * Get the attributes this entity should have when it spawns.
+	 * @return A map of the default attributes.
+	 */
+	public abstract Map<String, Attribute<?>> getDefaultAttributes();
+	
+	/**
+	 * Compile an input on the entity.
+	 * @param inputName The name of the input being compiled.
+	 * @param args The arguements it's being compiled with.
+	 * @param source The entity that's compiling the input.
+	 * @return A list of all the commands that should be run when this input is triggered.
+	 */
+	public List<Command> compileInput(String inputName, List<Attribute<?>> args, Entity source) {
+		return Collections.emptyList();
+	};
+	
+	/**
+	 * Get all the inputs that this entity accepts.
+	 * @return A collection of input declarations.
+	 */
+	public Collection<InputDeclaration> getDeclaredInputs() {
+		return Collections.emptyList();
+	}
+	
+	/**
+	 * Get all this entity's outputs.
+	 * @return A mutable list of this entity's outputs.
+	 */
+	public List<Output> getOutputs() {
+		return outputs;
 	}
 	
 	/**
@@ -89,24 +123,6 @@ public class Entity {
 	 */
 	public void setName(String name) {
 		this.name = name;
-	}
-	
-	/**
-	 * Get the render type this entity should render with in the editor.
-	 * SPRITE will render as a two dimensional sprite, and MODEL will render as a 3D model.
-	 * @return Render type.
-	 */
-	public RenderType getRenderType() {
-		return RenderType.SPRITE;
-	}
-	
-	/**
-	 * Get a path to the asset this entity should render with.
-	 * If getRenderType() retruns SPRITE, this should be an image, and if it returns MODEL, this should be a model.
-	 * @return
-	 */
-	public String getRenderAsset() {
-		return "scaffold/textures/editor/billboard_generic.png";
 	}
 	
 	/**
@@ -220,75 +236,6 @@ public class Entity {
 	public void removeAttribute(String name) {
 		attributes.remove(name);
 	}
-	
-	/* All entitiy's outputs */
-	private List<Output> outputs = new ArrayList<Output>();
-	
-	/**
-	 * Get a list of all this entity's output connections.
-	 * @return Outputs.
-	 */
-	public List<Output> outputConnections() {
-		return outputs;
-	}
-	
-	/**
-	 * Get whether this entity has an output connection of the given name.
-	 * @param name Name to check for.
-	 * @return Has output connection?
-	 */
-	public boolean hasOutput(String name) {
-		for (Output o : outputConnections()) {
-			if (o.name.matches(name)) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	/**
-	 * Create a new output.
-	 * @param name Name of the output to trigger on.
-	 * @return New output.
-	 */
-	public Output newOutputConnection(String name) {
-		Output output = new Output(this);
-		output.name = name;
-		outputs.add(output);
-		return output;
-	}
-	
-	private Set<Input> inputs = new HashSet<Input>();
-	
-	/**
-	 * Register a new input.
-	 * @param input Input to register.
-	 */
-	protected void registerInput(Input input) {
-		inputs.add(input);
-	}
-	
-	/**
-	 * Get a set of all this entity's inputs.
-	 * @return Inputs.
-	 */
-	public Set<Input> getInputs() {
-		return inputs;
-	}
-	
-	/**
-	 * Get an input my name.
-	 * @param name Input name.
-	 * @return Input.
-	 */
-	public Input getInput(String name) {
-		for (Input e : inputs) {
-			if (e.getName().matches(name)) {
-				return e;
-			}
-		}
-		return null;
-	}
 
 	/**
 	 * Called when entity is deserialized for subclasses to act on. <br>
@@ -367,43 +314,10 @@ public class Entity {
 	public boolean compileLogic(Datapack datapack) {
 		return true;
 	}
-	
-	
-	/**
-	 * Compile an entity output into commands.
-	 * 
-	 * @param outputName Output name to compile.
-	 * @param instigator Entity that started the io chain.
-	 * @return Output commands.
-	 */
-	public String[] compileOutput(String outputName, Entity instigator) {
-		// Get all outputs with name
-		List<String> commands = new ArrayList<String>();
-		for (Output o : outputConnections()) {
-			if (o.name.matches(outputName)) {
-				commands.add(o.compile(instigator));
-			}
-		}
 
-		return commands.toArray(new String[0]);
-	}
 	
 	@Override
 	public String toString() {
 		return getName();
-	}
-	
-	/**
-	 * Whether non-block visualizations of this entity should render in the editor.
-	 */
-	public boolean shouldRender() {
-		return shouldRender;
-	}
-	
-	/**
-	 * Set whether non-block visualizations of this entity should render in the editor.
-	 */
-	public void setShouldRender(boolean shouldRender) {
-		this.shouldRender = shouldRender;
 	}
 }

@@ -1,12 +1,13 @@
 package org.scaffoldeditor.scaffold.level.entity.logic;
 
+import java.util.Map;
+
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.EntityFactory;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
+import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.IntAttribute;
-import org.scaffoldeditor.scaffold.level.io.Input;
-import org.scaffoldeditor.scaffold.logic.Datapack;
 
 /**
  * This class relays io from it's inputs to it's outputs
@@ -23,36 +24,18 @@ public class Relay extends Entity {
 			}
 		});
 	}
+	
+	
 
 	public Relay(Level level, String name) {
 		super(level, name);
-		setAttribute("delay", new IntAttribute(0), true);
-		
-//		// Called to activate the relay.
-//		registerInput(new Input(this) {
-//
-//			@Override
-//			public String getName() {
-//				// TODO Auto-generated method stub
-//				return "Trigger";
-//			}
-//
-//			@Override
-//			public boolean takesArgs() {
-//				return false;
-//			}
-//
-//			@Override
-//			public String getCommand(Entity instigator, Entity caller, String[] args) {
-//				if (((IntAttribute) getAttribute("delay")).getValue() <= 0) { // if delay < 0, ignore it.
-//					return "function "+getLevel().getDatapack().formatFunctionCall(getFunctionName());
-//				}  else {
-//					return "schedule function "+getLevel().getDatapack().formatFunctionCall(getFunctionName())+" "+getAttribute("delay");
-//				}
-//			}
-//
-//		});
 	}
+	
+	@Override
+	public Map<String, Attribute<?>> getDefaultAttributes() {
+		return Map.of("delay", new IntAttribute(0));
+	}
+
 
 //	@Override
 //	public boolean compileLogic(Datapack datapack) {
@@ -79,10 +62,4 @@ public class Relay extends Entity {
 	public String getFunctionName() {
 		return "relay_" + getName();
 	}
-	
-	@Override
-	public String getRenderAsset() {
-		return "scaffold/textures/editor/relay.png";
-	}
-
 }
