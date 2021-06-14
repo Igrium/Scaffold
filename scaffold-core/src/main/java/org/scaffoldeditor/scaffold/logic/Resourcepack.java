@@ -3,13 +3,15 @@ package org.scaffoldeditor.scaffold.logic;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
+import org.scaffoldeditor.scaffold.util.GitignoreUtils;
 import org.scaffoldeditor.scaffold.util.ZipUtils;
+import org.scaffoldeditor.scaffold.util.GitignoreUtils.Gitignore;
 
 /**
  * Represents a Minecraft resourecpack.
@@ -91,17 +93,18 @@ public class Resourcepack {
 			FileUtils.deleteDirectory(compilePath.toFile());
 		}
 		
-//		// Create assetIgnore.
-//		FileIgnore assetIgnore = new FileIgnore(assetPath.resolve("assetignore.txt")) {
-//
-//			@Override
-//			protected void addDefaults() {
-//				ignoredFiles.add(Paths.get("assetignore.txt"));
-//			}
-//		};
+
+		String dataIgnoreContent;
+		if (assetFolder.resolve(".ignore").toFile().isFile()) {
+			dataIgnoreContent = Files.readString(assetFolder.resolve(".ignore"));
+		} else {
+			dataIgnoreContent = "";
+		}
+		
+		Gitignore ignore = GitignoreUtils.load(dataIgnoreContent);
 		
 		// Copy resources.
-//		FileUtils.copyDirectory(assetFolder.toFile(), assetPath.toFile(), assetIgnore.new Filter(), true);
+		FileUtils.copyDirectory(assetFolder.toFile(), assetPath.toFile(), (file) -> ignore.accepts(file.toString()) , true);
 		
 		// Generat pack.mcmeta.
 		File packMeta = compilePath.resolve("pack.mcmeta").toFile();

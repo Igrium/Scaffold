@@ -71,7 +71,7 @@ public final class GitignoreUtils {
 					return line.trim();
 				})
 				.filter(line -> {
-					return line != null && line.charAt(0) != '#';
+					return line.length() > 0 && line.charAt(0) != '#';
 				})
 				.reduce(new SingleTypePair<>(new ArrayList<String>(), new ArrayList<String>()),
 						(lists, line) -> {

@@ -1,5 +1,6 @@
 package org.scaffoldeditor.scaffold.logic;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -18,6 +19,7 @@ import org.json.JSONObject;
 import org.scaffoldeditor.nbt.util.Pair;
 import org.scaffoldeditor.scaffold.core.Project;
 import org.scaffoldeditor.scaffold.logic.datapack.AbstractFunction;
+import org.scaffoldeditor.scaffold.logic.datapack.FunctionNameUtils;
 import org.scaffoldeditor.scaffold.util.GitignoreUtils;
 import org.scaffoldeditor.scaffold.util.GitignoreUtils.Gitignore;
 
@@ -171,7 +173,7 @@ public class Datapack {
 		
 		// Write pack.mcmeta
 		generatePackMCMeta(compilePath);
-		
+			
 		
 		/* SET LOAD FUNCTIONS */
 		Path functionTags = compilePath.resolve(Paths.get("data","minecraft","tags","functions"));
@@ -227,6 +229,15 @@ public class Datapack {
 		tick.write(tickWriter, 4, 0);
 		tickWriter.close();
 		
+		
+		// Write functions to file
+		for (AbstractFunction function : functions) {
+			File file = compilePath.resolve("data").resolve(FunctionNameUtils.metaToPath(function.getMeta())).toFile();
+			file.getParentFile().mkdirs();
+			BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+			writer.write(function.compile());
+			writer.close();
+		}
 		
 		return true;
 	}

@@ -28,9 +28,9 @@ public final class FunctionNameUtils {
 	}
 	
 	/**
-	 * Get a function's pathin within the data folder from it's metadata.
+	 * Get a function's path within the data folder from it's metadata.
 	 * @param meta Function meta (namespace and pathname).
-	 * @return Function path.
+	 * @return Function path relative to the data folder.
 	 */
 	public static Path metaToPath(Pair<String, String> meta) {
 		return Paths.get(meta.getFirst(), "functions", meta.getSecond()+".mcfunction");
