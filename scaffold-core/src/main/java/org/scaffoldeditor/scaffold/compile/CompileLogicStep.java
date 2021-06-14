@@ -9,7 +9,8 @@ import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.logic.Datapack;
-import org.scaffoldeditor.scaffold.logic.MCFunction;
+import org.scaffoldeditor.scaffold.logic.datapack.Command;
+import org.scaffoldeditor.scaffold.logic.datapack.Function;
 
 public class CompileLogicStep implements CompileStep {
 
@@ -18,8 +19,8 @@ public class CompileLogicStep implements CompileStep {
 		Path datapackFolder = target.resolve("datapacks");
 		
 		// Create tick and init functions
-		MCFunction initFunction = new MCFunction("init");
-		MCFunction tickFunction = new MCFunction("tick");		
+		Function initFunction = new Function(level.getName(), "init");
+		Function tickFunction = new Function(level.getName(), "tick");		
 		level.setInitFunction(initFunction);
 		level.setTickFunction(tickFunction);
 		
@@ -28,12 +29,12 @@ public class CompileLogicStep implements CompileStep {
 		datapack.functions.add(initFunction);
 		datapack.functions.add(tickFunction);
 		
-		datapack.loadFunctions.add(datapack.formatFunctionCall(initFunction));
-		datapack.tickFunctions.add(datapack.formatFunctionCall(tickFunction));
+		datapack.loadFunctions.add(initFunction.getMeta());
+		datapack.tickFunctions.add(tickFunction.getMeta());
 		
 		// Respawn scoreboard entity.
-		initFunction.addCommand("kill " + level.getScoreboardEntity().getTargetSelector());
-		initFunction.addCommand(level.summonScoreboardEntity());
+		initFunction.commands.add(Command.fromString("kill "+level.getScoreboardEntity().getTargetSelector().compile()));
+		initFunction.commands.add(level.summonScoreboardEntity());
 
 		// Compile entities
 		for (Entity ent : level.getEntities().values()) {

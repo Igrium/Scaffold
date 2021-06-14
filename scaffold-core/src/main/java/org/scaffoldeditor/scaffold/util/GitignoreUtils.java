@@ -17,7 +17,7 @@ import org.scaffoldeditor.nbt.util.SingleTypePair;
  * </p>
  * <p>
  * Derived from <a
- * href=https://github.com/codemix/gitignore-parser>https://github.com/codemix/gitignore-parser<a>
+ * href=https://github.com/codemix/gitignore-parser>https://github.com/codemix/gitignore-parser</a>
  */
 public final class GitignoreUtils {
 	private GitignoreUtils() {}
@@ -53,7 +53,7 @@ public final class GitignoreUtils {
 	 * @param content The content to compile.
 	 * @return The generated Gitignore.
 	 */
-	public static Gitignore compile(String content) {
+	public static Gitignore load(String content) {
 		return new Gitignore(parse(content));
 	}
 	

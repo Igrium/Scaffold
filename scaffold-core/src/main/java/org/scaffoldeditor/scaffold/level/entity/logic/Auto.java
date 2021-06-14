@@ -48,26 +48,26 @@ public class Auto extends Entity {
 				new BillboardRenderEntity(this, getPosition(), "billboard", "scaffold:textures/editor/auto.png")));
 	}
 
-	@Override
-	public boolean compileLogic(Datapack datapack) {
-		if (!super.compileLogic(datapack)) {
-			return false;
-		}
-		
-		String[] loadCommands = compileOutput("OnLoad", this);
-		
-		for (String s : loadCommands) {
-			getLevel().initFunction().addCommand(s);
-		}
-		
-		String[] tickCommands = compileOutput("OnTick", this);
-		
-		for (String s : tickCommands) {
-			getLevel().tickFunction().addCommand(s);
-		}
-		
-		return true;
-	}
+//	@Override
+//	public boolean compileLogic(Datapack datapack) {
+//		if (!super.compileLogic(datapack)) {
+//			return false;
+//		}
+//		
+//		String[] loadCommands = compileOutput("OnLoad", this);
+//		
+//		for (String s : loadCommands) {
+//			getLevel().initFunction().addCommand(s);
+//		}
+//		
+//		String[] tickCommands = compileOutput("OnTick", this);
+//		
+//		for (String s : tickCommands) {
+//			getLevel().tickFunction().addCommand(s);
+//		}
+//		
+//		return true;
+//	}
 	
 	@Override
 	public String getRenderAsset() {

@@ -17,6 +17,7 @@ import org.scaffoldeditor.scaffold.level.entity.attribute.NBTAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.StringAttribute;
 import org.scaffoldeditor.scaffold.level.render.MCRenderEntity;
 import org.scaffoldeditor.scaffold.logic.Datapack;
+import org.scaffoldeditor.scaffold.logic.datapack.TargetSelector;
 import org.scaffoldeditor.scaffold.math.Vector;
 
 import net.querz.nbt.io.SNBTUtil;
@@ -172,8 +173,8 @@ public class GameEntity extends Rotatable implements TargetSelectable, EntityAdd
 	}
 
 	@Override
-	public String getTargetSelector() {
-		return "@e [type="+getEntityType()+",name="+getName()+"]";
+	public TargetSelector getTargetSelector() {
+		return TargetSelector.fromString("@e[type="+getEntityType()+",name="+getName()+"]");
 	}
 	
 	@Override

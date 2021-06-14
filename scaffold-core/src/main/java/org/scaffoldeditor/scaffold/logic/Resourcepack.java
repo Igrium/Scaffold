@@ -91,17 +91,17 @@ public class Resourcepack {
 			FileUtils.deleteDirectory(compilePath.toFile());
 		}
 		
-		// Create assetIgnore.
-		FileIgnore assetIgnore = new FileIgnore(assetPath.resolve("assetignore.txt")) {
-
-			@Override
-			protected void addDefaults() {
-				ignoredFiles.add(Paths.get("assetignore.txt"));
-			}
-		};
+//		// Create assetIgnore.
+//		FileIgnore assetIgnore = new FileIgnore(assetPath.resolve("assetignore.txt")) {
+//
+//			@Override
+//			protected void addDefaults() {
+//				ignoredFiles.add(Paths.get("assetignore.txt"));
+//			}
+//		};
 		
 		// Copy resources.
-		FileUtils.copyDirectory(assetFolder.toFile(), assetPath.toFile(), assetIgnore.new Filter(), true);
+//		FileUtils.copyDirectory(assetFolder.toFile(), assetPath.toFile(), assetIgnore.new Filter(), true);
 		
 		// Generat pack.mcmeta.
 		File packMeta = compilePath.resolve("pack.mcmeta").toFile();

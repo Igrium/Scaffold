@@ -35,7 +35,9 @@ import org.scaffoldeditor.scaffold.level.entity.attribute.BooleanAttribute;
 import org.scaffoldeditor.scaffold.level.entity.game.TargetSelectable;
 import org.scaffoldeditor.scaffold.level.render.RenderEntity;
 import org.scaffoldeditor.scaffold.logic.Datapack;
-import org.scaffoldeditor.scaffold.logic.MCFunction;
+import org.scaffoldeditor.scaffold.logic.datapack.Command;
+import org.scaffoldeditor.scaffold.logic.datapack.Function;
+import org.scaffoldeditor.scaffold.logic.datapack.TargetSelector;
 import org.scaffoldeditor.scaffold.math.Vector;
 import org.scaffoldeditor.scaffold.operation.OperationManager;
 import org.scaffoldeditor.scaffold.serialization.LevelReader;
@@ -71,8 +73,8 @@ public class Level {
 	private LevelData levelData = new LevelData(this);
 	
 	/* Game functions. ONLY EXIST DURING COMPILATION */
-	private MCFunction initFunction;
-	private MCFunction tickFunction;
+	private Function initFunction;
+	private Function tickFunction;
 	private Datapack datapack;
 	
 	private String name = "level";
@@ -200,7 +202,7 @@ public class Level {
 	 * ONLY EXISTS DURING COMPILATION!
 	 * @return Init function.
 	 */
-	public MCFunction initFunction() {
+	public Function initFunction() {
 		return initFunction;
 	}
 	
@@ -209,7 +211,7 @@ public class Level {
 	 * ONLY EXISTS DURING COMPILATION!
 	 * @return Tick function.
 	 */
-	public MCFunction tickFunction() {
+	public Function tickFunction() {
 		return tickFunction;
 	}
 	
@@ -222,14 +224,14 @@ public class Level {
 		return datapack;
 	}
 	
-	public void setInitFunction(MCFunction initFunction) {
+	public void setInitFunction(Function initFunction) {
 		this.initFunction = initFunction;
 	}
 	
 	/**
 	 * For use in the compiler only.
 	 */
-	public void setTickFunction(MCFunction tickFunction) {
+	public void setTickFunction(Function tickFunction) {
 		this.tickFunction = tickFunction;
 	}
 	
@@ -385,8 +387,8 @@ public class Level {
 		if (scoreboardEntity == null) {
 			scoreboardEntity = new TargetSelectable() {
 				@Override
-				public String getTargetSelector() {
-					return "@e[type="+SCOREBOARDTYPE+", name="+SCOREBOARDNAME+"]";
+				public TargetSelector getTargetSelector() {
+					return TargetSelector.fromString("@e[type="+SCOREBOARDTYPE+", name="+SCOREBOARDNAME+"]");
 				}
 			};
 		}
@@ -395,13 +397,13 @@ public class Level {
 	}
 	
 	
-	public String summonScoreboardEntity() {
+	public Command summonScoreboardEntity() {
 		CompoundTag nbt = new CompoundTag();
 		nbt.putString("CustomName","\""+SCOREBOARDNAME+"\"");
 		nbt.putInt("Duration", 2000000000);
 		
 		try {
-			return "summon "+SCOREBOARDTYPE+" 0 0 0 "+SNBTUtil.toSNBT(nbt);
+			return Command.fromString("summon "+SCOREBOARDTYPE+" 0 0 0 "+SNBTUtil.toSNBT(nbt));
 		} catch (IOException e) {
 			throw new AssertionError("Unable to spawn scoreboard entity due to an NBT error.", e);
 		}

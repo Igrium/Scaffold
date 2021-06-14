@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
@@ -14,7 +15,11 @@ import org.apache.logging.log4j.LogManager;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.scaffoldeditor.nbt.util.Pair;
 import org.scaffoldeditor.scaffold.core.Project;
+import org.scaffoldeditor.scaffold.logic.datapack.AbstractFunction;
+import org.scaffoldeditor.scaffold.util.GitignoreUtils;
+import org.scaffoldeditor.scaffold.util.GitignoreUtils.Gitignore;
 
 /**
  * Represents the main game datapack
@@ -28,19 +33,18 @@ public class Datapack {
 	private String defaultNamespace;
 	
 	/**
-	 * Function names that will be called on datapack load
+	 * Functions that will be called on datapack load.
+	 * The first entry in the pair is the function namespace and the second entry is the pathname.
 	 */
-	public final List<String> loadFunctions = new ArrayList<String>();
+	public final List<Pair<String, String>> loadFunctions = new ArrayList<>();
 	
 	/**
-	 *  Function names that will be called every tick 
+	 *  Functions that will be called every tick.
+	 *  The first entry in the pair is the function namespace and the second entry is the pathname.
 	 */
-	public final List<String> tickFunctions = new ArrayList<String>();
+	public final List<Pair<String, String>> tickFunctions = new ArrayList<>();
 	
-	/**
-	 * Additional functions to be compiled into datapack
-	 */
-	public final List<MCFunction> functions = new ArrayList<MCFunction>();
+	public final Collection<AbstractFunction> functions = new ArrayList<>();
 	
 	/**
 	 * The description which is written in pack.mcmeta
@@ -135,24 +139,7 @@ public class Datapack {
 	public Project getProject() {
 		return project;
 	}
-	
-	/**
-	 * Format a function name as if it were in the default namespace.
-	 * @param name Function name to format.
-	 * @return Formatted name.
-	 */
-	public String formatFunctionCall(String name) {
-		return getDefaultNamespace()+":"+name;
-	}
-	
-	/**
-	 * Format a function name as if it were in the default namespace.
-	 * @param function Function to format.
-	 * @return Formatted name.
-	 */
-	public String formatFunctionCall(MCFunction function) {
-		return formatFunctionCall(function.getName());
-	}
+
 	
 	/**
 	 * Compile this datapack into a runnable datapack
@@ -162,41 +149,23 @@ public class Datapack {
 	 */
 	public boolean compile(Path compilePath) throws IOException {
 		LogManager.getLogger().info("Starting datapack compile.");
-		
-		// Run pre-compile script
-//		preCompileScript();
+
 		
 		// Reset folder
 		if (compilePath.toFile().exists()) {
 			FileUtils.deleteDirectory(compilePath.toFile());
 		}
 		
-		// Load dataignore
-		FileIgnore dataignore = new DataIgnore(Paths.get(dataFolder.toString(), "dataignore.txt"));
+		String dataIgnoreContent = Files.readString(compilePath.resolve(".ignore"));
+		Gitignore dataIgnore = GitignoreUtils.load(dataIgnoreContent);
 		
-		// Copy the directory
-		FileUtils.copyDirectory(dataFolder.toFile(), compilePath.resolve("data").toFile(), dataignore.new Filter(), true);
-		
+		FileUtils.copyDirectory(dataFolder.toFile(), compilePath.resolve("data").toFile(), (pathName) -> {
+			return dataIgnore.accepts(pathName.toString());
+		});
 		
 		// Write pack.mcmeta
 		generatePackMCMeta(compilePath);
 		
-		
-		// Write MCFunctions
-		Path functionFolder = compilePath.resolve(Paths.get("data", defaultNamespace, "functions"));
-		functionFolder.toFile().mkdirs();
-		
-		for (MCFunction func : functions) {
-			func.variables().put("namespace", defaultNamespace);
-		}
-		
-		for (MCFunction func : functions) {
-			func.compile(functionFolder.resolve(func.getName()+".mcfunction").toFile());
-		}
-		
-		for (MCFunction func : functions) {
-			func.variables().remove("namespace");
-		}
 		
 		/* SET LOAD FUNCTIONS */
 		Path functionTags = compilePath.resolve(Paths.get("data","minecraft","tags","functions"));
@@ -218,8 +187,8 @@ public class Datapack {
 		
 		// Redundency if values never got assigned due to deserialization
 		loadValues = load.getJSONArray("values");
-		for (String f : loadFunctions) {
-			loadValues.put(f);
+		for (Pair<String, String> f : loadFunctions) {
+			loadValues.put(f.getFirst()+":"+f.getSecond());
 		}
 		
 		// Save JSON object
@@ -243,8 +212,8 @@ public class Datapack {
 				
 		// Redundency if values never got assigned due to deserialization
 		tickValues = tick.getJSONArray("values");
-		for (String f : tickFunctions) {
-			tickValues.put(f);
+		for (Pair<String, String> f : tickFunctions) {
+			tickValues.put(f.getFirst()+":"+f.getSecond());
 		}
 		
 		// Save JSON object
@@ -252,7 +221,6 @@ public class Datapack {
 		tick.write(tickWriter, 4, 0);
 		tickWriter.close();
 		
-//		postCompileScript(compilePath);
 		
 		return true;
 	}
@@ -266,13 +234,13 @@ public class Datapack {
 		JSONObject root = new JSONObject();
 		JSONObject pack = new JSONObject();
 		
-		pack.put("pack_format", 1);
+		pack.put("pack_format", 7);
 		pack.put("description", description);
 		root.put("pack", pack);
 		
 		// Save to file
 		FileWriter writer = new FileWriter(new File(compilePath.toString(), "pack.mcmeta"));
-		root.write(writer, 4, 0);
+		writer.write(root.toString(4));
 		writer.close();
 	}
 	
