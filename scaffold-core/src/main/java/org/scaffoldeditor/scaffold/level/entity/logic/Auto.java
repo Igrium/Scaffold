@@ -1,6 +1,8 @@
 package org.scaffoldeditor.scaffold.level.entity.logic;
 
+import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import org.scaffoldeditor.scaffold.level.Level;
@@ -8,7 +10,10 @@ import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.EntityFactory;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
+import org.scaffoldeditor.scaffold.level.io.OutputDeclaration;
 import org.scaffoldeditor.scaffold.level.render.BillboardRenderEntity;
+import org.scaffoldeditor.scaffold.logic.Datapack;
+import org.scaffoldeditor.scaffold.logic.datapack.Function;
 
 /**
  * Fires an output on level load.
@@ -34,6 +39,51 @@ public class Auto extends Entity {
 	@Override
 	public Map<String, Attribute<?>> getDefaultAttributes() {
 		return Collections.emptyMap();
+	}
+	
+	@Override
+	public Collection<OutputDeclaration> getDeclaredOutputs() {
+		Collection<OutputDeclaration> out = super.getDeclaredOutputs();
+		out.add(new OutputDeclaration() {
+			
+			@Override
+			public String getName() {
+				return "OnDatapackLoad";
+			}
+			
+			@Override
+			public List<String> getArguements() {
+				return Collections.emptyList();
+			}
+		});
+		out.add(new OutputDeclaration() {
+			
+			@Override
+			public String getName() {
+				return "OnTick";
+			}
+			
+			@Override
+			public List<String> getArguements() {
+				return Collections.emptyList();
+			}
+		});
+		return out;
+	}
+	
+	@Override
+	public boolean compileLogic(Datapack datapack) {
+		Function initFunction = new Function(getLevel().getName().toLowerCase(), getName()+"/init");
+		initFunction.commands.addAll(compileOutput("OnDatapackLoad"));
+		datapack.functions.add(initFunction);
+		datapack.loadFunctions.add(initFunction.getMeta());
+		
+		Function tickFunction = new Function(getLevel().getName().toLowerCase(), getName()+"/tick");
+		tickFunction.commands.addAll(compileOutput("OnTick"));
+		datapack.functions.add(tickFunction);
+		datapack.tickFunctions.add(tickFunction.getMeta());
+		
+		return super.compileLogic(datapack);
 	}
 	
 	@Override

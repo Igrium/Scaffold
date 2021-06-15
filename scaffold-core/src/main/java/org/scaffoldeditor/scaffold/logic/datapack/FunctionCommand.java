@@ -26,7 +26,7 @@ public class FunctionCommand implements Command {
 	 */
 	public FunctionCommand(Pair<String, String> target) {
 		this.namespace = target.getFirst();
-		this.namespace = target.getSecond();
+		this.path = target.getSecond();
 	}
 	
 	/**

@@ -59,7 +59,7 @@ public class Level {
 	public static final String SCOREBOARDNAME = "worldspawn";
 	
 	/* The type of the entity that keeps track of level scoreboard objectives */
-	public static final String SCOREBOARDTYPE = "minecraft:area_effect_cloud";
+	public static final String SCOREBOARDTYPE = "minecraft:marker";
 		
 	/* The project this level belongs to */
 	private Project project;

@@ -17,6 +17,7 @@ import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.VectorAttribute;
 import org.scaffoldeditor.scaffold.level.io.InputDeclaration;
 import org.scaffoldeditor.scaffold.level.io.Output;
+import org.scaffoldeditor.scaffold.level.io.OutputDeclaration;
 import org.scaffoldeditor.scaffold.level.render.RenderEntity;
 import org.scaffoldeditor.scaffold.logic.Datapack;
 import org.scaffoldeditor.scaffold.logic.datapack.Command;
@@ -98,15 +99,42 @@ public abstract class Entity {
 	 * @return A collection of input declarations.
 	 */
 	public Collection<InputDeclaration> getDeclaredInputs() {
-		return Collections.emptyList();
+		return new ArrayList<>();
 	}
 	
 	/**
-	 * Get all this entity's outputs.
+	 * Get all the outputs that this entity emits.
+	 * @return A collection of output declarations.
+	 */
+	public Collection<OutputDeclaration> getDeclaredOutputs() {
+		return new ArrayList<>();
+	}
+	
+	/**
+	 * Get all this entity's outputs that have been connected.
 	 * @return A mutable list of this entity's outputs.
 	 */
 	public List<Output> getOutputs() {
 		return outputs;
+	}
+	
+	/**
+	 * Compile all outputs with a trigger name matching the output name.
+	 * 
+	 * @param outputName Trigger name.
+	 * @return A list of all the commands that should be run when this output is
+	 *         triggered.
+	 */
+	public List<Command> compileOutput(String outputName) {
+		List<Command> list = new ArrayList<>();
+		
+		for (Output output : outputs) {
+			if (output.getTrigger().equals(outputName)) {
+				list.addAll(output.compile());
+			}
+		}
+		
+		return list;
 	}
 	
 	/**

@@ -1,13 +1,27 @@
 package org.scaffoldeditor.scaffold.level.entity.logic;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.scaffoldeditor.nbt.util.SingleTypePair;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.EntityFactory;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.IntAttribute;
+import org.scaffoldeditor.scaffold.level.entity.attribute.StringAttribute;
+import org.scaffoldeditor.scaffold.level.io.InputDeclaration;
+import org.scaffoldeditor.scaffold.level.io.OutputDeclaration;
+import org.scaffoldeditor.scaffold.logic.Datapack;
+import org.scaffoldeditor.scaffold.logic.datapack.Command;
+import org.scaffoldeditor.scaffold.logic.datapack.ExecuteCommandBuilder;
+import org.scaffoldeditor.scaffold.logic.datapack.Function;
+import org.scaffoldeditor.scaffold.logic.datapack.FunctionCommand;
+import org.scaffoldeditor.scaffold.logic.datapack.TargetSelector;
 
 /**
  * This class relays io from it's inputs to it's outputs
@@ -24,8 +38,6 @@ public class Relay extends Entity {
 			}
 		});
 	}
-	
-	
 
 	public Relay(Level level, String name) {
 		super(level, name);
@@ -33,33 +45,83 @@ public class Relay extends Entity {
 	
 	@Override
 	public Map<String, Attribute<?>> getDefaultAttributes() {
-		return Map.of("delay", new IntAttribute(0));
+		Map<String, Attribute<?>> attributes = new HashMap<>();
+		attributes.put("delay", new IntAttribute(0));
+		attributes.put("executorOverride", new StringAttribute(""));
+		
+		return attributes;
+	}
+	
+	@Override
+	public Collection<OutputDeclaration> getDeclaredOutputs() {
+		Collection<OutputDeclaration> out =  super.getDeclaredOutputs();
+		out.add(new OutputDeclaration() {	
+			@Override
+			public String getName() {
+				return "OnTrigger";
+			}
+			
+			@Override
+			public List<String> getArguements() {
+				return Collections.emptyList();
+			}
+		});
+		return out;
 	}
 
+	@Override
+	public Collection<InputDeclaration> getDeclaredInputs() {
+		return List.of(new InputDeclaration() {
 
-//	@Override
-//	public boolean compileLogic(Datapack datapack) {
-//		super.compileLogic(datapack);
-//
-//		// Compile relay function
-//		MCFunction function = new MCFunction(getFunctionName());
-//
-//		String[] outputCommands = compileOutput("OnTrigger", this);
-//
-//		for (String s : outputCommands) {
-//			function.addCommand(s);
-//		}
-//		
-//		datapack.functions.add(function);
-//
-//		return true;
-//	}
+			@Override
+			public String getName() {
+				return "Trigger";
+			}
+
+			@Override
+			public List<String> getArguements() {
+				return Collections.emptyList();
+			}
+		});
+	}
+
+	@Override
+	public List<Command> compileInput(String inputName, List<Attribute<?>> args, Entity source) {
+		if (inputName.matches("Trigger")) {
+			FunctionCommand function = new FunctionCommand(getTriggerFunction());
+			TargetSelector executor = getExecutorOverride();
+			Command command;
+			if (executor != null) {
+				command = new ExecuteCommandBuilder().as(executor).run(function);
+			} else {
+				command = function;
+			}
+			
+			return List.of(command);
+		}
+
+		return super.compileInput(inputName, args, source);
+	}
+
+	@Override
+	public boolean compileLogic(Datapack datapack) {
+		super.compileLogic(datapack);
+		
+		Function relayFunction = new Function(getTriggerFunction());
+		for (Command command : compileOutput("OnTrigger")) {
+			relayFunction.commands.add(command);
+		}
+		
+		datapack.functions.add(relayFunction);
+		return true;
+	}
+
+	public TargetSelector getExecutorOverride() {
+		String string = (String) getAttribute("executorOverride").getValue();
+		return string.length() > 0 ? TargetSelector.fromString(string) : null;
+	}
 	
-	/**
-	 * Get the name of the function this relay will generate.
-	 * @return Function name.
-	 */
-	public String getFunctionName() {
-		return "relay_" + getName();
+	public SingleTypePair<String> getTriggerFunction() {
+		return new SingleTypePair<String>(getLevel().getName().toLowerCase(), getName()+"/trigger");
 	}
 }
