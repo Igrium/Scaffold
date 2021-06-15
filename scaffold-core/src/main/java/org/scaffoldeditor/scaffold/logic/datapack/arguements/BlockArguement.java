@@ -14,35 +14,35 @@ import net.querz.nbt.tag.CompoundTag;
 
 /**
  * Represents a <a
- * href=https://minecraft.fandom.com/wiki/Argument_types#block_predicate>Block
- * Predicate</a> arguement.
+ * href=https://minecraft.fandom.com/wiki/Argument_types#block_state>Block</a>
+ * arguement.
  * 
  * @author Igrium
  */
-public class BlockPredicate {
+public class BlockArguement {
 	public final String id;
 	private Map<String, String> blockstate;
 	private CompoundTag data;
 	
-	public BlockPredicate(String id) {
+	public BlockArguement(String id) {
 		this.id = id;
 	}
 	
-	public BlockPredicate(String id, Map<String, String> blockstate, CompoundTag data) {
+	public BlockArguement(String id, Map<String, String> blockstate, CompoundTag data) {
 		this.id = id;
 		this.blockstate = blockstate;
 		this.data = data;
 	}
 	
-	public BlockPredicate(String id, Map<String, String> blockstate) { 
+	public BlockArguement(String id, Map<String, String> blockstate) { 
 		this(id, blockstate, null);
 	}
 	
-	public BlockPredicate(String id, CompoundTag data) {
+	public BlockArguement(String id, CompoundTag data) {
 		this(id, null, data);
 	}
 	
-	public BlockPredicate(Block block) {
+	public BlockArguement(Block block) {
 		this.id = block.getName();
 		CompoundTag properties = block.getProperties();
 		if (properties.size() > 0) {
@@ -63,7 +63,7 @@ public class BlockPredicate {
 				out = out + SNBTUtil.toSNBT(data);
 			}
 		} catch (IOException e) {
-			throw new AssertionError("Unable to compile block predicate NBT!", e);
+			throw new AssertionError("Unable to compile blockstate NBT!", e);
 		}
 		return out;
 	}

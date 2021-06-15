@@ -22,6 +22,7 @@ import org.scaffoldeditor.scaffold.level.entity.attribute.NBTAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.StringAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.VectorAttribute;
 import org.scaffoldeditor.scaffold.level.entity.game.GameEntity;
+import org.scaffoldeditor.scaffold.level.entity.game.RedstoneListener;
 import org.scaffoldeditor.scaffold.level.entity.logic.Auto;
 import org.scaffoldeditor.scaffold.level.entity.logic.CommandEntity;
 import org.scaffoldeditor.scaffold.level.entity.logic.FunctionEntity;
@@ -49,6 +50,7 @@ public class DefaultPlugin implements PluginInitializer {
 		GameEntity.register();
 		ModelTest.register();
 		CommandEntity.register();
+		RedstoneListener.register();
 		
 		StringAttribute.register();
 		NBTAttribute.register();

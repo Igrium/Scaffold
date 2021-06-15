@@ -3,7 +3,7 @@ package org.scaffoldeditor.scaffold.logic.datapack;
 import java.util.List;
 import java.util.StringJoiner;
 
-import org.scaffoldeditor.scaffold.logic.datapack.arguements.BlockPredicate;
+import org.scaffoldeditor.scaffold.logic.datapack.arguements.BlockArguement;
 import org.scaffoldeditor.scaffold.logic.datapack.arguements.CommandRotation;
 import org.scaffoldeditor.scaffold.logic.datapack.arguements.CommandVector3f;
 import org.scaffoldeditor.scaffold.logic.datapack.arguements.CommandVector3i;
@@ -151,8 +151,8 @@ public class ExecuteCommand implements Command {
 	}
 	
 	public static class BlockConditional implements Conditional {
-		public final BlockPredicate predicate;	
-		public BlockConditional(BlockPredicate predicate) {
+		public final BlockArguement predicate;	
+		public BlockConditional(BlockArguement predicate) {
 			this.predicate = predicate;
 		}
 		public String get() {

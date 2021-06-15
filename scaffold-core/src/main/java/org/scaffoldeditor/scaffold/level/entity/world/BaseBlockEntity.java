@@ -58,13 +58,14 @@ public abstract class BaseBlockEntity extends Entity implements BlockEntity {
 	};
 
 	/**
-	 * Called when it's time to update the blocks in this entity during an attribute update.
-	 * Implementations of this method do not need to mark sections as dirty, however, bounding box
-	 * updates should be calculated. 
-	 * <br>
-	 * SHOULD NOT CALL <code>compileWorld()</code>!
-	 * <br>
-	 * <b>Note:</b> the entity may have moved without calling <code>setPosition()</code> when this is called.
+	 * Called when it's time to update variables that determine the placed blocks
+	 * during an attribute update, typically to reload models from disk, etc. Not to
+	 * be confused with {@link #compileWorld(BlockWorld, boolean)}, which does the actual placing of the
+	 * blocks. Implementations of this method do not need to mark sections as dirty,
+	 * however, bounding box updates should be calculated. <br>
+	 * SHOULD NOT CALL <code>compileWorld()</code>! <br>
+	 * <b>Note:</b> the entity may have moved without calling
+	 * <code>setPosition()</code> when this is called.
 	 */
 	public abstract void onUpdateBlockAttributes();
 }

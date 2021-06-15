@@ -15,6 +15,7 @@ import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.WorldUpdates.UpdateRenderEntitiesEvent;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.VectorAttribute;
+import org.scaffoldeditor.scaffold.level.entity.game.RedstoneListener;
 import org.scaffoldeditor.scaffold.level.io.InputDeclaration;
 import org.scaffoldeditor.scaffold.level.io.Output;
 import org.scaffoldeditor.scaffold.level.io.OutputDeclaration;
@@ -84,11 +85,16 @@ public abstract class Entity {
 	public abstract Map<String, Attribute<?>> getDefaultAttributes();
 	
 	/**
-	 * Compile an input on the entity.
+	 * Compile an input on the entity. <br>
+	 * <b>Warning:</b> Should not call <code>level#getDatapack()</code> or any other
+	 * function that's only valid during logic compilation, as it's possible for
+	 * this method to be called during world compilation (ex: {@link RedstoneListener}).
+	 * 
 	 * @param inputName The name of the input being compiled.
-	 * @param args The arguements it's being compiled with.
-	 * @param source The entity that's compiling the input.
-	 * @return A list of all the commands that should be run when this input is triggered.
+	 * @param args      The arguements it's being compiled with.
+	 * @param source    The entity that's compiling the input.
+	 * @return A list of all the commands that should be run when this input is
+	 *         triggered.
 	 */
 	public List<Command> compileInput(String inputName, List<Attribute<?>> args, Entity source) {
 		return Collections.emptyList();
