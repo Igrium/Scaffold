@@ -23,6 +23,7 @@ import org.scaffoldeditor.scaffold.level.entity.attribute.StringAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.VectorAttribute;
 import org.scaffoldeditor.scaffold.level.entity.game.GameEntity;
 import org.scaffoldeditor.scaffold.level.entity.logic.Auto;
+import org.scaffoldeditor.scaffold.level.entity.logic.CommandEntity;
 import org.scaffoldeditor.scaffold.level.entity.logic.FunctionEntity;
 import org.scaffoldeditor.scaffold.level.entity.logic.Relay;
 import org.scaffoldeditor.scaffold.level.entity.util.ModelTest;
@@ -47,6 +48,7 @@ public class DefaultPlugin implements PluginInitializer {
 		Relay.Register();
 		GameEntity.register();
 		ModelTest.register();
+		CommandEntity.register();
 		
 		StringAttribute.register();
 		NBTAttribute.register();

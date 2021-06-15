@@ -48,7 +48,7 @@ public class Auto extends Entity {
 			
 			@Override
 			public String getName() {
-				return "OnDatapackLoad";
+				return "on_datapack_load";
 			}
 			
 			@Override
@@ -60,7 +60,7 @@ public class Auto extends Entity {
 			
 			@Override
 			public String getName() {
-				return "OnTick";
+				return "on_tick";
 			}
 			
 			@Override
@@ -74,12 +74,12 @@ public class Auto extends Entity {
 	@Override
 	public boolean compileLogic(Datapack datapack) {
 		Function initFunction = new Function(getLevel().getName().toLowerCase(), getName()+"/init");
-		initFunction.commands.addAll(compileOutput("OnDatapackLoad"));
+		initFunction.commands.addAll(compileOutput("on_datapack_loaded"));
 		datapack.functions.add(initFunction);
 		datapack.loadFunctions.add(initFunction.getMeta());
 		
 		Function tickFunction = new Function(getLevel().getName().toLowerCase(), getName()+"/tick");
-		tickFunction.commands.addAll(compileOutput("OnTick"));
+		tickFunction.commands.addAll(compileOutput("on_tick"));
 		datapack.functions.add(tickFunction);
 		datapack.tickFunctions.add(tickFunction.getMeta());
 		

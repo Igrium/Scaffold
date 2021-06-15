@@ -49,7 +49,7 @@ public class FunctionEntity extends Entity {
 
 			@Override
 			public String getName() {
-				return "Execute";
+				return "execute";
 			}
 
 			@Override
@@ -62,7 +62,7 @@ public class FunctionEntity extends Entity {
 	
 	@Override
 	public List<Command> compileInput(String inputName, List<Attribute<?>> args, Entity source) {
-		if (inputName.equals("Execute")) {
+		if (inputName.equals("execute")) {
 			return List.of(new FunctionCommand(getFunction()));
 		}
 		return super.compileInput(inputName, args, source);

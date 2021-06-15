@@ -58,7 +58,7 @@ public class Relay extends Entity {
 		out.add(new OutputDeclaration() {	
 			@Override
 			public String getName() {
-				return "OnTrigger";
+				return "on_trigger";
 			}
 			
 			@Override
@@ -75,7 +75,7 @@ public class Relay extends Entity {
 
 			@Override
 			public String getName() {
-				return "Trigger";
+				return "trigger";
 			}
 
 			@Override
@@ -87,7 +87,7 @@ public class Relay extends Entity {
 
 	@Override
 	public List<Command> compileInput(String inputName, List<Attribute<?>> args, Entity source) {
-		if (inputName.matches("Trigger")) {
+		if (inputName.matches("trigger")) {
 			FunctionCommand function = new FunctionCommand(getTriggerFunction());
 			TargetSelector executor = getExecutorOverride();
 			Command command;
@@ -108,7 +108,7 @@ public class Relay extends Entity {
 		super.compileLogic(datapack);
 		
 		Function relayFunction = new Function(getTriggerFunction());
-		for (Command command : compileOutput("OnTrigger")) {
+		for (Command command : compileOutput("on_trigger")) {
 			relayFunction.commands.add(command);
 		}
 		
