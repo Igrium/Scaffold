@@ -8,6 +8,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,15 +67,17 @@ public class AssetManager {
 		File file = project.getProjectFolder().resolve(in).toFile();
 		return file.exists() || getAsset(in) == null;
 	}
-	
+
 	/**
-	 * Search all the loaded asset sources for a file.
-	 * <br>
-	 * Begins by searching the project folder and other search directories. If the file is not found there,
-	 * it searches the resources of plugins in the order defined in <code>gameinfo.json</code>.
-	 * Finally, it draws on Scaffold's built-in resources.
+	 * Search all the loaded asset sources for a file. <br>
+	 * Begins by searching the project folder and other search directories. If the
+	 * file is not found there, it searches Scaffold's builtin resources. Finally,
+	 * it searches the resources of plugins in the order defined in
+	 * <code>gameinfo.json</code>.
+	 * 
 	 * @param in Pathname of file to find relative to project root.
-	 * @return URL of the located file or null if it doesn't exist. May be a file or a reference to a file within a jar.
+	 * @return URL of the located file or null if it doesn't exist. May be a file or
+	 *         a reference to a file within a jar.
 	 */
 	public URL getAsset(String in) {
 		for (Path folder : searchDirectories) {
@@ -88,12 +91,32 @@ public class AssetManager {
 			}
 		}
 		
-		URL resourceURL = project.getPluginManager().getClassLoader().getResource(in);
-		if (resourceURL != null) {
-			return resourceURL;
+		return project.getPluginManager().getClassLoader().getResource(in);
+	}
+	
+	/**
+	 * Get a list of all instances of an asset in search order, where assets earlier in the list are prioritized.
+	 * Follows the search order defined in {@link #getAsset(String)}.
+	 * @param in Asset to search for.
+	 * @return All instances of the asset.
+	 * @throws IOException If an IO exception occurs.
+	 */
+	public List<URL> getAssets(String in) throws IOException {
+		List<URL> assets = new ArrayList<>();
+		
+		for (Path folder : searchDirectories) {
+			File file = folder.resolve(in).toFile();
+			if (file.isFile()) {
+				try {
+					assets.add(file.toURI().toURL());
+				} catch (MalformedURLException e) {
+					throw new AssertionError();
+				}
+			}
 		}
 		
-		return getClass().getClassLoader().getResource(in);		
+		assets.addAll(Collections.list(project.getPluginManager().getClassLoader().getResources(in)));
+		return assets;
 	}
 	
 	/**

@@ -8,15 +8,16 @@ import org.scaffoldeditor.scaffold.compile.Compiler.CompileProgressListener;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.logic.Resourcepack;
+import org.scaffoldeditor.scaffold.logic.AbstractPack.OutputMode;
 
 public class CompileResourcepackStep implements CompileStep {
 
 	@Override
 	public boolean execute(Level level, Path target, Map<String, Attribute<?>> args, CompileProgressListener listener) {
 		try {
-			Resourcepack resourcepack = new Resourcepack(level.getProject().assetManager().getAbsolutePath("assets"));
+			Resourcepack resourcepack = new Resourcepack(level.getProject());
 			resourcepack.setDescription("Resources for "+level.getProject().getTitle());
-			resourcepack.compile(target.resolve("resources"), true);
+			resourcepack.compile(target.resolve("resources").toFile(), OutputMode.ZIP);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return false;

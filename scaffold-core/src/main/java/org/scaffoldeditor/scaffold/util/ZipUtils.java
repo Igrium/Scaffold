@@ -6,10 +6,15 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+
+import net.lingala.zip4j.io.inputstream.ZipInputStream;
+import net.lingala.zip4j.model.LocalFileHeader;
 
 /**
  * This utility compresses a list of files to standard ZIP format file.
@@ -64,7 +69,6 @@ public class ZipUtils {
      * @throws FileNotFoundException
      * @throws IOException
      */
-    @SuppressWarnings("unused")
 	private static void zipDirectory(File folder, String parentFolder,
             ZipOutputStream zos) throws FileNotFoundException, IOException {
         for (File file : folder.listFiles()) {
@@ -75,12 +79,10 @@ public class ZipUtils {
             zos.putNextEntry(new ZipEntry(parentFolder + "/" + file.getName()));
             BufferedInputStream bis = new BufferedInputStream(
                     new FileInputStream(file));
-            long bytesRead = 0;
             byte[] bytesIn = new byte[BUFFER_SIZE];
             int read = 0;
             while ((read = bis.read(bytesIn)) != -1) {
                 zos.write(bytesIn, 0, read);
-                bytesRead += read;
             }
             bis.close();
             zos.closeEntry();
@@ -93,20 +95,36 @@ public class ZipUtils {
      * @throws FileNotFoundException
      * @throws IOException
      */
-    @SuppressWarnings("unused")
 	private static void zipFile(File file, ZipOutputStream zos)
             throws FileNotFoundException, IOException {
         zos.putNextEntry(new ZipEntry(file.getName()));
         BufferedInputStream bis = new BufferedInputStream(new FileInputStream(
                 file));
-        long bytesRead = 0;
         byte[] bytesIn = new byte[BUFFER_SIZE];
         int read = 0;
         while ((read = bis.read(bytesIn)) != -1) {
             zos.write(bytesIn, 0, read);
-            bytesRead += read;
         }
         bis.close();
         zos.closeEntry();
     }
+	
+	public static void extractZip(ZipInputStream is, Path targetDir) throws IOException {
+		LocalFileHeader localFileHeader;
+		int readLen;
+		byte[] readBuffer = new byte[BUFFER_SIZE];
+		
+		while ((localFileHeader = is.getNextEntry()) != null) {
+			File extractedFile = targetDir.resolve(localFileHeader.getFileName()).toFile();
+			File parent = extractedFile.getParentFile();
+			if (parent.isFile()) parent.delete();
+			parent.mkdirs();
+			
+			OutputStream os = new FileOutputStream(extractedFile);
+			while ((readLen = is.read(readBuffer)) != -1) {
+				os.write(readBuffer, 0, readLen);
+			}
+			os.close();
+		}
+	}
 }

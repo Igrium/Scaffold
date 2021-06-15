@@ -1,36 +1,34 @@
 package org.scaffoldeditor.scaffold.logic;
 
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.scaffoldeditor.nbt.util.Pair;
 import org.scaffoldeditor.scaffold.core.Project;
 import org.scaffoldeditor.scaffold.logic.datapack.AbstractFunction;
 import org.scaffoldeditor.scaffold.logic.datapack.FunctionNameUtils;
-import org.scaffoldeditor.scaffold.util.GitignoreUtils;
-import org.scaffoldeditor.scaffold.util.GitignoreUtils.Gitignore;
 
 /**
  * Represents the main game datapack
  * @author Igrium
  *
  */
-public class Datapack {
-	/* The datapack's main data folder */
-	private Path dataFolder;
+public class Datapack extends AbstractPack {
+	
+	public static final String LOAD_TAG_FILE = "minecraft/tags/functions/load.json";
+	public static final String TICK_TAG_FILE = "minecraft/tags/functions/tick.json";
 	
 	private String defaultNamespace;
 	
@@ -46,29 +44,10 @@ public class Datapack {
 	 */
 	public final List<Pair<String, String>> tickFunctions = new ArrayList<>();
 	
+	/**
+	 * A mutable list of all the functions that will be compiled into the datapack.
+	 */
 	public final Collection<AbstractFunction> functions = new ArrayList<>();
-	
-	/**
-	 * The description which is written in pack.mcmeta
-	 */
-	private String description = "Map Datapack";
-	
-	/**
-	 * Project this datapack is associated with
-	 */
-	private Project project;
-	
-	/**
-	 * Create a new datapack object.
-	 * @param project Project to associate with.
-	 * @param dataFolder Datapack's main data folder.
-	 * @param defaultNamespace Namespace to put defined function objects in.
-	 */
-	public Datapack(Project project, Path dataFolder, String defaultNamespace) {
-		
-		this.dataFolder = dataFolder;
-		setDefaultNamespace(defaultNamespace);
-	}
 	
 	/**
 	 * Create a new datapack object.
@@ -76,20 +55,10 @@ public class Datapack {
 	 * @param defaultNamespace Namespace to put defined function objects in.
 	 */
 	public Datapack(Project project, String defaultNamespace) {
-		this.project = project;
-		this.dataFolder = project.assetManager().getAbsolutePath("data");
+		super(project, "data");
 		setDefaultNamespace(defaultNamespace);
-	}
-	
-	/**
-	 * Create a new datapack object
-	 * @param project Project to associate with
-	 * @param dataFolder Datapack's main data folder
-	 */
-	public Datapack(Project project, Path dataFolder) {
-		this.project = project;
-		this.dataFolder = dataFolder;
-		setDefaultNamespace(project.getName());
+		setDescription("Map datapack");
+		setPackFormat(7);
 	}
 	
 	/**
@@ -97,25 +66,8 @@ public class Datapack {
 	 * @param project Project to associate with
 	 */
 	public Datapack(Project project) {
-		this.project = project;
-		this.dataFolder = project.assetManager().getAbsolutePath("data");
+		super(project, "data");
 		setDefaultNamespace(project.getName());
-	}
-	
-	/**
-	 * Get the datapack's description
-	 * @return Description
-	 */
-	public String getDescription() {
-		return description;
-	}
-	
-	/**
-	 * Set the datapack's description
-	 * @param newDescription New description
-	 */
-	public void setDescription(String newDescription) {
-		description = newDescription;
 	}
 	
 	/**
@@ -133,139 +85,75 @@ public class Datapack {
 	public String getDefaultNamespace() {
 		return defaultNamespace;
 	}
+
 	
-	/**
-	 * Get the project this datapack is associated with
-	 * @return
-	 */
-	public Project getProject() {
-		return project;
+	private JSONArray loadCache;
+	private JSONArray tickCache;
+
+	@Override
+	protected void preCompile(OutputWriter writer) throws IOException {
+		loadCache = new JSONArray();
+		tickCache = new JSONArray();
 	}
-
 	
-	/**
-	 * Compile this datapack into a runnable datapack
-	 * @param compilePath Absolute path to folder to compile datapack in (datapacks/name)
-	 * @return Success
-	 * @throws IOException 
-	 */
-	public boolean compile(Path compilePath) throws IOException {
-		LogManager.getLogger().info("Starting datapack compile.");
-
-		
-		// Reset folder
-		if (compilePath.toFile().exists()) {
-			FileUtils.deleteDirectory(compilePath.toFile());
-		}
-		
-		String dataIgnoreContent;
-		if (dataFolder.resolve(".ignore").toFile().isFile()) {
-			dataIgnoreContent = Files.readString(dataFolder.resolve(".ignore"));
-		} else {
-			dataIgnoreContent = "";
-		}
-		
-		Gitignore dataIgnore = GitignoreUtils.load(dataIgnoreContent);
-		
-		FileUtils.copyDirectory(dataFolder.toFile(), compilePath.resolve("data").toFile(), (pathName) -> {
-			return dataIgnore.accepts(pathName.toString());
-		});
-		
-		// Write pack.mcmeta
-		generatePackMCMeta(compilePath);
+	@Override
+	protected void processFile(InputStream in, OutputStream out, String filepath) throws IOException {
+		if (FilenameUtils.equalsNormalized(filepath, LOAD_TAG_FILE)) {
+			try {
+				JSONTokener tokener = new JSONTokener(in);
+				JSONObject object = new JSONObject(tokener);
+				for (Object obj : object.getJSONArray("values")) {
+					loadCache.put(obj);
+				}			
+			} catch (JSONException e) {
+				LogManager.getLogger().error("Error parsing JSON file: filepath!", e);
+			}
 			
-		
-		/* SET LOAD FUNCTIONS */
-		Path functionTags = compilePath.resolve(Paths.get("data","minecraft","tags","functions"));
-		if (!functionTags.toFile().exists()) {
-			functionTags.toFile().mkdirs();
-		}
-		
-		JSONObject load;
-		JSONArray loadValues;
-		
-		// JSON file may already exist. Load if it does.
-		if (functionTags.resolve("load.json").toFile().exists()) {
-			load = loadJSON(functionTags.resolve("load.json"));
+		} else if (FilenameUtils.equalsNormalized(filepath, TICK_TAG_FILE)) {
+			try {
+				JSONTokener tokener = new JSONTokener(in);
+				JSONObject object = new JSONObject(tokener);
+				for (Object obj : object.getJSONArray("values")) {
+					tickCache.put(obj);
+				}		
+			} catch (JSONException e) {
+				LogManager.getLogger().error("Error parsing JSON file: filepath!", e);
+			}
 		} else {
-			load = new JSONObject();
-			loadValues = new JSONArray();
-			load.put("values",loadValues);
+			super.processFile(in, out, filepath);
+		}
+	}
+
+	@Override
+	protected void postCompile(OutputWriter writer) throws IOException {
+		for (Pair<String, String> function : loadFunctions) {
+			loadCache.put(function.getFirst()+":"+function.getSecond());
+		}
+		for (Pair<String, String> function : tickFunctions) {
+			tickCache.put(function.getFirst()+":"+function.getSecond());
 		}
 		
-		// Redundency if values never got assigned due to deserialization
-		loadValues = load.getJSONArray("values");
-		for (Pair<String, String> f : loadFunctions) {
-			loadValues.put(f.getFirst()+":"+f.getSecond());
-		}
+		PackOutputStream out1 = writer.openStream("data/" + LOAD_TAG_FILE);
+		OutputStreamWriter writer1 = new OutputStreamWriter(out1);
+		JSONObject loadFunctions = new JSONObject();
+		loadFunctions.put("values", loadCache);
+		writer1.write(loadFunctions.toString(4));
+		writer1.close();
 		
-		// Save JSON object
-		FileWriter loadWriter = new FileWriter(functionTags.resolve("load.json").toFile());
-		load.write(loadWriter, 4, 0);
-		loadWriter.close();
+		PackOutputStream out2 = writer.openStream("data/" + TICK_TAG_FILE);
+		OutputStreamWriter writer2 = new OutputStreamWriter(out2);
+		JSONObject tickFunctions = new JSONObject();
+		tickFunctions.put("values", tickCache);
+		writer2.write(tickFunctions.toString(4));
+		writer2.close();
 		
-		
-		/* SET TICK FUNCTIONS */
-		JSONObject tick;
-		JSONArray tickValues;
-		
-		// JSON file may already exist. Load if it does.
-		if (functionTags.resolve("tick.json").toFile().exists()) {
-			tick = loadJSON(functionTags.resolve("tick.json"));
-		} else {
-			tick = new JSONObject();
-			tickValues = new JSONArray();
-			tick.put("values",tickValues);
-		}
-				
-		// Redundency if values never got assigned due to deserialization
-		tickValues = tick.getJSONArray("values");
-		for (Pair<String, String> f : tickFunctions) {
-			tickValues.put(f.getFirst()+":"+f.getSecond());
-		}
-		
-		// Save JSON object
-		FileWriter tickWriter = new FileWriter(functionTags.resolve("tick.json").toFile());
-		tick.write(tickWriter, 4, 0);
-		tickWriter.close();
-		
-		
-		// Write functions to file
+		// Compile functions.
 		for (AbstractFunction function : functions) {
-			File file = compilePath.resolve("data").resolve(FunctionNameUtils.metaToPath(function.getMeta())).toFile();
-			file.getParentFile().mkdirs();
-			BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-			writer.write(function.compile());
-			writer.close();
+			PackOutputStream out = writer.openStream("data/" + FunctionNameUtils.metaToPath(function.getMeta()).toString());
+			BufferedWriter bufWriter = new BufferedWriter(new OutputStreamWriter(out));
+			bufWriter.write(function.compile());
+			bufWriter.close();
 		}
-		
-		return true;
-	}
-	
-	/**
-	 * Generate the pack.mcmeta file
-	 * @param compilePath Absolute path to folder datapack is compiling in
-	 * @throws IOException 
-	 */
-	private void generatePackMCMeta(Path compilePath) throws IOException {
-		JSONObject root = new JSONObject();
-		JSONObject pack = new JSONObject();
-		
-		pack.put("pack_format", 7);
-		pack.put("description", description);
-		root.put("pack", pack);
-		
-		// Save to file
-		FileWriter writer = new FileWriter(new File(compilePath.toString(), "pack.mcmeta"));
-		writer.write(root.toString(4));
-		writer.close();
-	}
-	
-	/* Load a JSONObject from a file */
-	private static JSONObject loadJSON(Path inputPath) throws IOException, JSONException {
-		List<String> jsonFile = Files.readAllLines(inputPath);
-		JSONObject jsonObject = new JSONObject(String.join("", jsonFile));
-		return jsonObject;
 	}
 
 }
