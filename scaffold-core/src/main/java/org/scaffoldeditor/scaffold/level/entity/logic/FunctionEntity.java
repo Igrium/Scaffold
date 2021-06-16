@@ -14,8 +14,8 @@ import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.StringAttribute;
 import org.scaffoldeditor.scaffold.level.io.InputDeclaration;
-import org.scaffoldeditor.scaffold.logic.datapack.Command;
-import org.scaffoldeditor.scaffold.logic.datapack.FunctionCommand;
+import org.scaffoldeditor.scaffold.logic.datapack.commands.Command;
+import org.scaffoldeditor.scaffold.logic.datapack.commands.FunctionCommand;
 
 /**
  * Runs a function on the input "Run".

@@ -20,9 +20,9 @@ import org.scaffoldeditor.scaffold.level.entity.attribute.BooleanAttribute;
 import org.scaffoldeditor.scaffold.level.entity.world.BaseBlockEntity;
 import org.scaffoldeditor.scaffold.level.io.OutputDeclaration;
 import org.scaffoldeditor.scaffold.logic.Datapack;
-import org.scaffoldeditor.scaffold.logic.datapack.Command;
 import org.scaffoldeditor.scaffold.logic.datapack.Function;
-import org.scaffoldeditor.scaffold.logic.datapack.FunctionCommand;
+import org.scaffoldeditor.scaffold.logic.datapack.commands.Command;
+import org.scaffoldeditor.scaffold.logic.datapack.commands.FunctionCommand;
 import org.scaffoldeditor.scaffold.math.Vector;
 
 import net.querz.nbt.tag.CompoundTag;

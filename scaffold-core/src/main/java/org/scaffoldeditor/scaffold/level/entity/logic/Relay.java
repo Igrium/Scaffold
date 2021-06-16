@@ -17,11 +17,11 @@ import org.scaffoldeditor.scaffold.level.entity.attribute.StringAttribute;
 import org.scaffoldeditor.scaffold.level.io.InputDeclaration;
 import org.scaffoldeditor.scaffold.level.io.OutputDeclaration;
 import org.scaffoldeditor.scaffold.logic.Datapack;
-import org.scaffoldeditor.scaffold.logic.datapack.Command;
-import org.scaffoldeditor.scaffold.logic.datapack.ExecuteCommandBuilder;
 import org.scaffoldeditor.scaffold.logic.datapack.Function;
-import org.scaffoldeditor.scaffold.logic.datapack.FunctionCommand;
 import org.scaffoldeditor.scaffold.logic.datapack.TargetSelector;
+import org.scaffoldeditor.scaffold.logic.datapack.commands.Command;
+import org.scaffoldeditor.scaffold.logic.datapack.commands.ExecuteCommandBuilder;
+import org.scaffoldeditor.scaffold.logic.datapack.commands.FunctionCommand;
 
 /**
  * This class relays io from it's inputs to it's outputs

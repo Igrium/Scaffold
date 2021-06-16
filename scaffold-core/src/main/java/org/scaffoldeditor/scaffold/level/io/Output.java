@@ -6,7 +6,7 @@ import java.util.List;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.AttributeRegistry;
-import org.scaffoldeditor.scaffold.logic.datapack.Command;
+import org.scaffoldeditor.scaffold.logic.datapack.commands.Command;
 import org.scaffoldeditor.scaffold.serialization.XMLSerializable;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

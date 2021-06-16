@@ -5,6 +5,7 @@ import java.io.StringWriter;
 import java.util.List;
 
 import org.scaffoldeditor.nbt.util.SingleTypePair;
+import org.scaffoldeditor.scaffold.logic.datapack.commands.Command;
 
 /**
  * Represents a series of commands that can be compiled into a <code>.mcfunction</code>

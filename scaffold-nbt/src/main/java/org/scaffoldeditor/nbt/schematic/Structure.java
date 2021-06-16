@@ -4,12 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.BlockReader;
 import org.scaffoldeditor.nbt.block.SizedBlockCollection;
@@ -22,7 +19,6 @@ import net.querz.nbt.tag.CompoundTag;
 import net.querz.nbt.tag.DoubleTag;
 import net.querz.nbt.tag.IntTag;
 import net.querz.nbt.tag.ListTag;
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -39,9 +35,6 @@ public class Structure implements SizedBlockCollection, BlockReader<Structure> {
 	private int sizeX;
 	private int sizeY;
 	private int sizeZ;
-	
-	/* A value from 0-3 that represents structure's rotation */
-	private int rotation;
 		
 	/**
 	 * Get the name of the block at a particular location.
@@ -100,130 +93,6 @@ public class Structure implements SizedBlockCollection, BlockReader<Structure> {
 			}
 		}
 		return null;
-	}
-	
-	/**
-	 * Get the structure's rotation
-	 * @return An integer from 0 - 3 that represents the rotation
-	 */
-	public int getRotation() {
-		return rotation;
-	}
-	
-	/**
-	 * Set the structure's rotation
-	 * @param amount An integer from 0 - 3 that represents the rotation
-	 */
-	public void setRotation(int amount) {
-		if (amount < 0 || amount > 3) {
-			throw new IllegalArgumentException("Rotation amount must be an int between 0 and 3.");
-		}
-		
-		rotate(amount - rotation);
-	}
-	
-	/**
-	 * Rotate the structure
-	 * @param amount An integer from -3 - 3 that represents the amount to rotate by
-	 */
-	public void rotate(int amount) {
-		if (amount < -3 || amount > 3) {
-			throw new IllegalArgumentException("Rotation amount must be an int between -3 and 3.");
-		}
-		
-		if (amount < 0) {
-			amount = 4 - (amount*-1);
-		}
-		
-		// Make backup of blocks to reference from
-		List<CompoundTag> oldBlocks = new ArrayList<>();
-		Collections.copy(oldBlocks, blocks);
-		
-		// Translate all blocks to new location
-		for (CompoundTag block : blocks) {
-			ListTag<IntTag> coords = block.getListTag("pos").asIntTagList();
-	
-						
-			// Rotate around Y axis, affecting x and z coordinates
-			int[] newCoords = rotatePoint(coords.get(0).asInt(), coords.get(2).asInt(),
-					sizeX/2, sizeZ/2, amount);
-			
-			coords.set(0, new IntTag(newCoords[0]));
-			coords.set(2, new IntTag(newCoords[2]));
-		}
-		
-		// Rotate all applicable blocks in palette
-		Map<Integer, String> rotations = new HashMap<Integer, String>();
-		rotations.put(0, "north");
-		rotations.put(1, "west");
-		rotations.put(2, "south");
-		rotations.put(3, "east");
-		
-		for (CompoundTag paletteBlock : palette) {
-			if (paletteBlock.containsKey("Properties")) {
-				CompoundTag properties = paletteBlock.getCompoundTag("Properties");
-				if (properties.containsKey("facing")) {
-					String facing = properties.getString("facing");
-
-					int facingKey = getKeyByValue(rotations, facing);
-					facingKey += amount;
-					
-					if (facingKey > 3) { // If true, it has gone 360* around.
-						facingKey -= 4;
-					} else if (facingKey < 0) {
-						facingKey += 4;
-					}
-					
-					properties.putString("facing", rotations.get(facingKey));
-				}
-			}
-		}
-		
-		rotation += amount;
-		
-		if (rotation > 3) { // If true, it has gone 360* around.
-			rotation -= 4;
-		} else if (rotation < 0) {
-			rotation += 4;
-		}
-	}
-	
-	/*
-	 * Get a map's key by it's value
-	 * Adapted from: https://stackoverflow.com/a/2904266/5676620
-	 */
-	public static <T, E> T getKeyByValue(Map<T, E> map, E value) {
-	    for (Entry<T, E> entry : map.entrySet()) {
-	        if (Objects.equals(value, entry.getValue())) {
-	            return entry.getKey();
-	        }
-	    }
-	    return null;
-	}
-	
-	/* Utility function to rotate a point incriments of 90 degrees around anotner
-	 * Rotation amount is determined by amount*90
-	 */
-	private static int[] rotatePoint(int pointX, int pointY, int centerX, int centerY, int amount) {
-		// Translate point so center is in origin
-		pointX -= centerX;
-		pointY -= centerY;
-		
-		int[] newPoint = null;
-		if (amount == 0) {
-			newPoint = new int[] {pointX, pointY};
-		} else if (amount == 1) {
-			newPoint = new int[] {pointY*-1, pointX};
-		}  else if (amount == 2) {
-			newPoint = new int[] {pointX*-1, pointY*-1};
-		} else if (amount == 3) {
-			newPoint = new int[] {pointY, pointX*-1};
-		} else {
-			throw new IllegalArgumentException("Rotation amount must be an int between 0 and 3.");
-		}
-		
-		// Translate back
-		return new int[] {newPoint[0]+centerX, newPoint[1]+centerY};
 	}
 	
 	/**

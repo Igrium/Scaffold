@@ -21,7 +21,7 @@ import org.scaffoldeditor.scaffold.level.io.Output;
 import org.scaffoldeditor.scaffold.level.io.OutputDeclaration;
 import org.scaffoldeditor.scaffold.level.render.RenderEntity;
 import org.scaffoldeditor.scaffold.logic.Datapack;
-import org.scaffoldeditor.scaffold.logic.datapack.Command;
+import org.scaffoldeditor.scaffold.logic.datapack.commands.Command;
 import org.scaffoldeditor.scaffold.math.Vector;
 import org.scaffoldeditor.scaffold.util.event.EventListener;
 import org.w3c.dom.Element;

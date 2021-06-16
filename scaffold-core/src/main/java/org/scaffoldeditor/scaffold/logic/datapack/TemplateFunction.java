@@ -9,6 +9,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.scaffoldeditor.scaffold.logic.datapack.commands.Command;
+
 /**
  * A function with various variables that can be applied at compile-time.
  * @author Igrium

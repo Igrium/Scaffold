@@ -1,12 +1,13 @@
-package org.scaffoldeditor.scaffold.logic.datapack;
+package org.scaffoldeditor.scaffold.logic.datapack.commands;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.scaffoldeditor.scaffold.logic.datapack.ExecuteCommand.*;
+import org.scaffoldeditor.scaffold.logic.datapack.TargetSelector;
 import org.scaffoldeditor.scaffold.logic.datapack.arguements.CommandRotation;
 import org.scaffoldeditor.scaffold.logic.datapack.arguements.CommandVector3f;
 import org.scaffoldeditor.scaffold.logic.datapack.arguements.CommandVector3i;
+import org.scaffoldeditor.scaffold.logic.datapack.commands.ExecuteCommand.*;
 
 /**
  * Builds execute commands.

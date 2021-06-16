@@ -25,7 +25,6 @@ import org.scaffoldeditor.scaffold.level.entity.attribute.AssetAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BooleanAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.EnumAttribute;
-import org.scaffoldeditor.scaffold.level.entity.attribute.StringAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.EnumAttribute.DefaultEnums.Direction;
 import org.scaffoldeditor.scaffold.math.Vector;
 
@@ -59,7 +58,7 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 	@Override
 	public Map<String, Attribute<?>> getDefaultAttributes() {
 		Map<String, Attribute<?>> map = new HashMap<>();
-		map.put("model", new StringAttribute(""));
+		map.put("model", new AssetAttribute("schematic", ""));
 		map.put("direction", new EnumAttribute<>(Direction.NORTH));
 		map.put("place_air", new BooleanAttribute(false));
 		return map;
@@ -203,9 +202,28 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 		}
 	}
 
-
 	@Override
 	public boolean needsRecompiling() {
 		return true;
+	}
+	
+	/**
+	 * Get the base block collection that this entity is loading.
+	 * 
+	 * @return The base model, or <code>null</code> if it's not loaded.
+	 */
+	public SizedBlockCollection getBaseModel() {
+		return baseModel;
+	}
+	
+	/**
+	 * Get the final block collectino that this entity will use to compile, after
+	 * any modifications are applied.
+	 * 
+	 * @return The final model, or <code>null</code> if it hasn't been processed
+	 *         yet.
+	 */
+	public SizedBlockCollection getFinalModel() {
+		return finalModel;
 	}
 }

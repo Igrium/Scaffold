@@ -13,9 +13,9 @@ import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.StringAttribute;
 import org.scaffoldeditor.scaffold.level.io.InputDeclaration;
-import org.scaffoldeditor.scaffold.logic.datapack.Command;
-import org.scaffoldeditor.scaffold.logic.datapack.ExecuteCommandBuilder;
 import org.scaffoldeditor.scaffold.logic.datapack.TargetSelector;
+import org.scaffoldeditor.scaffold.logic.datapack.commands.Command;
+import org.scaffoldeditor.scaffold.logic.datapack.commands.ExecuteCommandBuilder;
 
 /**
  * Executes a single Minecraft command when compiled.

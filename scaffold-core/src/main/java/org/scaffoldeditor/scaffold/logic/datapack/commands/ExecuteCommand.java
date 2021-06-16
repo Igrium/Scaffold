@@ -1,8 +1,10 @@
-package org.scaffoldeditor.scaffold.logic.datapack;
+package org.scaffoldeditor.scaffold.logic.datapack.commands;
 
 import java.util.List;
 import java.util.StringJoiner;
 
+import org.scaffoldeditor.nbt.util.Identifier;
+import org.scaffoldeditor.scaffold.logic.datapack.TargetSelector;
 import org.scaffoldeditor.scaffold.logic.datapack.arguements.BlockArguement;
 import org.scaffoldeditor.scaffold.logic.datapack.arguements.CommandRotation;
 import org.scaffoldeditor.scaffold.logic.datapack.arguements.CommandVector3f;
@@ -201,14 +203,14 @@ public class ExecuteCommand implements Command {
 	}
 	
 	public static class DataStorageConditional implements Conditional {
-		public final String source;
+		public final Identifier source;
 		public final String path;
-		public DataStorageConditional(String source, String path) {
+		public DataStorageConditional(Identifier source, String path) {
 			this.source = source;
 			this.path = path;
 		}
 		public String get() {
-			return "data storage "+source+" "+path;
+			return "data storage "+source.toString()+" "+path;
 		}
 	}
 	

@@ -43,7 +43,7 @@ public final class Constants {
 	static {
 		Map<String, Integer> map = new HashMap<String, Integer>();
 		
-		map.put("1.14.4", 1976);
+		map.put("1.17", 2724);
 		
 		DATA_VERSIONS = Collections.unmodifiableMap(map);
 		

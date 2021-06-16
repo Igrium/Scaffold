@@ -1,4 +1,4 @@
-package org.scaffoldeditor.scaffold.logic.datapack;
+package org.scaffoldeditor.scaffold.logic.datapack.commands;
 
 /**
  * Represents a single Minecraft command.

@@ -48,7 +48,7 @@ public class BlockArguement {
 		if (properties.size() > 0) {
 			blockstate = new HashMap<>();
 			for (String key : properties.keySet()) {
-				blockstate.put(key, properties.get(key).valueToString());
+				blockstate.put(key, properties.getString(key));
 			}
 		}
 	}

@@ -1,13 +1,17 @@
 package org.scaffoldeditor.scaffold.logic;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
@@ -15,10 +19,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+import org.scaffoldeditor.nbt.Constants;
+import org.scaffoldeditor.nbt.util.Identifier;
 import org.scaffoldeditor.nbt.util.Pair;
 import org.scaffoldeditor.scaffold.core.Project;
 import org.scaffoldeditor.scaffold.logic.datapack.AbstractFunction;
 import org.scaffoldeditor.scaffold.logic.datapack.FunctionNameUtils;
+
+import net.querz.nbt.io.NBTUtil;
+import net.querz.nbt.tag.CompoundTag;
 
 /**
  * Represents the main game datapack
@@ -48,6 +57,11 @@ public class Datapack extends AbstractPack {
 	 * A mutable list of all the functions that will be compiled into the datapack.
 	 */
 	public final Collection<AbstractFunction> functions = new ArrayList<>();
+	
+	/**
+	 * The nbt that will be saved in command storage when the level is compiled.
+	 */
+	public final Map<Identifier, CompoundTag> defaultStorage = new HashMap<>();
 	
 	/**
 	 * Create a new datapack object.
@@ -155,5 +169,49 @@ public class Datapack extends AbstractPack {
 			bufWriter.close();
 		}
 	}
-
+	
+	/**
+	 * Save the datapack's default storage values.
+	 * 
+	 * @param dataFolder <code>data</code> folder within the world. Not to be
+	 *                   confused with the <code>data</code> folder within the
+	 *                   datapack root.
+	 * @throws IOException If an IO exception occurs.
+	 */
+	public void writeStorage(Path dataFolder) throws IOException {
+		dataFolder.toFile().mkdir();
+		
+		// Sort entries.
+		Map<String, List<Identifier>> sorted = new HashMap<>();
+		for (Identifier entry : defaultStorage.keySet()) {
+			List<Identifier> list = sorted.get(entry.namespace);
+			if (list == null) {
+				list = new ArrayList<>();
+				sorted.put(entry.namespace, list);
+			}
+			
+			list.add(entry);
+		}
+		
+		for (String namespace : sorted.keySet()) {
+			writeStorageFile(dataFolder, namespace, sorted.get(namespace));
+		}
+	}
+	
+	private void writeStorageFile(Path dataFolder, String namespace, List<Identifier> entries) throws IOException {
+		CompoundTag root = new CompoundTag();
+		root.putInt("DataVersion", Constants.DEFAULT_DATA_VERSION);
+		CompoundTag data = new CompoundTag();
+		root.put("data", data);
+		CompoundTag contents = new CompoundTag();
+		data.put("contents", contents);
+		
+		for (Identifier entry : entries) {
+			contents.put(entry.value, defaultStorage.get(entry));
+		}
+		
+		File storageFile = dataFolder.resolve("command_storage_"+namespace+".dat").toFile();
+		
+		NBTUtil.write(root, storageFile, true);
+	}
 }

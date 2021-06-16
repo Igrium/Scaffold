@@ -29,6 +29,7 @@ import org.scaffoldeditor.scaffold.level.entity.logic.FunctionEntity;
 import org.scaffoldeditor.scaffold.level.entity.logic.Relay;
 import org.scaffoldeditor.scaffold.level.entity.util.ModelTest;
 import org.scaffoldeditor.scaffold.level.entity.world.WorldStatic;
+import org.scaffoldeditor.scaffold.level.entity.world.WorldTogglable;
 import org.scaffoldeditor.scaffold.level.entity.world.SingleBlock;
 import org.scaffoldeditor.scaffold.level.entity.world.WorldBrush;
 import org.scaffoldeditor.scaffold.level.entity.world.WorldChunked;
@@ -51,6 +52,7 @@ public class DefaultPlugin implements PluginInitializer {
 		ModelTest.register();
 		CommandEntity.register();
 		RedstoneListener.register();
+		WorldTogglable.register();
 		
 		StringAttribute.register();
 		NBTAttribute.register();
