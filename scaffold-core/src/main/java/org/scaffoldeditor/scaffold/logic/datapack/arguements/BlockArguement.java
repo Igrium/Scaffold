@@ -53,6 +53,16 @@ public class BlockArguement {
 		}
 	}
 	
+	/**
+	 * Create a block arguement.
+	 * @param block Block to use.
+	 * @param data Additional block entity data.
+	 */
+	public BlockArguement(Block block, CompoundTag data) {
+		this(block);
+		this.data = data;
+	}
+	
 	public String compile() {
 		String out = id;
 		try {

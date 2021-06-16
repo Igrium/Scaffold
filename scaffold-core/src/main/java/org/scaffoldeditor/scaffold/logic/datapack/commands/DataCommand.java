@@ -57,7 +57,7 @@ public class DataCommand implements Command {
 						return out;
 					}
 				} else {
-					return out+" "+SNBTUtil.toSNBT(value);
+					return out+" value "+SNBTUtil.toSNBT(value);
 				}
 			} else {
 				return "data remove "+compileTarget()+" "+targetPath;

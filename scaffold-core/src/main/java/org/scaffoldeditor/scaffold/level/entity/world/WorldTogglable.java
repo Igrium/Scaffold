@@ -1,5 +1,6 @@
 package org.scaffoldeditor.scaffold.level.entity.world;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,7 @@ import org.scaffoldeditor.scaffold.logic.datapack.commands.ExecuteCommand.Condit
 import org.scaffoldeditor.scaffold.logic.datapack.commands.ExecuteCommandBuilder;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.FunctionCommand;
 
+import net.querz.nbt.tag.ByteTag;
 import net.querz.nbt.tag.CompoundTag;
 
 
@@ -159,16 +161,20 @@ public class WorldTogglable extends WorldStatic {
 		disableFunction.commands.add(setEnabledCommand(false));
 		datapack.functions.add(disableFunction);
 		
+		Identifier storage = LogicUtils.getEntityStorage(this);
 		Function toggleFunction = new Function(getToggleFunction());
-		Command offCommand = new ExecuteCommandBuilder().executeIf(isEnabled()).run(new FunctionCommand(disableImpl));
-		Command onCommand = new ExecuteCommandBuilder().executeUnless(isEnabled()).run(new FunctionCommand(enableImpl));
-		Command offCommand2 = new ExecuteCommandBuilder().executeIf(isEnabled()).run(setEnabledCommand(false));
-		Command onCommand2 = new ExecuteCommandBuilder().executeUnless(isEnabled()).run(setEnabledCommand(true));
+		toggleFunction.commands.add(LogicUtils.cloneNBT(storage, "enabled", storage, "wasEnabled"));
 		
-		toggleFunction.commands.add(onCommand);
-		toggleFunction.commands.add(offCommand);
-		toggleFunction.commands.add(onCommand2);
-		toggleFunction.commands.add(offCommand2);
+		toggleFunction.addExecuteBlock(new ExecuteCommandBuilder().executeIf(wasEnabled()), Arrays.asList(
+					new FunctionCommand(disableImpl),
+					new DataCommandBuilder().modify().storage(storage).path("enabled").set().value(new ByteTag(false)).build()
+				));
+		
+		toggleFunction.addExecuteBlock(new ExecuteCommandBuilder().executeUnless(wasEnabled()), Arrays.asList(
+					new FunctionCommand(enableImpl),
+					new DataCommandBuilder().modify().storage(storage).path("enabled").set().value(new ByteTag(true)).build()
+				));
+		
 		datapack.functions.add(toggleFunction);
 		
 		CompoundTag defaultStorage = new CompoundTag();
@@ -180,6 +186,10 @@ public class WorldTogglable extends WorldStatic {
 	
 	public Conditional isEnabled() {
 		return LogicUtils.ifStorageHas(this, "{enabled:1b}");
+	}
+	
+	private Conditional wasEnabled() {
+		return LogicUtils.ifStorageHas(this, "{wasEnabled:1b}");
 	}
 	
 	public Identifier getEnableFunction() {

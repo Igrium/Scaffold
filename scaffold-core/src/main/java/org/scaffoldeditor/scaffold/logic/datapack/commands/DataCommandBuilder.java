@@ -113,6 +113,26 @@ public class DataCommandBuilder {
 			return this;
 		}
 		
+		public DataModifyBuilder append() {
+			return modification(ModificationType.APPEND);
+		}
+		
+		public DataModifyBuilder insert() {
+			return modification(ModificationType.INSERT);
+		}
+		
+		public DataModifyBuilder merge() {
+			return modification(ModificationType.MERGE);
+		}
+		
+		public DataModifyBuilder prepend() {
+			return modification(ModificationType.PREPEND);
+		}
+		
+		public DataModifyBuilder set() {
+			return modification(ModificationType.SET);
+		}
+		
 		public DataModifyBuilder modification(ModificationType modification) {
 			builtCommand.modification = modification;
 			return this;
@@ -152,20 +172,14 @@ public class DataCommandBuilder {
 			}
 		}
 		
-		public DataValueBuilder value() {
+		public DataModifyBuilder value(Tag<?> value) {
 			builtCommand.appendMode = AppendMode.VALUE;
-			return new DataValueBuilder();
+			builtCommand.value = value;
+			return this;
 		}
 		
-		public class DataValueBuilder {
-			public DataValueBuilder value(Tag<?> value) {
-				builtCommand.value = value;
-				return this;
-			}
-			
-			public DataCommand build() {
-				return builtCommand;
-			}
+		public DataCommand build() {
+			return builtCommand;
 		}
 	}
 }

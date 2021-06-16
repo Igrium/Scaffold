@@ -60,6 +60,20 @@ public final class LogicUtils {
 	}
 	
 	/**
+	 * Get a Minecraft function that's unique to a Scaffold entity.
+	 * 
+	 * @param entity Entity to use.
+	 * @param name   Name of the function.
+	 * @return An identifier in the following format:
+	 *         <code>[levelName]:[entityName]/[functionName]</code>
+	 */
+	public static Identifier getEntityFunction(Entity entity, String name) {
+		String namespace = entity.getLevel().getName().toLowerCase();
+		String value = entity.getName().toLowerCase()+"/"+name;
+		return new Identifier(namespace, value);
+	}
+	
+	/**
 	 * Generate a command that saves the passed tag into a Scaffold entity's storage entry.
 	 * @param entity Scaffold entity to use.
 	 * @param nbt The data to merge into the storage.
@@ -79,5 +93,17 @@ public final class LogicUtils {
 	public static Conditional ifStorageHas(Entity entity, String path) {
 		Identifier storage = getEntityStorage(entity);
 		return new DataStorageConditional(storage, path);
+	}
+	
+	/**
+	 * Generate a command that will clone an NBT tag.
+	 * @param storage1 Storage to clone from.
+	 * @param path1 Path of data to clone.
+	 * @param storage2 Storage to clone to.
+	 * @param path2 Path to clone to.
+	 * @return Generated command.
+	 */
+	public static Command cloneNBT(Identifier storage1, String path1, Identifier storage2, String path2) {
+		return new DataCommandBuilder().modify().storage(storage2).path(path2).set().from().storage(storage1).path(path1).build();
 	}
 }

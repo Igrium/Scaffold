@@ -55,7 +55,7 @@ public class StructureFunction extends AbstractFunction {
 				continue;
 			}
 			CommandVector3i finalPos = new CommandVector3i(pos.add(offset), Mode.RELATIVE);
-			commands.add(new SetBlockCommand(finalPos, new BlockArguement(block), SetBlockCommand.Mode.REPLACE));
+			commands.add(new SetBlockCommand(finalPos, new BlockArguement(block, structure.blockEntityAt(pos)), SetBlockCommand.Mode.REPLACE));
 		}
 		
 		return commands;
