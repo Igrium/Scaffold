@@ -147,4 +147,9 @@ public class Output implements XMLSerializable {
 		
 		return output;
 	}
+	
+	@Override
+	public Output clone() {
+		return new Output(owner, trigger, target, inputName, args);
+	}
 }
