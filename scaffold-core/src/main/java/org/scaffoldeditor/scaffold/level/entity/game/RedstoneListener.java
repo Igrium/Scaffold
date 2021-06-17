@@ -23,8 +23,6 @@ import org.scaffoldeditor.scaffold.logic.Datapack;
 import org.scaffoldeditor.scaffold.logic.datapack.Function;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.Command;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.FunctionCommand;
-import org.scaffoldeditor.scaffold.math.Vector;
-
 import net.querz.nbt.tag.CompoundTag;
 
 /**
@@ -112,7 +110,7 @@ public class RedstoneListener extends BaseBlockEntity {
 	}
 
 	@Override
-	public Block blockAt(Vector coord) {
+	public Block blockAt(Vector3i coord) {
 		return getBlock();
 	}
 	
@@ -122,8 +120,8 @@ public class RedstoneListener extends BaseBlockEntity {
 	}
 
 	@Override
-	public Vector[] getBounds() {
-		return new Vector[] { getPosition(), getPosition() };
+	public Vector3i[] getBounds() {
+		return new Vector3i[] { getBlockPosition(), getBlockPosition() };
 	}
 
 	@Override

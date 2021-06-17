@@ -12,6 +12,7 @@ import org.w3c.dom.Element;
  * Wrapper around {@link Vector3f} allowing it to be serialized
  * and used in attributes.
  * @author Igrium
+ * @deprecated use {@link Vector3f} instead.
  */
 public class Vector extends Vector3f implements XMLSerializable {
 	

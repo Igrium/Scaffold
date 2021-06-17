@@ -1,10 +1,10 @@
 package org.scaffoldeditor.scaffold.level.entity.world;
 
+import org.scaffoldeditor.nbt.math.Vector3f;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.BlockEntity;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.attribute.VectorAttribute;
-import org.scaffoldeditor.scaffold.math.Vector;
 
 /**
  * Implements many of the common features of block entities.
@@ -19,7 +19,7 @@ public abstract class BaseBlockEntity extends Entity implements BlockEntity {
 	/**
 	 * Cache the position of the entity so we can use the old position when attributes are updated.
 	 */
-	protected Vector positionCache;
+	protected Vector3f positionCache;
 	
 	/**
 	 * <p>
@@ -39,7 +39,7 @@ public abstract class BaseBlockEntity extends Entity implements BlockEntity {
 	@Override
 	public void onUpdateAttributes(boolean noRecompile) {
 		// Changing the attributes
-		Vector newPosition = getPosition();
+		Vector3f newPosition = getPosition();
 		if (positionCache != null && !newPosition.equals(positionCache)) {
 			// Temporarily set the position back so we can capture the bounds.
 			setAttribute("position", new VectorAttribute(positionCache), true);

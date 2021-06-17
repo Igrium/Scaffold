@@ -28,7 +28,6 @@ import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BooleanAttribute;
 import org.scaffoldeditor.scaffold.level.entity.game.KnownUUID;
 import org.scaffoldeditor.scaffold.level.entity.game.TargetSelectable;
-import org.scaffoldeditor.scaffold.level.render.MCRenderEntity;
 import org.scaffoldeditor.scaffold.level.render.ModelRenderEntity;
 import org.scaffoldeditor.scaffold.level.render.RenderEntity;
 import org.scaffoldeditor.scaffold.logic.Datapack;

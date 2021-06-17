@@ -1,6 +1,6 @@
 package org.scaffoldeditor.scaffold.level.entity;
 
-import org.scaffoldeditor.scaffold.math.Vector;
+import org.scaffoldeditor.nbt.math.Vector3i;
 
 /**
  * Represents a box-shaped entity where the bounds can be manually resized.
@@ -13,11 +13,11 @@ public interface BrushEntity {
 	 * @param newBounds A two-element array denoting the opposite corners of the brush's bounding box.
 	 * @param suppressUpdate If true, block update listeners (compilers, etc) are not triggered.
 	 */
-	public void setBounds(Vector[] newBounds, boolean suppressUpdate);
+	public void setBounds(Vector3i[] newBounds, boolean suppressUpdate);
 	
 	/**
 	 * Get the bounds of this brush in world space.
 	 * @return A two-element array denoting the opposite corners of the brush's bounding box.
 	 */
-	Vector[] getBounds();
+	Vector3i[] getBounds();
 }

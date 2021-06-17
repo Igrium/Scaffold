@@ -20,8 +20,6 @@ import org.scaffoldeditor.scaffold.level.entity.attribute.StringAttribute;
 import org.scaffoldeditor.scaffold.level.render.MCRenderEntity;
 import org.scaffoldeditor.scaffold.logic.Datapack;
 import org.scaffoldeditor.scaffold.logic.datapack.TargetSelector;
-import org.scaffoldeditor.scaffold.math.Vector;
-
 import net.querz.nbt.io.SNBTUtil;
 import net.querz.nbt.tag.CompoundTag;
 import net.querz.nbt.tag.FloatTag;
@@ -147,7 +145,7 @@ public class GameEntity extends Rotatable implements TargetSelectable, EntityAdd
 	 * @return
 	 */
 	public String getSpawnCommand() {
-		Vector position = getPosition();
+		Vector3f position = getPosition();
 		
 		// Set rotation
 		ListTag<FloatTag> rotArray = new ListTag<>(FloatTag.class);
@@ -164,7 +162,7 @@ public class GameEntity extends Rotatable implements TargetSelectable, EntityAdd
 			e.printStackTrace();
 		}
 		
-		String command = "summon "+getEntityType()+" "+position.X()+" "+position.Y()+" "+position.Z()+" "+nbt;
+		String command = "summon "+getEntityType()+" "+position.x+" "+position.y+" "+position.z+" "+nbt;
 		
 		getNBT().remove("Rotation");
 		getNBT().remove("CustomName");

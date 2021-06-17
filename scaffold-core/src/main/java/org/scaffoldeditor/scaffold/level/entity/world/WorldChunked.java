@@ -14,6 +14,7 @@ import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.nbt.block.Chunk;
 import org.scaffoldeditor.nbt.block.ChunkedBlockCollection;
 import org.scaffoldeditor.nbt.block.SizedBlockCollection;
+import org.scaffoldeditor.nbt.math.Vector3f;
 import org.scaffoldeditor.nbt.math.Vector3i;
 import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
 import org.scaffoldeditor.scaffold.io.AssetLoaderRegistry;
@@ -24,7 +25,6 @@ import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BooleanAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.StringAttribute;
-import org.scaffoldeditor.scaffold.math.Vector;
 
 /**
  * A block entity which is optimized for chunked block collections, 
@@ -50,7 +50,7 @@ public class WorldChunked extends BaseBlockEntity {
 	
 	// Keep track of the model path on our own for optimization.
 	private String modelpath;
-	private Vector[] boundsCache = new Vector[] {new Vector(0,0,0), new Vector(0,0,0)};
+	private Vector3i[] boundsCache = new Vector3i[] {new Vector3i(0,0,0), new Vector3i(0,0,0)};
 
 	public WorldChunked(Level level, String name) {
 		super(level, name);
@@ -123,8 +123,8 @@ public class WorldChunked extends BaseBlockEntity {
 			if (section.z > maxZ) maxZ = section.z;
 		}
 		
-		boundsCache[0] = new Vector(minX * width, minY * height, minZ * length);
-		boundsCache[1] = new Vector(maxX * width, maxY * height, maxZ * length);
+		boundsCache[0] = new Vector3i(minX * width, minY * height, minZ * length);
+		boundsCache[1] = new Vector3i(maxX * width, maxY * height, maxZ * length);
 	}
 
 	@Override
@@ -186,7 +186,7 @@ public class WorldChunked extends BaseBlockEntity {
 	 * <b>Note:</b> <code>WorldChunked</code> only checks if any of its sections
 	 * overlap the volume, not the blocks themselves.
 	 */
-	public boolean overlapsVolume(Vector point1, Vector point2) {
+	public boolean overlapsVolume(Vector3f point1, Vector3f point2) {
 		if (model == null) return false;
 		
 		Vector3i section1 = model.getSection(point1.floor());
@@ -210,7 +210,7 @@ public class WorldChunked extends BaseBlockEntity {
 	
 	@Override
 	public boolean overlapsArea(float[] point1, float[] point2) {
-		return overlapsVolume(new Vector(point1[0], 0, point2[0]), new Vector(point2[0], Chunk.HEIGHT, point2[1]));
+		return overlapsVolume(new Vector3f(point1[0], 0, point2[0]), new Vector3f(point2[0], Chunk.HEIGHT, point2[1]));
 	}
 
 	/**
@@ -220,7 +220,7 @@ public class WorldChunked extends BaseBlockEntity {
 	public boolean isAligned() {
 		if (model == null) return false;
 		
-		Vector position = getPosition();
+		Vector3i position = getBlockPosition();
 		int sectionWidth = model.getSectionWidth();
 		int sectionHeight = model.getSectionHeight();
 		int sectionLength = model.getSectionLength();
@@ -272,8 +272,8 @@ public class WorldChunked extends BaseBlockEntity {
 	}
 
 	@Override
-	public Block blockAt(Vector coord) {
-		Vector3i local = coord.subtract(getPosition()).floor();
+	public Block blockAt(Vector3i coord) {
+		Vector3i local = coord.subtract(getBlockPosition());
 		return model.blockAt(local);
 	}
 	
@@ -282,7 +282,7 @@ public class WorldChunked extends BaseBlockEntity {
 	}
 
 	@Override
-	public Vector[] getBounds() {
+	public Vector3i[] getBounds() {
 		return boundsCache;
 	}
 

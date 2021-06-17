@@ -5,11 +5,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.scaffoldeditor.nbt.math.Vector3f;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.VectorAttribute;
 import org.scaffoldeditor.scaffold.level.io.Output;
-import org.scaffoldeditor.scaffold.math.Vector;
 
 /**
  * Update the attributes and/or outputs of an entity.
@@ -20,11 +20,11 @@ public class ChangeAttributesOperation implements Operation {
 	private Entity target;
 	private Map<String, Attribute<?>> attributes = new HashMap<>();
 	private List<Output> outputs;
-	private Vector newPosition = null;
+	private Vector3f newPosition = null;
 	
 	private Map<String, Attribute<?>> old = new HashMap<>();
 	private List<Output> oldOutputs;
-	private Vector oldPosition = null;
+	private Vector3f oldPosition = null;
 	
 	/**
 	 * Create a change attributes operation. <br>

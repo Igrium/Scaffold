@@ -1,20 +1,20 @@
 package org.scaffoldeditor.scaffold.operation;
 
+import org.scaffoldeditor.nbt.math.Vector3f;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
-import org.scaffoldeditor.scaffold.math.Vector;
 
 public class MoveEntityOperation implements Operation {
 	private Entity target;
-	private Vector newPosition;
+	private Vector3f newPosition;
 	
-	private Vector oldPosition;
+	private Vector3f oldPosition;
 	
-	public MoveEntityOperation(Entity target, Vector newPosition) {
+	public MoveEntityOperation(Entity target, Vector3f newPosition) {
 		this.target = target;
 		this.newPosition = newPosition;
 	}
 	
-	public MoveEntityOperation(Entity target, Vector oldPosition, Vector newPosition) {
+	public MoveEntityOperation(Entity target, Vector3f oldPosition, Vector3f newPosition) {
 		this.target = target;
 		this.oldPosition = oldPosition;
 		this.newPosition = newPosition;

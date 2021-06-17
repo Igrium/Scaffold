@@ -20,7 +20,6 @@ import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BlockTextureAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.VectorAttribute;
-import org.scaffoldeditor.scaffold.math.Vector;
 
 public class WorldBrush extends BaseBlockEntity implements BrushEntity {
 	
@@ -42,10 +41,10 @@ public class WorldBrush extends BaseBlockEntity implements BrushEntity {
 	@Override
 	public Map<String, Attribute<?>> getDefaultAttributes() {
 		Map<String, Attribute<?>> map = new HashMap<>();
-		map.put("end_point", new VectorAttribute(new Vector(4,4,4)));
+		map.put("end_point", new VectorAttribute(new Vector3f(4,4,4)));
 		map.put("texture", new BlockTextureAttribute(new SingleBlockTexture(new Block("minecraft:stone"))));
-		map.put("texture_scale", new VectorAttribute(new Vector(1,1,1)));
-		map.put("texture_offset", new VectorAttribute(new Vector(0,0,0)));
+		map.put("texture_scale", new VectorAttribute(new Vector3f(1,1,1)));
+		map.put("texture_offset", new VectorAttribute(new Vector3f(0,0,0)));
 		
 		return map;
 	}
@@ -59,7 +58,7 @@ public class WorldBrush extends BaseBlockEntity implements BrushEntity {
 				for (int z = 0; z < endLocal.z; z++) {
 					Vector3i blockPos = getBlockPosition().add(new Vector3i(x,y,z));
 					world.setBlock(blockPos.x, blockPos.y, blockPos.z,
-							blockAt(new Vector(blockPos.toFloat())), this);
+							blockAt(blockPos), this);
 				}
 			}
 		}
@@ -68,27 +67,27 @@ public class WorldBrush extends BaseBlockEntity implements BrushEntity {
 	}
 
 	@Override
-	public Block blockAt(Vector coord) {
+	public Block blockAt(Vector3i coord) {
 		BlockTexture texture = getTexture();
 		Vector3d scale = new Vector3d(1,1,1);
 		if (texture.supportsScaling()) {
 			scale = getTextureScale().toDouble();
 		}
 		
-		Vector3f transformCoord = coord.add(getTextureOffset());
+		Vector3f transformCoord = coord.toFloat().add(getTextureOffset());
 		return getTexture().blockAt(transformCoord.x / scale.x, transformCoord.y / scale.y, transformCoord.z / scale.z);
 	}
 
 	@Override
-	public Vector[] getBounds() {
-		Vector position = getPosition();
-		return new Vector[] {position, new Vector(position.add(getEndPoint()))};
+	public Vector3i[] getBounds() {
+		Vector3i position = getBlockPosition();
+		return new Vector3i[] {position, position.add(getEndPoint().floor())};
 	}
 	
 	/**
 	 * Get the end point of this brush relative to it's start point. (AKA the root position)
 	 */
-	public Vector getEndPoint() {
+	public Vector3f getEndPoint() {
 		return ((VectorAttribute) getAttribute("end_point")).getValue();
 	}
 	
@@ -103,11 +102,11 @@ public class WorldBrush extends BaseBlockEntity implements BrushEntity {
 		((BlockTextureAttribute) getAttribute("texture")).reload();
 	}
 	
-	public Vector getTextureScale() {
+	public Vector3f getTextureScale() {
 		return ((VectorAttribute) getAttribute("texture_scale")).getValue();
 	}
 	
-	public Vector getTextureOffset() {
+	public Vector3f getTextureOffset() {
 		return ((VectorAttribute) getAttribute("texture_offset")).getValue();
 	}
 
@@ -121,9 +120,9 @@ public class WorldBrush extends BaseBlockEntity implements BrushEntity {
 	}
 
 	@Override
-	public void setBounds(Vector[] newBounds, boolean suppressUpdate) {
+	public void setBounds(Vector3i[] newBounds, boolean suppressUpdate) {
 		setAttribute("position", new VectorAttribute(newBounds[0]), true);
-		setAttribute("end_point", new VectorAttribute(new Vector(newBounds[1].subtract(newBounds[0]))));
+		setAttribute("end_point", new VectorAttribute(newBounds[1].subtract(newBounds[0])));
 		if (!suppressUpdate) onUpdateAttributes(false);
 	}
 

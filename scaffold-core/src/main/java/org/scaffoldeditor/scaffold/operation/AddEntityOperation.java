@@ -1,18 +1,18 @@
 package org.scaffoldeditor.scaffold.operation;
 
+import org.scaffoldeditor.nbt.math.Vector3f;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
-import org.scaffoldeditor.scaffold.math.Vector;
 
 public class AddEntityOperation implements Operation {
 
 	private String registryName;
 	private Level level;
 	private String name;
-	private Vector position;
+	private Vector3f position;
 	private Entity entity;
 	
-	public AddEntityOperation(Level level, String registryName, String name, Vector position) {
+	public AddEntityOperation(Level level, String registryName, String name, Vector3f position) {
 		this.registryName = registryName;
 		this.level = level;
 		this.name = name;

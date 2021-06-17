@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.scaffoldeditor.nbt.block.BlockWorld;
+import org.scaffoldeditor.nbt.math.Vector3f;
 import org.scaffoldeditor.nbt.math.Vector3i;
 import org.scaffoldeditor.scaffold.core.Project;
 import org.scaffoldeditor.scaffold.level.Level;
@@ -22,7 +23,6 @@ import org.scaffoldeditor.scaffold.level.io.OutputDeclaration;
 import org.scaffoldeditor.scaffold.level.render.RenderEntity;
 import org.scaffoldeditor.scaffold.logic.Datapack;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.Command;
-import org.scaffoldeditor.scaffold.math.Vector;
 import org.scaffoldeditor.scaffold.util.event.EventListener;
 import org.w3c.dom.Element;
 
@@ -74,7 +74,7 @@ public abstract class Entity {
 	public Entity(Level level, String name) {
 		this.name = name;
 		this.level = level;
-		attributes().put("position", new VectorAttribute(new Vector(0, 0, 0)));
+		attributes().put("position", new VectorAttribute(new Vector3f(0, 0, 0)));
 		attributes.putAll(getDefaultAttributes());
 	}
 	
@@ -171,7 +171,7 @@ public abstract class Entity {
 	 * Get this entity's world position.
 	 * @return Position
 	 */
-	public Vector getPosition() {
+	public Vector3f getPosition() {
 		return ((VectorAttribute) getAttribute("position")).getValue();
 	}
 	
@@ -188,7 +188,7 @@ public abstract class Entity {
 	 * Called on entity creation.
 	 * @param position New position
 	 */
-	public void setPosition(Vector position) {
+	public void setPosition(Vector3f position) {
 		this.setAttribute("position", new VectorAttribute(position));
 	}
 	

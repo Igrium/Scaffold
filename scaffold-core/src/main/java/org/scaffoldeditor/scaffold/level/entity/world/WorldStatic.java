@@ -26,7 +26,6 @@ import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BooleanAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.EnumAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.EnumAttribute.DefaultEnums.Direction;
-import org.scaffoldeditor.scaffold.math.Vector;
 
 /**
  * This entity compiles a standard block collection into the world.
@@ -175,16 +174,16 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 	}
 
 	@Override
-	public Block blockAt(Vector coord) {
-		Vector3i localCoord = coord.subtract(getPosition()).floor();
+	public Block blockAt(Vector3i coord) {
+		Vector3i localCoord = coord.subtract(getBlockPosition());
 		return finalModel.blockAt(localCoord);
 	}
 
 	@Override
-	public Vector[] getBounds() {
-		Vector position = getPosition();
-		if (finalModel == null) return new Vector[] { position, position };
-		return new Vector[] { new Vector(position.add(finalModel.getMin().toFloat())), new Vector(position.add(finalModel.getMax().toFloat())) };
+	public Vector3i[] getBounds() {
+		Vector3i position = getBlockPosition();
+		if (finalModel == null) return new Vector3i[] { position, position };
+		return new Vector3i[] { position.add(finalModel.getMin()),position.add(finalModel.getMax()) };
 	}
 
 	@Override

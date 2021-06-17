@@ -6,11 +6,11 @@ import java.util.Set;
 
 import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
 import org.scaffoldeditor.nbt.math.Vector3f;
+import org.scaffoldeditor.nbt.math.Vector3i;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.BlockEntity;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.math.MathUtils;
-import org.scaffoldeditor.scaffold.math.Vector;
 
 /**
  * A set of utility functions to be used on levels
@@ -71,21 +71,21 @@ public final class LevelOperations {
 	 * Mark all the sections where these two entities overlap as dirty.
 	 */
 	private static void addOverlap(Level level, BlockEntity ent1, BlockEntity ent2) {
-		Vector[] ent1Bounds = ent1.getBounds();
-		Vector[] ent2Bounds = ent2.getBounds();
+		Vector3i[] ent1Bounds = ent1.getBounds();
+		Vector3i[] ent2Bounds = ent2.getBounds();
 		
 		// We want to iterate over as few sections of possible; target the entity with the smallest volume.
-		boolean bool = MathUtils.calculateVolume(ent1Bounds[0], ent1Bounds[1]) < MathUtils
-				.calculateVolume(ent2Bounds[0], ent2Bounds[1]);
+		boolean bool = MathUtils.calculateVolume(ent1Bounds[0].toFloat(), ent1Bounds[1].toFloat()) < MathUtils
+				.calculateVolume(ent2Bounds[0].toFloat(), ent2Bounds[1].toFloat());
 		BlockEntity target = bool ? ent1 : ent2;
 		BlockEntity subject = bool ? ent2 : ent1;
-		Vector[] subjectBounds = subject.getBounds();
+		Vector3i[] subjectBounds = subject.getBounds();
 		
 		for (SectionCoordinate c : target.getOverlappingSections()) {
 			Vector3f sectionStart = new Vector3f(c.getStartX(), c.getStartY(), c.getStartZ());
 			Vector3f sectionEnd = new Vector3f(c.getEndX() - 1, c.getEndY() - 1, c.getEndZ() - 1);
 			
-			if (MathUtils.detectCollision(sectionStart, sectionEnd, subjectBounds[0], subjectBounds[1])) {
+			if (MathUtils.detectCollision(sectionStart, sectionEnd, subjectBounds[0].toFloat(), subjectBounds[1].toFloat())) {
 				level.dirtySections.add(c);
 			}
 		}

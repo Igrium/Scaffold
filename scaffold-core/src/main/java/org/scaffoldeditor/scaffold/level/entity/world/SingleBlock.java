@@ -8,6 +8,7 @@ import java.util.Set;
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
+import org.scaffoldeditor.nbt.math.Vector3f;
 import org.scaffoldeditor.nbt.math.Vector3i;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.BlockEntity;
@@ -17,8 +18,6 @@ import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.NBTAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.StringAttribute;
-import org.scaffoldeditor.scaffold.math.Vector;
-
 import net.querz.nbt.tag.CompoundTag;
 
 /**
@@ -75,8 +74,8 @@ public class SingleBlock extends Entity implements BlockEntity {
 	}
 
 	@Override
-	public Block blockAt(Vector coord) {
-		if (coord.floor().equals(getPosition().floor())) {
+	public Block blockAt(Vector3i coord) {
+		if (coord.equals(getBlockPosition())) {
 			return getBlock();
 		} else {
 			return null;
@@ -84,8 +83,8 @@ public class SingleBlock extends Entity implements BlockEntity {
 	}
 
 	@Override
-	public Vector[] getBounds() {
-		return new Vector[] {getPosition(), Vector.add(getPosition(), new Vector(1,1,1))};
+	public Vector3i[] getBounds() {
+		return new Vector3i[] {getBlockPosition(), getBlockPosition().add(new Vector3i(1,1,1))};
 	}
 	
 	@Override
@@ -96,7 +95,7 @@ public class SingleBlock extends Entity implements BlockEntity {
 	}
 	
 	@Override
-	public void setPosition(Vector position) {	
+	public void setPosition(Vector3f position) {	
 		getLevel().dirtySections.add(new SectionCoordinate(getPosition().floor()));
 		super.setPosition(position);
 		getLevel().dirtySections.add(new SectionCoordinate(position.floor()));
