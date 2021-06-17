@@ -33,6 +33,7 @@ import org.scaffoldeditor.scaffold.level.entity.world.WorldTogglable;
 import org.scaffoldeditor.scaffold.level.entity.world.SingleBlock;
 import org.scaffoldeditor.scaffold.level.entity.world.WorldBrush;
 import org.scaffoldeditor.scaffold.level.entity.world.WorldChunked;
+import org.scaffoldeditor.scaffold.level.entity.world.WorldDynamic;
 
 public class DefaultPlugin implements PluginInitializer {
 
@@ -53,6 +54,7 @@ public class DefaultPlugin implements PluginInitializer {
 		CommandEntity.register();
 		RedstoneListener.register();
 		WorldTogglable.register();
+		WorldDynamic.register();
 		
 		StringAttribute.register();
 		NBTAttribute.register();

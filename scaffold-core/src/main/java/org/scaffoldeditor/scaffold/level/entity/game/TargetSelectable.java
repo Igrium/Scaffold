@@ -15,4 +15,14 @@ public interface TargetSelectable {
 	 * @return
 	 */
 	public TargetSelector getTargetSelector();
+	
+	public static TargetSelectable wrap(TargetSelector in) {
+		return new TargetSelectable() {
+			
+			@Override
+			public TargetSelector getTargetSelector() {
+				return in;
+			}
+		};
+	}
 }

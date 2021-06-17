@@ -1,14 +1,19 @@
 package org.scaffoldeditor.scaffold.logic.datapack;
 
+import java.util.UUID;
+
 /**
- * Represents a Minecraft target selector.
+ * Represents a Minecraft target-selector-like object. May be a target selector,
+ * a UUID, or a player name.
+ * 
  * @author Igrium
  */
 public interface TargetSelector {
 	
 	/**
 	 * Get the target selector string.
-	 * @return String in the format <code>@e[name=...]</code>
+	 * 
+	 * @return Target selector string that can be inserted into commands.
 	 */
 	public String compile();
 	
@@ -26,4 +31,14 @@ public interface TargetSelector {
 			}
 		};
 	}
+	
+	/**
+	 * Create a target selector that references an entity with a specific UUID.
+	 * @param in UUID to use.
+	 * @return Target selector.
+	 */
+	public static TargetSelector fromUUID(UUID in) {
+		return TargetSelector.fromString(in.toString());
+	}
+	
 }

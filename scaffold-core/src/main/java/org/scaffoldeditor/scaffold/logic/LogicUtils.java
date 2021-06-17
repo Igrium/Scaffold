@@ -106,4 +106,5 @@ public final class LogicUtils {
 	public static Command cloneNBT(Identifier storage1, String path1, Identifier storage2, String path2) {
 		return new DataCommandBuilder().modify().storage(storage2).path(path2).set().from().storage(storage1).path(path1).build();
 	}
+	
 }

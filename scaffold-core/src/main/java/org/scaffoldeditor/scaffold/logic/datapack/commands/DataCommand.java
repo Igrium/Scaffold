@@ -73,7 +73,7 @@ public class DataCommand implements Command {
 		if (target == TargetType.BLOCK) {
 			return "block "+targetPos.getString();
 		} else if (target == TargetType.ENTITY) {
-			return "entity "+targetEntity;
+			return "entity "+targetEntity.compile();
 		} else {
 			return "storage "+targetStorage.toString();
 		}
@@ -83,7 +83,7 @@ public class DataCommand implements Command {
 		if (source == TargetType.BLOCK) {
 			return "block "+sourcePos;
 		} else if (source == TargetType.ENTITY) {
-			return "entity "+sourceEntity;
+			return "entity "+sourceEntity.compile();
 		} else {
 			return "storage "+sourceStorage.toString();
 		}

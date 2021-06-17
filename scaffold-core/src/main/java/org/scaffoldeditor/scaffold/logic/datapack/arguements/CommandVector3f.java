@@ -59,4 +59,9 @@ public class CommandVector3f extends Vector3f {
 		
 		return prefix+x+" "+prefix+y+" "+prefix+z;
 	}
+	
+	@Override
+	public String toString() {
+		return getString();
+	}
 }
