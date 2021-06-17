@@ -11,7 +11,7 @@ import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
 import org.scaffoldeditor.nbt.math.Vector3i;
-import org.scaffoldeditor.nbt.util.SingleTypePair;
+import org.scaffoldeditor.nbt.util.Identifier;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.EntityFactory;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
@@ -144,8 +144,8 @@ public class RedstoneListener extends BaseBlockEntity {
 		return (Boolean) getAttribute("repeating").getValue();
 	}
 	
-	protected SingleTypePair<String> getTriggerFunction() {
-		return new SingleTypePair<String>(getLevel().getName().toLowerCase(), getName().toLowerCase()+"/trigger");
+	protected Identifier getTriggerFunction() {
+		return new Identifier(getLevel().getName().toLowerCase(), getName().toLowerCase()+"/trigger");
 	}
 
 	

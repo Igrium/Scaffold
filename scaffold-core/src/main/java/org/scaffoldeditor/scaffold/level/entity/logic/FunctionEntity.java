@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.scaffoldeditor.nbt.util.SingleTypePair;
+import org.scaffoldeditor.nbt.util.Identifier;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.EntityFactory;
@@ -36,10 +36,10 @@ public class FunctionEntity extends Entity {
 		super(level, name);
 	}
 	
-	public SingleTypePair<String> getFunction() {
+	public Identifier getFunction() {
 		String namespace = (String) getAttribute("namespace").getValue();
 		String function = (String) getAttribute("function").getValue();
-		return new SingleTypePair<>(namespace, function);
+		return new Identifier(namespace, function);
 	}
 	
 	@Override

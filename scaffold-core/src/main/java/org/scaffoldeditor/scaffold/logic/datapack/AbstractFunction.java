@@ -4,7 +4,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
 
-import org.scaffoldeditor.nbt.util.SingleTypePair;
+import org.scaffoldeditor.nbt.util.Identifier;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.Command;
 
 /**
@@ -12,12 +12,14 @@ import org.scaffoldeditor.scaffold.logic.datapack.commands.Command;
  * @author Igrium
  */
 public abstract class AbstractFunction {
-	protected String namespace;
-	protected String path;
+	protected Identifier id;
 	
 	public AbstractFunction(String namespace, String path) {
-		this.namespace = namespace;
-		this.path = path;
+		this.id = new Identifier(namespace, path);
+	}
+	
+	public AbstractFunction(Identifier id) {
+		this.id = id;
 	}
 	
 	/**
@@ -31,7 +33,7 @@ public abstract class AbstractFunction {
 	 * @return Function namespace.
 	 */
 	public String getNamespace() {
-		return namespace;
+		return id.namespace;
 	}
 	
 	/**
@@ -41,7 +43,7 @@ public abstract class AbstractFunction {
 	 *         excluding the file extension.
 	 */
 	public String getPath() {
-		return path;
+		return id.value;
 	}
 	
 	/**
@@ -49,7 +51,7 @@ public abstract class AbstractFunction {
 	 * @param namespace Function namespace.
 	 */
 	public void setNamespace(String namespace) {
-		this.namespace = namespace;
+		this.id = new Identifier(namespace, id.value);
 	}
 	
 	/**
@@ -59,7 +61,14 @@ public abstract class AbstractFunction {
 	 *                     excluding the file extension.
 	 */
 	public void setPath(String path) {
-		this.path = path;
+		this.id = new Identifier(id.namespace, path);
+	}
+	
+	/**
+	 * Set this function's identifier.
+	 */
+	public void setIdentifier(Identifier id) {
+		this.id = id;
 	}
 	
 	/**
@@ -77,13 +86,12 @@ public abstract class AbstractFunction {
 		return stringWriter.toString();
 	}
 	
-	/**
-	 * Retrieve this function's namespace and path.
-	 * 
-	 * @return Pair where the first element is the namespace and the second element
-	 *         is the path.
-	 */
-	public SingleTypePair<String> getMeta() {
-		return new SingleTypePair<>(namespace, path);
+	public Identifier getID() {
+		return id;
+	}
+	
+	@Override
+	public String toString() {
+		return id.toString();
 	}
 }

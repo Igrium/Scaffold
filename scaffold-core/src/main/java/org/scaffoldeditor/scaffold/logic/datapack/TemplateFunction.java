@@ -9,6 +9,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.scaffoldeditor.nbt.util.Identifier;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.Command;
 
 /**
@@ -28,13 +29,12 @@ public class TemplateFunction extends AbstractFunction {
 	private final Map<String, String> variables = new HashMap<>();
 	
 	/**
-	 * Create a template functino object.
-	 * @param namespace Namespace of the function.
-	 * @param path Name of the function without the file extension.
+	 * Create a template functinon object.
+	 * @param identifier Function identifier.
 	 * @param rawText Raw text of the function. Excpects a multi-line string.
 	 */
-	public TemplateFunction(String namespace, String path, String rawText) {
-		super(namespace, path);
+	public TemplateFunction(Identifier identifier, String rawText) {
+		super(identifier);
 		this.rawText = rawText;
 	}
 	
@@ -74,7 +74,7 @@ public class TemplateFunction extends AbstractFunction {
 			String varName = getVarName(line.substring(matcher.start(), matcher.end()));
 			String value = variables.get(varName);
 			if (value == null) {
-				throw new IllegalStateException("Template function " + namespace + ":" + path
+				throw new IllegalStateException("Template function " + this
 						+ " expects a variable by the name '" + varName + "', but none was provided!");
 			}
 			newString += value;

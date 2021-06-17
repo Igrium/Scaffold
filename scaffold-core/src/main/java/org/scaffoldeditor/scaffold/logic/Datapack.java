@@ -21,7 +21,6 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 import org.scaffoldeditor.nbt.Constants;
 import org.scaffoldeditor.nbt.util.Identifier;
-import org.scaffoldeditor.nbt.util.Pair;
 import org.scaffoldeditor.scaffold.core.Project;
 import org.scaffoldeditor.scaffold.logic.datapack.AbstractFunction;
 import org.scaffoldeditor.scaffold.logic.datapack.FunctionNameUtils;
@@ -45,13 +44,13 @@ public class Datapack extends AbstractPack {
 	 * Functions that will be called on datapack load.
 	 * The first entry in the pair is the function namespace and the second entry is the pathname.
 	 */
-	public final List<Pair<String, String>> loadFunctions = new ArrayList<>();
+	public final List<Identifier> loadFunctions = new ArrayList<>();
 	
 	/**
 	 *  Functions that will be called every tick.
 	 *  The first entry in the pair is the function namespace and the second entry is the pathname.
 	 */
-	public final List<Pair<String, String>> tickFunctions = new ArrayList<>();
+	public final List<Identifier> tickFunctions = new ArrayList<>();
 	
 	/**
 	 * A mutable list of all the functions that will be compiled into the datapack.
@@ -140,11 +139,11 @@ public class Datapack extends AbstractPack {
 
 	@Override
 	protected void postCompile(OutputWriter writer) throws IOException {
-		for (Pair<String, String> function : loadFunctions) {
-			loadCache.put(function.getFirst()+":"+function.getSecond());
+		for (Identifier function : loadFunctions) {
+			loadCache.put(function.toString());
 		}
-		for (Pair<String, String> function : tickFunctions) {
-			tickCache.put(function.getFirst()+":"+function.getSecond());
+		for (Identifier function : tickFunctions) {
+			tickCache.put(function.toString());
 		}
 		
 		PackOutputStream out1 = writer.openStream("data/" + LOAD_TAG_FILE);
@@ -163,7 +162,7 @@ public class Datapack extends AbstractPack {
 		
 		// Compile functions.
 		for (AbstractFunction function : functions) {
-			PackOutputStream out = writer.openStream("data/" + FunctionNameUtils.metaToPath(function.getMeta()).toString());
+			PackOutputStream out = writer.openStream("data/" + FunctionNameUtils.identifierToPath(function.getID()).toString());
 			BufferedWriter bufWriter = new BufferedWriter(new OutputStreamWriter(out));
 			bufWriter.write(function.compile());
 			bufWriter.close();

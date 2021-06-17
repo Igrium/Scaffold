@@ -174,7 +174,7 @@ public class WorldDynamic extends Entity implements EntityAdder, TargetSelectabl
 		}
 		
 		datapack.functions.add(tickFunction);
-		datapack.tickFunctions.add(tickFunction.getMeta());
+		datapack.tickFunctions.add(tickFunction.getID());
 		
 		Function enableFunction = new Function(enableFunction());
 		for (Vector3i coord : entities.keySet()) {

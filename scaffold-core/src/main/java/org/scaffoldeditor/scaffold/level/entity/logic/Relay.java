@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.scaffoldeditor.nbt.util.SingleTypePair;
+import org.scaffoldeditor.nbt.util.Identifier;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.EntityFactory;
@@ -17,6 +17,7 @@ import org.scaffoldeditor.scaffold.level.entity.attribute.StringAttribute;
 import org.scaffoldeditor.scaffold.level.io.InputDeclaration;
 import org.scaffoldeditor.scaffold.level.io.OutputDeclaration;
 import org.scaffoldeditor.scaffold.logic.Datapack;
+import org.scaffoldeditor.scaffold.logic.LogicUtils;
 import org.scaffoldeditor.scaffold.logic.datapack.Function;
 import org.scaffoldeditor.scaffold.logic.datapack.TargetSelector;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.Command;
@@ -121,7 +122,7 @@ public class Relay extends Entity {
 		return string.length() > 0 ? TargetSelector.fromString(string) : null;
 	}
 	
-	public SingleTypePair<String> getTriggerFunction() {
-		return new SingleTypePair<String>(getLevel().getName().toLowerCase(), getName()+"/trigger");
+	public Identifier getTriggerFunction() {
+		return LogicUtils.getEntityFunction(this, "trigger");
 	}
 }

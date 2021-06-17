@@ -31,8 +31,8 @@ public class CompileLogicStep implements CompileStep {
 		datapack.functions.add(initFunction);
 		datapack.functions.add(tickFunction);
 		
-		datapack.loadFunctions.add(initFunction.getMeta());
-		datapack.tickFunctions.add(tickFunction.getMeta());
+		datapack.loadFunctions.add(initFunction.getID());
+		datapack.tickFunctions.add(tickFunction.getID());
 		
 		// Respawn scoreboard entity.
 		initFunction.commands.add(Command.fromString("kill "+level.getScoreboardEntity().getTargetSelector().compile()));

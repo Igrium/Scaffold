@@ -76,12 +76,12 @@ public class Auto extends Entity {
 		Function initFunction = new Function(getLevel().getName().toLowerCase(), getName()+"/init");
 		initFunction.commands.addAll(compileOutput("on_datapack_loaded"));
 		datapack.functions.add(initFunction);
-		datapack.loadFunctions.add(initFunction.getMeta());
+		datapack.loadFunctions.add(initFunction.getID());
 		
 		Function tickFunction = new Function(getLevel().getName().toLowerCase(), getName()+"/tick");
 		tickFunction.commands.addAll(compileOutput("on_tick"));
 		datapack.functions.add(tickFunction);
-		datapack.tickFunctions.add(tickFunction.getMeta());
+		datapack.tickFunctions.add(tickFunction.getID());
 		
 		return super.compileLogic(datapack);
 	}

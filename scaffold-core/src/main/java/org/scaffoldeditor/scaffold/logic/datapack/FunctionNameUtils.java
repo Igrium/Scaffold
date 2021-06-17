@@ -4,8 +4,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.apache.commons.io.FilenameUtils;
-import org.scaffoldeditor.nbt.util.Pair;
-import org.scaffoldeditor.nbt.util.SingleTypePair;
+import org.scaffoldeditor.nbt.util.Identifier;
 
 public final class FunctionNameUtils {
 	private FunctionNameUtils() {};
@@ -16,7 +15,7 @@ public final class FunctionNameUtils {
 	 * @param path Path to function file, relative to the data folder
 	 * @return Function namespace and pathname.
 	 */
-	public static SingleTypePair<String> metaFromPath(Path path) {
+	public static Identifier identifierFromPath(Path path) {
 		Path namespacePath = path.subpath(0, 1);
 		Path relativeFunctionPath = Paths.get(namespacePath.toString(), "functions").relativize(path);
 		
@@ -24,15 +23,15 @@ public final class FunctionNameUtils {
 		String functionName = FilenameUtils.removeExtension(relativeFunctionPath.toString());
 		functionName = FilenameUtils.normalize(functionName, true);
 		
-		return new SingleTypePair<String>(namespace, functionName);
+		return new Identifier(namespace, functionName);
 	}
 	
 	/**
-	 * Get a function's path within the data folder from it's metadata.
-	 * @param meta Function meta (namespace and pathname).
+	 * Get a function's path within the data folder from its identifier.
+	 * @param id Function identifier.
 	 * @return Function path relative to the data folder.
 	 */
-	public static Path metaToPath(Pair<String, String> meta) {
-		return Paths.get(meta.getFirst(), "functions", meta.getSecond()+".mcfunction");
+	public static Path identifierToPath(Identifier id) {
+		return Paths.get(id.namespace, "functions", id.value+".mcfunction");
 	}
 }
