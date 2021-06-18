@@ -12,6 +12,7 @@ import org.scaffoldeditor.scaffold.level.entity.attribute.AssetAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BlockAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BlockTextureAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BooleanAttribute;
+import org.scaffoldeditor.scaffold.level.entity.attribute.ContainerAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.DoubleAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.EnumAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.FloatAttribute;
@@ -21,6 +22,7 @@ import org.scaffoldeditor.scaffold.level.entity.attribute.LongAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.NBTAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.StringAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.VectorAttribute;
+import org.scaffoldeditor.scaffold.level.entity.game.ContainerEntity;
 import org.scaffoldeditor.scaffold.level.entity.game.GameEntity;
 import org.scaffoldeditor.scaffold.level.entity.game.RedstoneListener;
 import org.scaffoldeditor.scaffold.level.entity.logic.Auto;
@@ -55,6 +57,7 @@ public class DefaultPlugin implements PluginInitializer {
 		RedstoneListener.register();
 		WorldTogglable.register();
 		WorldDynamic.register();
+		ContainerAttribute.register();
 		
 		StringAttribute.register();
 		NBTAttribute.register();
@@ -69,6 +72,7 @@ public class DefaultPlugin implements PluginInitializer {
 		BlockTextureAttribute.register();
 		AssetAttribute.register();
 		EnumAttribute.register();
+		ContainerEntity.register();
 		
 		StructureAsset.register();
 		ConstructionAsset.register();
