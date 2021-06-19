@@ -74,7 +74,7 @@ public class ContainerAttribute extends Attribute<ListTag<CompoundTag>> {
 	}
 
 	@Override
-	public Attribute<ListTag<CompoundTag>> clone() {
+	public ContainerAttribute clone() {
 		return new ContainerAttribute(items.clone());
 	}
 
