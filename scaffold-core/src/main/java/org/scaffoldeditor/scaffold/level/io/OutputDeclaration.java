@@ -1,5 +1,6 @@
 package org.scaffoldeditor.scaffold.level.io;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -18,5 +19,7 @@ public interface OutputDeclaration {
 	 * Get the arguements this output will emit to its connected input.
 	 * @return A list of attribute registry names.
 	 */
-	public List<String> getArguements();
+	default List<String> getArguements() {
+		return Collections.emptyList();
+	}
 }
