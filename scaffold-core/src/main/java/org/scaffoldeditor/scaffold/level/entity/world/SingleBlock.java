@@ -100,4 +100,5 @@ public class SingleBlock extends Entity implements BlockEntity {
 		super.setPosition(position);
 		getLevel().dirtySections.add(new SectionCoordinate(position.floor()));
 	}
+	
 }

@@ -2,9 +2,7 @@ package org.scaffoldeditor.scaffold.level.entity.world;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -126,20 +124,17 @@ public class WorldDynamic extends Entity implements EntityAdder, TargetSelectabl
 	}
 	
 	@Override
-	public void updateRenderEntities() {
-		super.updateRenderEntities();
-		if (model == null) updateRenderEntities(Collections.emptySet());
+	public Set<RenderEntity> getRenderEntities() {
+		Set<RenderEntity> renderEnts = super.getRenderEntities();
+		if (model == null) return renderEnts;
 		
-		Set<RenderEntity> renderEnts = new HashSet<>();
 		for (Vector3i pos : entities.keySet()) {
-//			renderEnts.add(new MCRenderEntity(this, pos.toFloat().add(getPosition()), new Vector3f(0, 0, 0),
-//					entities.get(pos), "ent" + pos.toString()));
 			renderEnts.add(new ModelRenderEntity(this, getPosition().add(pos.toFloat()), new Vector3f(0, 0, 0),
 					"ent" + pos.toString(),
 					entities.get(pos).getNBT().getCompoundTag("BlockState").getString("Name") + "#Inventory"));
 		}
 		
-		updateRenderEntities(renderEnts);
+		return renderEnts;
 	}
 	
 	private MCEntity generateEntity(Block block) {
@@ -181,8 +176,9 @@ public class WorldDynamic extends Entity implements EntityAdder, TargetSelectabl
 			MCEntity ent = entities.get(coord);
 			try {
 				enableFunction.addExecuteBlock(new ExecuteCommandBuilder().at(getRoot()).executeUnless(isEnabled()), Arrays.asList(new Command[] {
-						Command.fromString("summon minecraft:falling_block "+new CommandVector3f(coord.toFloat(), Mode.LOCAL)+" "+SNBTUtil.toSNBT(ent.getNBT()))
-				}));
+						Command.fromString("summon minecraft:falling_block "
+								+ new CommandVector3f(coord.toFloat().subtract(new Vector3f(.5f, 0f, .5f)), Mode.LOCAL)
+								+ " " + SNBTUtil.toSNBT(ent.getNBT()))				}));
 			} catch (IOException e) {
 				throw new AssertionError("Error writing falling block NBT!", e);
 			}
@@ -215,7 +211,7 @@ public class WorldDynamic extends Entity implements EntityAdder, TargetSelectabl
 		
 		if (startEnabled()) {
 			for (Vector3i coord : entities.keySet()) {
-				world.addEntity(entities.get(coord).getNBT(), coord.toFloat().add(getPosition()).toDouble());
+				world.addEntity(entities.get(coord).getNBT(), coord.toFloat().add(getPosition()).subtract(new Vector3f(.5f, 0f, .5f)).toDouble());
 			}
 		}
 		CompoundTag ent = LogicUtils.getCompanionEntity(this);

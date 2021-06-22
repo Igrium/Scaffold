@@ -1,8 +1,8 @@
 package org.scaffoldeditor.scaffold.level.entity.game;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.nbt.math.Vector3f;
@@ -18,6 +18,7 @@ import org.scaffoldeditor.scaffold.level.entity.attribute.BooleanAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.NBTAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.StringAttribute;
 import org.scaffoldeditor.scaffold.level.render.MCRenderEntity;
+import org.scaffoldeditor.scaffold.level.render.RenderEntity;
 import org.scaffoldeditor.scaffold.logic.Datapack;
 import org.scaffoldeditor.scaffold.logic.datapack.TargetSelector;
 import net.querz.nbt.io.SNBTUtil;
@@ -55,22 +56,11 @@ public class GameEntity extends Rotatable implements TargetSelectable, EntityAdd
 		}
 	
 	@Override
-	public void onAdded() {
-		super.onAdded();
-		updateRenderEntities();
-	}
-	
-	@Override
-	public void updateRenderEntities() {
-		MCRenderEntity entity = new MCRenderEntity(this, getPosition(), new Vector3f(0, 0, 0),
-				new MCEntity(getEntityType(), getNBT()), "entity");
-		updateRenderEntities(Collections.singleton(entity));
-	}
-	
-	@Override
-	public void onUpdateAttributes(boolean noRecompile) {
-		super.onUpdateAttributes(noRecompile);
-		updateRenderEntities();
+	public Set<RenderEntity> getRenderEntities() {
+		Set<RenderEntity> set = super.getRenderEntities();
+		set.add(new MCRenderEntity(this, getPosition(), new Vector3f(0, 0, 0),
+				new MCEntity(getEntityType(), getNBT()), "entity"));
+		return set;
 	}
 	
 	/**

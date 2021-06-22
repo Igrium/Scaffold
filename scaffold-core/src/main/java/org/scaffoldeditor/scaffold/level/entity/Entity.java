@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -289,13 +290,25 @@ public abstract class Entity {
 	 *                    recompile the world later.
 	 */
 	public void onUpdateAttributes(boolean noRecompile) {
+		updateRenderEntities();
 	}
 	
 	/**
 	 * Called when the entity has finished initialization and is added (or re-added)
 	 * to the level. This is when you should update your render entities.
 	 */
-	public void onAdded() {}
+	public void onAdded() {
+		updateRenderEntities();
+	}
+	
+	/**
+	 * Get a set of all this entity's render entities. Called whenever they need to be updated.
+	 * @return Render entities.
+	 */
+	public Set<RenderEntity> getRenderEntities() {
+		return new HashSet<>();
+	};
+	
 	
 	/**
 	 * <p>
@@ -336,9 +349,11 @@ public abstract class Entity {
 	}
 	
 	/**
-	 * Update this entity's visual representation in the editor.
+	 * Force-update this entity's visual representation in the editor.
 	 */
-	public void updateRenderEntities() {}
+	public void updateRenderEntities() {
+		updateRenderEntities(getRenderEntities());
+	}
 	
 	/**
 	 * Compile this entity's logic.

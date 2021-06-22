@@ -1,7 +1,7 @@
 package org.scaffoldeditor.scaffold.level.entity.util;
 
-import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 import org.scaffoldeditor.nbt.math.Vector3f;
 import org.scaffoldeditor.scaffold.level.Level;
@@ -11,6 +11,7 @@ import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.StringAttribute;
 import org.scaffoldeditor.scaffold.level.render.ModelRenderEntity;
+import org.scaffoldeditor.scaffold.level.render.RenderEntity;
 
 public class ModelTest extends Entity {
 	
@@ -34,24 +35,13 @@ public class ModelTest extends Entity {
 	public Map<String, Attribute<?>> getDefaultAttributes() {
 		return Map.of("model", new StringAttribute(""));
 	}
-	
+
 	@Override
-	public void onAdded() {
-		super.onAdded();
-		updateRenderEntities();
-	}
-	
-	@Override
-	public void onUpdateAttributes(boolean noRecompile) {
-		super.onUpdateAttributes(noRecompile);
-		updateRenderEntities();
-	}
-	
-	@Override
-	public void updateRenderEntities() {
-		super.updateRenderEntities();
+	public Set<RenderEntity> getRenderEntities() {
+		Set<RenderEntity> set = super.getRenderEntities();
 		String model = ((StringAttribute) getAttribute("model")).getValue();
-		updateRenderEntities(Collections.singleton(new ModelRenderEntity(this, getPosition(), new Vector3f(0,0,0), "model", model)));
+		set.add(new ModelRenderEntity(this, getPosition(), new Vector3f(0,0,0), "model", model));
+		return set;
 	}
 
 }

@@ -12,6 +12,7 @@ import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.VectorAttribute;
 import org.scaffoldeditor.scaffold.level.render.BrushRenderEntity;
+import org.scaffoldeditor.scaffold.level.render.RenderEntity;
 
 /**
  * Base class for brush entities that have no physical manifestation in the
@@ -72,25 +73,10 @@ public abstract class ToolBrushEntity extends Entity implements BrushEntity {
 	public abstract String getTexture();
 	
 	@Override
-	public void updateRenderEntities() {
-		super.updateRenderEntities();
+	public Set<RenderEntity> getRenderEntities() {
+		Set<RenderEntity> set = super.getRenderEntities();
 		Vector3f position = getPosition();
-		
-		updateRenderEntities(Set.of(
-				new BrushRenderEntity(this, position, position.add(getEndPoint()), getTexture(), "brush_entity")
-		));
+		set.add(new BrushRenderEntity(this, position, position.add(getEndPoint()), getTexture(), "brush_entity"));
+		return set;
 	}
-	
-	@Override
-	public void onAdded() {
-		super.onAdded();
-		updateRenderEntities();
-	}
-	
-	@Override
-	public void onUpdateAttributes(boolean noRecompile) {
-		super.onUpdateAttributes(noRecompile);
-		updateRenderEntities();
-	}
-
 }
