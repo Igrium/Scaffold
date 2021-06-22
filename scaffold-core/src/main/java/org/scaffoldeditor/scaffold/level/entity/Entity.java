@@ -193,6 +193,7 @@ public abstract class Entity {
 		this.setAttribute("position", new VectorAttribute(position));
 	}
 	
+	
 	/**
 	 * Get the level this entity belongs to.
 	 * @return Level
@@ -353,6 +354,60 @@ public abstract class Entity {
 	 */
 	public void updateRenderEntities() {
 		updateRenderEntities(getRenderEntities());
+	}
+	
+	/**
+	 * Whether the transform preview is enabled.
+	 */
+	protected boolean transformPreview = false;
+	
+	/**
+	 * The current preview position.
+	 */
+	protected Vector3f previewPosition = new Vector3f(0,0,0);
+	
+	/**
+	 * Get the position at which this entity should render in the editor. This is
+	 * the function that should be used for positioning render entities.
+	 * 
+	 * @return The preview position if the transform preview is enabled, and the
+	 *         standard position if it's not.
+	 */
+	public Vector3f getPreviewPosition() {
+		if (transformPreview) return previewPosition;
+		else return getPosition();
+	}
+	
+	/**
+	 * Enable the transform preview and set its position. Used for transform gismos
+	 * and other operations where the standard implementation is too expensive to
+	 * call every frame.
+	 * 
+	 * @param pos New preview position.
+	 */
+	public void setPreviewPosition(Vector3f pos) {
+		transformPreview = true;
+		previewPosition = pos;
+		updateRenderEntities();
+	}
+	
+	/**
+	 * Disable the transform preview, reverting the rendered entity back to its real
+	 * position.
+	 */
+	public void disableTransformPreview() {
+		transformPreview = false;
+		updateRenderEntities();
+	}
+	
+	/**
+	 * Determine whether the transform preview is enabled.
+	 * 
+	 * @return True if this entity is actively being moved by a transformation gizmo
+	 *         or the like.
+	 */
+	public boolean isTransformPreviewEnabled() {
+		return transformPreview;
 	}
 	
 	/**

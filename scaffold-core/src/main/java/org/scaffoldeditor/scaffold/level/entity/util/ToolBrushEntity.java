@@ -75,7 +75,7 @@ public abstract class ToolBrushEntity extends Entity implements BrushEntity {
 	@Override
 	public Set<RenderEntity> getRenderEntities() {
 		Set<RenderEntity> set = super.getRenderEntities();
-		Vector3f position = getPosition();
+		Vector3f position = getPreviewPosition();
 		set.add(new BrushRenderEntity(this, position, position.add(getEndPoint()), getTexture(), "brush_entity"));
 		return set;
 	}

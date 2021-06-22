@@ -58,7 +58,7 @@ public class GameEntity extends Rotatable implements TargetSelectable, EntityAdd
 	@Override
 	public Set<RenderEntity> getRenderEntities() {
 		Set<RenderEntity> set = super.getRenderEntities();
-		set.add(new MCRenderEntity(this, getPosition(), new Vector3f(0, 0, 0),
+		set.add(new MCRenderEntity(this, getPreviewPosition(), new Vector3f(0, 0, 0),
 				new MCEntity(getEntityType(), getNBT()), "entity"));
 		return set;
 	}

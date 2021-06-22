@@ -40,7 +40,7 @@ public class ModelTest extends Entity {
 	public Set<RenderEntity> getRenderEntities() {
 		Set<RenderEntity> set = super.getRenderEntities();
 		String model = ((StringAttribute) getAttribute("model")).getValue();
-		set.add(new ModelRenderEntity(this, getPosition(), new Vector3f(0,0,0), "model", model));
+		set.add(new ModelRenderEntity(this, getPreviewPosition(), new Vector3f(0,0,0), "model", model));
 		return set;
 	}
 

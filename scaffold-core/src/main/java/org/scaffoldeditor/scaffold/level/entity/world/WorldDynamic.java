@@ -129,7 +129,7 @@ public class WorldDynamic extends Entity implements EntityAdder, TargetSelectabl
 		if (model == null) return renderEnts;
 		
 		for (Vector3i pos : entities.keySet()) {
-			renderEnts.add(new ModelRenderEntity(this, getPosition().add(pos.toFloat()), new Vector3f(0, 0, 0),
+			renderEnts.add(new ModelRenderEntity(this, getPreviewPosition().add(pos.toFloat()), new Vector3f(0, 0, 0),
 					"ent" + pos.toString(),
 					entities.get(pos).getNBT().getCompoundTag("BlockState").getString("Name") + "#Inventory"));
 		}
