@@ -3,6 +3,7 @@ package org.scaffoldeditor.scaffold.operation;
 import org.scaffoldeditor.nbt.math.Vector3f;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 
+@Deprecated
 public class MoveEntityOperation implements Operation {
 	private Entity target;
 	private Vector3f newPosition;

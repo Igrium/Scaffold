@@ -576,6 +576,8 @@ public class Level {
 	 * Compile all the chunks marked as dirty.
 	 */
 	public void quickRecompile() {
+		if (dirtySections.isEmpty()) return;
+		
 		compileSections(dirtySections);
 //		compileBlockWorld(false);
 		fireWorldUpdateEvent(dirtySections);
