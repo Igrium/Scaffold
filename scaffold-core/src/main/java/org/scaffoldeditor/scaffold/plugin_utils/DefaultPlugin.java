@@ -30,7 +30,8 @@ import org.scaffoldeditor.scaffold.level.entity.logic.CommandEntity;
 import org.scaffoldeditor.scaffold.level.entity.logic.FunctionEntity;
 import org.scaffoldeditor.scaffold.level.entity.logic.Relay;
 import org.scaffoldeditor.scaffold.level.entity.logic.TriggerMultiple;
-import org.scaffoldeditor.scaffold.level.entity.util.ModelTest;
+import org.scaffoldeditor.scaffold.level.entity.test.BlockModelTest;
+import org.scaffoldeditor.scaffold.level.entity.test.ModelTest;
 import org.scaffoldeditor.scaffold.level.entity.world.WorldStatic;
 import org.scaffoldeditor.scaffold.level.entity.world.WorldTogglable;
 import org.scaffoldeditor.scaffold.level.entity.world.SingleBlock;
@@ -60,6 +61,7 @@ public class DefaultPlugin implements PluginInitializer {
 		WorldDynamic.register();
 		ContainerAttribute.register();
 		TriggerMultiple.register();
+		BlockModelTest.register();
 //		TestBrushEntity.register();
 		
 		StringAttribute.register();

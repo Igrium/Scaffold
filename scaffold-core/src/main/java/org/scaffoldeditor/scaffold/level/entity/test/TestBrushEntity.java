@@ -1,7 +1,8 @@
-package org.scaffoldeditor.scaffold.level.entity.util;
+package org.scaffoldeditor.scaffold.level.entity.test;
 
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
+import org.scaffoldeditor.scaffold.level.entity.util.ToolBrushEntity;
 
 public class TestBrushEntity extends ToolBrushEntity {
 	

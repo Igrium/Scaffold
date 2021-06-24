@@ -1,4 +1,4 @@
-package org.scaffoldeditor.scaffold.level.entity.util;
+package org.scaffoldeditor.scaffold.level.entity.test;
 
 import java.util.Map;
 import java.util.Set;

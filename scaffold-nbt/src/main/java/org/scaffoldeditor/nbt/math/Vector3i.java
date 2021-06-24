@@ -70,6 +70,10 @@ public class Vector3i {
 		return new Vector3i(x / num, y / num, z / num);
 	}
 	
+	public int dot(Vector3i other) {
+		return x * other.x + y * other.y + z * other.z;
+	}
+	
 	public Vector3f toFloat() {
 		return new Vector3f(x, y, z);
 	}
