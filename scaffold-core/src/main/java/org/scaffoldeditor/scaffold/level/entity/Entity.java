@@ -15,6 +15,7 @@ import org.scaffoldeditor.nbt.math.Vector3i;
 import org.scaffoldeditor.scaffold.core.Project;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.WorldUpdates.UpdateRenderEntitiesEvent;
+import org.scaffoldeditor.scaffold.level.entity.Macro.Confirmation;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.VectorAttribute;
 import org.scaffoldeditor.scaffold.level.entity.game.RedstoneListener;
@@ -24,6 +25,7 @@ import org.scaffoldeditor.scaffold.level.io.OutputDeclaration;
 import org.scaffoldeditor.scaffold.level.render.RenderEntity;
 import org.scaffoldeditor.scaffold.logic.Datapack;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.Command;
+import org.scaffoldeditor.scaffold.operation.ChangeAttributesOperation;
 import org.scaffoldeditor.scaffold.util.event.EventListener;
 import org.w3c.dom.Element;
 
@@ -86,9 +88,24 @@ public abstract class Entity {
 	public abstract Map<String, Attribute<?>> getDefaultAttributes();
 	
 	/**
+	 * Obtain the macros (small functions that can be called from the UI) that this
+	 * entity defines.
+	 * 
+	 * @return Macro list.
+	 */
+	public List<Macro> getMacros() {
+		List<Macro> macros = new ArrayList<>();
+		macros.add(new Macro("Reset", () -> {
+			level.getOperationManager()
+					.execute(new ChangeAttributesOperation(this, getDefaultAttributes(), new ArrayList<>()));
+		}, new Confirmation("Reset all attributes?", "This will reset all attributes to their default values.")));
+		return macros;
+	}
+	
+	/**
 	 * Compile an input on the entity. <br>
 	 * <b>Warning:</b> Should not call <code>level#getDatapack()</code> or any other
-	 * function that's only valid during logic compilation, as it's possible for
+	 * function that's only valid during logic compilation, as it'ss possible for
 	 * this method to be called during world compilation (ex: {@link RedstoneListener}).
 	 * 
 	 * @param inputName The name of the input being compiled.
@@ -272,6 +289,20 @@ public abstract class Entity {
 	 */
 	public void removeAttribute(String name) {
 		attributes.remove(name);
+	}
+	
+	/**
+	 * Reset this entity's attributes to default.
+	 * 
+	 * @param supressUpdate If true, {@link #onUpdateAttributes(boolean)} is NOT
+	 *                      called.
+	 */
+	public void reset(boolean supressUpdate) {
+		attributes.clear();
+		attributes.putAll(getDefaultAttributes());
+		if (!supressUpdate) {
+			onUpdateAttributes(false);
+		}
 	}
 
 	/**

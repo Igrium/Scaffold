@@ -3,6 +3,7 @@ package org.scaffoldeditor.scaffold.level.entity.world;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -22,6 +23,7 @@ import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.EntityFactory;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
 import org.scaffoldeditor.scaffold.level.entity.Faceable;
+import org.scaffoldeditor.scaffold.level.entity.Macro;
 import org.scaffoldeditor.scaffold.level.entity.attribute.AssetAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BooleanAttribute;
@@ -62,6 +64,20 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 		map.put("direction", new EnumAttribute<>(Direction.NORTH));
 		map.put("place_air", new BooleanAttribute(false));
 		return map;
+	}
+	
+	@Override
+	public List<Macro> getMacros() {
+		List<Macro> macros = super.getMacros();
+		macros.add(new Macro("Reload", () -> {
+			getLevel().dirtySections.addAll(getOverlappingSections());
+			reload();
+			getLevel().dirtySections.addAll(getOverlappingSections());
+			if (getLevel().autoRecompile) {
+				getLevel().quickRecompile();
+			}
+		}));
+		return macros;
 	}
 
 	/**
