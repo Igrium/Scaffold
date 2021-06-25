@@ -5,7 +5,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.scaffoldeditor.nbt.block.Block;
+import org.scaffoldeditor.nbt.block.BlockCollection;
 import org.scaffoldeditor.nbt.block.BlockWorld;
+import org.scaffoldeditor.nbt.block.GenericBlockCollection;
 import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
 import org.scaffoldeditor.nbt.math.Vector3d;
 import org.scaffoldeditor.nbt.math.Vector3f;
@@ -125,5 +127,19 @@ public class WorldBrush extends BaseBlockEntity implements BrushEntity {
 		setAttribute("end_point", new VectorAttribute(newBounds[1].subtract(newBounds[0])));
 		if (!suppressUpdate) onUpdateAttributes(false);
 	}
-
+	
+	@Override
+	public BlockCollection getBlockCollection() {
+		GenericBlockCollection blocks = new GenericBlockCollection();
+		Vector3i endPoint = getEndPoint().floor();
+		for (int x = 0; x < endPoint.x; x++) {
+			for (int y = 0; y < endPoint.y; y++) {
+				for (int z = 0; z < endPoint.z; z++) {
+					Block block = blockAt(new Vector3i(x, y, z).add(getBlockPosition()));
+					if (block != null) blocks.setBlock(x, y, z, block);
+				}
+			}
+		}
+		return blocks;
+	}
 }

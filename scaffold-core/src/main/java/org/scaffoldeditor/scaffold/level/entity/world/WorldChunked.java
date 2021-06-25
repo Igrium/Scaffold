@@ -10,6 +10,7 @@ import java.util.Set;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.scaffoldeditor.nbt.block.Block;
+import org.scaffoldeditor.nbt.block.BlockCollection;
 import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.nbt.block.Chunk;
 import org.scaffoldeditor.nbt.block.ChunkedBlockCollection;
@@ -296,5 +297,10 @@ public class WorldChunked extends BaseBlockEntity {
 		if (!((StringAttribute) getAttribute("model")).getValue().equals(modelpath)) {
 			reload();	
 		};
+	}
+
+	@Override
+	public BlockCollection getBlockCollection() {
+		return model;
 	}
 }

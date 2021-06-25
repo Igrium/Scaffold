@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.scaffoldeditor.nbt.block.Block;
+import org.scaffoldeditor.nbt.block.BlockCollection;
 import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.nbt.block.SizedBlockCollection;
 import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
@@ -224,5 +225,11 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 	 */
 	public SizedBlockCollection getFinalModel() {
 		return finalModel;
+	}
+
+
+	@Override
+	public BlockCollection getBlockCollection() {
+		return getFinalModel();
 	}
 }

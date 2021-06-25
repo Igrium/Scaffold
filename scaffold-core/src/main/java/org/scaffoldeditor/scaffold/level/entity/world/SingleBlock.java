@@ -101,4 +101,8 @@ public class SingleBlock extends Entity implements BlockEntity {
 		getLevel().dirtySections.add(new SectionCoordinate(position.floor()));
 	}
 	
+	@Override
+	public boolean isGridLocked() {
+		return true;
+	}
 }

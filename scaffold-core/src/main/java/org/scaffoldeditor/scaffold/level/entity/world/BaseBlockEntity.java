@@ -1,10 +1,15 @@
 package org.scaffoldeditor.scaffold.level.entity.world;
 
+import java.util.Set;
+
+import org.scaffoldeditor.nbt.block.BlockCollection;
 import org.scaffoldeditor.nbt.math.Vector3f;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.BlockEntity;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.attribute.VectorAttribute;
+import org.scaffoldeditor.scaffold.level.render.BlockRenderEntity;
+import org.scaffoldeditor.scaffold.level.render.RenderEntity;
 
 /**
  * Implements many of the common features of block entities.
@@ -68,4 +73,26 @@ public abstract class BaseBlockEntity extends Entity implements BlockEntity {
 	 * <code>setPosition()</code> when this is called.
 	 */
 	public abstract void onUpdateBlockAttributes();
+
+	/**
+	 * Obtain a block collection with all of the blocks in this entity. Used for
+	 * generating the block hologram used when moving the entity.
+	 * 
+	 * @return All the blocks in the entity.
+	 */
+	public abstract BlockCollection getBlockCollection();
+	
+	@Override
+	public Set<RenderEntity> getRenderEntities() {
+		Set<RenderEntity> set = super.getRenderEntities();
+		if (isTransformPreviewEnabled()) {
+			set.add(new BlockRenderEntity(this, getBlockCollection(), getPreviewPosition(), new Vector3f(0, 0, 0), "model"));
+		}
+		return set;
+	}
+	
+	@Override
+	public boolean isGridLocked() {
+		return true;
+	}
 }

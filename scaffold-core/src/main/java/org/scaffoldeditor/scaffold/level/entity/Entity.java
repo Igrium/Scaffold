@@ -190,6 +190,7 @@ public abstract class Entity {
 	 * @param position New position
 	 */
 	public void setPosition(Vector3f position) {
+		if (isGridLocked()) position = position.floor().toFloat();
 		this.setAttribute("position", new VectorAttribute(position));
 	}
 	
@@ -398,6 +399,16 @@ public abstract class Entity {
 	public void disableTransformPreview() {
 		transformPreview = false;
 		updateRenderEntities();
+	}
+	
+	/**
+	 * Determine whether this entity is grid-locked. Being grid-locked means it's a
+	 * block entity or some other entity that must be aligned to the block grid.
+	 * 
+	 * @return Is this entity grid locked?
+	 */
+	public boolean isGridLocked() {
+		return false;
 	}
 	
 	/**

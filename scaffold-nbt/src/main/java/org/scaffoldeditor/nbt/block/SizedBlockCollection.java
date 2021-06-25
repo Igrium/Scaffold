@@ -110,4 +110,29 @@ public interface SizedBlockCollection extends BlockCollection {
 			}
 		};
 	}
+	
+	/**
+	 * Get a block collection that consists of a single block.
+	 * @param block The block.
+	 * @return Wrapper block collection.
+	 */
+	public static SizedBlockCollection singleBlock(Block block) {
+		return new SizedBlockCollection() {
+			
+			@Override
+			public Block blockAt(int x, int y, int z) {
+				return block;
+			}
+			
+			@Override
+			public Vector3i getMin() {
+				return new Vector3i(0, 0, 0);
+			}
+			
+			@Override
+			public Vector3i getMax() {
+				return new Vector3i(1, 1, 1);
+			}
+		};
+	}
 }

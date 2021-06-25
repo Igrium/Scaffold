@@ -5,8 +5,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.scaffoldeditor.nbt.block.Block;
+import org.scaffoldeditor.nbt.block.BlockCollection;
 import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
+import org.scaffoldeditor.nbt.block.SizedBlockCollection;
 import org.scaffoldeditor.nbt.math.Vector3i;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.EntityFactory;
@@ -120,5 +122,9 @@ public class ContainerEntity extends BaseBlockEntity {
 	@Override
 	public void onUpdateBlockAttributes() {
 	}
-
+	
+	@Override
+	public BlockCollection getBlockCollection() {
+		return SizedBlockCollection.singleBlock(getBlock());
+	}
 }

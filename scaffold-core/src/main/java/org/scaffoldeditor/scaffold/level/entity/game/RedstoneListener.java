@@ -8,7 +8,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.scaffoldeditor.nbt.block.Block;
+import org.scaffoldeditor.nbt.block.BlockCollection;
 import org.scaffoldeditor.nbt.block.BlockWorld;
+import org.scaffoldeditor.nbt.block.SizedBlockCollection;
 import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
 import org.scaffoldeditor.nbt.math.Vector3i;
 import org.scaffoldeditor.nbt.util.Identifier;
@@ -148,5 +150,8 @@ public class RedstoneListener extends BaseBlockEntity {
 		return new Identifier(getLevel().getName().toLowerCase(), getName().toLowerCase()+"/trigger");
 	}
 
-	
+	@Override
+	public BlockCollection getBlockCollection() {
+		return SizedBlockCollection.singleBlock(getBlock());
+	}
 }
