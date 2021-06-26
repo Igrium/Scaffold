@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.scaffoldeditor.nbt.math.Vector3f;
-import org.scaffoldeditor.nbt.math.Vector3i;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.BrushEntity;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
@@ -50,18 +49,18 @@ public abstract class ToolBrushEntity extends Entity implements BrushEntity {
 	}
 
 	@Override
-	public void setBounds(Vector3i[] newBounds, boolean suppressUpdate) {
-		Vector3i start = newBounds[0];
-		Vector3i end = newBounds[1];
+	public void setBrushBounds(Vector3f[] newBounds, boolean suppressUpdate) {
+		Vector3f start = newBounds[0];
+		Vector3f end = newBounds[1];
 		
 		setAttribute("position", new VectorAttribute(start));
 		setAttribute("end_point", new VectorAttribute(end.subtract(start)));
 	}
 
 	@Override
-	public Vector3i[] getBounds() {
-		Vector3i position = getBlockPosition();
-		return new Vector3i[] { position, position.add(getEndPoint().floor()) };
+	public Vector3f[] getBrushBounds() {
+		Vector3f position = getPosition();
+		return new Vector3f[] { position, position.add(getEndPoint()) };
 	}
 	
 	/**

@@ -81,9 +81,15 @@ public class WorldBrush extends BaseBlockEntity implements BrushEntity {
 	}
 
 	@Override
+	public Vector3f[] getBrushBounds() {
+		Vector3f position = getPosition();
+		return new Vector3f[] { position, position.add(getEndPoint()) };
+	}
+	
+	@Override
 	public Vector3i[] getBounds() {
-		Vector3i position = getBlockPosition();
-		return new Vector3i[] {position, position.add(getEndPoint().floor())};
+		Vector3i position = getPosition().floor();
+		return new Vector3i[] { position, position.add(getEndPoint().floor()) };
 	}
 	
 	/**
@@ -122,7 +128,7 @@ public class WorldBrush extends BaseBlockEntity implements BrushEntity {
 	}
 
 	@Override
-	public void setBounds(Vector3i[] newBounds, boolean suppressUpdate) {
+	public void setBrushBounds(Vector3f[] newBounds, boolean suppressUpdate) {
 		setAttribute("position", new VectorAttribute(newBounds[0]), true);
 		setAttribute("end_point", new VectorAttribute(newBounds[1].subtract(newBounds[0])));
 		if (!suppressUpdate) onUpdateAttributes(false);
