@@ -29,9 +29,9 @@ import org.scaffoldeditor.scaffold.logic.datapack.commands.FunctionCommand;
  * 
  * @author Igrium
  */
-public class Relay extends Entity {
+public class Relay extends LogicEntity {
 	
-	public static void Register() {
+	public static void register() {
 		EntityRegistry.registry.put("logic_relay", new EntityFactory<Entity>() {		
 			@Override
 			public Entity create(Level level, String name) {
@@ -124,5 +124,10 @@ public class Relay extends Entity {
 	
 	public Identifier getTriggerFunction() {
 		return LogicUtils.getEntityFunction(this, "trigger");
+	}
+
+	@Override
+	public String getSprite() {
+		return "scaffold:textures/editor/relay.png";
 	}
 }

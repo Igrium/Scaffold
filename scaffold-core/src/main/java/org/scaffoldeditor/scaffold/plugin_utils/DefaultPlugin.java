@@ -50,9 +50,9 @@ public class DefaultPlugin implements PluginInitializer {
 		WorldChunked.register();
 		WorldBrush.register();
 		SingleBlock.Register();
-		Auto.Register();
-		FunctionEntity.Register();
-		Relay.Register();
+		Auto.register();
+		FunctionEntity.register();
+		Relay.register();
 		GameEntity.register();
 		ModelTest.register();
 		CommandEntity.register();

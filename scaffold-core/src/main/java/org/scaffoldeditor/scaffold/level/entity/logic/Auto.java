@@ -2,16 +2,15 @@ package org.scaffoldeditor.scaffold.level.entity.logic;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.EntityFactory;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.io.OutputDeclaration;
-import org.scaffoldeditor.scaffold.level.render.BillboardRenderEntity;
 import org.scaffoldeditor.scaffold.logic.Datapack;
 import org.scaffoldeditor.scaffold.logic.datapack.Function;
 
@@ -20,9 +19,9 @@ import org.scaffoldeditor.scaffold.logic.datapack.Function;
  * 
  * @author Igrium
  */
-public class Auto extends Entity {
+public class Auto extends LogicEntity {
 	
-	public static void Register() {
+	public static void register() {
 		EntityRegistry.registry.put("logic_auto", new EntityFactory<Entity>() {		
 			@Override
 			public Entity create(Level level, String name) {
@@ -38,7 +37,7 @@ public class Auto extends Entity {
 
 	@Override
 	public Map<String, Attribute<?>> getDefaultAttributes() {
-		return Collections.emptyMap();
+		return new HashMap<>();
 	}
 	
 	@Override
@@ -85,24 +84,10 @@ public class Auto extends Entity {
 		
 		return super.compileLogic(datapack);
 	}
-	
-	@Override
-	public void onAdded() {
-		super.onAdded();
-		updateRenderEntities();
-	}
-	
-	@Override
-	public void onUpdateAttributes(boolean noRecompile) {
-		super.onUpdateAttributes(noRecompile);
-		updateRenderEntities();
-	}
 
 	@Override
-	public void updateRenderEntities() {
-		super.updateRenderEntities();
-		updateRenderEntities(Collections.singleton(
-				new BillboardRenderEntity(this, getPosition(), "billboard", "scaffold:textures/editor/auto.png")));
+	public String getSprite() {
+		return "scaffold:textures/editor/auto.png";
 	}
 
 }

@@ -21,9 +21,9 @@ import org.scaffoldeditor.scaffold.logic.datapack.commands.FunctionCommand;
  * Runs a function on the input "Run".
  * @author Igrium
  */
-public class FunctionEntity extends Entity {
+public class FunctionEntity extends LogicEntity {
 	
-	public static void Register() {
+	public static void register() {
 		EntityRegistry.registry.put("logic_function", new EntityFactory<Entity>() { 
 			@Override
 			public Entity create(Level level, String name) {
@@ -74,5 +74,10 @@ public class FunctionEntity extends Entity {
 		map.put("namespace", new StringAttribute(getProject().getName().toLowerCase()));
 		map.put("function", new StringAttribute(""));
 		return map;
+	}
+
+	@Override
+	public String getSprite() {
+		return "scaffold:textures/editor/function.png";
 	}
 }
