@@ -21,7 +21,7 @@ public abstract class LogicEntity extends Entity {
 	@Override
 	public Set<RenderEntity> getRenderEntities() {
 		Set<RenderEntity> set = super.getRenderEntities();
-		set.add(new BillboardRenderEntity(this, getPreviewPosition(), "sprite", getSprite()));
+		set.add(new BillboardRenderEntity(this, getPreviewPosition(), "sprite", getSprite(), getRenderScale()));
 		return set;
 	}
 	
@@ -38,5 +38,12 @@ public abstract class LogicEntity extends Entity {
 		 * things easier.
 		 */
 		return true;
+	}
+	
+	/**
+	 * Get the scale to render the billboard at.
+	 */
+	protected float getRenderScale() {
+		return 1;
 	}
 }

@@ -78,6 +78,11 @@ public class FunctionEntity extends LogicEntity {
 
 	@Override
 	public String getSprite() {
-		return "scaffold:textures/editor/function.png";
+		return "scaffold:textures/editor/script.png";
 	}
+	
+	@Override
+		protected float getRenderScale() {
+			return .5f;
+		}
 }

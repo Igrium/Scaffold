@@ -21,7 +21,7 @@ import org.scaffoldeditor.scaffold.logic.datapack.commands.ExecuteCommandBuilder
  * Executes a single Minecraft command when compiled.
  * @author Igrium
  */
-public class CommandEntity extends Entity {
+public class CommandEntity extends LogicEntity {
 	
 	public static void register() {
 		EntityRegistry.registry.put("logic_command", new EntityFactory<CommandEntity>() {	
@@ -91,6 +91,11 @@ public class CommandEntity extends Entity {
 		}
 		
 		return super.compileInput(inputName, args, source);
+	}
+
+	@Override
+	public String getSprite() {
+		return "scaffold:textures/editor/command.png";
 	}
 	
 }
