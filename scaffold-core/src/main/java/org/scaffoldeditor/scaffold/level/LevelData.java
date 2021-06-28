@@ -3,6 +3,7 @@ package org.scaffoldeditor.scaffold.level;
 import java.io.File;
 import java.io.IOException;
 import org.json.JSONObject;
+import org.scaffoldeditor.nbt.math.Vector3i;
 
 import net.querz.nbt.io.NBTUtil;
 import net.querz.nbt.io.NamedTag;
@@ -153,6 +154,12 @@ public class LevelData {
 		root.put("Data", data);
 		
 		return root;
+	}
+	
+	public void setSpawn(Vector3i pos) {
+		values.put("SpawnX", pos.x);
+		values.put("SpawnY", pos.y);
+		values.put("SpawnZ", pos.z);
 	}
 	
 	/**

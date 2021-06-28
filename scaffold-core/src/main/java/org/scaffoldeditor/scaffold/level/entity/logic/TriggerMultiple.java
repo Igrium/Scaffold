@@ -81,6 +81,14 @@ public class TriggerMultiple extends ToolBrushEntity {
 				return "on_end_touch";
 			}
 		});
+		
+		out.add(new OutputDeclaration() {
+			
+			@Override
+			public String getName() {
+				return "on_tick";
+			}
+		});
 
 		return out;
 	}
@@ -126,6 +134,9 @@ public class TriggerMultiple extends ToolBrushEntity {
 		
 		tickFunction.commands.add(new ExecuteCommandBuilder().executeIf(isTouching()).executeUnless(isDisabled())
 				.executeUnless(new EntityConditional(getSelector())).run(new FunctionCommand(handleEndTouch)));
+		
+		tickFunction.addExecuteBlock(new ExecuteCommandBuilder().executeIf(isTouching()), compileOutput("on_tick"));
+		
 		datapack.functions.add(tickFunction);
 		datapack.tickFunctions.add(tickFunction.getID());
 		

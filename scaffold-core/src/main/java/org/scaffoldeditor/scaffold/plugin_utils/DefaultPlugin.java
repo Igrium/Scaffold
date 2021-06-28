@@ -25,6 +25,7 @@ import org.scaffoldeditor.scaffold.level.entity.attribute.VectorAttribute;
 import org.scaffoldeditor.scaffold.level.entity.game.ContainerEntity;
 import org.scaffoldeditor.scaffold.level.entity.game.GameEntity;
 import org.scaffoldeditor.scaffold.level.entity.game.RedstoneListener;
+import org.scaffoldeditor.scaffold.level.entity.info.PlayerStart;
 import org.scaffoldeditor.scaffold.level.entity.logic.Auto;
 import org.scaffoldeditor.scaffold.level.entity.logic.CommandEntity;
 import org.scaffoldeditor.scaffold.level.entity.logic.FunctionEntity;
@@ -62,7 +63,7 @@ public class DefaultPlugin implements PluginInitializer {
 		ContainerAttribute.register();
 		TriggerMultiple.register();
 		BlockModelTest.register();
-//		TestBrushEntity.register();
+		PlayerStart.register();
 		
 		StringAttribute.register();
 		NBTAttribute.register();

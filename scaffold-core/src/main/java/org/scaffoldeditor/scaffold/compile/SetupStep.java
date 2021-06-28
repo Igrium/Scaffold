@@ -10,6 +10,7 @@ import org.scaffoldeditor.scaffold.compile.Compiler.CompileProgressListener;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BooleanAttribute;
+import org.scaffoldeditor.scaffold.level.entity.info.PlayerStart;
 
 public class SetupStep implements CompileStep {
 
@@ -33,6 +34,17 @@ public class SetupStep implements CompileStep {
 
 		// Make world folder
 		target.toFile().mkdir();
+		
+		PlayerStart playerStartEntity = null;
+		for (String name : level.getEntityStack()) {
+			if (level.getEntity(name) instanceof PlayerStart) {
+				playerStartEntity = (PlayerStart) level.getEntity(name);
+			}
+		}
+		
+		if (playerStartEntity != null) {
+			level.levelData().setSpawn(playerStartEntity.getBlockPosition());
+		}
 
 		// Compile levelData
 		try {
