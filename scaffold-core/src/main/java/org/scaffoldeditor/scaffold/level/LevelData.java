@@ -36,6 +36,20 @@ public class LevelData {
 	}
 	
 	/**
+	 * Set the level data from a compound tag.
+	 * @param data Compound tag to set.
+	 */
+	public void setData(CompoundTag data) {
+		this.data = data;
+		if (data.containsKey("GameRules")) {
+			this.gamerules = data.getCompoundTag("GameRules");
+		} else {
+			this.gamerules = new CompoundTag();
+			data.put("GameRules", gamerules);
+		}
+	}
+	
+	/**
 	 * Return the current overrides in the level data.
 	 */
 	public CompoundTag getData() {

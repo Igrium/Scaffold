@@ -1,15 +1,23 @@
 package org.scaffoldeditor.scaffold.serialization;
 
+import java.io.IOException;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.scaffoldeditor.nbt.util.NBTMerger;
+import org.scaffoldeditor.nbt.util.NBTMerger.ListMergeMode;
 import org.scaffoldeditor.scaffold.core.Constants;
 import org.scaffoldeditor.scaffold.core.Project;
 import org.scaffoldeditor.scaffold.level.Level;
+import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import net.querz.nbt.io.SNBTUtil;
+import net.querz.nbt.tag.CompoundTag;
 
 public class LevelSerializer implements XMLSerializable {
 		
@@ -31,6 +39,14 @@ public class LevelSerializer implements XMLSerializable {
 			entities.appendChild(entity);
 		}
 		
+		Element levelData = document.createElement("level_data");
+		try {
+			levelData.setTextContent(SNBTUtil.toSNBT(level.levelData().getData()));
+		} catch (DOMException | IOException e) {
+			throw new AssertionError("Unable to write level data!", e);
+		}
+		
+		root.appendChild(levelData);
 		root.appendChild(entities);
 		return root;
 	}
@@ -52,6 +68,8 @@ public class LevelSerializer implements XMLSerializable {
 				Element element = (Element) child;
 				if (element.getTagName().equals("entities")) {
 					loadEntities(level, element);
+				} else if (element.getTagName().equals("level_data")) {
+					loadData(level, element);
 				}
 			}
 		}
@@ -68,6 +86,16 @@ public class LevelSerializer implements XMLSerializable {
 			}
 		}
 		level.updateEntityStack();
+	}
+	
+	private static void loadData(Level level, Element xml) {
+		try {
+			CompoundTag dataTag = (CompoundTag) SNBTUtil.fromSNBT(xml.getTextContent());
+			NBTMerger.mergeCompound(level.levelData().getData(), dataTag, true, ListMergeMode.REPLACE);
+			
+		} catch (DOMException | IOException e) {
+			throw new IllegalArgumentException("Improperly formatted level data!", e);
+		}
 	}
 	
 	/**
