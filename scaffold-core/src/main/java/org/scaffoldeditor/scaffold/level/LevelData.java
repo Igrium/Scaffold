@@ -2,17 +2,18 @@ package org.scaffoldeditor.scaffold.level;
 
 import java.io.File;
 import java.io.IOException;
-import org.json.JSONObject;
+import org.scaffoldeditor.nbt.Constants;
 import org.scaffoldeditor.nbt.math.Vector3i;
+import org.scaffoldeditor.nbt.util.NBTMerger;
+import org.scaffoldeditor.nbt.util.NBTMerger.ListMergeMode;
+import org.scaffoldeditor.scaffold.io.AssetManager;
+import org.scaffoldeditor.scaffold.level.entity.Entity;
+import org.scaffoldeditor.scaffold.level.entity.info.PlayerStart;
 
+import net.querz.nbt.io.NBTDeserializer;
 import net.querz.nbt.io.NBTUtil;
 import net.querz.nbt.io.NamedTag;
-import net.querz.nbt.tag.ByteTag;
 import net.querz.nbt.tag.CompoundTag;
-import net.querz.nbt.tag.DoubleTag;
-import net.querz.nbt.tag.IntTag;
-import net.querz.nbt.tag.LongTag;
-import net.querz.nbt.tag.StringTag;
 
 
 /**
@@ -21,146 +22,89 @@ import net.querz.nbt.tag.StringTag;
  *
  */
 public class LevelData {
-	// JSON provides a very nice way to store typed values in a map.
-	private JSONObject values = new JSONObject();
 	private Level level;
+	private CompoundTag data = new CompoundTag();
+	private CompoundTag gamerules = new CompoundTag();
 	
-	/**
-	 * Create a new LevelData.
-	 * @param level Level this data is of
-	 */
 	public LevelData(Level level) {
-		values.put("BorderCenterX", 0d);
-		values.put("BorderCenterZ", 0d);
-		values.put("BorderDamagePerBlock", 0.2d);
-		values.put("BorderSafeZone", 5d);
-		values.put("BorderSize", 60000000d);
-		values.put("BorderSizeLerpTarget", 60000000d);
-		values.put("BorderSizeLerpTime", 0l);
-		values.put("BorderWarningBlocks", 5d);
-		values.put("BorderWarningTime", 15d);
-		values.put("DayTime", 0);
-		values.put("Difficulty", 2);
-		values.put("DifficultyLocked", false);
-		values.put("GameType", 3);
-		values.put("hardcore", false);
-		values.put("RandomSeed", Math.random()*Math.pow(10, 18));
-		values.put("SpawnX", 8);
-		values.put("SpawnY", 55);
-		values.put("SpawnZ", 8);
-		values.put("version", 19133);
-		
-		JSONObject gamerules = new JSONObject();
-		
-		gamerules.put("announceAdvancements", "true");
-		gamerules.put("commandBlockOutput", "false");
-		gamerules.put("disableElytraMovementCheck", "false");
-		gamerules.put("disableRaids", "false");
-		gamerules.put("doDaylightCycle", "true");
-		gamerules.put("doEntityDrops", "true");
-		gamerules.put("doFireTick", "false");
-		gamerules.put("doLimitedCrafting", "false");
-		gamerules.put("doMobLoot", "true");
-		gamerules.put("doMobSpawning", "false");
-		gamerules.put("doTileDrops", "true");
-		gamerules.put("doWeatherCycle", "false");
-		gamerules.put("keepInventory", "false");
-		gamerules.put("logAdminCommands", "true");
-		gamerules.put("maxCommandChainLength", "65535");
-		gamerules.put("maxEntityCramming", "24");
-		gamerules.put("mobGriefing", "false");
-		gamerules.put("naturalRegeneration", "true");
-		gamerules.put("randomTickSpeed", "3");
-		gamerules.put("reducedDebugInfo", "false");
-		gamerules.put("sendCommandFeedback", "true");
-		gamerules.put("showDeathMessages", "true");
-		gamerules.put("spawnRadius", "1");
-		gamerules.put("spectatorsGenerateChunks", "false");
-		
-		values.put("gamerules", gamerules);
-		
 		this.level = level;
+		
+		data.putByte("Difficulty", (byte) 2);
+		data.putBoolean("DifficultyLocked", false);
+		data.putBoolean("hardcore", false);
+		data.putLong("RandomSeed", (long) (Math.random() * Math.pow(10, 18)));
+		data.put("GameRules", gamerules);
 	}
 	
 	/**
-	 * Create a new LevelData from a JSONObject of values.
-	 * @param level Level this data is of.
-	 * @param values Values to copy from.
+	 * Return the current overrides in the level data.
 	 */
-	public LevelData(Level level, JSONObject values) {
-		this.values = values;
-		this.level = level;
+	public CompoundTag getData() {
+		return data;
 	}
 	
 	/**
-	 * Return a JSONObject with all data.
-	 * @return data
+	 * Get the gamerules tag.
 	 */
-	public JSONObject getData() {
-		return values;
+	public CompoundTag getGamerules() {
+		return gamerules;
 	}
 	
 	/**
-	 * Compile this LevelData into an NBT compound map
+	 * Set a gamerule.
+	 * @param name Gamerule name.
+	 * @param value Gamerule value.
+	 */
+	public void setGamerule(String name, String value) {
+		gamerules.putString(name, value);
+	}
+	
+	/**
+	 * Get a gamerule.
+	 * @param name Gamerule name.
+	 * @return Gamerule value, or null if it's not explicitly set.
+	 */
+	public String getGamerule(String name) {
+		return gamerules.getString(name);
+	}
+	
+	/**
+	 * Compile this LevelData into a compound tag.
 	 * @param cheats Should the compiled world have cheats on?
-	 * @return Compiled CompoundMap
+	 * @return Compiled NBT
 	 */
-	public CompoundTag compile(boolean cheats) {
-		CompoundTag data = new CompoundTag();
-		data.put("allowCommands", new ByteTag(cheats));
-		data.put("BorderCenterX", new DoubleTag(values.getDouble("BorderCenterX")));
-		data.put("BorderCenterY", new DoubleTag(values.getDouble("BorderCenterZ")));
-		data.put("BorderDamagePerBlock", new DoubleTag(values.getDouble("BorderDamagePerBlock")));
-		data.put("BorderSafeZone", new DoubleTag(values.getDouble("BorderSafeZone")));
-		data.put("BorderSize", new DoubleTag(values.getDouble("BorderSize")));
-		data.put("BorderSizeLerpTarget", new DoubleTag(values.getDouble("BorderSizeLerpTarget")));
-		data.put("BorderSizeLerpTime", new LongTag(values.getLong("BorderSizeLerpTime")));
-		data.put("BorderWarningBlocks", new DoubleTag(values.getDouble("BorderWarningBlocks")));
-		data.put("BorderWarningTime", new DoubleTag(values.getDouble("BorderWarningTime")));
-		data.put("clearWeatherTime", new IntTag(0));
-		data.put("DataVersion", new IntTag(1976));
-		data.put("DayTime", new IntTag(values.getInt("DayTime")));
-		data.put("Difficulty", new ByteTag((byte) values.getInt("Difficulty")));
-		data.put("DifficultyLocked", new ByteTag(values.getBoolean("DifficultyLocked")));
-		data.put("GameType", new IntTag(values.getInt("GameType")));
-		data.put("generatorName", new StringTag("flat"));
-		data.put("generatorVersion", new IntTag(0));
-		data.put("hardcore", new ByteTag(values.getBoolean("hardcore")));
-		data.put("intialized", new ByteTag(true));
-		data.put("LevelName", new StringTag(level.getPrettyName()));
-		data.put("MapFeatures", new ByteTag(false));
-		data.put("raining", new ByteTag(false));
-		data.put("rainTime", new IntTag(100000));
-		data.put("RandomSeed", new IntTag(values.getInt("RandomSeed")));
-		data.put("SpawnX", new IntTag(values.getInt("SpawnX")));
-		data.put("SpawnY", new IntTag(values.getInt("SpawnY")));
-		data.put("SpawnZ", new IntTag(values.getInt("SpawnZ")));
-		data.put("thundering", new IntTag(0));
-		data.put("thunderTime", new IntTag(100000));
-		data.put("Time", new LongTag(0));
-		data.put("version", new IntTag(19133));
-		data.put("WanderingTraderSpawnChance", new IntTag(0));
-		data.put("WanderingTraderSpawnDelay", new IntTag(15600));
+	public CompoundTag compile(boolean cheats) throws IOException {
+		AssetManager assetManager = level.getProject().assetManager();
 		
-		// Compile gamerules
-		CompoundTag gameruleMap = new CompoundTag();
-		JSONObject gamerules = values.getJSONObject("gamerules");
-		for (String key : gamerules.keySet()) {
-			gameruleMap.put(key, new StringTag(gamerules.getString(key)));	
+		NamedTag named = new NBTDeserializer(true).fromStream(assetManager.getAssetAsStream("defaults/default_level.dat"));
+		CompoundTag tag = (CompoundTag) named.getTag();
+		CompoundTag data = tag.getCompoundTag("Data");
+		NBTMerger.mergeCompound(data, data, true, ListMergeMode.REPLACE);
+		
+		// Identify player start
+		Entity start = null;
+		for (String name : level.getEntityStack()) {
+			Entity ent = level.getEntity(name);
+			if (ent instanceof PlayerStart) {
+				start = ent;
+			}
 		}
-		data.put("GameRules", gameruleMap);
 		
-		CompoundTag root = new CompoundTag();
-		root.put("Data", data);
+		if (start != null) {
+			Vector3i startPos = start.getBlockPosition();
+			data.putInt("SpawnX", startPos.x);
+			data.putInt("SpawnY", startPos.y);
+			data.putInt("SpawnZ", startPos.z);
+		}
 		
-		return root;
+		data.putBoolean("allowCommands", cheats);
+		data.putInt("version", Constants.DEFAULT_DATA_VERSION);
+		data.putString("LevelName", level.getPrettyName());
+		
+		return tag;
 	}
 	
-	public void setSpawn(Vector3i pos) {
-		values.put("SpawnX", pos.x);
-		values.put("SpawnY", pos.y);
-		values.put("SpawnZ", pos.z);
-	}
+
 	
 	/**
 	 * Compile level data to nbt file.
