@@ -2,7 +2,6 @@ package org.scaffoldeditor.scaffold.level;
 
 import java.io.File;
 import java.io.IOException;
-import org.scaffoldeditor.nbt.Constants;
 import org.scaffoldeditor.nbt.math.Vector3i;
 import org.scaffoldeditor.nbt.util.NBTMerger;
 import org.scaffoldeditor.nbt.util.NBTMerger.ListMergeMode;
@@ -98,7 +97,6 @@ public class LevelData {
 		}
 		
 		data.putBoolean("allowCommands", cheats);
-		data.putInt("version", Constants.DEFAULT_DATA_VERSION);
 		data.putString("LevelName", level.getPrettyName());
 		
 		return tag;
