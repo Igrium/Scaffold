@@ -2,6 +2,8 @@ package org.scaffoldeditor.scaffold.level;
 
 import java.io.File;
 import java.io.IOException;
+
+import org.apache.logging.log4j.LogManager;
 import org.scaffoldeditor.nbt.math.Vector3i;
 import org.scaffoldeditor.nbt.util.NBTMerger;
 import org.scaffoldeditor.nbt.util.NBTMerger.ListMergeMode;
@@ -21,7 +23,7 @@ import net.querz.nbt.tag.CompoundTag;
  *
  */
 public class LevelData {
-	private Level level;
+	private Level level;	
 	private CompoundTag data = new CompoundTag();
 	private CompoundTag gamerules = new CompoundTag();
 	
@@ -33,6 +35,12 @@ public class LevelData {
 		data.putBoolean("hardcore", false);
 		data.putLong("RandomSeed", (long) (Math.random() * Math.pow(10, 18)));
 		data.put("GameRules", gamerules);
+		
+		try {
+			NBTMerger.mergeCompound(data, loadTemplate().getCompoundTag("Data"), false, ListMergeMode.REPLACE);
+		} catch (IOException e) {
+			LogManager.getLogger().error("Error loading default level data.", e);
+		}
 	}
 	
 	/**
@@ -47,6 +55,19 @@ public class LevelData {
 			this.gamerules = new CompoundTag();
 			data.put("GameRules", gamerules);
 		}
+		
+		
+		try {
+			CompoundTag template = loadTemplate();
+			NBTMerger.mergeCompound(data, template.getCompoundTag("Data"), false, ListMergeMode.REPLACE);
+		} catch (IOException e) {
+			LogManager.getLogger().error("Error loading default level data.", e);
+		}
+	}
+	
+	private CompoundTag loadTemplate() throws IOException {
+		AssetManager assetManager = level.getProject().assetManager();
+		return (CompoundTag) new NBTDeserializer(true).fromStream(assetManager.getAssetAsStream("defaults/template_level.dat")).getTag();
 	}
 	
 	/**

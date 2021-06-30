@@ -91,6 +91,9 @@ public class LevelSerializer implements XMLSerializable {
 	private static void loadData(Level level, Element xml) {
 		try {
 			CompoundTag dataTag = (CompoundTag) SNBTUtil.fromSNBT(xml.getTextContent());
+			// Need to disable loading gamerules untill Querz NBT fixes it's boolean string issue.
+			// See: https://github.com/Querz/NBT/issues/63
+			dataTag.remove("GameRules");
 			NBTMerger.mergeCompound(level.levelData().getData(), dataTag, true, ListMergeMode.REPLACE);
 			
 		} catch (DOMException | IOException e) {

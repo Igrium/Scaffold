@@ -70,7 +70,7 @@ public class Level {
 	/* The order of entities in the map */
 	private List<String> entityStack = new ArrayList<>();
 	
-	private LevelData levelData = new LevelData(this);
+	private LevelData levelData;
 	
 	/* Game functions. ONLY EXIST DURING COMPILATION */
 	private Function initFunction;
@@ -116,6 +116,7 @@ public class Level {
 	public Level(Project project, String prettyName) {
 		this.project = project;
 		setPrettyName(prettyName);
+		levelData = new LevelData(this);
 	}
 	
 	/**
