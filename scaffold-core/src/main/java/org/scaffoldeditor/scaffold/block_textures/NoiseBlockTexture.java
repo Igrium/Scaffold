@@ -17,6 +17,7 @@ import org.scaffoldeditor.scaffold.math.OpenSimplex2S;
 public class NoiseBlockTexture extends SerializableBlockTexture {
 	
 	public static final String REGISTRY_NAME = "noise";
+	private static final double RANGE = Math.sqrt(3d/4d);
 	
 	public static void register() {
 		BlockTextureRegistry.registry.put(REGISTRY_NAME, new BlockTextureFactory<NoiseBlockTexture>() {
@@ -49,7 +50,7 @@ public class NoiseBlockTexture extends SerializableBlockTexture {
 			return new Block("minecraft:stone");
 		}
 		
-		int index = (int) Math.floor(Math.abs(value) * blocks.size());
+		int index = (int) Math.floor(remap(value, -RANGE, RANGE, 0, blocks.size()));
 		Attribute<?> target = blocks.get(index);
 		if (!(target instanceof BlockAttribute)) {
 			return new Block("minecraft:stone");
@@ -82,5 +83,9 @@ public class NoiseBlockTexture extends SerializableBlockTexture {
 		if (attribute.matches("seed")) {
 			noiseFunction = new OpenSimplex2S(((LongAttribute) getAttribute("seed")).getValue());
 		}
+	}
+	
+	private static double remap(double value, double low1, double high1, double low2, double high2) {
+		return low2 + (value - low1) * (high2 - low2) / (high1 - low1);
 	}
 }
