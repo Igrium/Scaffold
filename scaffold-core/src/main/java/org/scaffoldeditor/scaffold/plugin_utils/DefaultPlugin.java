@@ -50,7 +50,7 @@ public class DefaultPlugin implements PluginInitializer {
 		WorldStatic.Register();
 		WorldChunked.register();
 		WorldBrush.register();
-		SingleBlock.Register();
+		SingleBlock.register();
 		Auto.register();
 		FunctionEntity.register();
 		Relay.register();

@@ -8,18 +8,15 @@ import java.util.Map;
 import java.util.Set;
 
 import org.scaffoldeditor.nbt.block.Block;
-import org.scaffoldeditor.nbt.block.BlockCollection;
 import org.scaffoldeditor.nbt.block.BlockWorld;
-import org.scaffoldeditor.nbt.block.SizedBlockCollection;
 import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
-import org.scaffoldeditor.nbt.math.Vector3i;
 import org.scaffoldeditor.nbt.util.Identifier;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.EntityFactory;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BooleanAttribute;
-import org.scaffoldeditor.scaffold.level.entity.world.BaseBlockEntity;
+import org.scaffoldeditor.scaffold.level.entity.world.BaseSingleBlock;
 import org.scaffoldeditor.scaffold.level.io.OutputDeclaration;
 import org.scaffoldeditor.scaffold.logic.Datapack;
 import org.scaffoldeditor.scaffold.logic.datapack.Function;
@@ -31,7 +28,7 @@ import net.querz.nbt.tag.CompoundTag;
  * Places a command block that fires an output when it recieves a redstone signal.
  * @author Igrium
  */
-public class RedstoneListener extends BaseBlockEntity {
+public class RedstoneListener extends BaseSingleBlock {
 	
 	public static void register() {
 		EntityRegistry.registry.put("world_redstone_listener", new EntityFactory<RedstoneListener>() {
@@ -69,8 +66,7 @@ public class RedstoneListener extends BaseBlockEntity {
 
 	@Override
 	public boolean compileWorld(BlockWorld world, boolean full, Set<SectionCoordinate> sections) {
-		Vector3i pos = getBlockPosition();
-		world.setBlock(pos.x, pos.y, pos.z, getBlock(), this);
+		super.compileWorld(world, full, sections);
 		
 		commandCache = compileOutput("on_powered");
 		String command;
@@ -110,20 +106,10 @@ public class RedstoneListener extends BaseBlockEntity {
 		commandCache = null;
 		return super.compileLogic(datapack);
 	}
-
-	@Override
-	public Block blockAt(Vector3i coord) {
-		return getBlock();
-	}
 	
 	public Block getBlock() {
 		String name = isRepeating() ? "minecraft:repeating_command_block" : "minecraft:command_block";
 		return new Block(name);
-	}
-
-	@Override
-	public Vector3i[] getBounds() {
-		return new Vector3i[] { getBlockPosition(), getBlockPosition() };
 	}
 
 	@Override
@@ -148,10 +134,5 @@ public class RedstoneListener extends BaseBlockEntity {
 	
 	protected Identifier getTriggerFunction() {
 		return new Identifier(getLevel().getName().toLowerCase(), getName().toLowerCase()+"/trigger");
-	}
-
-	@Override
-	public BlockCollection getBlockCollection() {
-		return SizedBlockCollection.singleBlock(getBlock());
 	}
 }

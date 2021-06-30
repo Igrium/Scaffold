@@ -1,17 +1,9 @@
 package org.scaffoldeditor.scaffold.level.entity.world;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
-
 import org.scaffoldeditor.nbt.block.Block;
-import org.scaffoldeditor.nbt.block.BlockWorld;
-import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
-import org.scaffoldeditor.nbt.math.Vector3f;
-import org.scaffoldeditor.nbt.math.Vector3i;
 import org.scaffoldeditor.scaffold.level.Level;
-import org.scaffoldeditor.scaffold.level.entity.BlockEntity;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.EntityFactory;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
@@ -24,9 +16,9 @@ import net.querz.nbt.tag.CompoundTag;
  * Places a single block into the world.
  * @author Igrium
  */
-public class SingleBlock extends Entity implements BlockEntity {
+public class SingleBlock extends BaseSingleBlock {
 	
-	public static void Register() {
+	public static void register() {
 		EntityRegistry.registry.put("single_block", new EntityFactory<Entity>() {		
 			@Override
 			public Entity create(Level level, String name) {
@@ -47,10 +39,6 @@ public class SingleBlock extends Entity implements BlockEntity {
 		return map;
 	}
 	
-	/**
-	 * Get the block this entity represents.
-	 * @return
-	 */
 	public Block getBlock() {
 		return new Block(((StringAttribute) getAttribute("blockName")).getValue(),
 				((NBTAttribute) getAttribute("blockProperties")).getValue());
@@ -66,43 +54,11 @@ public class SingleBlock extends Entity implements BlockEntity {
 	}
 
 	@Override
-	public boolean compileWorld(BlockWorld world, boolean full, Set<SectionCoordinate> sections) {
-		Vector3i gridPos = getPosition().floor();
-		world.setBlock(gridPos.x, gridPos.y, gridPos.z, getBlock(), this);
-		
-		return false;
-	}
-
-	@Override
-	public Block blockAt(Vector3i coord) {
-		if (coord.equals(getBlockPosition())) {
-			return getBlock();
-		} else {
-			return null;
-		}
-	}
-
-	@Override
-	public Vector3i[] getBounds() {
-		return new Vector3i[] {getBlockPosition(), getBlockPosition().add(new Vector3i(1,1,1))};
-	}
-	
-	@Override
-	public Set<SectionCoordinate> getOverlappingSections() {
-		Set<SectionCoordinate> set = new HashSet<>();
-		set.add(new SectionCoordinate(getPosition().floor()));
-		return set;
-	}
-	
-	@Override
-	public void setPosition(Vector3f position) {	
-		getLevel().dirtySections.add(new SectionCoordinate(getPosition().floor()));
-		super.setPosition(position);
-		getLevel().dirtySections.add(new SectionCoordinate(position.floor()));
-	}
-	
-	@Override
-	public boolean isGridLocked() {
+	protected boolean needsRecompiling() {
 		return true;
+	}
+
+	@Override
+	public void onUpdateBlockAttributes() {
 	}
 }

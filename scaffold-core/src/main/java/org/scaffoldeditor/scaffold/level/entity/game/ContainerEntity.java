@@ -5,10 +5,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.scaffoldeditor.nbt.block.Block;
-import org.scaffoldeditor.nbt.block.BlockCollection;
 import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
-import org.scaffoldeditor.nbt.block.SizedBlockCollection;
 import org.scaffoldeditor.nbt.math.Vector3i;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.EntityFactory;
@@ -18,7 +16,7 @@ import org.scaffoldeditor.scaffold.level.entity.attribute.BlockAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.ContainerAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.NBTAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.StringAttribute;
-import org.scaffoldeditor.scaffold.level.entity.world.BaseBlockEntity;
+import org.scaffoldeditor.scaffold.level.entity.world.BaseSingleBlock;
 
 import net.querz.nbt.tag.CompoundTag;
 
@@ -27,7 +25,7 @@ import net.querz.nbt.tag.CompoundTag;
  * @author Igrium
  *
  */
-public class ContainerEntity extends BaseBlockEntity {
+public class ContainerEntity extends BaseSingleBlock {
 	
 	public static void register() {
 		EntityRegistry.registry.put("world_container", new EntityFactory<ContainerEntity>() {
@@ -60,12 +58,8 @@ public class ContainerEntity extends BaseBlockEntity {
 
 	@Override
 	public boolean compileWorld(BlockWorld world, boolean full, Set<SectionCoordinate> sections) {
-		Vector3i pos = getBlockPosition();
-		world.setBlock(pos.x, pos.y, pos.z, getBlock(), this);
-		
-		world.addBlockEntity(pos, compileBlockEntity());
-		
-		return true;
+		world.addBlockEntity(getBlockPosition(), compileBlockEntity());
+		return super.compileWorld(world, full, sections);
 	}
 	
 	public CompoundTag compileBlockEntity() {
@@ -98,16 +92,6 @@ public class ContainerEntity extends BaseBlockEntity {
 	}
 
 	@Override
-	public Block blockAt(Vector3i coord) {
-		return getBlock();
-	}
-
-	@Override
-	public Vector3i[] getBounds() {
-		return new Vector3i[] { getBlockPosition(), getBlockPosition() };
-	}
-
-	@Override
 	protected boolean needsRecompiling() {
 		return (!getBlock().equals(oldBlock) || !getBlockPosition().equals(oldPos));
 	}
@@ -121,10 +105,5 @@ public class ContainerEntity extends BaseBlockEntity {
 
 	@Override
 	public void onUpdateBlockAttributes() {
-	}
-	
-	@Override
-	public BlockCollection getBlockCollection() {
-		return SizedBlockCollection.singleBlock(getBlock());
 	}
 }
