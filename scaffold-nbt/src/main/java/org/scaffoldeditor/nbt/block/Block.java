@@ -85,5 +85,10 @@ public class Block {
 	public int hashCode() {
 		return Objects.hash(name, properties);
 	}
+	
+	@Override
+	protected Block clone() {
+		return new Block(name, properties.clone());
+	}
 
 }
