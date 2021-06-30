@@ -27,6 +27,13 @@ public class LevelData {
 	private CompoundTag data = new CompoundTag();
 	private CompoundTag gamerules = new CompoundTag();
 	
+	public enum GameType {
+		SURVIVAL,
+		CREATIVE,
+		ADVENTURE,
+		SPECTATOR
+	}
+	
 	public LevelData(Level level) {
 		this.level = level;
 		
@@ -105,15 +112,16 @@ public class LevelData {
 	/**
 	 * Compile this LevelData into a compound tag.
 	 * @param cheats Should the compiled world have cheats on?
+	 * @param gameType Initial gamemode for the player.
 	 * @return Compiled NBT
 	 */
-	public CompoundTag compile(boolean cheats) throws IOException {
+	public CompoundTag compile(boolean cheats, GameType gameType) throws IOException {
 		AssetManager assetManager = level.getProject().assetManager();
 		
 		NamedTag named = new NBTDeserializer(true).fromStream(assetManager.getAssetAsStream("defaults/default_level.dat"));
 		CompoundTag tag = (CompoundTag) named.getTag();
 		CompoundTag data = tag.getCompoundTag("Data");
-		NBTMerger.mergeCompound(data, data, true, ListMergeMode.REPLACE);
+		NBTMerger.mergeCompound(data, this.data, true, ListMergeMode.REPLACE);
 		
 		// Identify player start
 		Entity start = null;
@@ -133,6 +141,7 @@ public class LevelData {
 		
 		data.putBoolean("allowCommands", cheats);
 		data.putString("LevelName", level.getPrettyName());
+		data.putInt("GameType", gameType.ordinal());
 		
 		return tag;
 	}
@@ -143,10 +152,11 @@ public class LevelData {
 	 * Compile level data to nbt file.
 	 * @param file File to save to.
 	 * @param cheats Should cheats be enabled?
+	 * @param gameType Initial gamemode for the player.
 	 * @throws IOException if an I/O error occurs.
 	 */
-	public void compileFile(File file, boolean cheats) throws IOException {
-		CompoundTag compiled = compile(cheats);
+	public void compileFile(File file, boolean cheats, GameType gameType) throws IOException {
+		CompoundTag compiled = compile(cheats, gameType);
 		NBTUtil.write(new NamedTag("", compiled), file);
 	}
 	

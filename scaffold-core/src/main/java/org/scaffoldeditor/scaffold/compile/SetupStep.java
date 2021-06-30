@@ -8,6 +8,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.scaffoldeditor.scaffold.compile.Compiler.CompileProgressListener;
 import org.scaffoldeditor.scaffold.level.Level;
+import org.scaffoldeditor.scaffold.level.LevelData.GameType;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BooleanAttribute;
 
@@ -30,13 +31,19 @@ public class SetupStep implements CompileStep {
 		if (args.get("cheats") instanceof BooleanAttribute) {
 			cheats = ((BooleanAttribute) args.get("cheats")).getValue();
 		}
-
+		
+		GameType gameType = GameType.ADVENTURE;
+		Object gameTypeAtt = args.get("gameType").getValue();
+		if (gameTypeAtt instanceof GameType) {
+			gameType = (GameType) gameTypeAtt;
+		}
+		
 		// Make world folder
 		target.toFile().mkdir();
 
 		// Compile levelData
 		try {
-			level.levelData().compileFile(target.resolve("level.dat").toFile(), cheats);
+			level.levelData().compileFile(target.resolve("level.dat").toFile(), cheats, gameType);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return false;

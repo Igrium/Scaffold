@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.scaffoldeditor.scaffold.level.LevelData;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -61,6 +62,7 @@ public class EnumAttribute<T extends Enum<T>> extends Attribute<T> {
 
 		enumRegistry.put("placeholder", DefaultEnums.PlaceholderEnum.class);
 		enumRegistry.put("direction", DefaultEnums.Direction.class);
+		enumRegistry.put("game_type", LevelData.GameType.class);
 	}
 
 	private T value;
