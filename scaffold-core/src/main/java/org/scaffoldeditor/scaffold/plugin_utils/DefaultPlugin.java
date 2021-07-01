@@ -25,6 +25,7 @@ import org.scaffoldeditor.scaffold.level.entity.attribute.VectorAttribute;
 import org.scaffoldeditor.scaffold.level.entity.game.ContainerEntity;
 import org.scaffoldeditor.scaffold.level.entity.game.GameEntity;
 import org.scaffoldeditor.scaffold.level.entity.game.RedstoneListener;
+import org.scaffoldeditor.scaffold.level.entity.game.RedstoneTrigger;
 import org.scaffoldeditor.scaffold.level.entity.info.PlayerStart;
 import org.scaffoldeditor.scaffold.level.entity.logic.Auto;
 import org.scaffoldeditor.scaffold.level.entity.logic.CommandEntity;
@@ -59,6 +60,7 @@ public class DefaultPlugin implements PluginInitializer {
 		ModelTest.register();
 		CommandEntity.register();
 		RedstoneListener.register();
+		RedstoneTrigger.register();
 		WorldTogglable.register();
 		WorldDynamic.register();
 		ContainerAttribute.register();

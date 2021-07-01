@@ -31,7 +31,7 @@ import net.querz.nbt.tag.CompoundTag;
 public class RedstoneListener extends BaseSingleBlock {
 	
 	public static void register() {
-		EntityRegistry.registry.put("world_redstone_listener", new EntityFactory<RedstoneListener>() {
+		EntityRegistry.registry.put("redstone_listener", new EntityFactory<RedstoneListener>() {
 
 			@Override
 			public RedstoneListener create(Level level, String name) {
