@@ -14,6 +14,7 @@ import org.scaffoldeditor.scaffold.level.entity.attribute.BlockTextureAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BooleanAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.ContainerAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.DoubleAttribute;
+import org.scaffoldeditor.scaffold.level.entity.attribute.EntityAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.EnumAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.FloatAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.IntAttribute;
@@ -26,10 +27,12 @@ import org.scaffoldeditor.scaffold.level.entity.game.ContainerEntity;
 import org.scaffoldeditor.scaffold.level.entity.game.GameEntity;
 import org.scaffoldeditor.scaffold.level.entity.game.RedstoneListener;
 import org.scaffoldeditor.scaffold.level.entity.game.RedstoneTrigger;
+import org.scaffoldeditor.scaffold.level.entity.info.InfoTarget;
 import org.scaffoldeditor.scaffold.level.entity.info.PlayerStart;
 import org.scaffoldeditor.scaffold.level.entity.logic.Auto;
 import org.scaffoldeditor.scaffold.level.entity.logic.CommandEntity;
 import org.scaffoldeditor.scaffold.level.entity.logic.FunctionEntity;
+import org.scaffoldeditor.scaffold.level.entity.logic.LogicTeleport;
 import org.scaffoldeditor.scaffold.level.entity.logic.Relay;
 import org.scaffoldeditor.scaffold.level.entity.logic.TriggerIndividual;
 import org.scaffoldeditor.scaffold.level.entity.logic.TriggerMultiple;
@@ -68,6 +71,8 @@ public class DefaultPlugin implements PluginInitializer {
 		TriggerIndividual.register();
 		BlockModelTest.register();
 		PlayerStart.register();
+		InfoTarget.register();
+		LogicTeleport.register();
 		
 		StringAttribute.register();
 		NBTAttribute.register();
@@ -83,6 +88,7 @@ public class DefaultPlugin implements PluginInitializer {
 		AssetAttribute.register();
 		EnumAttribute.register();
 		ContainerEntity.register();
+		EntityAttribute.register();
 		
 		StructureAsset.register();
 		ConstructionAsset.register();

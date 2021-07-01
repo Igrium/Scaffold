@@ -10,6 +10,8 @@ import java.util.UUID;
  */
 public interface TargetSelector {
 	
+	public static final TargetSelector SELF = fromString("@s");
+	
 	/**
 	 * Get the target selector string.
 	 * 
