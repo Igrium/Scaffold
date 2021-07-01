@@ -30,6 +30,7 @@ import org.scaffoldeditor.scaffold.level.entity.logic.Auto;
 import org.scaffoldeditor.scaffold.level.entity.logic.CommandEntity;
 import org.scaffoldeditor.scaffold.level.entity.logic.FunctionEntity;
 import org.scaffoldeditor.scaffold.level.entity.logic.Relay;
+import org.scaffoldeditor.scaffold.level.entity.logic.TriggerIndividual;
 import org.scaffoldeditor.scaffold.level.entity.logic.TriggerMultiple;
 import org.scaffoldeditor.scaffold.level.entity.test.BlockModelTest;
 import org.scaffoldeditor.scaffold.level.entity.test.ModelTest;
@@ -62,6 +63,7 @@ public class DefaultPlugin implements PluginInitializer {
 		WorldDynamic.register();
 		ContainerAttribute.register();
 		TriggerMultiple.register();
+		TriggerIndividual.register();
 		BlockModelTest.register();
 		PlayerStart.register();
 		
