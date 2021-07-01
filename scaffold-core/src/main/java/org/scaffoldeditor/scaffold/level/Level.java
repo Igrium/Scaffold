@@ -106,6 +106,7 @@ public class Level {
 	 */
 	public Level(Project project) {
 		this.project = project;
+		levelData = new LevelData(this);
 	}
 
 	/**
