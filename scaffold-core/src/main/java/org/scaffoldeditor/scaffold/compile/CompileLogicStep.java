@@ -39,7 +39,7 @@ public class CompileLogicStep implements CompileStep {
 		initFunction.commands.add(level.summonScoreboardEntity());
 
 		// Compile entities
-		for (Entity ent : level.getEntities().values()) {
+		for (Entity ent : level.getLevelStack()) {
 			if (!ent.compileLogic(datapack) && listener != null) {
 				listener.onError("Failed to compile logic for entity: "+ent.getName());
 			};

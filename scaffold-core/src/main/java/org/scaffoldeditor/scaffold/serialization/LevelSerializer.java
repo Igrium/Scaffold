@@ -10,6 +10,7 @@ import org.scaffoldeditor.nbt.util.NBTMerger.ListMergeMode;
 import org.scaffoldeditor.scaffold.core.Constants;
 import org.scaffoldeditor.scaffold.core.Project;
 import org.scaffoldeditor.scaffold.level.Level;
+import org.scaffoldeditor.scaffold.level.stack.StackGroup;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -33,11 +34,7 @@ public class LevelSerializer implements XMLSerializable {
 		root.setAttribute("editor_version", Constants.VERSION);
 		root.setAttribute("pretty_name", level.getPrettyName());
 		
-		Element entities = document.createElement("entities");
-		for (String name : level.getEntityStack()) {
-			Element entity = new EntitySerializer(level.getEntity(name)).serialize(document);
-			entities.appendChild(entity);
-		}
+		Element entities = level.getLevelStack().serialize(document);
 		
 		Element levelData = document.createElement("level_data");
 		try {
@@ -65,9 +62,12 @@ public class LevelSerializer implements XMLSerializable {
 		for (int i = 0; i < children.getLength(); i++) {
 			Node child = children.item(i);
 			if (child.getNodeType() == Node.ELEMENT_NODE) {
+				
 				Element element = (Element) child;
-				if (element.getTagName().equals("entities")) {
+				
+				if (element.getTagName().equals("entities") || element.getTagName().equals("group")) {
 					loadEntities(level, element);
+					
 				} else if (element.getTagName().equals("level_data")) {
 					loadData(level, element);
 				}
@@ -77,15 +77,10 @@ public class LevelSerializer implements XMLSerializable {
 		return level;
 	}
 	
+	@SuppressWarnings("deprecation")
 	private static void loadEntities(Level level, Element xml) {
-		NodeList children = xml.getChildNodes();
-		for (int i = 0; i < children.getLength(); i++) {
-			Node child = children.item(i);
-			if (child.getNodeType() == Node.ELEMENT_NODE) {
-				EntitySerializer.deserialize((Element) child, level);
-			}
-		}
-		level.updateEntityStack();
+		level.setLevelStack(StackGroup.deserialize(xml, level));
+		level.updateLevelStack();
 	}
 	
 	private static void loadData(Level level, Element xml) {

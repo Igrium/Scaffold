@@ -93,7 +93,7 @@ public class ClipboardManager {
 					entities.add(EntitySerializer.deserialize(element, level));
 				}
 			}
-			level.updateEntityStack();
+			level.updateLevelStack();
 
 		} catch (SAXException | IOException e) {
 			throw new AssertionError(e);

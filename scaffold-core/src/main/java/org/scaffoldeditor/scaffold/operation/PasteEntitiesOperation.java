@@ -29,7 +29,7 @@ public class PasteEntitiesOperation implements Operation {
 	@Override
 	public void undo() {
 		for (Entity ent : pastedEntities) {
-			level.removeEntity(ent.getName(), true);
+			level.removeEntity(ent, true);
 		}
 		if (level.autoRecompile) {
 			level.quickRecompile();
@@ -39,7 +39,7 @@ public class PasteEntitiesOperation implements Operation {
 	@Override
 	public void redo() {
 		for (Entity ent : pastedEntities) {
-			level.addEntity(ent, level.getEntityStack().size(), true);
+			level.addEntity(ent, true);
 		}
 		if (level.autoRecompile) {
 			level.quickRecompile();

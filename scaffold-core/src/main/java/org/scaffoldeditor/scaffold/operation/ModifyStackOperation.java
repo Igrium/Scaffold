@@ -1,9 +1,7 @@
 package org.scaffoldeditor.scaffold.operation;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.scaffoldeditor.scaffold.level.Level;
+import org.scaffoldeditor.scaffold.level.stack.StackGroup;
 import org.scaffoldeditor.scaffold.util.LevelOperations;
 
 /**
@@ -12,26 +10,22 @@ import org.scaffoldeditor.scaffold.util.LevelOperations;
  */
 public class ModifyStackOperation implements Operation {
 	private Level level;
-	private List<String> newStack;
-	private List<String> newStackCloned = new ArrayList<>();
-	private List<String> oldStack = new ArrayList<>();
+	private StackGroup newStack;
+	private StackGroup oldStack;
 	
 	/**
-	 * Create a modify stack operator.
+	 * Create a modify stack operation.
 	 * @param level Level to target.
-	 * @param newStack Updated stack. Doesn't get commited untill execution.
-	 * Before that, changes made to the list will be reflected.
+	 * @param newStack Updated stack.
 	 */
-	public ModifyStackOperation(Level level, List<String> newStack) {
-		this.level = level;
-		this.newStack = newStack;
+	public ModifyStackOperation(Level level, StackGroup newStack) {
+		this.newStack = newStack.copy();
 	}
 	
 	@Override
 	public boolean execute() {
-		newStackCloned.addAll(newStack);
-		oldStack.addAll(level.getEntityStack());
-		LevelOperations.modifyEntityStack(level, newStack, false);
+		oldStack = level.getLevelStack().copy();
+		LevelOperations.modifyLevelStack(level, newStack, false);
 		
 		if (level.autoRecompile) {
 			level.quickRecompile();
@@ -41,7 +35,7 @@ public class ModifyStackOperation implements Operation {
 	}
 	@Override
 	public void undo() {
-		LevelOperations.modifyEntityStack(level, oldStack, false);
+		LevelOperations.modifyLevelStack(level, oldStack, false);
 		
 		if (level.autoRecompile) {
 			level.quickRecompile();
@@ -49,7 +43,7 @@ public class ModifyStackOperation implements Operation {
 	}
 	@Override
 	public void redo() {
-		LevelOperations.modifyEntityStack(level, newStack, false);
+		LevelOperations.modifyLevelStack(level, newStack, false);
 		
 		if (level.autoRecompile) {
 			level.quickRecompile();
@@ -57,7 +51,7 @@ public class ModifyStackOperation implements Operation {
 	}
 	@Override
 	public String getName() {
-		return "Update entity stack";
+		return "Update level stack";
 	}
 	
 }

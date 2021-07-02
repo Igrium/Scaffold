@@ -87,14 +87,17 @@ public class EntitySerializer implements XMLSerializable {
 	
 	/**
 	 * Load an entity from XML and add it to the level.
-	 * @param xml XML element to load from.
+	 * 
+	 * @param xml   XML element to load from.
 	 * @param level Level to load into.
 	 * @return Loaded entity.
+	 * @deprecated Automatically adds to the level, not respecting stack groups. Use
+	 *             {@link #loadEntity(Element, Level)} instead.
 	 */
 	public static Entity deserialize(Element xml, Level level) {
 		Entity entity = loadEntity(xml, level);
 		if (entity == null) return null;
-		level.addEntity(entity, level.getEntityStack().size(), true);
+		level.addEntity(entity, true);
 		
 		return entity;
 	}

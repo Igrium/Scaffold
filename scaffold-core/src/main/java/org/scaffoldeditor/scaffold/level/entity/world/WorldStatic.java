@@ -16,6 +16,8 @@ import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
 import org.scaffoldeditor.nbt.block.transform.TransformSizedBlockCollection;
 import org.scaffoldeditor.nbt.math.Matrix;
 import org.scaffoldeditor.nbt.math.Vector3i;
+import org.scaffoldeditor.scaffold.block_textures.SerializableBlockTexture;
+import org.scaffoldeditor.scaffold.block_textures.SingleBlockTexture;
 import org.scaffoldeditor.scaffold.io.AssetLoaderRegistry;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.BlockEntity;
@@ -26,6 +28,7 @@ import org.scaffoldeditor.scaffold.level.entity.Faceable;
 import org.scaffoldeditor.scaffold.level.entity.Macro;
 import org.scaffoldeditor.scaffold.level.entity.attribute.AssetAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
+import org.scaffoldeditor.scaffold.level.entity.attribute.BlockTextureAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BooleanAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.EnumAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.EnumAttribute.DefaultEnums.Direction;
@@ -63,6 +66,9 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 		map.put("model", new AssetAttribute("schematic", ""));
 		map.put("direction", new EnumAttribute<>(Direction.NORTH));
 		map.put("place_air", new BooleanAttribute(false));
+		map.put("texture_override", new BooleanAttribute(false));
+		map.put("texture", new BlockTextureAttribute(new SingleBlockTexture(new Block("minecraft:stone"))));
+		
 		return map;
 	}
 	
@@ -156,7 +162,16 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 		
 		Vector3i gridPos = getPosition().floor();
 		if (sections == null) { // TODO: Smarter algorithm to determine which compilation method we should use.
-			world.addBlockCollection(finalModel, gridPos.x , gridPos.y, gridPos.z, true, shouldPlaceAir(), this);
+			if (textureOverrideEnabled()) {
+				for (Vector3i local : finalModel) {
+					Vector3i global = local.add(getBlockPosition());
+					if (!finalModel.blockAt(local).getName().equals("minecraft:air")) {
+						world.setBlock(global.x, global.y, global.z, getTexture().blockAt(global.x, global.y, global.z), this);
+					}
+				}
+			} else {
+				world.addBlockCollection(finalModel, gridPos.x , gridPos.y, gridPos.z, true, shouldPlaceAir(), this);
+			}
 		} else {
 			for (SectionCoordinate coord : sections) {
 				compileSection(world, coord);
@@ -178,8 +193,14 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 			for (int y = coord.getStartY(); y < coord.getEndY(); y++) {
 				for (int z = coord.getStartZ(); z < coord.getEndZ(); z++) {
 					 Block block = finalModel.blockAt(x - gridPos.x, y - gridPos.y, z - gridPos.z);
-					 if (block != null && (placeAir || !block.getName().equals("minecraft:air"))) {
-						 world.setBlock(x, y, z, block, this);
+					 if (textureOverrideEnabled()) {
+						 if (block != null && !block.getName().equals("minecraft:air")) {
+							 world.setBlock(x, y, z, getTexture().blockAt(x, y, z));
+						 }
+					 } else {
+						 if (block != null && (placeAir || !block.getName().equals("minecraft:air"))) {
+							 world.setBlock(x, y, z, block, this);
+						 } 
 					 }
 				}
 			}
@@ -242,7 +263,20 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 	public SizedBlockCollection getFinalModel() {
 		return finalModel;
 	}
-
+	
+	/**
+	 * Get whether Texture Override is enabled.
+	 */
+	public boolean textureOverrideEnabled() {
+		return (Boolean) getAttribute("texture_override").getValue();
+	}
+	
+	/**
+	 * Get the block texture to use if Texture Override is enabled.
+	 */
+	public SerializableBlockTexture getTexture() {
+		return (SerializableBlockTexture) getAttribute("texture").getValue();
+	}
 
 	@Override
 	public BlockCollection getBlockCollection() {

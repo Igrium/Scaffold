@@ -10,6 +10,7 @@ import org.scaffoldeditor.nbt.math.Vector3i;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.BlockEntity;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
+import org.scaffoldeditor.scaffold.level.stack.StackGroup;
 import org.scaffoldeditor.scaffold.math.MathUtils;
 
 /**
@@ -20,35 +21,42 @@ public final class LevelOperations {
 	private LevelOperations() {};
 	
 	/**
-	 * Update a level's entity stack, marking the necessary chunks as dirty.
+	 * Update a level's level stack, marking the necessary chunks as dirty.
 	 * @param level Level to target.
-	 * @param newStack New version of the level stack. (clones this list; doesn't reference it)
+	 * @param stack New version of the level stack. (clones this list; doesn't reference it)
 	 * @param suppressUpdate Don't call entity stack listeners.
 	 */
-	public static void modifyEntityStack(Level level, List<String> newStack, boolean suppressUpdate) {
-		List<String> oldStack = level.getEntityStack();
-		Set<String> processed = new HashSet<>(); // The entities that have already been processed.
+	@SuppressWarnings("deprecation")
+	public static void modifyLevelStack(Level level, StackGroup stack, boolean suppressUpdate) {
+		List<Entity> oldStack = level.getLevelStack().collapse();
+		List<Entity> newStack = stack.collapse();
+		Set<Entity> processed = new HashSet<>(); // The entities that have already been processed.
+		
+		for (Entity ent : oldStack) {
+			if (!newStack.contains(ent)) {
+				throw new IllegalArgumentException("New stack is missing entity: "+ent);
+			}
+		}
 		
 		for (int newIndex = 0; newIndex < newStack.size(); newIndex++) {
-			String name = newStack.get(newIndex);
-			Entity entity = level.getEntity(name);
+			Entity entity = newStack.get(newIndex);
 			
 			if (entity instanceof BlockEntity) {
 				BlockEntity blockEntity = (BlockEntity) entity;
-				int oldIndex = oldStack.indexOf(name);
+				int oldIndex = oldStack.indexOf(entity);
 				// If it's not in the old stack, it means it was added.
 				if (oldIndex == -1) {
 					level.dirtySections.addAll(blockEntity.getOverlappingSections());
 					
 				} else {
+					// Compare against other entities.
 					for (int otherNewIndex = 0; otherNewIndex < newStack.size(); otherNewIndex++) {
-						String otherName = newStack.get(otherNewIndex);
-						Entity otherEntity = level.getEntity(otherName);
+						Entity otherEntity = newStack.get(otherNewIndex);
 						
 						// Only update if the other entity is a block entity and we haven't already processed it.
-						if (otherEntity instanceof BlockEntity && !processed.contains(otherName)) {
+						if (otherEntity instanceof BlockEntity && !processed.contains(otherEntity)) {
 							BlockEntity other = (BlockEntity) otherEntity;
-							int otherOldIndex = oldStack.indexOf(otherName);
+							int otherOldIndex = oldStack.indexOf(otherEntity);
 							
 							// Only update if they've actually changed places relative to each other.
 							if ((newIndex > otherNewIndex && oldIndex < otherOldIndex)
@@ -59,12 +67,11 @@ public final class LevelOperations {
 					}
 				}
 			}
-			processed.add(name);
+			processed.add(entity);
 		}
 		
-		oldStack.clear();
-		oldStack.addAll(newStack);
-		if (!suppressUpdate) level.updateEntityStack();
+		level.setLevelStack(stack);
+		if (!suppressUpdate) level.updateLevelStack();
 	}
 	
 	/**

@@ -33,7 +33,7 @@ public class AddEntityOperation implements Operation {
 
 	@Override
 	public void undo() {
-		level.removeEntity(entity.getName());
+		level.removeEntity(entity);
 	}
 
 	@Override

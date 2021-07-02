@@ -125,8 +125,7 @@ public class LevelData {
 		
 		// Identify player start
 		Entity start = null;
-		for (String name : level.getEntityStack()) {
-			Entity ent = level.getEntity(name);
+		for (Entity ent : level.getLevelStack()) {
 			if (ent instanceof PlayerStart) {
 				start = ent;
 			}

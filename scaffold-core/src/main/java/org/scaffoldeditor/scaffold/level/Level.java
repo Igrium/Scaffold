@@ -35,6 +35,8 @@ import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BooleanAttribute;
 import org.scaffoldeditor.scaffold.level.entity.game.TargetSelectable;
 import org.scaffoldeditor.scaffold.level.render.RenderEntity;
+import org.scaffoldeditor.scaffold.level.stack.StackGroup;
+import org.scaffoldeditor.scaffold.level.stack.StackItem;
 import org.scaffoldeditor.scaffold.logic.Datapack;
 import org.scaffoldeditor.scaffold.logic.datapack.Function;
 import org.scaffoldeditor.scaffold.logic.datapack.TargetSelector;
@@ -65,10 +67,7 @@ public class Level {
 	private Project project;
 	
 	/* All the entities in the map */
-	private Map<String, Entity> entities = new HashMap<String, Entity>();
-	
-	/* The order of entities in the map */
-	private List<String> entityStack = new ArrayList<>();
+	private StackGroup levelStack = new StackGroup("entities");
 	
 	private LevelData levelData;
 	
@@ -130,23 +129,58 @@ public class Level {
 	
 	/**
 	 * Returns a Map with all this level's entities
+	 * 
 	 * @return Map Entities
+	 * @deprecated With the addition of the level stack, and the change to the
+	 *             structure in which entities are stored, this method is redundant.
+	 *             It simply constructs an unmodifiable map from the data in the
+	 *             level stack.
 	 */
 	public Map<String, Entity> getEntities() {
-		return entities;
-	}
-	
-	public List<String> getEntityStack() {
-		return entityStack;
+		Map<String, Entity> entities = new HashMap<>();
+		for (Entity ent : levelStack) {
+			entities.put(ent.getName(), ent);
+		}
+		
+		return Map.copyOf(entities);
 	}
 	
 	/**
+	 * Get all the entities in the level, orginized into groups.
+	 * @return Level stack.
+	 */
+	public StackGroup getLevelStack() {
+		return levelStack;
+	}
+	
+	/**
+	 * Replace the level stack.
+	 * @param newStack New stack
+	 * @deprecated For internal use only. Can VERY EASILY cause instability.
+	 */
+	public void setLevelStack(StackGroup newStack) {
+		this.levelStack = newStack;
+	}
+	
+	/**
+	 * Get a list of all the entities in the map in compilation order.
+	 * @return Unmodifiable list of entities.
+	 */
+	public List<Entity> collapseStack() {
+		return levelStack.collapse();
+	}
+
+	/**
 	 * Get an entity by name.
+	 * 
 	 * @param name Entity name.
-	 * @return Entity
+	 * @return The entity, or <code>null</code> if no entity exists by this name.
 	 */
 	public Entity getEntity(String name) {
-		return entities.get(name);
+		for (Entity ent : levelStack) {
+			if (ent.getName().equals(name)) return ent;
+		}
+		return null;
 	}
 	
 	/**
@@ -256,7 +290,7 @@ public class Level {
 			return name;
 		}
 		
-		while (entities.containsKey(name)){
+		while (getEntity(name) != null){
 			// Attempt to increment number
 			if (Character.isDigit(name.charAt(name.length() - 1))) {
 				int lastNum = Character.getNumericValue(name.charAt(name.length() - 1)) + 1;
@@ -294,7 +328,7 @@ public class Level {
 	 * @param entity Entity to add.
 	 */
 	public void addEntity(Entity entity) {
-		addEntity(entity, entityStack.size(), false);
+		addEntity(entity, false);
 	}
 	
 	/**
@@ -305,46 +339,72 @@ public class Level {
 	 * @param entity Entity to add.
 	 * @param stackIndex Index to add it to in the entity stack.
 	 * @param noRecompile Don't recompile the level afterward.
+	 * @deprecated Entities can no-longer be simply inserted into the stack.
 	 */
 	public void addEntity(Entity entity, int stackIndex, boolean noRecompile) {
+		addEntity(entity, noRecompile);
+	}
+	
+	/**
+	 * Add an existing entity object to the level.
+	 * <br>
+	 * <b>Warning: </b> Only call if you know what you're doing! Can lead to illegal states!
+	 * <code>newEntity</code> should be used most of the time.
+	 * @param entity Entity to add.
+	 * @param noRecompile Don't recompile the level afterward.
+	 */
+	public void addEntity(Entity entity, boolean noRecompile) {
+		addEntity(entity, levelStack, levelStack.items.size(), noRecompile);
+	}
+	
+	/**
+	 * Add an existing entity object to the level. <br>
+	 * <b>Warning: </b> Only call if you know what you're doing! Can lead to illegal
+	 * states! <code>newEntity</code> should be used most of the time.
+	 * 
+	 * @param entity      Entity to add.
+	 * @param group       Stack group to add to.
+	 * @param index       Index within group to add at.
+	 * @param noRecompile Don't recompile the level afterward.
+	 */
+	public void addEntity(Entity entity, StackGroup group, int index, boolean noRecompile) {
+		if (!levelStack.containsGroup(group)) {
+			throw new IllegalArgumentException("Entity can only be added to a group within the level!");
+		}
 		entity.setName(validateName(entity.getName(), new String[] {}));
 		
-		entities.put(entity.getName(), entity);
-		entityStack.add(stackIndex, entity.getName());
-		updateEntityStack();
+		group.items.add(index, new StackItem(entity));
+		updateLevelStack();
 		entity.onAdded();
 		
 		if (entity instanceof BlockEntity) {
 			dirtySections.addAll(((BlockEntity) entity).getOverlappingSections());
-		}
-		
-		if (!noRecompile && autoRecompile) {
-			quickRecompile();
+			if (!noRecompile && autoRecompile) {
+				quickRecompile();
+			}
 		}
 	}
 	
 	/**
 	 * Remove an entity from the level.
-	 * @param name Entity to remove.
+	 * @param entity Entity to remove.
 	 */
-	public void removeEntity(String name) {
-		removeEntity(name, false);
+	public void removeEntity(Entity entity) {
+		removeEntity(entity, false);
 	}
 	
 	/**
 	 * Remove an entity from the level.
-	 * @param name Entity to remove.
+	 * @param entity Entity to remove.
 	 * @param noRecompile Don't recompile the level after removal.
 	 */
-	public void removeEntity(String name, boolean noRecompile) {
-		Entity entity = entities.get(name);
+	public void removeEntity(Entity entity, boolean noRecompile) {
 		if (entity instanceof BlockEntity) {
 			dirtySections.addAll(((BlockEntity) entity).getOverlappingSections());
 		}
 		
-		entities.remove(name);
-		entityStack.remove(name);
-		updateEntityStack();
+		levelStack.remove(entity);
+		updateLevelStack();
 		entity.onRemoved();
 		
 		if (!noRecompile && autoRecompile) {
@@ -359,21 +419,11 @@ public class Level {
 	 * @return Success
 	 */
 	public boolean renameEntity(String oldName, String newName) {
-		// Make sure entity exists and name is available
-		if (entities.get(oldName) == null) {
-			return false;
-		}
+		Entity ent = getEntity(oldName);
+		if (ent == null) return false;
 		
-		newName = validateName(newName, new String[] {oldName});
-		
-		Entity ent = entities.get(oldName);
-		entities.put(newName, ent);
-		entities.remove(oldName);
-		
-		int stackIndex = entityStack.indexOf(oldName);
-		entityStack.set(stackIndex, newName);
+		newName = validateName(newName, new String[] { oldName });
 		ent.setName(newName);
-		updateEntityStack();
 		return true;
 	}
 	
@@ -463,8 +513,7 @@ public class Level {
 		blockWorld.clear(); // Clear the blockworld of previous compiles.
 		LogManager.getLogger().info("Compiling world...");
 		
-		for (String name : entityStack) {
-			Entity entity = getEntity(name);
+		for (Entity entity: levelStack) {
 			if (entity instanceof BlockEntity) {
 				BlockEntity blockEntity = (BlockEntity) entity;
 				try {
@@ -495,8 +544,7 @@ public class Level {
 			c.entities.clear();
 		}
 		
-		for (String name : entityStack) {
-			Entity entity = getEntity(name);
+		for (Entity entity : levelStack) {
 			if (entity instanceof EntityAdder) {
 				EntityAdder adder = (EntityAdder) entity;
 				try {
@@ -526,8 +574,7 @@ public class Level {
 		
 		List<BlockEntity> updatingEntities = new ArrayList<>();
 		
-		for (String entName : entityStack) {
-			Entity entity = getEntity(entName);
+		for (Entity entity : levelStack) {
 			if (entity instanceof BlockEntity) {
 				BlockEntity blockEntity = (BlockEntity) entity;
 				Vector3i[] bounds = blockEntity.getBounds();
@@ -613,7 +660,7 @@ public class Level {
 	/**
 	 * Trigger all entity stack listeners.
 	 */
-	public void updateEntityStack() {
+	public void updateLevelStack() {
 		for (Runnable listener : updateStackListeners) {
 			listener.run();
 		}
