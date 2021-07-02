@@ -112,6 +112,17 @@ public class StackGroup extends AbstractCollection<Entity> implements XMLSeriali
 		return null;
 	}
 	
+	public StackGroup getOwningGroup(StackItem item) {
+		for (StackItem it : items) {
+			if (it.equals(item)) return this;
+			if (it.getType() == ItemType.GROUP) {
+				StackGroup owner = it.getGroup().getOwningGroup(item);
+				if (owner != null) return owner;
+			}
+		}
+		return null;
+	}
+	
 	/**
 	 * Check if the passed group is or is a child of this group.
 	 * @param group Group to check.
@@ -245,6 +256,11 @@ public class StackGroup extends AbstractCollection<Entity> implements XMLSeriali
 		}
 		
 		return new StackGroup(items, name);
+	}
+	
+	@Override
+	public String toString() {
+		return items.toString();
 	}
 
 	@Override

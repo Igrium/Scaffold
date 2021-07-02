@@ -20,6 +20,7 @@ public class ModifyStackOperation implements Operation {
 	 */
 	public ModifyStackOperation(Level level, StackGroup newStack) {
 		this.newStack = newStack.copy();
+		this.level = level;
 	}
 	
 	@Override

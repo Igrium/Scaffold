@@ -77,7 +77,7 @@ public class StackItem implements XMLSerializable {
 	
 	@Override
 	public boolean equals(Object obj) {
-		return get().equals(obj);
+		return (obj instanceof StackItem && hashCode() == obj.hashCode());
 	}
 
 	@Override
@@ -98,5 +98,10 @@ public class StackItem implements XMLSerializable {
 		} else {
 			return entity.getName();
 		}
+	}
+	
+	@Override
+	public String toString() {
+		return "StackItem: "+get().toString();
 	}
 }

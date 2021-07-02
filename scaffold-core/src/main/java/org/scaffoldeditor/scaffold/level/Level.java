@@ -41,6 +41,7 @@ import org.scaffoldeditor.scaffold.logic.Datapack;
 import org.scaffoldeditor.scaffold.logic.datapack.Function;
 import org.scaffoldeditor.scaffold.logic.datapack.TargetSelector;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.Command;
+import org.scaffoldeditor.scaffold.operation.AddGroupOperation;
 import org.scaffoldeditor.scaffold.operation.OperationManager;
 import org.scaffoldeditor.scaffold.serialization.LevelReader;
 import org.scaffoldeditor.scaffold.serialization.LevelWriter;
@@ -386,6 +387,69 @@ public class Level {
 	}
 	
 	/**
+	 * Add an existing stack group to the level. <b>Warning: </b> Only call if you
+	 * know what you're doing! Can lead to illegal states! An
+	 * {@link AddGroupOperation} should be used most of the time.
+	 * 
+	 * @param group       Group to add.
+	 * @param parent      Group to add to.
+	 * @param index       Index within group to add at.
+	 * @param noRecompile Don't recompile the level afterward.
+	 */
+	public void addGroup(StackGroup group, StackGroup parent, int index, boolean noRecompile) {
+		if (!levelStack.containsGroup(parent)) {
+			throw new IllegalArgumentException("Parent group is not within the level!");
+		}
+		boolean recompile = false;
+		parent.items.add(index, new StackItem(group));
+		for (Entity entity : group) {
+			entity.setName(validateName(entity.getName(), new String[] {}));
+			if (entity instanceof BlockEntity) {
+				dirtySections.addAll(((BlockEntity) entity).getOverlappingSections());
+				recompile = true;
+			}
+			entity.onAdded();
+		}
+		
+		if (!noRecompile && autoRecompile && recompile) {
+			quickRecompile();
+		}
+	}
+	
+	/**
+	 * Remove a stack group from the level.
+	 * 
+	 * @param group       Group to remove.
+	 * @param noRecompile Don't recompile the level afterward.
+	 * @return If the group was found in the level.
+	 */
+	public boolean removeGroup(StackGroup group, boolean noRecompile) {
+		if (group.equals(getLevelStack())) {
+			throw new IllegalArgumentException("Level stack root cannot be removed!");
+		}
+
+		StackGroup parent = levelStack.getOwningGroup(new StackItem(group));
+		if (parent == null) return false;
+		
+		boolean recompile = false;
+		parent.items.remove(new StackItem(group));
+
+		for (Entity entity : group) {
+			if (entity instanceof BlockEntity) {
+				dirtySections.addAll(((BlockEntity) entity).getOverlappingSections());
+				recompile = true;
+			}
+			entity.onRemoved();
+		}
+		
+		if (!noRecompile && autoRecompile && recompile) {
+			quickRecompile();
+		}
+		
+		return true;
+	}
+	
+	/**
 	 * Remove an entity from the level.
 	 * @param entity Entity to remove.
 	 */
@@ -622,7 +686,9 @@ public class Level {
 	}
 	
 	/**
-	 * Compile all the chunks marked as dirty.
+	 * Compile all the chunks marked as dirty. <br>
+	 * Note: {@link #autoRecompile} should be checked before calling unless you
+	 * explicitly want to bypass it.
 	 */
 	public void quickRecompile() {
 		if (dirtySections.isEmpty()) return;
