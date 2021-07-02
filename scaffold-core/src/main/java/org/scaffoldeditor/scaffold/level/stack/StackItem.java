@@ -88,4 +88,15 @@ public class StackItem implements XMLSerializable {
 			return new EntitySerializer(getEntity()).serialize(document);
 		}
 	}
+	
+	/**
+	 * Get the name if the enclosed item.
+	 */
+	public String getName() {
+		if (type == ItemType.GROUP) {
+			return group.getName();
+		} else {
+			return entity.getName();
+		}
+	}
 }

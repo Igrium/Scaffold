@@ -2,9 +2,9 @@ package org.scaffoldeditor.scaffold.level.stack;
 
 import java.util.AbstractCollection;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.stack.StackItem.ItemType;
@@ -212,13 +212,12 @@ public class StackGroup extends AbstractCollection<Entity> implements XMLSeriali
 	
 	@Override
 	public boolean equals(Object obj) {
-		if (!(obj instanceof StackGroup)) return false;
-		return ((StackGroup) obj).items.equals(this.items);
+		return this.hashCode() == obj.hashCode();
 	}
 	
 	@Override
 	public int hashCode() {
-		return items.hashCode()+1;
+		return Arrays.hashCode(items.toArray());
 	}
 	
 	public int indexOf(Entity entity) {
@@ -262,4 +261,5 @@ public class StackGroup extends AbstractCollection<Entity> implements XMLSeriali
 		
 		return element;
 	}
+
 }
