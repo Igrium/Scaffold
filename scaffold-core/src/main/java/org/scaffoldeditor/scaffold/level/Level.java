@@ -186,6 +186,28 @@ public class Level {
 	}
 	
 	/**
+	 * Get a list of all entities in the level in compile order.
+	 */
+	public List<Entity> listEntities() {
+		List<Entity> list = new ArrayList<>();
+		for (Entity ent : levelStack) {
+			list.add(ent);
+		}
+		return list;
+	}
+	
+	/**
+	 * Get a list of all entity names in the level in compile order.
+	 */
+	public List<String> listEntityNames() {
+		List<String> list = new ArrayList<>();
+		for (Entity ent : levelStack) {
+			list.add(ent.getName());
+		}
+		return list;
+	}
+	
+	/**
 	 * Get this level's LevelData.
 	 * @return LevelData
 	 */
@@ -488,6 +510,7 @@ public class Level {
 		
 		if (noRefactor) return true;
 		refactorEntityName(oldName, newName, false);
+		updateLevelStack();
 		
 		return true;
 	}
