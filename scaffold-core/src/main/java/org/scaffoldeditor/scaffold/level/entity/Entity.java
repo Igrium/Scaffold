@@ -17,6 +17,7 @@ import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.WorldUpdates.UpdateRenderEntitiesEvent;
 import org.scaffoldeditor.scaffold.level.entity.Macro.Confirmation;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
+import org.scaffoldeditor.scaffold.level.entity.attribute.EntityAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.VectorAttribute;
 import org.scaffoldeditor.scaffold.level.entity.game.RedstoneListener;
 import org.scaffoldeditor.scaffold.level.io.InputDeclaration;
@@ -57,6 +58,12 @@ public abstract class Entity {
 	 * The type name this entity gets saved with when serialized.
 	 */
 	public String registryName;
+	
+	/**
+	 * When not empty, entity names within this entity (attributes and outputs) are
+	 * remapped at compile time. Names not in this map will be treated as-is.
+	 */
+	public Map<String, String> entityNameOverride = new HashMap<>();
 	
 	/* Name of the entity */
 	private String name;
@@ -162,6 +169,48 @@ public abstract class Entity {
 	}
 	
 	/**
+	 * Determine an entity's compile-time name according to the {@link #entityNameOverride}.
+	 * @param name Name to evaluate.
+	 * @return Compile-time name. Might be the same as the original name.
+	 */
+	public String evaluateName(String name) {
+		if (entityNameOverride.containsKey(name)) {
+			name = entityNameOverride.get(name);
+		}
+		return name;
+	}
+	
+	/**
+	 * Replace all references to an entity name within this entity (attributes and outputs).
+	 * @param original Original name.
+	 * @param updated New name.
+	 * @param supressUpdate Don't call {@link #onUpdateAttributes(boolean)} afterward.
+	 * @return How many instances of the name were found.
+	 */
+	public int refactorName(String original, String updated, boolean supressUpdate) {
+		int found = 0;
+		for (String name : attributes.keySet()) {
+			Attribute<?> att = getAttribute(name);
+			if (att instanceof EntityAttribute && ((EntityAttribute) att).getValue().equals(original)) {
+				setAttribute(name, new EntityAttribute(updated), true);
+				found++;
+			}
+		}
+		for (Output output : getOutputs()) {
+			if (output.getTarget().equals(original)) {
+				output.setTarget(updated);
+				found++;
+			}
+		}
+		
+		if (found > 0 && !supressUpdate) {
+			onUpdateAttributes(true);
+		}
+		
+		return found;
+	}
+	
+	/**
 	 * Get this entity's name.
 	 * @return Name
 	 */
@@ -170,8 +219,17 @@ public abstract class Entity {
 	}
 	
 	/**
-	 * Set this entity's name. (DON'T CALL MANUALLY!)
+	 * Get this entity's compile-time name according to the {@link #entityNameOverride}.
+	 * @return
+	 */
+	public String getFinalName() {
+		return evaluateName(getName());
+	}
+	
+	/**
+	 * Set this entity's name.
 	 * @param name New name
+	 * @deprecated For internal use only. Use {@link Level#renameEntity(Entity, String, boolean)} instead.
 	 */
 	public void setName(String name) {
 		this.name = name;
@@ -307,7 +365,8 @@ public abstract class Entity {
 
 	/**
 	 * Called when entity is deserialized for subclasses to act on. <br>
-	 * <b>Note:</b> This may be called before the entity is added to the level.
+	 * <b>Note:</b> This is called before the entity is added to the level or any
+	 * name conflict resolving.
 	 * 
 	 * @param xml XML element that it was deserialized from.
 	 */
@@ -327,8 +386,14 @@ public abstract class Entity {
 	}
 	
 	/**
+	 * <p>
 	 * Called when the entity has finished initialization and is added (or re-added)
 	 * to the level. This is when you should update your render entities.
+	 * </p>
+	 * <p>
+	 * Note: if name refactoring has taken place during deserialization, this is
+	 * called after this entity's name has changed but before it's refactored.
+	 * </p>
 	 */
 	public void onAdded() {
 		updateRenderEntities();

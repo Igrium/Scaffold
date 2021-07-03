@@ -1,5 +1,6 @@
 package org.scaffoldeditor.scaffold.util;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -96,6 +97,32 @@ public final class LevelOperations {
 				level.dirtySections.add(c);
 			}
 		}
-		
+	}
+
+	/**
+	 * Make sure an entity name is valid (there are no duplicates), and return a
+	 * new, valid name if it isn't.
+	 * 
+	 * @param name          Name to test.
+	 * @param existingNames Names of all the entities in the level that we need to
+	 *                      check against.
+	 * @param ignore        If the name is in this list, return it as-is.
+	 * @return Valid name.
+	 */
+	public static String validateName(String name, Set<String> existingNames, String... ignore) {
+		if (Arrays.asList(ignore).contains(name)) {
+			return name;
+		}
+
+		while (existingNames.contains(name)) {
+			// Attempt to increment number
+			if (Character.isDigit(name.charAt(name.length() - 1))) {
+				int lastNum = Character.getNumericValue(name.charAt(name.length() - 1)) + 1;
+				name = name.substring(0, name.length() - 1) + lastNum;
+			} else {
+				name = name + '1';
+			}
+		}
+		return name;
 	}
 }

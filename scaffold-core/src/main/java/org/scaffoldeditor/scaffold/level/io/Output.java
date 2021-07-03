@@ -105,6 +105,7 @@ public class Output implements XMLSerializable {
 	 * @return The list of commands that should be called when this output is triggered.
 	 */
 	public List<Command> compile() {
+		String target = owner.evaluateName(this.target);
 		Entity entity = owner.getLevel().getEntity(target);
 		if (entity == null) {
 			LogManager.getLogger().error(owner.getName()+" tried to compile an output with a target entity that does not exist: "+target);

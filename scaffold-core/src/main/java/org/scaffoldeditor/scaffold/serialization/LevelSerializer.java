@@ -10,6 +10,7 @@ import org.scaffoldeditor.nbt.util.NBTMerger.ListMergeMode;
 import org.scaffoldeditor.scaffold.core.Constants;
 import org.scaffoldeditor.scaffold.core.Project;
 import org.scaffoldeditor.scaffold.level.Level;
+import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.stack.StackGroup;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
@@ -79,7 +80,13 @@ public class LevelSerializer implements XMLSerializable {
 	
 	@SuppressWarnings("deprecation")
 	private static void loadEntities(Level level, Element xml) {
-		level.setLevelStack(StackGroup.deserialize(xml, level));
+		LoadContext context = new LoadContext();
+		level.setLevelStack(StackGroup.deserialize(xml, level, context));
+		
+		for (Entity ent : level.getLevelStack()) {
+			ent.onAdded();
+		}
+		
 		level.updateLevelStack();
 	}
 	

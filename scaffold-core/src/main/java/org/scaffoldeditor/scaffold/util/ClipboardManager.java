@@ -4,10 +4,13 @@ import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -22,13 +25,12 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.scaffoldeditor.scaffold.level.Level;
-import org.scaffoldeditor.scaffold.level.entity.BlockEntity;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
-import org.scaffoldeditor.scaffold.serialization.EntitySerializer;
+import org.scaffoldeditor.scaffold.level.stack.StackGroup;
+import org.scaffoldeditor.scaffold.level.stack.StackItem;
+import org.scaffoldeditor.scaffold.serialization.LoadContext;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -64,81 +66,141 @@ public class ClipboardManager {
 		}
 	}
 	
-	public String serializeEntities(Set<Entity> entities) throws TransformerException {	
-
+	/**
+	 * Serialize a stack group into XML.
+	 * @param group Group to serialize.
+	 * @param raw Whether to include the group itself when pasting.
+	 * @return XML string.
+	 * @throws TransformerException If an unrecoverable error occursduring the course of the transformation.
+	 */
+	public String serializeGroup(StackGroup group, boolean raw) throws TransformerException {
 		Document doc = dBuilder.newDocument();
-		Element root = doc.createElement("entities");
-		for (Entity entity : entities) {
-			Element element = new EntitySerializer(entity).serialize(doc);
-			root.appendChild(element);
-		}
+		Element root = group.serialize(doc);
+		root.setAttribute("raw", Boolean.toString(raw));
 		doc.appendChild(root);
-
+		
 		StringWriter writer = new StringWriter();
 		transformer.transform(new DOMSource(doc), new StreamResult(writer));
 		return writer.getBuffer().toString();
-
 	}
 	
-	public Set<Entity> deserializeEntities(String in, Level level) {
-		Set<Entity> entities = new HashSet<>();
+	/**
+	 * Serialize a list of stack items into XML.
+	 * @param items Items to serialize.
+	 * @return XML string.
+	 * @throws TransformerException If an unrecoverable error occursduring the course of the transformation.
+	 */
+	public String serializeItems(List<StackItem> items) throws TransformerException {
+		StackGroup group = new StackGroup(items, "clipboard");
+		return serializeGroup(group, true);
+	}
+	
+	/**
+	 * Copy a stack group to the clipboard.
+	 * @param group Group to copy.
+	 */
+	public void copyGroup(StackGroup group) {
 		try {
-			Document doc = dBuilder.parse(new InputSource(new StringReader(in)));
-			Element entitiesElement = doc.getDocumentElement();
-			NodeList children = entitiesElement.getChildNodes();
-			for (int i = 0; i < children.getLength(); i++) {
-				Node child = children.item(i);
-				if (child.getNodeType() == Node.ELEMENT_NODE) {
-					Element element = (Element) child;
-					entities.add(EntitySerializer.deserialize(element, level));
-				}
-			}
-			level.updateLevelStack();
-
-		} catch (SAXException | IOException e) {
+			String serialized = serializeGroup(group, false);
+			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+			clipboard.setContents(new StringSelection(serialized), null);
+		} catch (TransformerException e) {
 			throw new AssertionError(e);
 		}
-
-		for (Entity ent : entities) {
-			if (ent instanceof BlockEntity) {
-				level.dirtySections.addAll(((BlockEntity) ent).getOverlappingSections());
-			}
-		}
-		if (level.autoRecompile) {
-			level.quickRecompile();
-		}
-		return entities;
 	}
 	
 	/**
-	 * Copy a set of entities to the clipboard.
-	 * @param entities Entities to copy.
+	 * Copy a list of stack items to the clipboard.
+	 * @param items Items to copy.
 	 */
-	public void copyEntities(Set<Entity> entities) {
+	public void copyItems(List<StackItem> items) {
 		try {
-			StringSelection data = new StringSelection(serializeEntities(entities));
-			clipboard.setContents(data, data);
-		} catch (Exception e) {
-			throw new AssertionError("Unable to copy entities!", e);
+			String serialized = serializeItems(items);
+			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+			clipboard.setContents(new StringSelection(serialized), null);
+		} catch (TransformerException e) {
+			throw new AssertionError(e);
 		}
-		
 	}
 	
 	/**
-	 * Paste the entities from the clipboard.
-	 * @param level Level to paste into.
-	 * @return The pasted entities.
+	 * Deserialize string-based clipboard content.
+	 * @param in XML string.
+	 * @param level Level to assign to entities. Doesn't actually add to the level.
+	 * @return Deserialized stack items.
 	 */
-	public Set<Entity> pasteEntities(Level level) {
-		if (clipboard.isDataFlavorAvailable(DataFlavor.stringFlavor)) {
-			try {
-				String data = (String) clipboard.getData(DataFlavor.stringFlavor);
-				return deserializeEntities(data, level);
-			} catch (Exception e) {
-				throw new AssertionError("Unable to paste entities!", e);
+	@SuppressWarnings("deprecation")
+	public List<StackItem> deserialize(String in, Level level) {
+		try {
+			Document doc = dBuilder.parse(new InputSource(new StringReader(in)));
+			Element root = doc.getDocumentElement();
+			LoadContext context = new LoadContext();
+			StackGroup group = StackGroup.deserialize(root, level, context);
+			
+			// Fix naming conflicts.
+			Set<String> takenNames = new HashSet<>();
+			for (Entity entity : level.getLevelStack()) {
+				takenNames.add(entity.getName());
 			}
-		} else {
-			return new HashSet<>();
+			
+			for (Entity entity : group) {
+				String oldName = entity.getName();
+				String newName = LevelOperations.validateName(oldName, takenNames);
+				takenNames.add(newName);
+				
+				if (!oldName.equals(newName)) {
+					entity.setName(newName);
+					for (Entity ent : group) {
+						// We don't want to recompile because they haven't been added to the world yet.
+						ent.refactorName(oldName, newName, true);
+						ent.onUpdateAttributes(true);
+					}
+				}
+				
+				entity.onAdded();
+			}
+			
+			boolean raw = "true".equals(root.getAttribute("raw"));	
+			if (raw) {
+				return group.items;
+			} else {
+				return List.of(new StackItem(group));
+			}
+
+		} catch (SAXException | IOException e) {
+			throw new RuntimeException("Unable to deserialize clipboard content!", e);
 		}
-	}	
+	}
+
+	
+	/**
+	 * Paste the current clipboard content into the level.
+	 * @param level Level to paste into.
+	 * @param parent Group to paste under.
+	 * @return The pasted items.
+	 */
+	public List<StackItem> paste(Level level, StackGroup parent) throws IOException {
+		if (clipboard.isDataFlavorAvailable(DataFlavor.stringFlavor)) {
+			String data;
+			try {
+				data = (String) clipboard.getData(DataFlavor.stringFlavor);
+			} catch (UnsupportedFlavorException | IOException e) {
+				throw new RuntimeException("Unable to paste clipboard content!", e);
+			}
+			List<StackItem> parsed;
+			try {
+				parsed = deserialize(data, level);
+			} catch (Throwable e) {
+				throw new IOException("Unable to paste clipboard content!", e);
+			}
+			parent.items.addAll(parsed);
+			level.updateLevelStack();
+			if (level.autoRecompile) {
+				level.quickRecompile();
+			}
+			return parsed;
+		} else {
+			return Collections.emptyList();
+		}
+	}
 }

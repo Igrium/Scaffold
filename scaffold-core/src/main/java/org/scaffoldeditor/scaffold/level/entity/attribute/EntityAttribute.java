@@ -50,5 +50,13 @@ public class EntityAttribute extends Attribute<String> {
 	public EntityAttribute clone() {
 		return this;
 	}
-
+	
+	/**
+	 * Evaluate this entity name according to an {@link Entity#entityNameOverride}
+	 * @param owner Entity scope to evaluate in.
+	 * @return Evaluated name.
+	 */
+	public String evaluate(Entity owner) {
+		return owner.evaluateName(getValue());
+	}
 }

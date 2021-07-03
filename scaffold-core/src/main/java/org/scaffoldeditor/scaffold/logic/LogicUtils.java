@@ -25,7 +25,7 @@ public final class LogicUtils {
 	 */
 	public static CompoundTag getCompanionEntity(Entity entity) {
 		CompoundTag data = new CompoundTag();
-		data.putString("scaffoldID", entity.getName());
+		data.putString("scaffoldID", entity.getFinalName());
 		
 		CompoundTag ent = new CompoundTag();
 		ent.put("data", data);
@@ -42,7 +42,7 @@ public final class LogicUtils {
 	 * @return Companion entity.
 	 */
 	public static TargetSelector getCompanionSelector(Entity entity) {
-		return TargetSelector.fromString("@e[type=minecraft:marker,limit=1,nbt={data:{scaffoldID:"+entity.getName()+"}}]");
+		return TargetSelector.fromString("@e[type=minecraft:marker,limit=1,nbt={data:{scaffoldID:"+entity.getFinalName()+"}}]");
 	}
 	
 	/**
@@ -55,7 +55,7 @@ public final class LogicUtils {
 	 */
 	public static Identifier getEntityStorage(Entity entity) {
 		String namespace = entity.getLevel().getName().toLowerCase();
-		String value = entity.getName().toLowerCase();
+		String value = entity.getFinalName().toLowerCase();
 		return new Identifier(namespace, value);
 	}
 	
@@ -69,7 +69,7 @@ public final class LogicUtils {
 	 */
 	public static Identifier getEntityFunction(Entity entity, String name) {
 		String namespace = entity.getLevel().getName().toLowerCase();
-		String value = entity.getName().toLowerCase()+"/"+name;
+		String value = entity.getFinalName().toLowerCase()+"/"+name;
 		return new Identifier(namespace, value);
 	}
 	

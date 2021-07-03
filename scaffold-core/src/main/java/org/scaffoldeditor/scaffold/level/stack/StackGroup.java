@@ -9,6 +9,7 @@ import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.stack.StackItem.ItemType;
 import org.scaffoldeditor.scaffold.serialization.EntitySerializer;
+import org.scaffoldeditor.scaffold.serialization.LoadContext;
 import org.scaffoldeditor.scaffold.serialization.XMLSerializable;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -22,12 +23,15 @@ import org.w3c.dom.NodeList;
 public class StackGroup extends AbstractCollection<Entity> implements XMLSerializable {
 	
 	/**
-	 * Deserialize a stack group from XML.
-	 * @param xml Input XML.
-	 * @param level Level to add entities to.
+	 * Deserialize a stack group from XML. Doesn't actually add to the level stack.
+	 * Automatically calles {@link Entity#onUnserialized(Element)}.
+	 * 
+	 * @param xml     Input XML.
+	 * @param level   Level to give to entity constructors.
+	 * @param context The load context.
 	 * @return Deserialized stack group.
 	 */
-	public static StackGroup deserialize(Element xml, Level level) {
+	public static StackGroup deserialize(Element xml, Level level, LoadContext context) {
 		List<StackItem> items = new ArrayList<>();
 		NodeList children = xml.getChildNodes();
 		for (int i = 0; i < children.getLength(); i++) {
@@ -36,11 +40,11 @@ public class StackGroup extends AbstractCollection<Entity> implements XMLSeriali
 				Element element = (Element) child;
 				
 				if (element.getTagName().equals("group")) {
-					items.add(new StackItem(StackGroup.deserialize(element, level)));
+					items.add(new StackItem(StackGroup.deserialize(element, level, context)));
 					
 				} else {
 					Entity ent = EntitySerializer.loadEntity(element, level);
-					ent.onAdded();
+					ent.onUnserialized(element);
 					items.add(new StackItem(ent));
 				}
 			}
@@ -50,7 +54,8 @@ public class StackGroup extends AbstractCollection<Entity> implements XMLSeriali
 	}
 	
 	/**
-	 * The items in the group, mutable.
+	 * The items in the group, mutable. If part of the level stack,
+	 * {@link Level#updateLevelStack()} should be called after modifying.
 	 */
 	public final List<StackItem> items;
 	

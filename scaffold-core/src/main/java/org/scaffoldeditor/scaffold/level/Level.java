@@ -7,7 +7,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -46,6 +45,7 @@ import org.scaffoldeditor.scaffold.operation.AddGroupOperation;
 import org.scaffoldeditor.scaffold.operation.OperationManager;
 import org.scaffoldeditor.scaffold.serialization.LevelReader;
 import org.scaffoldeditor.scaffold.serialization.LevelWriter;
+import org.scaffoldeditor.scaffold.util.LevelOperations;
 import org.scaffoldeditor.scaffold.util.event.EventDispatcher;
 import org.scaffoldeditor.scaffold.util.event.EventListener;
 
@@ -287,21 +287,13 @@ public class Level {
 	 * @param ignore If the name is in this list, return it as-is.
 	 * @return Valid name.
 	 */
-	public String validateName(String name, String[] ignore) {
-		if (Arrays.asList(ignore).contains(name)) {
-			return name;
+	public String validateName(String name, String... ignore) {
+		Set<String> existing = new HashSet<>();
+		for (Entity ent : getLevelStack()) {
+			existing.add(ent.getName());
 		}
 		
-		while (getEntity(name) != null){
-			// Attempt to increment number
-			if (Character.isDigit(name.charAt(name.length() - 1))) {
-				int lastNum = Character.getNumericValue(name.charAt(name.length() - 1)) + 1;
-				name = name.substring(0, name.length() - 1) + lastNum;
-			} else {
-				name = name + '1';
-			}
-		}
-		return name;
+		return LevelOperations.validateName(name, existing, ignore);
 	}
 	
 	/**
@@ -369,6 +361,7 @@ public class Level {
 	 * @param index       Index within group to add at.
 	 * @param noRecompile Don't recompile the level afterward.
 	 */
+	@SuppressWarnings("deprecation")
 	public void addEntity(Entity entity, StackGroup group, int index, boolean noRecompile) {
 		if (!levelStack.containsGroup(group)) {
 			throw new IllegalArgumentException("Entity can only be added to a group within the level!");
@@ -397,6 +390,7 @@ public class Level {
 	 * @param index       Index within group to add at.
 	 * @param noRecompile Don't recompile the level afterward.
 	 */
+	@SuppressWarnings("deprecation")
 	public void addGroup(StackGroup group, StackGroup parent, int index, boolean noRecompile) {
 		if (!levelStack.containsGroup(parent)) {
 			throw new IllegalArgumentException("Parent group is not within the level!");
@@ -479,17 +473,46 @@ public class Level {
 	
 	/**
 	 * Rename an entity in the level.
-	 * @param oldName Entity to rename.
+	 * @param target Entity to rename.
 	 * @param newName New name.
+	 * @param noRefactor Don't refactor references in other entities.
 	 * @return Success
 	 */
-	public boolean renameEntity(String oldName, String newName) {
-		Entity ent = getEntity(oldName);
-		if (ent == null) return false;
+	@SuppressWarnings("deprecation")
+	public boolean renameEntity(Entity target, String newName, boolean noRefactor) {
+		String oldName = target.getName();
+		if (oldName.equals(newName)) return false;
 		
-		newName = validateName(newName, new String[] { oldName });
-		ent.setName(newName);
+		newName = validateName(newName, oldName);
+		target.setName(newName);
+		
+		if (noRefactor) return true;
+		refactorEntityName(oldName, newName, false);
+		
 		return true;
+	}
+	
+	/**
+	 * Refactor an entity name. Does not rename the entity itself. For that, use
+	 * {@link #renameEntity(Entity, String, boolean)}.
+	 * 
+	 * @param oldName       Old entity name.
+	 * @param newName       New entity name.
+	 * @param supressUpdate Don't call {@link Entity#onUpdateAttributes(boolean)} on
+	 *                      entities with their attributes updated.
+	 * @return The number of entities that were updated.
+	 */
+	public int refactorEntityName(String oldName, String newName, boolean supressUpdate) {
+		Set<Entity> updated = new HashSet<>();
+		for (Entity entity : levelStack) {
+			if (entity.refactorName(oldName, newName, true) > 0) {
+				updated.add(entity);
+				if (!supressUpdate) entity.onUpdateAttributes(true);
+			}
+		}
+		
+		if (autoRecompile && updated.size() > 0) quickRecompile();
+		return updated.size();
 	}
 	
 	private TargetSelectable scoreboardEntity;
