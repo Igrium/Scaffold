@@ -95,8 +95,8 @@ public interface BlockEntity {
 	default Set<SectionCoordinate> getOverlappingSections() {
 		Vector3i[] bounds = getBounds();
 		Set<SectionCoordinate> overlapping = new HashSet<>();
-		Vector3i min = bounds[0].divide(16);
-		Vector3i max = bounds[1].divide(16);
+		Vector3i min = bounds[0].toFloat().divide(16).floor();
+		Vector3i max = bounds[1].toFloat().divide(16).floor();
 		for (int x = min.x; x <= max.x; x++) {
 			for (int y = min.y; y <= max.y; y++) {
 				for (int z = min.z; z <= max.z; z++) {
