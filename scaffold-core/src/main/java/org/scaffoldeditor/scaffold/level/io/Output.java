@@ -3,6 +3,7 @@ package org.scaffoldeditor.scaffold.level.io;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.AttributeRegistry;
@@ -106,10 +107,16 @@ public class Output implements XMLSerializable {
 	public List<Command> compile() {
 		Entity entity = owner.getLevel().getEntity(target);
 		if (entity == null) {
-			throw new IllegalStateException("Tried to compile an output with a target entity that does not exist: "+target);
+			LogManager.getLogger().error(owner.getName()+" tried to compile an output with a target entity that does not exist: "+target);
+			return new ArrayList<>();
 		}
 		
-		return entity.compileInput(inputName, args, getOwner());
+		try {
+			return entity.compileInput(inputName, args, getOwner());
+		} catch (Throwable e) {
+			LogManager.getLogger().error("Error compiling output on entity: "+owner, e);
+			return new ArrayList<>();
+		}
 	}
 	
 	@Override

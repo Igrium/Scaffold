@@ -583,7 +583,7 @@ public class Level {
 				try {
 					blockEntity.compileWorld(blockWorld, full);
 				} catch (Throwable e) {
-					LOGGER.error("Unable to compile block entity: "+name, e);
+					LOGGER.error("Unable to compile world entity: "+name, e);
 				}
 			}
 			if (entity instanceof EntityAdder) {
@@ -664,7 +664,7 @@ public class Level {
 			try {
 				entity.compileWorld(tempWorld, false, sections);
 			} catch (Throwable e) {
-				e.printStackTrace();
+				LOGGER.error("Unable to compile world entity: "+entity, e);
 			}
 		}
 		
