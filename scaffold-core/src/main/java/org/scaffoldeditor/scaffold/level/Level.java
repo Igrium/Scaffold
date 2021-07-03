@@ -33,6 +33,7 @@ import org.scaffoldeditor.scaffold.level.entity.EntityAdder;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BooleanAttribute;
+import org.scaffoldeditor.scaffold.level.entity.attribute.VectorAttribute;
 import org.scaffoldeditor.scaffold.level.entity.game.TargetSelectable;
 import org.scaffoldeditor.scaffold.level.render.RenderEntity;
 import org.scaffoldeditor.scaffold.level.stack.StackGroup;
@@ -315,7 +316,7 @@ public class Level {
 		name = validateName(name, new String[] {});
 		
 		Entity entity = EntityRegistry.createEntity(typeName, this, name);
-		entity.setPosition(position);
+		entity.setAttribute("position", new VectorAttribute(position), true);
 		addEntity(entity);
 		
 		return entity;
