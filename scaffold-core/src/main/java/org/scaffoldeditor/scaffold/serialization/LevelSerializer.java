@@ -34,6 +34,7 @@ public class LevelSerializer implements XMLSerializable {
 		Element root = document.createElement("level");
 		root.setAttribute("editor_version", Constants.VERSION);
 		root.setAttribute("pretty_name", level.getPrettyName());
+		root.setAttribute("enable_resourcepack", Boolean.toString(level.getEnableResourcepack()));
 		
 		Element entities = level.getLevelStack().serialize(document);
 		
@@ -58,6 +59,7 @@ public class LevelSerializer implements XMLSerializable {
 	public static Level deserialize(Element xml, Project project) {
 		String prettyName = xml.getAttribute("pretty_name");
 		Level level = new Level(project, prettyName);
+		level.setEnableResourcepack("true".equals(xml.getAttribute("enable_resourcepack")));
 		
 		NodeList children = xml.getChildNodes();
 		for (int i = 0; i < children.getLength(); i++) {

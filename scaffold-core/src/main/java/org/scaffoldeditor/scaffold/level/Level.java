@@ -83,6 +83,8 @@ public class Level {
 	/* The name that shows up in the Minecraft world menu */
 	private String prettyName = "Level";
 	
+	private boolean enableResourcepack = false;
+	
 	/* The BlockWorld that this level uses */
 	private BlockWorld blockWorld = new BlockWorld();
 	private OperationManager operationManager = new OperationManager(this);
@@ -249,6 +251,20 @@ public class Level {
 		return prettyName;
 	}
 	
+	/**
+	 * Get whether this level should compile with a resourcepack.
+	 */
+	public boolean getEnableResourcepack() {
+		return enableResourcepack;
+	}
+
+	/**
+	 * Set whether this level should compile with a resourcepack.
+	 */
+	public void setEnableResourcepack(boolean enableResourcepack) {
+		this.enableResourcepack = enableResourcepack;
+	}
+
 	/**
 	 * Get the level's operation manager.
 	 * @return Operation manager.
