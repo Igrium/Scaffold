@@ -1,5 +1,7 @@
 package org.scaffoldeditor.scaffold.serialization;
 
+import java.util.Map;
+
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
@@ -31,11 +33,15 @@ public class EntitySerializer implements XMLSerializable {
 	public Element serialize(Document document) {
 		Element root = document.createElement(entity.registryName);
 		root.setAttribute("name", entity.getName());
-
+		
+		Map<String, Attribute<?>> defaults = entity.getDefaultAttributes();
 		Element attributes = document.createElement("attributes");
 		for (String name : entity.getAttributes()) {
+			Attribute<?> att = entity.getAttribute(name);
+			if (att.equals(defaults.get(name))) continue;
+			
 			try {
-				Element attribute = entity.getAttribute(name).serialize(document);
+				Element attribute = att.serialize(document);
 				attribute.setAttribute("name", name);
 				attributes.appendChild(attribute);	
 			} catch (DOMException e) {

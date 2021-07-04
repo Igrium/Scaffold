@@ -2,6 +2,7 @@ package org.scaffoldeditor.scaffold.block_textures;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.scaffoldeditor.nbt.block.Block;
@@ -21,6 +22,10 @@ public abstract class SerializableBlockTexture implements BlockTexture, XMLSeria
 	protected final Map<String, Attribute<?>> attributes = new HashMap<>();
 	
 	public static SerializableBlockTexture DEFAULT = new SingleBlockTexture(new Block("minecraft:stone"));
+	
+	public SerializableBlockTexture() {
+	}
+	
 	
 	/**
 	 * Get the name this block texture should use in its registry.
@@ -84,4 +89,16 @@ public abstract class SerializableBlockTexture implements BlockTexture, XMLSeria
 	 * @param attribute The attribute that was updated.
 	 */
 	protected void onUpdateAttribute(String attribute) {}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(getRegistryName(), attributes);
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof SerializableBlockTexture)) return false;
+		SerializableBlockTexture other = (SerializableBlockTexture) obj;
+		return (getRegistryName().equals(other.getRegistryName()) && this.attributes.equals(other.attributes));
+	}
 }
