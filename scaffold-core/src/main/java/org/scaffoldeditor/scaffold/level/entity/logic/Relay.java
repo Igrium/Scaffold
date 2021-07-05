@@ -23,6 +23,8 @@ import org.scaffoldeditor.scaffold.logic.datapack.TargetSelector;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.Command;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.ExecuteCommandBuilder;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.FunctionCommand;
+import org.scaffoldeditor.scaffold.logic.datapack.commands.ScheduleCommand;
+import org.scaffoldeditor.scaffold.logic.datapack.commands.ScheduleCommand.Mode;
 
 /**
  * This class relays io from it's inputs to it's outputs
@@ -85,11 +87,20 @@ public class Relay extends LogicEntity {
 			}
 		});
 	}
+	
+	public int getDelay() {
+		return ((IntAttribute) getAttribute("delay")).getValue();
+	}
 
 	@Override
 	public List<Command> compileInput(String inputName, List<Attribute<?>> args, Entity source) {
 		if (inputName.matches("trigger")) {
-			FunctionCommand function = new FunctionCommand(getTriggerFunction());
+			Command function;
+			if (getDelay() == 0) {
+				function = new FunctionCommand(getTriggerFunction());
+			} else {
+				function = new ScheduleCommand(getTriggerFunction(), getDelay(), Mode.APPEND);
+			}
 			TargetSelector executor = getExecutorOverride();
 			Command command;
 			if (executor != null) {
