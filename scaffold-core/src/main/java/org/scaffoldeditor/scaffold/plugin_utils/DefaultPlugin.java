@@ -33,6 +33,7 @@ import org.scaffoldeditor.scaffold.level.entity.logic.Auto;
 import org.scaffoldeditor.scaffold.level.entity.logic.CommandEntity;
 import org.scaffoldeditor.scaffold.level.entity.logic.FunctionEntity;
 import org.scaffoldeditor.scaffold.level.entity.logic.LogicTeleport;
+import org.scaffoldeditor.scaffold.level.entity.logic.LogicTimer;
 import org.scaffoldeditor.scaffold.level.entity.logic.Relay;
 import org.scaffoldeditor.scaffold.level.entity.logic.TriggerIndividual;
 import org.scaffoldeditor.scaffold.level.entity.logic.TriggerMultiple;
@@ -73,6 +74,7 @@ public class DefaultPlugin implements PluginInitializer {
 		PlayerStart.register();
 		InfoTarget.register();
 		LogicTeleport.register();
+		LogicTimer.register();
 		
 		StringAttribute.register();
 		NBTAttribute.register();

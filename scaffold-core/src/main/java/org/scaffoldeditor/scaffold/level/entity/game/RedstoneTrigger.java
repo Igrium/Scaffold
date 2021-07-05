@@ -1,22 +1,28 @@
 package org.scaffoldeditor.scaffold.level.entity.game;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.scaffoldeditor.nbt.block.Block;
+import org.scaffoldeditor.nbt.util.Identifier;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BooleanAttribute;
+import org.scaffoldeditor.scaffold.level.entity.attribute.IntAttribute;
 import org.scaffoldeditor.scaffold.level.entity.world.BaseSingleBlock;
 import org.scaffoldeditor.scaffold.level.io.InputDeclaration;
+import org.scaffoldeditor.scaffold.logic.Datapack;
+import org.scaffoldeditor.scaffold.logic.LogicUtils;
+import org.scaffoldeditor.scaffold.logic.datapack.Function;
 import org.scaffoldeditor.scaffold.logic.datapack.arguements.BlockArguement;
 import org.scaffoldeditor.scaffold.logic.datapack.arguements.CommandVector3i;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.Command;
+import org.scaffoldeditor.scaffold.logic.datapack.commands.ScheduleCommand;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.SetBlockCommand;
 
 /**
@@ -39,6 +45,7 @@ public class RedstoneTrigger extends BaseSingleBlock {
 	public Map<String, Attribute<?>> getDefaultAttributes() {
 		Map<String, Attribute<?>> map = new HashMap<>();
 		map.put("start_enabled", new BooleanAttribute(false));
+		map.put("pulse_length", new IntAttribute(20));
 		return map;
 	}
 	
@@ -64,14 +71,14 @@ public class RedstoneTrigger extends BaseSingleBlock {
 			public String getName() {
 				return "pulse";
 			}
-			
-			@Override
-			public List<String> getArguements() {
-				return Arrays.asList(new String[] { "int_attribute" });
-			}
+
 		});
 		
 		return in;
+	}
+	
+	public int getPulseLength() {
+		return ((IntAttribute) getAttribute("pulse_length")).getValue();
 	}
 	
 	@Override
@@ -81,6 +88,12 @@ public class RedstoneTrigger extends BaseSingleBlock {
 		}
 		if (inputName.equals("disable")) {
 			return List.of(disableCommand());
+		}
+		if (inputName.equals("pulse")) {
+			List<Command> list = new ArrayList<>();
+			list.add(enableCommand());
+			list.add(new ScheduleCommand(disableFunction(), getPulseLength()));
+			return list;
 		}
 		
 		return super.compileInput(inputName, args, source);
@@ -98,6 +111,19 @@ public class RedstoneTrigger extends BaseSingleBlock {
 	public Command disableCommand() {
 		return new SetBlockCommand(new CommandVector3i(getBlockPosition()), new BlockArguement(DISABLED_BLOCK),
 				SetBlockCommand.Mode.REPLACE);
+	}
+	
+	private Identifier disableFunction() {
+		return LogicUtils.getEntityFunction(this, "disable");
+	}
+	
+	@Override
+	public boolean compileLogic(Datapack datapack) {
+		Function disable = new Function(disableFunction());
+		disable.commands.add(disableCommand());
+		datapack.functions.add(disable);
+		
+		return super.compileLogic(datapack);
 	}
 
 	@Override
