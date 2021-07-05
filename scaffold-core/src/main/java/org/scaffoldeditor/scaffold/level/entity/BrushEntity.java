@@ -20,4 +20,12 @@ public interface BrushEntity {
 	 * @return A two-element array denoting the opposite corners of the brush's bounding box.
 	 */
 	Vector3f[] getBrushBounds();
+	
+	/**
+	 * Determine whether this entity is grid-locked. Being grid-locked means it's a
+	 * block entity or some other entity that must be aligned to the block grid.
+	 * 
+	 * @return Is this entity grid locked?
+	 */
+	boolean isGridLocked();
 }
