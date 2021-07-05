@@ -156,7 +156,8 @@ public class TriggerMultiple extends ToolBrushEntity {
 		Vector3f pos = getPosition();
 		Vector3f dPos = getEndPoint();
 		
-		return TargetSelector.fromString(prefix+"[x="+pos.x+",y="+pos.y+",z="+pos.z+",dx="+dPos.x+",dy="+dPos.y+",dz="+dPos.z+"]");
+		return TargetSelector.fromString(prefix + "[x=" + pos.x + ",y=" + pos.y + ",z=" + pos.z + ",dx=" + (dPos.x - 1)
+				+ ",dy=" + (dPos.y - 1) + ",dz=" + (dPos.z - 1) + "]");
 	}
 	
 	/**
@@ -188,6 +189,11 @@ public class TriggerMultiple extends ToolBrushEntity {
 	@Override
 	public String getTexture() {
 		return "scaffold:textures/editor/trigger.png";
+	}
+	
+	@Override
+	public boolean isGridLocked() {
+		return true;
 	}
 
 }
