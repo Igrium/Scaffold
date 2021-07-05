@@ -73,7 +73,7 @@ public class Auto extends LogicEntity {
 	@Override
 	public boolean compileLogic(Datapack datapack) {
 		Function initFunction = new Function(getLevel().getName().toLowerCase(), getName()+"/init");
-		initFunction.commands.addAll(compileOutput("on_datapack_loaded"));
+		initFunction.commands.addAll(compileOutput("on_datapack_load"));
 		datapack.functions.add(initFunction);
 		datapack.loadFunctions.add(initFunction.getID());
 		
