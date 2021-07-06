@@ -14,7 +14,7 @@ plugins {
 }
 
 mainClassName = 'org.scaffoldeditor.nbt.test.NBTTester'
-version = '0.4.0'
+version = '0.5.0-SNAPSHOT'
 group = 'org.scaffoldeditor'
 
 sourceCompatibility = JavaVersion.VERSION_1_8
