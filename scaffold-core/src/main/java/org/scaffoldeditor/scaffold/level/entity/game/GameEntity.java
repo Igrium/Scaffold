@@ -3,6 +3,7 @@ package org.scaffoldeditor.scaffold.level.entity.game;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.nbt.math.Vector3f;
@@ -20,7 +21,8 @@ import org.scaffoldeditor.scaffold.level.entity.attribute.StringAttribute;
 import org.scaffoldeditor.scaffold.level.render.MCRenderEntity;
 import org.scaffoldeditor.scaffold.level.render.RenderEntity;
 import org.scaffoldeditor.scaffold.logic.Datapack;
-import org.scaffoldeditor.scaffold.logic.datapack.TargetSelector;
+import org.scaffoldeditor.scaffold.util.UUIDUtils;
+
 import net.querz.nbt.io.SNBTUtil;
 import net.querz.nbt.tag.CompoundTag;
 import net.querz.nbt.tag.FloatTag;
@@ -31,7 +33,7 @@ import net.querz.nbt.tag.ListTag;
  * @author Igrium
  *
  */
-public class GameEntity extends Rotatable implements TargetSelectable, EntityProvider {
+public class GameEntity extends Rotatable implements KnownUUID, EntityProvider {
 	
 	public static void register() {
 		EntityRegistry.registry.put("game_entity", new EntityFactory<Entity>() {		
@@ -51,7 +53,6 @@ public class GameEntity extends Rotatable implements TargetSelectable, EntityPro
 			Map<String, Attribute<?>> map = super.getDefaultAttributes();
 			map.put("entityType", new StringAttribute("minecraft:marker"));
 			map.put("nbt", new NBTAttribute(new CompoundTag()));
-			map.put("template", new BooleanAttribute(false));
 			return map;
 		}
 	
@@ -88,26 +89,6 @@ public class GameEntity extends Rotatable implements TargetSelectable, EntityPro
 	}
 	
 	/**
-	 * Get whether this is a template entity. If this is a template entity, it will
-	 * not compile into the world. Instead, it will wait to be spawned via an input.
-	 * 
-	 * @return Is template?
-	 */
-	public boolean isTemplate() {
-		return (boolean) this.attributes().get("template").getValue();
-	}
-	
-	/**
-	 * Set whether this is a template entity. If this is a template entity, it will
-	 * not compile into the world. Instead, it will wait to be spawned via an input.
-	 * 
-	 * @param isTemplate Is template?
-	 */
-	public void setTemplate(boolean isTemplate) {
-		setAttribute("template", new BooleanAttribute(isTemplate));
-	}
-	
-	/**
 	 * Get the nbt data of the entity in the format {data}.
 	 * @return Nbt data.
 	 */
@@ -122,60 +103,35 @@ public class GameEntity extends Rotatable implements TargetSelectable, EntityPro
 	
 	@Override
 	public boolean compileGameEntities(BlockWorld world) {
-		if (!isTemplate()) {
-			CompoundTag nbt = getNBT().clone();
-			nbt.putString("id", getEntityType());
-			world.addEntity(nbt, this.getPosition().toDouble());
-		}
-		return true;
-	}
-	
-	/**
-	 * Get the command used for spawning the entity
-	 * @return
-	 */
-	public String getSpawnCommand() {
-		Vector3f position = getPosition();
+		CompoundTag nbt = getNBT().clone();
+		nbt.putString("id", getEntityType());
 		
 		// Set rotation
 		ListTag<FloatTag> rotArray = new ListTag<>(FloatTag.class);
 		rotArray.add(new FloatTag(rotX()));
 		rotArray.add(new FloatTag(rotY()));
 		
-		getNBT().put("Rotation", rotArray);
-		getNBT().putString("CustomName","\""+getName()+"\"");
+		nbt.put("Rotation", rotArray);
+		nbt.putIntArray("UUID", UUIDUtils.toIntArray(getUUID()));
 		
-		String nbt = "{}";
-		try {
-			nbt = SNBTUtil.toSNBT(getNBT());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		String command = "summon "+getEntityType()+" "+position.x+" "+position.y+" "+position.z+" "+nbt;
-		
-		getNBT().remove("Rotation");
-		getNBT().remove("CustomName");
-
-		return command;
+		world.addEntity(nbt, this.getPosition().toDouble());
+		return true;
 	}
-	
-	
 	
 	@Override
 	public boolean compileLogic(Datapack datapack) {
 		super.compileLogic(datapack);
 		return true;
 	}
-
-	@Override
-	public TargetSelector getTargetSelector() {
-		return TargetSelector.fromString("@e[type="+getEntityType()+",name="+getName()+"]");
-	}
 	
 	@Override
 	public String getDefaultName() {
 		return "entity";
+	}
+
+	@Override
+	public UUID getUUID() {
+		return getLevel().getCompanionUUID(this);
 	}
 
 }
