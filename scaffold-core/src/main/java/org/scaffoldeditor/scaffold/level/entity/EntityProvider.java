@@ -8,7 +8,7 @@ import org.scaffoldeditor.nbt.block.BlockWorld;
  * 
  * @author Igrium
  */
-public interface EntityAdder {
+public interface EntityProvider {
 	
 	/**
 	 * Compile this entity's game entities into the world.

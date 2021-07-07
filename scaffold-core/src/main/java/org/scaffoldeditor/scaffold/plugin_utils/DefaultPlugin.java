@@ -27,6 +27,7 @@ import org.scaffoldeditor.scaffold.level.entity.game.ContainerEntity;
 import org.scaffoldeditor.scaffold.level.entity.game.GameEntity;
 import org.scaffoldeditor.scaffold.level.entity.game.RedstoneListener;
 import org.scaffoldeditor.scaffold.level.entity.game.RedstoneTrigger;
+import org.scaffoldeditor.scaffold.level.entity.info.InfoPath;
 import org.scaffoldeditor.scaffold.level.entity.info.InfoTarget;
 import org.scaffoldeditor.scaffold.level.entity.info.PlayerStart;
 import org.scaffoldeditor.scaffold.level.entity.logic.Auto;
@@ -75,6 +76,7 @@ public class DefaultPlugin implements PluginInitializer {
 		InfoTarget.register();
 		LogicTeleport.register();
 		LogicTimer.register();
+		InfoPath.register();
 		
 		StringAttribute.register();
 		NBTAttribute.register();

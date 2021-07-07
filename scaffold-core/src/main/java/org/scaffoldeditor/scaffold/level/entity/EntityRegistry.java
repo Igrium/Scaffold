@@ -16,6 +16,11 @@ public final class EntityRegistry {
 	public static final Map<String, EntityFactory<?>> registry = new HashMap<>();
 	
 	/**
+	 * A registry of entitity classes. Auto-generated from the primary registry.
+	 */
+	private static final Map<String, Class<? extends Entity>> classRegistry = new HashMap<>();
+	
+	/**
 	 * Spawn an entity.
 	 * @param registryName Registry name of the entity to spawn.
 	 * @param level Level to spawn in.
@@ -46,5 +51,25 @@ public final class EntityRegistry {
 			entity.onUpdateAttributes(false);
 		}
 		return entity;
+	}
+	
+	/**
+	 * Get the class of an entity type.
+	 * @param registryName Registry name of the entity type.
+	 * @return Entity class, or <code>null</code> if no entity of that type exists.
+	 */
+	public static Class<? extends Entity> getClass(String registryName) {
+		Class<? extends Entity> val = classRegistry.get(registryName);
+		if (val != null) return val;
+		
+		if (!registry.containsKey(registryName)) {
+			LogManager.getLogger().error("Unknown entity type: "+registryName);
+			return null;
+		}
+		
+		Entity entity = registry.get(registryName).create(null, "temp");
+		val = entity.getClass();
+		classRegistry.put(registryName, val);
+		return val;
 	}
 }

@@ -18,7 +18,7 @@ import org.scaffoldeditor.nbt.util.MCEntity;
 import org.scaffoldeditor.scaffold.io.AssetLoader;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
-import org.scaffoldeditor.scaffold.level.entity.EntityAdder;
+import org.scaffoldeditor.scaffold.level.entity.EntityProvider;
 import org.scaffoldeditor.scaffold.level.entity.EntityFactory;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
 import org.scaffoldeditor.scaffold.level.entity.attribute.AssetAttribute;
@@ -54,7 +54,7 @@ import net.querz.nbt.tag.CompoundTag;
  * @author Igrium
  *
  */
-public class WorldDynamic extends Entity implements EntityAdder, TargetSelectable {
+public class WorldDynamic extends Entity implements EntityProvider, TargetSelectable {
 	
 	public static void register() {
 		EntityRegistry.registry.put("world_dynamic", new EntityFactory<WorldDynamic>() {

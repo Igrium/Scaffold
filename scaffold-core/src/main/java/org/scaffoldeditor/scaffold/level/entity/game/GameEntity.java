@@ -9,7 +9,7 @@ import org.scaffoldeditor.nbt.math.Vector3f;
 import org.scaffoldeditor.nbt.util.MCEntity;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
-import org.scaffoldeditor.scaffold.level.entity.EntityAdder;
+import org.scaffoldeditor.scaffold.level.entity.EntityProvider;
 import org.scaffoldeditor.scaffold.level.entity.EntityFactory;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
 import org.scaffoldeditor.scaffold.level.entity.Rotatable;
@@ -31,7 +31,7 @@ import net.querz.nbt.tag.ListTag;
  * @author Igrium
  *
  */
-public class GameEntity extends Rotatable implements TargetSelectable, EntityAdder {
+public class GameEntity extends Rotatable implements TargetSelectable, EntityProvider {
 	
 	public static void register() {
 		EntityRegistry.registry.put("game_entity", new EntityFactory<Entity>() {		

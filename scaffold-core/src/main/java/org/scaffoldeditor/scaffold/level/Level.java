@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,7 +29,7 @@ import org.scaffoldeditor.scaffold.level.WorldUpdates.WorldUpdateEvent;
 import org.scaffoldeditor.scaffold.level.WorldUpdates.WorldUpdateListener;
 import org.scaffoldeditor.scaffold.level.entity.BlockEntity;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
-import org.scaffoldeditor.scaffold.level.entity.EntityAdder;
+import org.scaffoldeditor.scaffold.level.entity.EntityProvider;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BooleanAttribute;
@@ -649,8 +650,8 @@ public class Level {
 					LOGGER.error("Unable to compile world entity: "+name, e);
 				}
 			}
-			if (entity instanceof EntityAdder) {
-				EntityAdder adder = (EntityAdder) entity;
+			if (entity instanceof EntityProvider) {
+				EntityProvider adder = (EntityProvider) entity;
 				try {
 					adder.compileGameEntities(blockWorld);
 				} catch (Throwable e) {
@@ -672,8 +673,8 @@ public class Level {
 		}
 		
 		for (Entity entity : levelStack) {
-			if (entity instanceof EntityAdder) {
-				EntityAdder adder = (EntityAdder) entity;
+			if (entity instanceof EntityProvider) {
+				EntityProvider adder = (EntityProvider) entity;
 				try {
 					adder.compileGameEntities(blockWorld);
 				} catch (Throwable e) {
@@ -843,6 +844,29 @@ public class Level {
 
 	public void setHasUnsavedChanges(boolean hasUnsavedChanges) {
 		this.hasUnsavedChanges = hasUnsavedChanges;
+	}
+	
+	
+	// UUID CACHE
+	
+	private Map<Entity, UUID> uuidCache = new HashMap<>();
+	
+	/**
+	 * Get the UUID of a potential MC companion entity to a Scaffold entitiy.
+	 * Whether or not this entity exists is up to the implementation of the Scaffold
+	 * entity. Note: these UUIDs are non-persistant and are only guarenteed to
+	 * remain consistant throughout compilation. They may not be serialized.
+	 * 
+	 * @param entity Entity to get the UUID of.
+	 * @return Companion UUID.
+	 */
+	public UUID getCompanionUUID(Entity entity) {
+		UUID val = uuidCache.get(entity);
+		if (val == null) {
+			val = UUID.randomUUID();
+			uuidCache.put(entity, val);
+		}
+		return val;
 	}
 		
 }
