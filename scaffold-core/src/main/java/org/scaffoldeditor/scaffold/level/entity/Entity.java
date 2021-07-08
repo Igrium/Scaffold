@@ -113,18 +113,21 @@ public abstract class Entity {
 	 * Compile an input on the entity. <br>
 	 * <b>Warning:</b> Should not call <code>level#getDatapack()</code> or any other
 	 * function that's only valid during logic compilation, as it'ss possible for
-	 * this method to be called during world compilation (ex: {@link RedstoneListener}).
+	 * this method to be called during world compilation (ex:
+	 * {@link RedstoneListener}).
 	 * 
-	 * @param inputName The name of the input being compiled.
-	 * @param args      The arguements it's being compiled with.
-	 * @param source    The entity that's compiling the input.
+	 * @param inputName  The name of the input being compiled.
+	 * @param args       The arguements it's being compiled with.
+	 * @param source     The entity that's compiling the input.
+	 * @param instigator The "instigator" of this IO chain. Usually the entity that
+	 *                   the function the commands will be written to belongs to.
 	 * @return A list of all the commands that should be run when this input is
 	 *         triggered.
 	 */
-	public List<Command> compileInput(String inputName, List<Attribute<?>> args, Entity source) {
+	public List<Command> compileInput(String inputName, List<Attribute<?>> args, Entity source, Entity instigator) {
 		return Collections.emptyList();
 	};
-	
+		
 	/**
 	 * Get all the inputs that this entity accepts.
 	 * @return A collection of input declarations.
@@ -157,11 +160,24 @@ public abstract class Entity {
 	 *         triggered.
 	 */
 	public List<Command> compileOutput(String outputName) {
+		return compileOutput(outputName, this);
+	}
+	
+	/**
+	 * Compile all outputs with a trigger name matching the output name.
+	 * 
+	 * @param outputName Trigger name.
+	 * @param instigator The "instigator" of this IO chain. Usually the entity that
+	 *                   the function the commands will be written to belongs to.
+	 * @return A list of all the commands that should be run when this output is
+	 *         triggered.
+	 */
+	public List<Command> compileOutput(String outputName, Entity instigator) {
 		List<Command> list = new ArrayList<>();
 		
 		for (Output output : outputs) {
 			if (output.getTrigger().equals(outputName)) {
-				list.addAll(output.compile());
+				list.addAll(output.compile(instigator));
 			}
 		}
 		

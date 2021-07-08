@@ -73,7 +73,7 @@ public class PathTrain extends Entity implements KnownUUID, EntityProvider {
 	}
 	
 	@Override
-	public List<Command> compileInput(String inputName, List<Attribute<?>> args, Entity source) {
+	public List<Command> compileInput(String inputName, List<Attribute<?>> args, Entity source, Entity instigator) {
 		if (inputName.equals("start_forward")) {
 			return List.of(Command.fromString("tag "+getTargetSelector().compile()+" add forward"));
 		}
@@ -82,7 +82,7 @@ public class PathTrain extends Entity implements KnownUUID, EntityProvider {
 		}
 		if (inputName.equals("reset")) {
 			List<Command> commands = new ArrayList<>();
-			commands.addAll(compileInput("stop", args, source));
+			commands.addAll(compileInput("stop", args, source, instigator));
 			PathNode start = getStartingPath();
 			if (start != null) {
 				commands.add(jumpToNode(getStartingPath()));
@@ -90,7 +90,7 @@ public class PathTrain extends Entity implements KnownUUID, EntityProvider {
 			return commands;
 		}
 		
-		return super.compileInput(inputName, args, source);
+		return super.compileInput(inputName, args, source, instigator);
 	}
 	
 	/**

@@ -82,7 +82,7 @@ public class RedstoneTrigger extends BaseSingleBlock {
 	}
 	
 	@Override
-	public List<Command> compileInput(String inputName, List<Attribute<?>> args, Entity source) {
+	public List<Command> compileInput(String inputName, List<Attribute<?>> args, Entity source, Entity instigator) {
 		if (inputName.equals("enable")) {
 			return List.of(enableCommand());
 		}
@@ -96,7 +96,7 @@ public class RedstoneTrigger extends BaseSingleBlock {
 			return list;
 		}
 		
-		return super.compileInput(inputName, args, source);
+		return super.compileInput(inputName, args, source, instigator);
 	}
 	
 	public boolean startEnabled() {

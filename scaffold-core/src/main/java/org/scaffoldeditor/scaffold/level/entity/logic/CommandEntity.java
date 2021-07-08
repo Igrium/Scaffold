@@ -80,7 +80,7 @@ public class CommandEntity extends LogicEntity {
 	}
 	
 	@Override
-	public List<Command> compileInput(String inputName, List<Attribute<?>> args, Entity source) {
+	public List<Command> compileInput(String inputName, List<Attribute<?>> args, Entity source, Entity instigator) {
 		if (inputName.equals("execute")) {
 			TargetSelector executor = getExecutor();
 			if (executor != null) {
@@ -90,7 +90,7 @@ public class CommandEntity extends LogicEntity {
 			}
 		}
 		
-		return super.compileInput(inputName, args, source);
+		return super.compileInput(inputName, args, source, instigator);
 	}
 
 	@Override

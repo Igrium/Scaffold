@@ -105,6 +105,18 @@ public class Output implements XMLSerializable {
 	 * @return The list of commands that should be called when this output is triggered.
 	 */
 	public List<Command> compile() {
+		return compile(getOwner());
+	}
+	
+	/**
+	 * Compile this output.
+	 * 
+	 * @param instigator The "instigator" of this IO chain. Usually the entity that
+	 *                   the function the commands will be written to belongs to.
+	 * @return The list of commands that should be called when this output is
+	 *         triggered.
+	 */
+	public List<Command> compile(Entity instigator) {
 		String target = owner.evaluateName(this.target);
 		Entity entity = owner.getLevel().getEntity(target);
 		if (entity == null) {
@@ -113,7 +125,7 @@ public class Output implements XMLSerializable {
 		}
 		
 		try {
-			return entity.compileInput(inputName, args, getOwner());
+			return entity.compileInput(inputName, args, getOwner(), instigator);
 		} catch (Throwable e) {
 			LogManager.getLogger().error("Error compiling output on entity: "+owner, e);
 			return new ArrayList<>();

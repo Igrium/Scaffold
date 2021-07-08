@@ -79,7 +79,7 @@ public class LogicTimer extends LogicEntity {
 	}
 	
 	@Override
-	public List<Command> compileInput(String inputName, List<Attribute<?>> args, Entity source) {
+	public List<Command> compileInput(String inputName, List<Attribute<?>> args, Entity source, Entity instigator) {
 		if (inputName.equals("enable")) {
 			List<Command> commands = new ArrayList<>();
 			commands.add(new DataCommandBuilder().modify().storage(LogicUtils.getEntityStorage(this)).path("enabled")
@@ -104,7 +104,7 @@ public class LogicTimer extends LogicEntity {
 			return List.of(getScheduleCommand());
 		}
 		
-		return super.compileInput(inputName, args, source);
+		return super.compileInput(inputName, args, source, instigator);
 	}
 	
 	@Override

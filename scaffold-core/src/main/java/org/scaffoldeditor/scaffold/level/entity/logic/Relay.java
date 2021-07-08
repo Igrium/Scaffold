@@ -93,7 +93,7 @@ public class Relay extends LogicEntity {
 	}
 
 	@Override
-	public List<Command> compileInput(String inputName, List<Attribute<?>> args, Entity source) {
+	public List<Command> compileInput(String inputName, List<Attribute<?>> args, Entity source, Entity instigator) {
 		if (inputName.matches("trigger")) {
 			Command function;
 			if (getDelay() == 0) {
@@ -112,7 +112,7 @@ public class Relay extends LogicEntity {
 			return List.of(command);
 		}
 
-		return super.compileInput(inputName, args, source);
+		return super.compileInput(inputName, args, source, instigator);
 	}
 
 	@Override

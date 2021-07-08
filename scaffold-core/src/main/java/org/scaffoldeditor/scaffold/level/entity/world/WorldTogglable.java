@@ -121,7 +121,7 @@ public class WorldTogglable extends WorldStatic {
 	}
 	
 	@Override
-	public List<Command> compileInput(String inputName, List<Attribute<?>> args, Entity source) {
+	public List<Command> compileInput(String inputName, List<Attribute<?>> args, Entity source, Entity instigator) {
 		if (inputName.equals("toggle")) {
 			return List.of(getLocalExecute(new FunctionCommand(getToggleFunction())));
 		}
@@ -132,7 +132,7 @@ public class WorldTogglable extends WorldStatic {
 			return List.of(getLocalExecute(new FunctionCommand(getDisableFunction())));
 		}
 		
-		return super.compileInput(inputName, args, source);
+		return super.compileInput(inputName, args, source, instigator);
 	}
 	
 	private Command getLocalExecute(Command run) {

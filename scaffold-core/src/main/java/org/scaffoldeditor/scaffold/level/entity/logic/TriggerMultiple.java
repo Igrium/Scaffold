@@ -102,7 +102,7 @@ public class TriggerMultiple extends ToolBrushEntity {
 	}
 	
 	@Override
-	public List<Command> compileInput(String inputName, List<Attribute<?>> args, Entity source) {
+	public List<Command> compileInput(String inputName, List<Attribute<?>> args, Entity source, Entity instigator) {
 		if (inputName.equals("enable")) {
 			return List.of(setDisabled(false));
 		}
@@ -110,7 +110,7 @@ public class TriggerMultiple extends ToolBrushEntity {
 			return List.of(setDisabled(true));
 		}
 		
-		return super.compileInput(inputName, args, source);
+		return super.compileInput(inputName, args, source, instigator);
 	}
 	
 	@Override
