@@ -1,4 +1,4 @@
-package org.scaffoldeditor.scaffold.level.entity.info;
+package org.scaffoldeditor.scaffold.level.entity.path;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,6 +13,7 @@ import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.EntityAttribute;
 import org.scaffoldeditor.scaffold.level.entity.game.KnownUUID;
 import org.scaffoldeditor.scaffold.level.entity.logic.LogicEntity;
+import org.scaffoldeditor.scaffold.logic.LogicUtils;
 import org.scaffoldeditor.scaffold.math.MathUtils;
 import org.scaffoldeditor.scaffold.util.UUIDUtils;
 
@@ -27,13 +28,13 @@ import net.querz.nbt.tag.ListTag;
  * 
  * @author Igrium
  */
-public class InfoPath extends LogicEntity implements KnownUUID, EntityProvider {
+public class PathNode extends LogicEntity implements KnownUUID, EntityProvider {
 	
 	public static void register() {
-		EntityRegistry.registry.put("info_path", InfoPath::new);
+		EntityRegistry.registry.put("path_node", PathNode::new);
 	}
-	
-	public InfoPath(Level level, String name) {
+		
+	public PathNode(Level level, String name) {
 		super(level, name);
 	}
 
@@ -43,12 +44,11 @@ public class InfoPath extends LogicEntity implements KnownUUID, EntityProvider {
 		map.put("next", new EntityAttribute(""));
  		return map;
 	}
-	
-	
-	public InfoPath getNext() {
-		Entity ent = getLevel().getEntity(((EntityAttribute) getAttribute("next")).getValue());
-		if (ent instanceof InfoPath) {
-			return (InfoPath) ent;
+
+	public PathNode getNext() {
+		Entity ent = getLevel().getEntity(((EntityAttribute) getAttribute("next")).evaluate(this));
+		if (ent instanceof PathNode) {
+			return (PathNode) ent;
 		} else {
 			return null;
 		}
@@ -58,29 +58,29 @@ public class InfoPath extends LogicEntity implements KnownUUID, EntityProvider {
 	 * Generate the companion entity.
 	 */
 	public CompoundTag getEntity() {
-		CompoundTag nbt = new CompoundTag();
-		nbt.putIntArray("UUID", UUIDUtils.toIntArray(getUUID()));
-		double[] rot = getRotation();
+		CompoundTag ent = LogicUtils.getCompanionEntity(this);
 		ListTag<FloatTag> rotation = new ListTag<>(FloatTag.class);
+		double[] rot = getRotation();
 		rotation.addFloat((float) rot[0]);
 		rotation.addFloat((float) rot[1]);
-		nbt.put("Rotation", rotation);
-		nbt.putString("CustomName", "'"+getFinalName()+"'");
+		ent.put("Rotation", rotation);
 		
-		CompoundTag data = new CompoundTag();
-		InfoPath next = getNext();
+		PathNode next = getNext();
 		if (next != null) {
-			data.putIntArray("next", UUIDUtils.toIntArray(next.getUUID()));
+			ent.getCompoundTag("data").putIntArray("next", UUIDUtils.toIntArray(next.getUUID()));
+
 		}
-		data.putString("scaffoldID", getFinalName());
-		nbt.put("data", data);
-		
-		nbt.putString("id", "minecraft:marker");
-		return nbt;
+		return ent;
 	}
 	
-	private double[] getRotation() {
-		InfoPath target = getNext();
+	/**
+	 * Get the rotation this path must be at to face it's target.
+	 * 
+	 * @return A two-element array indicating the calculated yaw and pitch in
+	 *         aformat that can be plugged into Minecraft entities.
+	 */
+	public double[] getRotation() {
+		PathNode target = getNext();
 		if (target == null) return new double[] { 0, 0 };
 		
 		return MathUtils.getFacingAngle(target.getPosition().subtract(getPosition()).toDouble());

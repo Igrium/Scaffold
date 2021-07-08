@@ -2,11 +2,13 @@ package org.scaffoldeditor.scaffold.logic;
 
 import org.scaffoldeditor.nbt.util.Identifier;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
+import org.scaffoldeditor.scaffold.level.entity.game.KnownUUID;
 import org.scaffoldeditor.scaffold.logic.datapack.TargetSelector;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.Command;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.DataCommandBuilder;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.ExecuteCommand.Conditional;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.ExecuteCommand.DataStorageConditional;
+import org.scaffoldeditor.scaffold.util.UUIDUtils;
 
 import net.querz.nbt.tag.CompoundTag;
 
@@ -25,11 +27,16 @@ public final class LogicUtils {
 	 */
 	public static CompoundTag getCompanionEntity(Entity entity) {
 		CompoundTag data = new CompoundTag();
-		data.putString("scaffoldID", entity.getFinalName());
+		data.putString("ScaffoldID", entity.getFinalName());
+		data.putString("ScaffoldType", entity.registryName);
 		
 		CompoundTag ent = new CompoundTag();
 		ent.put("data", data);
 		ent.putString("id", "minecraft:marker");
+		
+		if (entity instanceof KnownUUID) {
+			ent.putIntArray("UUID", UUIDUtils.toIntArray(((KnownUUID) entity).getUUID()));
+		}
 		
 		return ent;
 	}

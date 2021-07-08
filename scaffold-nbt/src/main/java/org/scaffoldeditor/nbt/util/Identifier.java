@@ -18,7 +18,7 @@ public class Identifier {
 	}
 	
 	public Identifier(String name) {
-		String[] split = name.split(":", 1);
+		String[] split = name.split(":", 2);
 		namespace = split[0];
 		value = split[1];
 	}

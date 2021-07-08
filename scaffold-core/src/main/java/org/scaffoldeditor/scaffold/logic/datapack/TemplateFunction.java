@@ -1,5 +1,9 @@
 package org.scaffoldeditor.scaffold.logic.datapack;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -10,6 +14,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.scaffoldeditor.nbt.util.Identifier;
+import org.scaffoldeditor.scaffold.io.AssetManager;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.Command;
 
 /**
@@ -20,7 +25,7 @@ public class TemplateFunction extends AbstractFunction {
 	/**
 	 * The regex pattern to identify 
 	 */
-	public static final Pattern pattern = Pattern.compile("(\\${[^\\$]*})");
+	public static final Pattern pattern = Pattern.compile("(\\$\\{[^\\$\\{\\}]*\\})");
 	
 	/**
 	 * The raw text of the function, before variables are applied.
@@ -87,5 +92,38 @@ public class TemplateFunction extends AbstractFunction {
 	private String getVarName(String substring) {
 		return substring.substring(2, substring.length()-1);
 	}
-
+	
+	@Override
+	public TemplateFunction clone() {
+		return cloneWithID(id);
+	}
+	
+	public TemplateFunction cloneWithID(Identifier id) {
+		TemplateFunction cloned = new TemplateFunction(id, rawText);
+		cloned.variables.putAll(variables);
+		return cloned;
+	}
+	
+	public static TemplateFunction fromInputStream(Identifier id, InputStream in) {
+		String raw = new BufferedReader(new InputStreamReader(in)).lines()
+				.collect(Collectors.joining(System.lineSeparator()));
+		return new TemplateFunction(id, raw);
+	}
+	
+	/**
+	 * Load a template function from an asset.
+	 * @param manager Asset manager to use.
+	 * @param id Identifier to assign to loaded function.
+	 * @param assetPath Asset to load.
+	 * @return Modifiable template function.
+	 * @throws IOException If an IO Exception occurs while loading.
+	 */
+	public static TemplateFunction fromAsset(AssetManager manager, Identifier id, String assetPath) throws IOException {
+		if (!manager.getLoader(assetPath).isAssignableTo(TemplateFunction.class)) {
+			throw new IOException(assetPath+" is not parsable as a function!");
+		}
+		
+		TemplateFunction loaded = (TemplateFunction) manager.loadAsset(assetPath, false);
+		return loaded.cloneWithID(id);
+	}
 }

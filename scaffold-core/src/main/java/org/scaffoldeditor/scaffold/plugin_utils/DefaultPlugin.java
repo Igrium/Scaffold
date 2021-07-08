@@ -8,6 +8,7 @@ import org.scaffoldeditor.scaffold.io.BlockTextureAsset;
 import org.scaffoldeditor.scaffold.io.ConstructionAsset;
 import org.scaffoldeditor.scaffold.io.ConstructionWorldAsset;
 import org.scaffoldeditor.scaffold.io.StructureAsset;
+import org.scaffoldeditor.scaffold.io.TemplateFunctionAsset;
 import org.scaffoldeditor.scaffold.level.entity.attribute.AssetAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BlockAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BlockTextureAttribute;
@@ -27,7 +28,6 @@ import org.scaffoldeditor.scaffold.level.entity.game.ContainerEntity;
 import org.scaffoldeditor.scaffold.level.entity.game.GameEntity;
 import org.scaffoldeditor.scaffold.level.entity.game.RedstoneListener;
 import org.scaffoldeditor.scaffold.level.entity.game.RedstoneTrigger;
-import org.scaffoldeditor.scaffold.level.entity.info.InfoPath;
 import org.scaffoldeditor.scaffold.level.entity.info.InfoTarget;
 import org.scaffoldeditor.scaffold.level.entity.info.PlayerStart;
 import org.scaffoldeditor.scaffold.level.entity.logic.Auto;
@@ -38,6 +38,9 @@ import org.scaffoldeditor.scaffold.level.entity.logic.LogicTimer;
 import org.scaffoldeditor.scaffold.level.entity.logic.Relay;
 import org.scaffoldeditor.scaffold.level.entity.logic.TriggerIndividual;
 import org.scaffoldeditor.scaffold.level.entity.logic.TriggerMultiple;
+import org.scaffoldeditor.scaffold.level.entity.path.PathNode;
+import org.scaffoldeditor.scaffold.level.entity.path.PathTrain;
+import org.scaffoldeditor.scaffold.level.entity.phys.PhysParent;
 import org.scaffoldeditor.scaffold.level.entity.test.BlockModelTest;
 import org.scaffoldeditor.scaffold.level.entity.test.ModelTest;
 import org.scaffoldeditor.scaffold.level.entity.world.WorldStatic;
@@ -76,7 +79,9 @@ public class DefaultPlugin implements PluginInitializer {
 		InfoTarget.register();
 		LogicTeleport.register();
 		LogicTimer.register();
-		InfoPath.register();
+		PathNode.register();
+		PathTrain.register();
+		PhysParent.register();
 		
 		StringAttribute.register();
 		NBTAttribute.register();
@@ -98,6 +103,7 @@ public class DefaultPlugin implements PluginInitializer {
 		ConstructionAsset.register();
 		ConstructionWorldAsset.register();
 		BlockTextureAsset.register();
+		TemplateFunctionAsset.register();
 		
 		SingleBlockTexture.register();
 		NoiseBlockTexture.register();
