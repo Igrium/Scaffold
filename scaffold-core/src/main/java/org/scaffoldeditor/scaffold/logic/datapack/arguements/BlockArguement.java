@@ -22,10 +22,11 @@ import net.querz.nbt.tag.CompoundTag;
 public class BlockArguement {
 	public final String id;
 	private Map<String, String> blockstate;
-	private CompoundTag data;
+	public final CompoundTag data;
 	
 	public BlockArguement(String id) {
 		this.id = id;
+		this.data = null;
 	}
 	
 	public BlockArguement(String id, Map<String, String> blockstate, CompoundTag data) {
@@ -43,14 +44,7 @@ public class BlockArguement {
 	}
 	
 	public BlockArguement(Block block) {
-		this.id = block.getName();
-		CompoundTag properties = block.getProperties();
-		if (properties.size() > 0) {
-			blockstate = new HashMap<>();
-			for (String key : properties.keySet()) {
-				blockstate.put(key, properties.getString(key));
-			}
-		}
+		this(block, null);
 	}
 	
 	/**
@@ -59,7 +53,14 @@ public class BlockArguement {
 	 * @param data Additional block entity data.
 	 */
 	public BlockArguement(Block block, CompoundTag data) {
-		this(block);
+		this.id = block.getName();
+		CompoundTag properties = block.getProperties();
+		if (properties.size() > 0) {
+			blockstate = new HashMap<>();
+			for (String key : properties.keySet()) {
+				blockstate.put(key, properties.getString(key));
+			}
+		}
 		this.data = data;
 	}
 	
@@ -78,7 +79,7 @@ public class BlockArguement {
 		return out;
 	}
 	
-	private String writeBlockstate() {
+	public String writeBlockstate() {
 		List<String> compBlockstates = blockstate.keySet().stream().map(key -> {
 			return key+"="+blockstate.get(key);
 		}).collect(Collectors.toList());
@@ -91,7 +92,18 @@ public class BlockArguement {
 	}
 	
 	@Override
-		public String toString() {
-			return compile();
+	public String toString() {
+		return compile();
+	}
+	
+	public static Map<String, String> parseBlockStates(String in) {
+		in = in.substring(1, in.length() - 1);
+		String[] compBlockstates = in.split(",");
+		Map<String, String> map = new HashMap<>();
+		for (String str : compBlockstates) {
+			int index = str.indexOf('=');
+			map.put(str.substring(0, index), str.substring(index+1));
 		}
+		return map;
+	}
 }

@@ -36,6 +36,19 @@ public class CommandVector3i extends Vector3i {
 		this(vec, Mode.GLOBAL);
 	}
 	
+	public static CommandVector3i fromString(String in) {
+		char modeChar = in.charAt(0);
+		Mode mode;
+		if (modeChar == '~') mode = Mode.RELATIVE;
+		else if (modeChar == '^') mode = Mode.LOCAL;
+		else mode = Mode.GLOBAL;
+		
+		in = in.replace("~", "").replace("^", "");
+		String[] split = in.split(" ");
+		
+		return new CommandVector3i(Integer.parseInt(split[0]), Integer.parseInt(split[1]), Integer.parseInt(split[2]), mode);
+	}
+	
 	/**
 	 * Get this vector as a string that can be inserted into a command.
 	 * @return Command string.

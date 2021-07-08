@@ -21,7 +21,7 @@ public class ExecuteCommand implements Command {
 	}
 	
 	public static class Align implements SubCommand {
-		private String value;
+		public final String value;
 		public Align(String value) {
 			this.value = value;
 		}
@@ -31,7 +31,7 @@ public class ExecuteCommand implements Command {
 	}
 	
 	public static class Anchored implements SubCommand {
-		private String value;
+		public final String value;
 		public Anchored(String value) {
 			this.value = value;
 		}
@@ -41,7 +41,7 @@ public class ExecuteCommand implements Command {
 	}
 	
 	public static class As implements SubCommand {
-		private TargetSelector value;
+		public final TargetSelector value;
 		public As(TargetSelector value) {
 			this.value = value;
 		}
@@ -51,7 +51,7 @@ public class ExecuteCommand implements Command {
 	}
 	
 	public static class At implements SubCommand {
-		private TargetSelector value;
+		public final TargetSelector value;
 		public At(TargetSelector value) {
 			this.value = value;
 		}
@@ -61,7 +61,7 @@ public class ExecuteCommand implements Command {
 	}
 	
 	public static class Facing implements SubCommand {
-		private CommandVector3f value;
+		public final CommandVector3f value;
 		public Facing(CommandVector3f value) {
 			this.value = value;
 		}
@@ -71,8 +71,8 @@ public class ExecuteCommand implements Command {
 	}
 	
 	public static class FacingEnt implements SubCommand {
-		private TargetSelector target;
-		private String anchor;
+		public final TargetSelector target;
+		public final String anchor;
 		public FacingEnt(TargetSelector target, String anchor) {
 			this.target = target;
 			this.anchor = anchor;
@@ -83,7 +83,7 @@ public class ExecuteCommand implements Command {
 	}
 	
 	public static class In implements SubCommand {
-		private String value;
+		public final String value;
 		public In(String value) {
 			this.value = value;
 		}
@@ -93,7 +93,7 @@ public class ExecuteCommand implements Command {
 	}
 	
 	public static class Positioned implements SubCommand {
-		private CommandVector3f value;
+		public final CommandVector3f value;
 		public Positioned(CommandVector3f value) {
 			this.value = value;
 		}
@@ -103,7 +103,7 @@ public class ExecuteCommand implements Command {
 	}
 	
 	public static class PositionedAs implements SubCommand {
-		private TargetSelector value;
+		public final TargetSelector value;
 		public PositionedAs(TargetSelector value) {
 			this.value = value;
 		}
@@ -113,7 +113,7 @@ public class ExecuteCommand implements Command {
 	}
 	
 	public static class Rotated implements SubCommand {
-		CommandRotation value;
+		public final CommandRotation value;
 		public Rotated(CommandRotation value) {
 			this.value = value;
 		}
@@ -123,7 +123,7 @@ public class ExecuteCommand implements Command {
 	}
 	
 	public static class RotatedAs implements SubCommand {
-		TargetSelector value;
+		public final TargetSelector value;
 		public RotatedAs(TargetSelector value) {
 			this.value = value;
 		}
@@ -133,7 +133,7 @@ public class ExecuteCommand implements Command {
 	}
 	
 	public static class If implements SubCommand {
-		Conditional value;
+		public final Conditional value;
 		public If(Conditional value) {
 			this.value = value;
 		}
@@ -143,7 +143,7 @@ public class ExecuteCommand implements Command {
 	}
 	
 	public static class Unless implements SubCommand {
-		Conditional value;
+		public final Conditional value;
 		public Unless(Conditional value) {
 			this.value = value;
 		}

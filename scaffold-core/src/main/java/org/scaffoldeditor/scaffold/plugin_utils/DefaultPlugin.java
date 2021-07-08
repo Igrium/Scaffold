@@ -17,6 +17,7 @@ import org.scaffoldeditor.scaffold.level.entity.attribute.ContainerAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.DoubleAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.EntityAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.EnumAttribute;
+import org.scaffoldeditor.scaffold.level.entity.attribute.FilterAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.FloatAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.IntAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.ListAttribute;
@@ -33,6 +34,7 @@ import org.scaffoldeditor.scaffold.level.entity.info.PlayerStart;
 import org.scaffoldeditor.scaffold.level.entity.logic.Auto;
 import org.scaffoldeditor.scaffold.level.entity.logic.CommandEntity;
 import org.scaffoldeditor.scaffold.level.entity.logic.FunctionEntity;
+import org.scaffoldeditor.scaffold.level.entity.logic.LogicFilter;
 import org.scaffoldeditor.scaffold.level.entity.logic.LogicTeleport;
 import org.scaffoldeditor.scaffold.level.entity.logic.LogicTimer;
 import org.scaffoldeditor.scaffold.level.entity.logic.Relay;
@@ -79,6 +81,7 @@ public class DefaultPlugin implements PluginInitializer {
 		InfoTarget.register();
 		LogicTeleport.register();
 		LogicTimer.register();
+		LogicFilter.register();
 		PathNode.register();
 		PathTrain.register();
 		PhysParent.register();
@@ -98,6 +101,7 @@ public class DefaultPlugin implements PluginInitializer {
 		EnumAttribute.register();
 		ContainerEntity.register();
 		EntityAttribute.register();
+		FilterAttribute.register();
 		
 		StructureAsset.register();
 		ConstructionAsset.register();

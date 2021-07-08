@@ -36,6 +36,19 @@ public class CommandVector3f extends Vector3f {
 		this(vec, Mode.GLOBAL);
 	}
 	
+	public static CommandVector3f fromString(String in) {
+		char modeChar = in.charAt(0);
+		Mode mode;
+		if (modeChar == '~') mode = Mode.RELATIVE;
+		else if (modeChar == '^') mode = Mode.LOCAL;
+		else mode = Mode.GLOBAL;
+		
+		in = in.replace("~", "").replace("^", "");
+		String[] split = in.split(" ");
+		
+		return new CommandVector3f(Float.parseFloat(split[0]), Float.parseFloat(split[1]), Float.parseFloat(split[2]), mode);
+	}
+	
 	/**
 	 * Get this vector as a string that can be inserted into a command.
 	 * @return Command string.
@@ -64,4 +77,5 @@ public class CommandVector3f extends Vector3f {
 	public String toString() {
 		return getString();
 	}
+
 }

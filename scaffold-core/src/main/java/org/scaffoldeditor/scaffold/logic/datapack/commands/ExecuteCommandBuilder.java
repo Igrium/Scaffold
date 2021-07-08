@@ -107,10 +107,14 @@ public class ExecuteCommandBuilder {
 	}
 	
 	public ExecuteCommand run(Command runCommand) {
-		return new ExecuteCommand(subCommands, runCommand);
+		return new ExecuteCommand(List.copyOf(subCommands), runCommand);
 	}
 	
 	public ExecuteCommand build() {
 		return new ExecuteCommand(subCommands, null);
+	}
+	
+	public List<SubCommand> getSubCommands() {
+		return subCommands;
 	}
 }

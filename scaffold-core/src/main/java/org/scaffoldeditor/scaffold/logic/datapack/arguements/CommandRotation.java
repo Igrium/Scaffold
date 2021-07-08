@@ -35,4 +35,15 @@ public class CommandRotation {
 		if (mode == Mode.RELATIVE) prefix = "~";
 		return prefix+yaw+" "+prefix+pitch;
 	}
+	
+	public static CommandRotation fromString(String in) {
+		Mode mode;
+		if (in.charAt(0) == '~') mode = Mode.RELATIVE;
+		else mode = Mode.GLOBAL;
+		
+		in = in.replace("~", "");
+		String[] split = in.split(" ");
+		
+		return new CommandRotation(Double.parseDouble(split[0]), Double.parseDouble(split[1]), mode);
+	}
 }
