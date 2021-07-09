@@ -16,7 +16,11 @@ import net.querz.nbt.tag.CompoundTag;
 public interface KnownUUID extends TargetSelectable {
 	@Override
 	default TargetSelector getTargetSelector() {
-		return TargetSelector.fromUUID(getUUID());
+		return new TargetSelector() {
+			public String compile() {
+				return getUUID().toString();
+			}
+		};
 	}
 	
 	/**
