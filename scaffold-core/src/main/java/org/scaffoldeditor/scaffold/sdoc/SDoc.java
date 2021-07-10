@@ -1,9 +1,8 @@
 package org.scaffoldeditor.scaffold.sdoc;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.scaffoldeditor.scaffold.io.AssetManager;
 
@@ -13,9 +12,9 @@ import org.scaffoldeditor.scaffold.io.AssetManager;
  */
 public class SDoc {
 	private String description;
-	public final Map<String, ComponentDoc> attributes = new HashMap<>();
-	public final Map<String, ComponentDoc> inputs = new HashMap<>();
-	public final Map<String, ComponentDoc> outputs = new HashMap<>();
+	public final List<ComponentDoc> attributes = new ArrayList<>();
+	public final List<ComponentDoc> inputs = new ArrayList<>();
+	public final List<ComponentDoc> outputs = new ArrayList<>();
 	
 	public SDoc(String description) {
 		this.description = description;
@@ -31,13 +30,13 @@ public class SDoc {
 	
 	public String write() {
 		String output = description + System.lineSeparator();
-		for (ComponentDoc comp : attributes.values()) {
+		for (ComponentDoc comp : attributes) {
 			output += writeComponent(comp);
 		}
-		for (ComponentDoc comp : inputs.values()) {
+		for (ComponentDoc comp : inputs) {
 			output += writeComponent(comp);
 		}
-		for (ComponentDoc comp : outputs.values()) {
+		for (ComponentDoc comp : outputs) {
 			output += writeComponent(comp);
 		}
 		return output.strip();
@@ -64,11 +63,11 @@ public class SDoc {
 			ComponentDoc component = ComponentDoc.parse(str);
 			
 			if (component.getType().equals("attribute")) {
-				doc.attributes.put(component.getName(), component);
+				doc.attributes.add(component);
 			} else if (component.getType().equals("input")) {
-				doc.inputs.put(component.getName(), component);
+				doc.inputs.add(component);
 			} else if (component.getType().equals("output")) {
-				doc.outputs.put(component.getName(), component);
+				doc.outputs.add(component);
 			} else {
 				LogManager.getLogger().error("Unknown component type: "+component);
 			}
