@@ -68,6 +68,6 @@ public class LogicFilter extends LogicEntity {
 	
 	@Override
 	public SDoc getDocumentation() {
-		return SDoc.loadAsset(getAssetManager(), "doc/logic_filter.sdoc");
+		return SDoc.loadAsset(getAssetManager(), "doc/logic_filter.sdoc", super.getDocumentation());
 	}
 }

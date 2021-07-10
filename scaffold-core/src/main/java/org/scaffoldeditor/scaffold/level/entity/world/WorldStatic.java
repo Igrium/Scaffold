@@ -286,6 +286,6 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 	
 	@Override
 	public SDoc getDocumentation() {
-		return SDoc.loadAsset(getProject().assetManager(), "doc/world_static.sdoc");
+		return SDoc.loadAsset(getProject().assetManager(), "doc/world_static.sdoc", super.getDocumentation());
 	}
 }

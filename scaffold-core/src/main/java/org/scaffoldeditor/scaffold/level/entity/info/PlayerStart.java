@@ -37,6 +37,6 @@ public class PlayerStart extends LogicEntity {
 	
 	@Override
 	public SDoc getDocumentation() {
-		return SDoc.loadAsset(getAssetManager(), "doc/info_player_start.sdoc");
+		return SDoc.loadAsset(getAssetManager(), "doc/info_player_start.sdoc", super.getDocumentation());
 	}
 }

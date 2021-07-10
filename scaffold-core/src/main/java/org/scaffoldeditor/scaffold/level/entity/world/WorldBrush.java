@@ -152,6 +152,6 @@ public class WorldBrush extends BaseBlockEntity implements BrushEntity {
 	
 	@Override
 	public SDoc getDocumentation() {
-		return SDoc.loadAsset(getAssetManager(), "doc/world_brush.sdoc");
+		return SDoc.loadAsset(getAssetManager(), "doc/world_brush.sdoc", super.getDocumentation());
 	}
 }

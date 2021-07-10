@@ -56,6 +56,6 @@ public class PhysParent extends LogicEntity {
 	
 	@Override
 	public SDoc getDocumentation() {
-		return SDoc.loadAsset(getAssetManager(), "doc/phys_parent.sdoc");
+		return SDoc.loadAsset(getAssetManager(), "doc/phys_parent.sdoc", super.getDocumentation());
 	}
 }

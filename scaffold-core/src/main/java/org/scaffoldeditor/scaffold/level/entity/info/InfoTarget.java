@@ -37,6 +37,6 @@ public class InfoTarget extends LogicEntity {
 	
 	@Override
 	public SDoc getDocumentation() {
-		return SDoc.loadAsset(getAssetManager(), "doc/info_target.sdoc");
+		return SDoc.loadAsset(getAssetManager(), "doc/info_target.sdoc", super.getDocumentation());
 	}
 }

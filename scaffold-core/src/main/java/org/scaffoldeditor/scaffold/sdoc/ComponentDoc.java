@@ -96,4 +96,16 @@ public class ComponentDoc {
 		
 		return tokens.toArray(new String[0]);
 	}
+	
+	@Override
+	public ComponentDoc clone(){
+		return new ComponentDoc(type, name, prettyName, description);
+	}
+	
+	public static boolean containsName(Iterable<ComponentDoc> collection, String name) {
+		for (ComponentDoc doc : collection) {
+			if (name.equals(doc.name)) return true;
+		}
+		return false;
+	}
 }

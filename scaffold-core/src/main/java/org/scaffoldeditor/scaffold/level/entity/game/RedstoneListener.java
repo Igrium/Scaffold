@@ -140,6 +140,6 @@ public class RedstoneListener extends BaseSingleBlock {
 	
 	@Override
 	public SDoc getDocumentation() {
-		return SDoc.loadAsset(getAssetManager(), "doc/redstone_listener.sdoc");
+		return SDoc.loadAsset(getAssetManager(), "doc/redstone_listener.sdoc", super.getDocumentation());
 	}
 }

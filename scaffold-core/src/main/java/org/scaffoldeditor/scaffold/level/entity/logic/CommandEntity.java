@@ -101,6 +101,6 @@ public class CommandEntity extends LogicEntity {
 	
 	@Override
 	public SDoc getDocumentation() {
-		return SDoc.loadAsset(getAssetManager(), "doc/logic_command.sdoc");
+		return SDoc.loadAsset(getAssetManager(), "doc/logic_command.sdoc", super.getDocumentation());
 	}
 }

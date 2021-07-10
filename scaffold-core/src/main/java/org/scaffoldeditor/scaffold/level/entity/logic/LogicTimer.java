@@ -149,7 +149,7 @@ public class LogicTimer extends LogicEntity {
 	
 	@Override
 	public SDoc getDocumentation() {
-		return SDoc.loadAsset(getAssetManager(), "doc/logic_timer.sdoc");
+		return SDoc.loadAsset(getAssetManager(), "doc/logic_timer.sdoc", super.getDocumentation());
 	}
 	
 }

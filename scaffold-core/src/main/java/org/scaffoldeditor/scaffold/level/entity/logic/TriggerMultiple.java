@@ -199,6 +199,6 @@ public class TriggerMultiple extends ToolBrushEntity {
 	
 	@Override
 	public SDoc getDocumentation() {
-		return SDoc.loadAsset(getAssetManager(), "doc/trigger_multiple.sdoc");
+		return SDoc.loadAsset(getAssetManager(), "doc/trigger_multiple.sdoc", super.getDocumentation());
 	}
 }

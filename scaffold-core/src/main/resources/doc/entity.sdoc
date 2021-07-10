@@ -1,0 +1,3 @@
+Base entity class. Should never be instanciated.
+
+@attribute position Position The entity's root position in the world.

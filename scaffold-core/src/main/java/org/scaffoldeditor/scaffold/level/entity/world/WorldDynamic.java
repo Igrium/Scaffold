@@ -249,6 +249,6 @@ public class WorldDynamic extends Entity implements EntityProvider, TargetSelect
 	
 	@Override
 	public SDoc getDocumentation() {
-		return SDoc.loadAsset(getProject().assetManager(), "doc/world_dynamic.sdoc");
+		return SDoc.loadAsset(getProject().assetManager(), "doc/world_dynamic.sdoc", super.getDocumentation());
 	}
 }

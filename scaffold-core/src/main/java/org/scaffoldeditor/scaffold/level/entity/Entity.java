@@ -559,7 +559,7 @@ public abstract class Entity {
 	 * @return Documentation object.
 	 */
 	public SDoc getDocumentation() {
-		return new SDoc("");
+		return SDoc.loadAsset(getAssetManager(), "doc/entity.sdoc", null);
 	}
 		
 	@Override

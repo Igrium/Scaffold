@@ -66,6 +66,6 @@ public class SingleBlock extends BaseSingleBlock {
 	
 	@Override
 	public SDoc getDocumentation() {
-		return SDoc.loadAsset(getAssetManager(), "doc/single_block.sdoc");
+		return SDoc.loadAsset(getAssetManager(), "doc/single_block.sdoc", super.getDocumentation());
 	}
 }

@@ -143,6 +143,6 @@ public class RedstoneTrigger extends BaseSingleBlock {
 	
 	@Override
 	public SDoc getDocumentation() {
-		return SDoc.loadAsset(getAssetManager(), "doc/redstone_trigger.sdoc");
+		return SDoc.loadAsset(getAssetManager(), "doc/redstone_trigger.sdoc", super.getDocumentation());
 	}
 }

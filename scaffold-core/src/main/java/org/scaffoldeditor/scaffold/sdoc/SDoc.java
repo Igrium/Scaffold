@@ -46,6 +46,11 @@ public class SDoc {
 		return "@"+component.write()+System.lineSeparator();
 	}
 	
+	/**
+	 * Parse an SDoc file.
+	 * @param input Text content of file.
+	 * @return Parsed SDoc.
+	 */
 	public static SDoc parse(String input) {
 		int descriptionEnd = input.indexOf('@');
 		if (descriptionEnd == -1) {
@@ -56,7 +61,7 @@ public class SDoc {
 		description = description.strip();
 		
 		SDoc doc = new SDoc(description);
-		
+
 		String[] components = input.substring(descriptionEnd).split("@");
 		for (String str : components) {
 			if (str.length() == 0) continue;	
@@ -76,16 +81,54 @@ public class SDoc {
 		return doc;
 	}
 	
-	public static SDoc loadAsset(AssetManager assetManager, String asset) {
+	/**
+	 * Load an SDoc file from an asset.
+	 * @param assetManager Asset manager to use.
+	 * @param asset Asset path to load.
+	 * @param parent Parent SDoc object. May be null.
+	 * @return Loaded asset.
+	 */
+	public static SDoc loadAsset(AssetManager assetManager, String asset, SDoc parent) {
 		if (!(assetManager.getLoader(asset).isAssignableTo(SDoc.class))) {
 			throw new IllegalArgumentException("Unable to load SDoc from asset "+asset+" because it has the wrong file extension!");
 		}
 		
 		try {
-			return (SDoc) assetManager.loadAsset(asset, false);
+			SDoc doc = (SDoc) assetManager.loadAsset(asset, false);
+			if (parent != null) {
+				return merge(parent, doc);
+			} else {
+				return doc;
+			}
 		} catch (IOException e) {
 			LogManager.getLogger().error("Error loading Scaffold documentation!", e);
 			return new SDoc("[error loading documentation]");
 		}
+	}
+	
+	@Override
+	public SDoc clone() {
+		SDoc doc = new SDoc(description);
+		attributes.stream().map(comp -> comp.clone()).forEachOrdered(comp -> doc.attributes.add(comp));
+		inputs.stream().map(comp -> comp.clone()).forEachOrdered(comp -> doc.inputs.add(comp));
+		outputs.stream().map(comp -> comp.clone()).forEachOrdered(comp -> doc.outputs.add(comp));
+		return doc;
+	}
+	
+	
+	public static SDoc merge(SDoc parent, SDoc child) {
+		SDoc doc = new SDoc(child.getDescription());
+		parent.attributes.stream().filter(comp -> !ComponentDoc.containsName(child.attributes, comp.getName()))
+				.forEachOrdered(doc.attributes::add);
+		parent.inputs.stream().filter(comp -> !ComponentDoc.containsName(child.inputs, comp.getName()))
+				.forEachOrdered(doc.inputs::add);
+		parent.outputs.stream().filter(comp -> !ComponentDoc.containsName(child.outputs, comp.getName()))
+		.forEachOrdered(doc.outputs::add);
+		
+		doc.attributes.addAll(child.attributes);
+		doc.inputs.addAll(child.inputs);
+		doc.outputs.addAll(child.outputs);
+		
+		return doc;
 	}
 }

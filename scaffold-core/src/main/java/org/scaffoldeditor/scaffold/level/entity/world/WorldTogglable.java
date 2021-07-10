@@ -213,6 +213,6 @@ public class WorldTogglable extends WorldStatic {
 	
 	@Override
 	public SDoc getDocumentation() {
-		return SDoc.loadAsset(getAssetManager(), "doc/world_togglable.sdoc");
+		return SDoc.loadAsset(getAssetManager(), "doc/world_togglable.sdoc", super.getDocumentation());
 	}
 }

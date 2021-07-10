@@ -101,6 +101,6 @@ public class LogicTeleport extends LogicEntity {
 	
 	@Override
 	public SDoc getDocumentation() {
-		return SDoc.loadAsset(getAssetManager(), "doc/logic_teleport.sdoc");
+		return SDoc.loadAsset(getAssetManager(), "doc/logic_teleport.sdoc", super.getDocumentation());
 	}
 }

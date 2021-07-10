@@ -138,6 +138,6 @@ public class TriggerIndividual extends ToolBrushEntity {
 	
 	@Override
 	public SDoc getDocumentation() {
-		return SDoc.loadAsset(getAssetManager(), "doc/trigger_individual.sdoc");
+		return SDoc.loadAsset(getAssetManager(), "doc/trigger_individual.sdoc", super.getDocumentation());
 	}
 }

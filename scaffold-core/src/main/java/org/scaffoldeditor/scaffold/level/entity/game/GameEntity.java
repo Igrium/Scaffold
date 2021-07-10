@@ -136,6 +136,6 @@ public class GameEntity extends Rotatable implements KnownUUID, EntityProvider {
 	
 	@Override
 	public SDoc getDocumentation() {
-		return SDoc.loadAsset(getAssetManager(), "doc/game_entity.sdoc");
+		return SDoc.loadAsset(getAssetManager(), "doc/game_entity.sdoc", super.getDocumentation());
 	}
 }

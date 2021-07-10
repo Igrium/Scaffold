@@ -145,6 +145,6 @@ public class Relay extends LogicEntity {
 	
 	@Override
 	public SDoc getDocumentation() {
-		return SDoc.loadAsset(getAssetManager(), "doc/logic_relay.sdoc");
+		return SDoc.loadAsset(getAssetManager(), "doc/logic_relay.sdoc", super.getDocumentation());
 	}
 }

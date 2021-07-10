@@ -233,6 +233,6 @@ public class PathTrain extends Entity implements KnownUUID, EntityProvider {
 	
 	@Override
 	public SDoc getDocumentation() {
-		return SDoc.loadAsset(getAssetManager(), "doc/path_train.sdoc");
+		return SDoc.loadAsset(getAssetManager(), "doc/path_train.sdoc", super.getDocumentation());
 	}
 }

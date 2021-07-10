@@ -93,7 +93,7 @@ public class Auto extends LogicEntity {
 
 	@Override
 	public SDoc getDocumentation() {
-		return SDoc.loadAsset(getAssetManager(), "doc/logic_auto.sdoc");
+		return SDoc.loadAsset(getAssetManager(), "doc/logic_auto.sdoc", super.getDocumentation());
 	}
 
 }

@@ -141,6 +141,6 @@ public class PathNode extends LogicEntity implements KnownUUID, EntityProvider {
 	
 	@Override
 	public SDoc getDocumentation() {
-		return SDoc.loadAsset(getAssetManager(), "doc/path_node.sdoc");
+		return SDoc.loadAsset(getAssetManager(), "doc/path_node.sdoc", super.getDocumentation());
 	}
 }

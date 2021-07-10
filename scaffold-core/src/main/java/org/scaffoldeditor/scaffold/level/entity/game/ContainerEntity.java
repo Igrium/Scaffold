@@ -110,6 +110,6 @@ public class ContainerEntity extends BaseSingleBlock {
 	
 	@Override
 	public SDoc getDocumentation() {
-		return SDoc.loadAsset(getAssetManager(), "doc/world_container.sdoc");
+		return SDoc.loadAsset(getAssetManager(), "doc/world_container.sdoc", super.getDocumentation());
 	}
 }

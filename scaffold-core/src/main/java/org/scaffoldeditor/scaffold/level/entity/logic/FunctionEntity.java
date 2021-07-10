@@ -89,6 +89,6 @@ public class FunctionEntity extends LogicEntity {
 	
 	@Override
 	public SDoc getDocumentation() {
-		return SDoc.loadAsset(getAssetManager(), "doc/logic_function.sdoc");
+		return SDoc.loadAsset(getAssetManager(), "doc/logic_function.sdoc", super.getDocumentation());
 	}
 }
