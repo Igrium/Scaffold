@@ -2,9 +2,11 @@ package org.scaffoldeditor.scaffold.level.entity.path;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.scaffoldeditor.nbt.block.BlockWorld;
+import org.scaffoldeditor.nbt.math.Vector3f;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.EntityProvider;
@@ -13,6 +15,8 @@ import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.EntityAttribute;
 import org.scaffoldeditor.scaffold.level.entity.game.KnownUUID;
 import org.scaffoldeditor.scaffold.level.entity.logic.LogicEntity;
+import org.scaffoldeditor.scaffold.level.render.LineRenderEntity;
+import org.scaffoldeditor.scaffold.level.render.RenderEntity;
 import org.scaffoldeditor.scaffold.logic.LogicUtils;
 import org.scaffoldeditor.scaffold.math.MathUtils;
 import org.scaffoldeditor.scaffold.util.UUIDUtils;
@@ -37,6 +41,9 @@ public class PathNode extends LogicEntity implements KnownUUID, EntityProvider {
 	public PathNode(Level level, String name) {
 		super(level, name);
 	}
+	
+	// for updating render entities
+	private Vector3f nextPos;
 
 	@Override
 	public Map<String, Attribute<?>> getDefaultAttributes() {
@@ -52,6 +59,15 @@ public class PathNode extends LogicEntity implements KnownUUID, EntityProvider {
 		} else {
 			return null;
 		}
+	}
+	
+	public PathNode getPrevious() {
+		for (Entity ent : getLevel().getLevelStack()) {
+			if (ent instanceof PathNode && ent.getAttribute("next").getValue().equals(getName())) {
+				return (PathNode) ent;
+			}
+		}
+		return null;
 	}
 	
 	/**
@@ -106,5 +122,19 @@ public class PathNode extends LogicEntity implements KnownUUID, EntityProvider {
 		world.addEntity(getEntity(), getPosition().toDouble());
 		return true;
 	}
-
+	
+	@Override
+	public Set<RenderEntity> getRenderEntities() {
+		Set<RenderEntity> ents = super.getRenderEntities();
+		PathNode next = getNext();
+		if (next != null) {
+			ents.add(new LineRenderEntity(this, getPreviewPosition(), next.getPreviewPosition(), "line", .72f, .48f, .09f, .82f));
+			nextPos = next.getPreviewPosition();
+		}
+		PathNode previous = getPrevious();
+		if (previous != null && !getPreviewPosition().equals(previous.nextPos)) {
+			previous.updateRenderEntities();
+		}
+		return ents;
+	}
 }
