@@ -30,6 +30,7 @@ import org.scaffoldeditor.scaffold.logic.datapack.commands.ExecuteCommandBuilder
 import org.scaffoldeditor.scaffold.logic.datapack.commands.FunctionCommand;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.ScheduleCommand;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.ScheduleCommand.Mode;
+import org.scaffoldeditor.scaffold.sdoc.SDoc;
 
 public class LogicTimer extends LogicEntity {
 	
@@ -144,6 +145,11 @@ public class LogicTimer extends LogicEntity {
 	@Override
 	public String getSprite() {
 		return "scaffold:textures/editor/clock.png";
+	}
+	
+	@Override
+	public SDoc getDocumentation() {
+		return SDoc.loadAsset(getAssetManager(), "doc/logic_timer.sdoc");
 	}
 	
 }

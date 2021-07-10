@@ -1,0 +1,4 @@
+Executes a single Minecraft command when triggered.
+
+@attribute command Command The command to execute, without the '/'.
+@attribute executor_override "Executor Override" Target selector to execute the command. If blank, executed as executor.

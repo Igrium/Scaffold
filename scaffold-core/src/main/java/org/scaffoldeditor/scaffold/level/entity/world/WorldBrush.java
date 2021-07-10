@@ -22,6 +22,7 @@ import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BlockTextureAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.VectorAttribute;
+import org.scaffoldeditor.scaffold.sdoc.SDoc;
 
 public class WorldBrush extends BaseBlockEntity implements BrushEntity {
 	
@@ -147,5 +148,10 @@ public class WorldBrush extends BaseBlockEntity implements BrushEntity {
 			}
 		}
 		return blocks;
+	}
+	
+	@Override
+	public SDoc getDocumentation() {
+		return SDoc.loadAsset(getAssetManager(), "doc/world_brush.sdoc");
 	}
 }

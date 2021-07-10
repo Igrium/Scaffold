@@ -1,0 +1,7 @@
+Represents a collection of blocks that's rendered as a set of entities, allowing them to be moved around off-grid.
+Note: because of the implementation of `falling_sand`, the model doesn't render properly when rotated.
+
+**Warning:** Don't use for large block collections because it's VERY expensive. Each block gets its own `falling_block` entity which renders it.
+
+@attribute model Model Schematic to use.
+@attribute start_enabled "Start Enabled" Whether to start with the model enabled.

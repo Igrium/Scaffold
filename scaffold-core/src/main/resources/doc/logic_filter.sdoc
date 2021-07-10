@@ -1,0 +1,5 @@
+Applies an execute command to an IO chain. Unlike `logic_auto`, a new function is not generated. 
+Instead, all connections to the `on_trigger` output are added to each calling function. This means that
+the IO instigator is passed through.
+
+@attribute filter Filter Execute filter to apply.

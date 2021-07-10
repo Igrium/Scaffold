@@ -8,6 +8,7 @@ import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.logic.LogicEntity;
+import org.scaffoldeditor.scaffold.sdoc.SDoc;
 
 public class PlayerStart extends LogicEntity {
 	
@@ -32,5 +33,10 @@ public class PlayerStart extends LogicEntity {
 	@Override
 	protected Vector3f getRenderOffset() {
 		return new Vector3f(.5f, 0, .5f);
+	}
+	
+	@Override
+	public SDoc getDocumentation() {
+		return SDoc.loadAsset(getAssetManager(), "doc/info_player_start.sdoc");
 	}
 }

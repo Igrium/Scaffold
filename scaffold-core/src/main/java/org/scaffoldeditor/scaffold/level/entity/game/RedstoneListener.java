@@ -22,6 +22,8 @@ import org.scaffoldeditor.scaffold.logic.Datapack;
 import org.scaffoldeditor.scaffold.logic.datapack.Function;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.Command;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.FunctionCommand;
+import org.scaffoldeditor.scaffold.sdoc.SDoc;
+
 import net.querz.nbt.tag.CompoundTag;
 
 /**
@@ -134,5 +136,10 @@ public class RedstoneListener extends BaseSingleBlock {
 	
 	protected Identifier getTriggerFunction() {
 		return new Identifier(getLevel().getName().toLowerCase(), getName().toLowerCase()+"/trigger");
+	}
+	
+	@Override
+	public SDoc getDocumentation() {
+		return SDoc.loadAsset(getAssetManager(), "doc/redstone_listener.sdoc");
 	}
 }

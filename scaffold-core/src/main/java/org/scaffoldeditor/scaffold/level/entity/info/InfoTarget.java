@@ -7,6 +7,7 @@ import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.logic.LogicEntity;
+import org.scaffoldeditor.scaffold.sdoc.SDoc;
 
 /**
  * An extreamly simple entity that serves no purpose except to provide its
@@ -33,5 +34,9 @@ public class InfoTarget extends LogicEntity {
 	public String getSprite() {
 		return "scaffold:textures/editor/target.png";
 	}
-
+	
+	@Override
+	public SDoc getDocumentation() {
+		return SDoc.loadAsset(getAssetManager(), "doc/info_target.sdoc");
+	}
 }

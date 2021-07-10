@@ -1,0 +1,4 @@
+Places a single block into the world.
+
+@attribute blockName "Block Name" Namespaced name of the block to place.
+@attribute blockProperties "Block Properties" Blockstate as a list tag.

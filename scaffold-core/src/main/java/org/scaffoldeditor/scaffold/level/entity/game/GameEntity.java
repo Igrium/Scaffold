@@ -20,6 +20,7 @@ import org.scaffoldeditor.scaffold.level.entity.attribute.StringAttribute;
 import org.scaffoldeditor.scaffold.level.render.MCRenderEntity;
 import org.scaffoldeditor.scaffold.level.render.RenderEntity;
 import org.scaffoldeditor.scaffold.logic.Datapack;
+import org.scaffoldeditor.scaffold.sdoc.SDoc;
 import org.scaffoldeditor.scaffold.util.UUIDUtils;
 
 import net.querz.nbt.io.SNBTUtil;
@@ -132,5 +133,9 @@ public class GameEntity extends Rotatable implements KnownUUID, EntityProvider {
 	public UUID getUUID() {
 		return getLevel().getCompanionUUID(this);
 	}
-
+	
+	@Override
+	public SDoc getDocumentation() {
+		return SDoc.loadAsset(getAssetManager(), "doc/game_entity.sdoc");
+	}
 }

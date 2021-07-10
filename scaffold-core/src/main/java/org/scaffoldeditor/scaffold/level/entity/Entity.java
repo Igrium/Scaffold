@@ -13,6 +13,7 @@ import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.nbt.math.Vector3f;
 import org.scaffoldeditor.nbt.math.Vector3i;
 import org.scaffoldeditor.scaffold.core.Project;
+import org.scaffoldeditor.scaffold.io.AssetManager;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.WorldUpdates.UpdateRenderEntitiesEvent;
 import org.scaffoldeditor.scaffold.level.entity.Macro.Confirmation;
@@ -27,6 +28,7 @@ import org.scaffoldeditor.scaffold.level.render.RenderEntity;
 import org.scaffoldeditor.scaffold.logic.Datapack;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.Command;
 import org.scaffoldeditor.scaffold.operation.ChangeAttributesOperation;
+import org.scaffoldeditor.scaffold.sdoc.SDoc;
 import org.scaffoldeditor.scaffold.util.event.EventListener;
 import org.w3c.dom.Element;
 
@@ -309,6 +311,14 @@ public abstract class Entity {
 	}
 	
 	/**
+	 * Shortcut method for getting the asset manager of the project this entity belongs to.
+	 * @return Project's asset manager.
+	 */
+	public AssetManager getAssetManager() {
+		return getProject().assetManager();
+	}
+	
+	/**
 	 * Get a map of this entity's attributes.
 	 * @return Attributes
 	 */
@@ -541,8 +551,17 @@ public abstract class Entity {
 	public boolean compileLogic(Datapack datapack) {
 		return true;
 	}
-
 	
+	/**
+	 * Get this entity's documentation. Usually this is loaded from an {@code sdoc}
+	 * file using the asset manager.
+	 * 
+	 * @return Documentation object.
+	 */
+	public SDoc getDocumentation() {
+		return new SDoc("");
+	}
+		
 	@Override
 	public String toString() {
 		return getName();

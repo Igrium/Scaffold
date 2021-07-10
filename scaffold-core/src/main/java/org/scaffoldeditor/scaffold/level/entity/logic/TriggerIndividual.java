@@ -20,6 +20,7 @@ import org.scaffoldeditor.scaffold.logic.datapack.commands.DataCommand;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.DataCommandBuilder;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.ExecuteCommand.Conditional;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.ExecuteCommand.DataStorageConditional;
+import org.scaffoldeditor.scaffold.sdoc.SDoc;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.ExecuteCommandBuilder;
 
 import net.querz.nbt.tag.ByteTag;
@@ -39,7 +40,7 @@ public class TriggerIndividual extends ToolBrushEntity {
 		Map<String, Attribute<?>> map = super.getDefaultAttributes();
 		map.put("scope", new EnumAttribute<>(ActivatorScope.PLAYERS));
 		map.put("start_disabled", new BooleanAttribute(false));
-		map.put("use_event_functions", new BooleanAttribute(false));
+		map.put("use_event_functions", new BooleanAttribute(true));
 		return map;
 	}
 	
@@ -134,5 +135,9 @@ public class TriggerIndividual extends ToolBrushEntity {
 	public boolean isGridLocked() {
 		return true;
 	}
-
+	
+	@Override
+	public SDoc getDocumentation() {
+		return SDoc.loadAsset(getAssetManager(), "doc/trigger_individual.sdoc");
+	}
 }

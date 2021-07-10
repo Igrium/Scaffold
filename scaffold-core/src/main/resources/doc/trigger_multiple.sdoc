@@ -1,0 +1,8 @@
+Fires an output when entities enter and exit the trigger volume.
+
+Note: only triggers when the first entity enters the volume and when the last entity leaves the volume.
+To listen for individual entities, use `trigger_individual`.
+
+@attribute scope Scope The scope of entities to listen for.
+@attribute start_disabled "Start Disabled" Start with this trigger disabled.
+@attribute trigger_once "Trigger Once" Disable the trigger after it has been triggered.

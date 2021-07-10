@@ -7,6 +7,8 @@ import org.scaffoldeditor.scaffold.block_textures.SingleBlockTexture;
 import org.scaffoldeditor.scaffold.io.BlockTextureAsset;
 import org.scaffoldeditor.scaffold.io.ConstructionAsset;
 import org.scaffoldeditor.scaffold.io.ConstructionWorldAsset;
+import org.scaffoldeditor.scaffold.io.DocAsset;
+import org.scaffoldeditor.scaffold.io.StringAsset;
 import org.scaffoldeditor.scaffold.io.StructureAsset;
 import org.scaffoldeditor.scaffold.io.TemplateFunctionAsset;
 import org.scaffoldeditor.scaffold.level.entity.attribute.AssetAttribute;
@@ -59,7 +61,7 @@ public class DefaultPlugin implements PluginInitializer {
 		LogManager.getLogger().info("Initializing default plugin...");
 		BlockCollectionManager.registerDefaults();
 
-		WorldStatic.Register();
+		WorldStatic.register();
 		WorldChunked.register();
 		WorldBrush.register();
 		SingleBlock.register();
@@ -108,6 +110,8 @@ public class DefaultPlugin implements PluginInitializer {
 		ConstructionWorldAsset.register();
 		BlockTextureAsset.register();
 		TemplateFunctionAsset.register();
+		StringAsset.register();
+		DocAsset.register();
 		
 		SingleBlockTexture.register();
 		NoiseBlockTexture.register();

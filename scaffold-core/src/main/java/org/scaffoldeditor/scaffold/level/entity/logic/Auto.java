@@ -13,6 +13,7 @@ import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.io.OutputDeclaration;
 import org.scaffoldeditor.scaffold.logic.Datapack;
 import org.scaffoldeditor.scaffold.logic.datapack.Function;
+import org.scaffoldeditor.scaffold.sdoc.SDoc;
 
 /**
  * Fires an output on level load.
@@ -88,6 +89,11 @@ public class Auto extends LogicEntity {
 	@Override
 	public String getSprite() {
 		return "scaffold:textures/editor/auto.png";
+	}
+
+	@Override
+	public SDoc getDocumentation() {
+		return SDoc.loadAsset(getAssetManager(), "doc/logic_auto.sdoc");
 	}
 
 }

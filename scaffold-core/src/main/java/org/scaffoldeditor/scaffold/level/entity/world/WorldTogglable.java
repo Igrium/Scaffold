@@ -28,6 +28,7 @@ import org.scaffoldeditor.scaffold.logic.datapack.arguements.CommandVector3f;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.Command;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.DataCommandBuilder;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.ExecuteCommand.Conditional;
+import org.scaffoldeditor.scaffold.sdoc.SDoc;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.ExecuteCommandBuilder;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.FunctionCommand;
 
@@ -208,5 +209,10 @@ public class WorldTogglable extends WorldStatic {
 		CompoundTag storage = new CompoundTag();
 		storage.putBoolean("enabled", enabled);
 		return new DataCommandBuilder().merge().storage(LogicUtils.getEntityStorage(this)).nbt(storage).build();
+	}
+	
+	@Override
+	public SDoc getDocumentation() {
+		return SDoc.loadAsset(getAssetManager(), "doc/world_togglable.sdoc");
 	}
 }

@@ -1,0 +1,6 @@
+Fires a redstone output when it recieves an input.
+
+Works by placing a redstone block when triggered, so redstone contraptions must be setup to handle that.
+
+@attribute start_enabled "Start Enabled" Start with the redstone powered on.
+@attribute pulse_length "Pulse Length" The length of the pulse to fire when the 'pulse' input is triggered.

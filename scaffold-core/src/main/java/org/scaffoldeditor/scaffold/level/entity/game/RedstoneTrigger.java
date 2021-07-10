@@ -24,6 +24,7 @@ import org.scaffoldeditor.scaffold.logic.datapack.arguements.CommandVector3i;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.Command;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.ScheduleCommand;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.SetBlockCommand;
+import org.scaffoldeditor.scaffold.sdoc.SDoc;
 
 /**
  * Fires a redstone output when it recieves an input.
@@ -139,5 +140,9 @@ public class RedstoneTrigger extends BaseSingleBlock {
 	@Override
 	public void onUpdateBlockAttributes() {
 	}
-
+	
+	@Override
+	public SDoc getDocumentation() {
+		return SDoc.loadAsset(getAssetManager(), "doc/redstone_trigger.sdoc");
+	}
 }

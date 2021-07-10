@@ -1,0 +1,6 @@
+Creates a large block of blocks in the world. This block is modifiable in the editor and is populated by a block texture.
+
+@attribute end_point "End Point" The end point of the brush relative to the entity root. Must be positive.
+@attribute texture Texture The block texture to use.
+@attribute texture_scale "Texture Scale" Scale the texture by this amount.
+@attribute texture_offset "Texture Offset" Offset the texture by this amount.

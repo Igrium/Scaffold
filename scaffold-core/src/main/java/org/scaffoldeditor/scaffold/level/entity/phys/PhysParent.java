@@ -13,6 +13,7 @@ import org.scaffoldeditor.scaffold.level.entity.game.TargetSelectable;
 import org.scaffoldeditor.scaffold.level.entity.logic.LogicEntity;
 import org.scaffoldeditor.scaffold.logic.Datapack;
 import org.scaffoldeditor.scaffold.logic.datapack.constraints.ParentConstraint;
+import org.scaffoldeditor.scaffold.sdoc.SDoc;
 
 public class PhysParent extends LogicEntity {
 	
@@ -52,5 +53,9 @@ public class PhysParent extends LogicEntity {
 	public String getSprite() {
 		return "scaffold:textures/editor/script.png";
 	}
-
+	
+	@Override
+	public SDoc getDocumentation() {
+		return SDoc.loadAsset(getAssetManager(), "doc/phys_parent.sdoc");
+	}
 }

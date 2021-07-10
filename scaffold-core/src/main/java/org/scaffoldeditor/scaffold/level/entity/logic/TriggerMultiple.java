@@ -22,6 +22,7 @@ import org.scaffoldeditor.scaffold.logic.datapack.commands.Command;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.DataCommand;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.DataCommandBuilder;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.ExecuteCommand.*;
+import org.scaffoldeditor.scaffold.sdoc.SDoc;
 
 import net.querz.nbt.tag.ByteTag;
 import net.querz.nbt.tag.CompoundTag;
@@ -195,5 +196,9 @@ public class TriggerMultiple extends ToolBrushEntity {
 	public boolean isGridLocked() {
 		return true;
 	}
-
+	
+	@Override
+	public SDoc getDocumentation() {
+		return SDoc.loadAsset(getAssetManager(), "doc/trigger_multiple.sdoc");
+	}
 }

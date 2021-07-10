@@ -19,6 +19,7 @@ import org.scaffoldeditor.scaffold.logic.datapack.arguements.CommandVector;
 import org.scaffoldeditor.scaffold.logic.datapack.arguements.CommandVector3f;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.Command;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.ExecuteCommandBuilder;
+import org.scaffoldeditor.scaffold.sdoc.SDoc;
 
 /***
  * Teleports Minecraft entities to this entity's location.
@@ -97,5 +98,9 @@ public class LogicTeleport extends LogicEntity {
 	public Entity getLandmark() {
 		return getLevel().getEntity((String) getAttribute("landmark").getValue());
 	}
-
+	
+	@Override
+	public SDoc getDocumentation() {
+		return SDoc.loadAsset(getAssetManager(), "doc/logic_teleport.sdoc");
+	}
 }

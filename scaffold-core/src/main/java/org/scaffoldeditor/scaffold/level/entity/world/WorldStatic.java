@@ -32,6 +32,7 @@ import org.scaffoldeditor.scaffold.level.entity.attribute.BlockTextureAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BooleanAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.EnumAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.EnumAttribute.DefaultEnums.Direction;
+import org.scaffoldeditor.scaffold.sdoc.SDoc;
 
 /**
  * This entity compiles a standard block collection into the world.
@@ -46,7 +47,7 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 	private String modelpath;
 	private Direction direction = Direction.NORTH;
 	
-	public static void Register() {
+	public static void register() {
 		EntityRegistry.registry.put("world_static", new EntityFactory<Entity>() {		
 			@Override
 			public Entity create(Level level, String name) {
@@ -281,5 +282,10 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 	@Override
 	public BlockCollection getBlockCollection() {
 		return getFinalModel();
+	}
+	
+	@Override
+	public SDoc getDocumentation() {
+		return SDoc.loadAsset(getProject().assetManager(), "doc/world_static.sdoc");
 	}
 }

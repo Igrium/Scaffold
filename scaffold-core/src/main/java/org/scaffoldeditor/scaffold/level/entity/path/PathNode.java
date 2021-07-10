@@ -19,6 +19,7 @@ import org.scaffoldeditor.scaffold.level.render.LineRenderEntity;
 import org.scaffoldeditor.scaffold.level.render.RenderEntity;
 import org.scaffoldeditor.scaffold.logic.LogicUtils;
 import org.scaffoldeditor.scaffold.math.MathUtils;
+import org.scaffoldeditor.scaffold.sdoc.SDoc;
 import org.scaffoldeditor.scaffold.util.UUIDUtils;
 
 import net.querz.nbt.tag.CompoundTag;
@@ -136,5 +137,10 @@ public class PathNode extends LogicEntity implements KnownUUID, EntityProvider {
 			previous.updateRenderEntities();
 		}
 		return ents;
+	}
+	
+	@Override
+	public SDoc getDocumentation() {
+		return SDoc.loadAsset(getAssetManager(), "doc/path_node.sdoc");
 	}
 }

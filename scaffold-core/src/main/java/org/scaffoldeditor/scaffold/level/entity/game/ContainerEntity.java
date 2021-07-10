@@ -17,6 +17,7 @@ import org.scaffoldeditor.scaffold.level.entity.attribute.ContainerAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.NBTAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.StringAttribute;
 import org.scaffoldeditor.scaffold.level.entity.world.BaseSingleBlock;
+import org.scaffoldeditor.scaffold.sdoc.SDoc;
 
 import net.querz.nbt.tag.CompoundTag;
 
@@ -105,5 +106,10 @@ public class ContainerEntity extends BaseSingleBlock {
 
 	@Override
 	public void onUpdateBlockAttributes() {
+	}
+	
+	@Override
+	public SDoc getDocumentation() {
+		return SDoc.loadAsset(getAssetManager(), "doc/world_container.sdoc");
 	}
 }

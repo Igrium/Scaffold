@@ -14,6 +14,7 @@ import org.scaffoldeditor.scaffold.level.io.InputDeclaration;
 import org.scaffoldeditor.scaffold.level.io.OutputDeclaration;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.Command;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.ExecuteCommandBuilder;
+import org.scaffoldeditor.scaffold.sdoc.SDoc;
 
 public class LogicFilter extends LogicEntity {
 	
@@ -64,5 +65,9 @@ public class LogicFilter extends LogicEntity {
 		map.put("filter", new FilterAttribute());
 		return map;
 	}
-
+	
+	@Override
+	public SDoc getDocumentation() {
+		return SDoc.loadAsset(getAssetManager(), "doc/logic_filter.sdoc");
+	}
 }

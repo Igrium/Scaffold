@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.logging.log4j.LogManager;
 import org.scaffoldeditor.scaffold.core.Project;
 
 /**
@@ -215,5 +216,25 @@ public class AssetManager {
 	 */
 	public AssetLoader<?> getLoader(String asset) {
 		return AssetLoaderRegistry.registry.get(FilenameUtils.getExtension(asset));
+	}
+	
+	/**
+	 * Utility function to load a text file as a string.
+	 * 
+	 * @param asset Asset to load. Must have a registered asset loader that returns
+	 *              a value assignable to {@code String}!
+	 * @return Loaded string.
+	 */
+	public String loadText(String asset) {
+		if (!getLoader(asset).isAssignableTo(String.class)) {
+			throw new IllegalArgumentException(asset+" is not loadable as a string!");
+		}
+		
+		try {
+			return (String) loadAsset(asset, false);
+		} catch (IOException e) {
+			LogManager.getLogger().error("Error loading text file!", e);
+			return "";
+		}
 	}
 }

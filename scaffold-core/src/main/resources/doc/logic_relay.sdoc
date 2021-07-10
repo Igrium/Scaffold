@@ -1,0 +1,8 @@
+A message forwarder. Every time the `trigger` input is fired, the `on_trigger` output is fired.
+
+Note: this entity works by creating a function containing all the output commands, which is fired every time the trigger is called.
+This means that the compile-time instigator entity of the IO chain is reset to this entity. If this behaviour is undesired, `logic_filter`
+should be used instead.
+
+@attribute delay Delay The amount of ticks to wait after recieving an input to fire the outputs. Note: this resets the executor if set to other than zero.
+@attribute executorOverride "Executor Override" Target selector to execute the command. If blank, executed as executor. Cannot be used in junction with Delay.

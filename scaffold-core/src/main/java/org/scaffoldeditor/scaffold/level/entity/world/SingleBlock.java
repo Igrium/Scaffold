@@ -10,6 +10,8 @@ import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.NBTAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.StringAttribute;
+import org.scaffoldeditor.scaffold.sdoc.SDoc;
+
 import net.querz.nbt.tag.CompoundTag;
 
 /**
@@ -60,5 +62,10 @@ public class SingleBlock extends BaseSingleBlock {
 
 	@Override
 	public void onUpdateBlockAttributes() {
+	}
+	
+	@Override
+	public SDoc getDocumentation() {
+		return SDoc.loadAsset(getAssetManager(), "doc/single_block.sdoc");
 	}
 }

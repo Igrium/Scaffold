@@ -1,0 +1,4 @@
+Executes an arbitrary function when triggered.
+
+@attribute namespace Namespace Namespace of function.
+@attribute function Function Function name, excluding namespace.

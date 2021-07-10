@@ -1,0 +1,7 @@
+Represents a container in-game such as a chest.
+
+@attribute contents Contents Container contents.
+@attribute block Block Block to place in the world. Must be a container block.
+@attribute custom_name "Custom Name" Name to apply to the container.
+@attribute lock The lock this container uses. See the Minecraft Wiki for more details.
+@attribute additional_nbt "Additional NBT" Addition NBT data to put in the block entity.

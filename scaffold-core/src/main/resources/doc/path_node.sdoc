@@ -1,0 +1,6 @@
+Represents a single node in a path. A path is created when two or more nodes are connected together.
+
+Paths are a general-purpose feature in Scaffold. They don't do anything on their own, but entities such as
+`path_train` make use of them to dictate where to go.
+
+@attribute next Next The next node in the path.

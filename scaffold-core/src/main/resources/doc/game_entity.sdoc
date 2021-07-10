@@ -1,0 +1,4 @@
+Represents a single Minecraft entity in the editor.
+
+@attribute entityType "Entity Type" Namespaced name of the entity.
+@attribute nbt NBT Additional NBT data to add.

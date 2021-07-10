@@ -1,0 +1,3 @@
+Places a command block that fires an output when triggered.
+
+@attribute repeating Repeating If set, output is fired every tick there's a redstone signal.

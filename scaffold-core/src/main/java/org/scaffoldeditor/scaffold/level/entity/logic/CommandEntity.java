@@ -16,6 +16,7 @@ import org.scaffoldeditor.scaffold.level.io.InputDeclaration;
 import org.scaffoldeditor.scaffold.logic.datapack.TargetSelector;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.Command;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.ExecuteCommandBuilder;
+import org.scaffoldeditor.scaffold.sdoc.SDoc;
 
 /**
  * Executes a single Minecraft command when compiled.
@@ -98,4 +99,8 @@ public class CommandEntity extends LogicEntity {
 		return "scaffold:textures/editor/command.png";
 	}
 	
+	@Override
+	public SDoc getDocumentation() {
+		return SDoc.loadAsset(getAssetManager(), "doc/logic_command.sdoc");
+	}
 }

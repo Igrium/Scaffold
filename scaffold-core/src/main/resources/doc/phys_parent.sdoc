@@ -1,0 +1,5 @@
+Attaches two Minecraft entities together in a parent-child relationship. 
+Both entities must be represented by target-selectable Scaffold entities.
+
+@attribute parent Parent The parent entity.
+@attribute child Child The child entity.

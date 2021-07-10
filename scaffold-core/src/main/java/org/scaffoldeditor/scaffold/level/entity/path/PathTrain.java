@@ -28,6 +28,7 @@ import org.scaffoldeditor.scaffold.logic.datapack.TemplateFunction;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.Command;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.ExecuteCommandBuilder;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.FunctionCommand;
+import org.scaffoldeditor.scaffold.sdoc.SDoc;
 import org.scaffoldeditor.scaffold.util.UUIDUtils;
 
 import net.querz.nbt.tag.CompoundTag;
@@ -229,5 +230,9 @@ public class PathTrain extends Entity implements KnownUUID, EntityProvider {
 		
 		return true;
 	}
-
+	
+	@Override
+	public SDoc getDocumentation() {
+		return SDoc.loadAsset(getAssetManager(), "doc/path_train.sdoc");
+	}
 }

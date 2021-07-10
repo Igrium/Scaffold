@@ -16,6 +16,7 @@ import org.scaffoldeditor.scaffold.level.entity.attribute.StringAttribute;
 import org.scaffoldeditor.scaffold.level.io.InputDeclaration;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.Command;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.FunctionCommand;
+import org.scaffoldeditor.scaffold.sdoc.SDoc;
 
 /**
  * Runs a function on the input "Run".
@@ -82,7 +83,12 @@ public class FunctionEntity extends LogicEntity {
 	}
 	
 	@Override
-		protected float getRenderScale() {
-			return .5f;
-		}
+	protected float getRenderScale() {
+		return .5f;
+	}
+	
+	@Override
+	public SDoc getDocumentation() {
+		return SDoc.loadAsset(getAssetManager(), "doc/logic_function.sdoc");
+	}
 }

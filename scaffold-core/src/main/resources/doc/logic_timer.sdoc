@@ -1,0 +1,11 @@
+While enabled, fires an output on a loop.
+
+@attribute time Time The amount of ticks to wait between each fire.
+@attribute start_active "Start Active" Whether this timer should start enabled.
+@attribute fire_on_activate "Fire on Activate" If true, the output is fired as soon as the timer is activeted, Otherwise, it is activated after the first loop.
+
+@input enable Enable Enable the timer.
+@input disable Disable Disable the timer.
+@input reset Reset Reset the timer back to its longest possible time.
+
+@output on_fire "On Fire" Called every time the timer reaches zero.

@@ -1,0 +1,6 @@
+Teleports Minecraft entities to this entity's location.
+
+@attribute target Target Target entity.
+@attribute relative Relative If set, performs a relative teleport instead of an absolute teleport.
+@attribute landmark Landmark Relative teleports are performed relative to this entity. 
+If the player is a block away from the landmark, they will be a block away from the teleport entity once teleported.

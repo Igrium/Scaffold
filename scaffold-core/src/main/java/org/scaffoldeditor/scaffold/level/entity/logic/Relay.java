@@ -25,6 +25,7 @@ import org.scaffoldeditor.scaffold.logic.datapack.commands.ExecuteCommandBuilder
 import org.scaffoldeditor.scaffold.logic.datapack.commands.FunctionCommand;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.ScheduleCommand;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.ScheduleCommand.Mode;
+import org.scaffoldeditor.scaffold.sdoc.SDoc;
 
 /**
  * This class relays io from it's inputs to it's outputs
@@ -140,5 +141,10 @@ public class Relay extends LogicEntity {
 	@Override
 	public String getSprite() {
 		return "scaffold:textures/editor/relay.png";
+	}
+	
+	@Override
+	public SDoc getDocumentation() {
+		return SDoc.loadAsset(getAssetManager(), "doc/logic_relay.sdoc");
 	}
 }

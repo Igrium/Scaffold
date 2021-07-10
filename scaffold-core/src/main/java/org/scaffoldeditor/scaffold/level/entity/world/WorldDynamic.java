@@ -40,6 +40,7 @@ import org.scaffoldeditor.scaffold.logic.datapack.commands.ExecuteCommand.Condit
 import org.scaffoldeditor.scaffold.logic.datapack.commands.ExecuteCommand.DataEntityConditional;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.ExecuteCommandBuilder;
 import org.scaffoldeditor.scaffold.logic.datapack.constraints.ParentConstraint;
+import org.scaffoldeditor.scaffold.sdoc.SDoc;
 import org.scaffoldeditor.scaffold.util.UUIDUtils;
 
 import net.querz.nbt.io.SNBTUtil;
@@ -244,5 +245,10 @@ public class WorldDynamic extends Entity implements EntityProvider, TargetSelect
 	@Override
 	public TargetSelector getTargetSelector() {
 		return getRoot();
+	}
+	
+	@Override
+	public SDoc getDocumentation() {
+		return SDoc.loadAsset(getProject().assetManager(), "doc/world_dynamic.sdoc");
 	}
 }

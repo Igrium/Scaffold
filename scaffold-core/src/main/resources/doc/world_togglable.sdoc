@@ -1,0 +1,12 @@
+A `world_static` that can be turned on and off.
+
+This entity compiles a function with a list of setblock commands that place all the blocks in the schematic when enabled.
+When disabled, the entity replaces its blocks according to a cache that's generated when the level is compiled. If the
+underlying were modified befcore it was enabled, the modifications are not saved.
+
+@attribute model Model Schematic to use.
+@attribute direction Direction Direction to face.
+@attribute place_air "Place Air" Whether or not to place air blocks. Note: structure voids are NOT placed.
+@attribute texture_override "Texture Override" Whether or not to use the texture override.
+@attribute texture Texture If 'Texture Override' is enabled, replace all the non-air blocks in the model with the blocks from this texture.
+@attribute start_enabled "Start Enabled" Whether to start with the model enabled.
