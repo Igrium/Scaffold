@@ -117,8 +117,16 @@ public class Output implements XMLSerializable {
 	 *         triggered.
 	 */
 	public List<Command> compile(Entity instigator) {
-		String target = owner.evaluateName(this.target);
-		Entity entity = owner.getLevel().getEntity(target);
+		Entity entity = null;
+		if (target.startsWith("!")) {
+			entity = evaluateKeyword(target, instigator);
+		}
+		
+		if (entity == null) {
+			String target = owner.evaluateName(this.target);
+			entity = owner.getLevel().getEntity(target);
+		}
+		
 		if (entity == null) {
 			LogManager.getLogger().error(owner.getName()+" tried to compile an output with a target entity that does not exist: "+target);
 			return new ArrayList<>();
@@ -171,5 +179,23 @@ public class Output implements XMLSerializable {
 	@Override
 	public Output clone() {
 		return new Output(owner, trigger, target, inputName, args);
+	}
+	
+	/**
+	 * Evaluate a keyword.
+	 * @param in Target string.
+	 * @param instigator Instigator of this IO chain.
+	 * @return Target entity.
+	 */
+	public Entity evaluateKeyword(String in, Entity instigator) {
+		in = in.replace("!", "");
+		if (in.equals("this")) {
+			return owner;
+		} else if (in.equals("instigator")) {
+			return instigator;
+		} else {
+			LogManager.getLogger().error("Unknown output keyword: "+in);
+			return null;
+		}
 	}
 }

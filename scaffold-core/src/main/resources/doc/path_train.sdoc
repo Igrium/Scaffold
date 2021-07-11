@@ -1,5 +1,5 @@
 Represents a train-like entity that can follow a Scaffold path. This entity on it's own simply creates a marker that follows the path,
 but in combination with a `phys_parent`, any Minecraft entity can be made to follow the path.
 
-@attribute starting_path_node` "Starting Path Node" The path node to start at. Entity will teleport to this node on spawn.
+@attribute starting_path_node "Starting Path Node" The path node to start at. Entity will teleport to this node on spawn.
 @attribute speed Speed The speed to move at in blocks per second.
