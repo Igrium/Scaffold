@@ -2,4 +2,6 @@ Applies an execute command to an IO chain. Unlike `logic_auto`, a new function i
 Instead, all connections to the `on_trigger` output are added to each calling function. This means that
 the IO instigator is passed through.
 
+[Learn more about execute commands](https://minecraft.fandom.com/wiki/Commands/execute)
+
 @attribute filter Filter Execute filter to apply.
