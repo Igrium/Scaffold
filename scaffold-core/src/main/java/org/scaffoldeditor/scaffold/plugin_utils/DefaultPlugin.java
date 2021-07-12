@@ -36,6 +36,7 @@ import org.scaffoldeditor.scaffold.level.entity.info.PlayerStart;
 import org.scaffoldeditor.scaffold.level.entity.logic.Auto;
 import org.scaffoldeditor.scaffold.level.entity.logic.CommandEntity;
 import org.scaffoldeditor.scaffold.level.entity.logic.FunctionEntity;
+import org.scaffoldeditor.scaffold.level.entity.logic.LogicEntryPoint;
 import org.scaffoldeditor.scaffold.level.entity.logic.LogicFilter;
 import org.scaffoldeditor.scaffold.level.entity.logic.LogicTeleport;
 import org.scaffoldeditor.scaffold.level.entity.logic.LogicTimer;
@@ -60,7 +61,8 @@ public class DefaultPlugin implements PluginInitializer {
 	public void initialize() {
 		LogManager.getLogger().info("Initializing default plugin...");
 		BlockCollectionManager.registerDefaults();
-
+		
+		/* ENTITIES */
 		WorldStatic.register();
 		WorldChunked.register();
 		WorldBrush.register();
@@ -84,10 +86,12 @@ public class DefaultPlugin implements PluginInitializer {
 		LogicTeleport.register();
 		LogicTimer.register();
 		LogicFilter.register();
+		LogicEntryPoint.register();
 		PathNode.register();
 		PathTrain.register();
 		PhysParent.register();
 		
+		/* ATTRIBUTES */
 		StringAttribute.register();
 		NBTAttribute.register();
 		IntAttribute.register();
@@ -105,6 +109,7 @@ public class DefaultPlugin implements PluginInitializer {
 		EntityAttribute.register();
 		FilterAttribute.register();
 		
+		/* ASSETS */
 		StructureAsset.register();
 		ConstructionAsset.register();
 		ConstructionWorldAsset.register();
@@ -113,6 +118,7 @@ public class DefaultPlugin implements PluginInitializer {
 		StringAsset.register();
 		DocAsset.register();
 		
+		/* BLOCK TEXTURES */
 		SingleBlockTexture.register();
 		NoiseBlockTexture.register();
 		

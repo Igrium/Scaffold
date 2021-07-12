@@ -1,0 +1,8 @@
+Represents an entrypoint that external functions (datapacks, triggers, etc) can use to trigger IO events. Could be considered the inverse to `logic_function`.
+
+To use, set 'Identifier' to a valid function name of your choice. Then, in any external function, simply execute this function. This will cause the `on_trigger` output to be fired.
+
+**Note:** This will override any functions provided by datapacks. If multiple `logic_entrypoints` use the same identifier, *only* the one that's higher on the compile stack is used. Same goes for if this function name interferes with the internal implementation of any entities. It is recommended to use the namespace of your external datapack for this reason.
+
+@attribute identifier Identifier Identifier of the function that this entity will create.
+@output on_trigger "On Trigger" Triggered when the subject function is called.
