@@ -1,5 +1,8 @@
 package org.scaffoldeditor.scaffold.logic;
 
+import java.io.IOException;
+import java.util.UUID;
+
 import org.scaffoldeditor.nbt.util.Identifier;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.game.KnownUUID;
@@ -8,8 +11,10 @@ import org.scaffoldeditor.scaffold.logic.datapack.commands.Command;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.DataCommandBuilder;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.ExecuteCommand.Conditional;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.ExecuteCommand.DataStorageConditional;
+import org.scaffoldeditor.scaffold.logic.datapack.commands.ExecuteCommand.DataEntityConditional;
 import org.scaffoldeditor.scaffold.util.UUIDUtils;
 
+import net.querz.nbt.io.SNBTUtil;
 import net.querz.nbt.tag.CompoundTag;
 
 /**
@@ -114,4 +119,18 @@ public final class LogicUtils {
 		return new DataCommandBuilder().modify().storage(storage2).path(path2).set().from().storage(storage1).path(path1).build();
 	}
 	
+	/**
+	 * Get a conditional that tests if the executing entity has the given UUID.
+	 * @param uuid UUID to test.
+	 * @return The conditional.
+	 */
+	public static Conditional hasUUID(UUID uuid) {
+		CompoundTag testData = new CompoundTag();
+		testData.putIntArray("UUID", UUIDUtils.toIntArray(uuid));
+		try {
+			return new DataEntityConditional(TargetSelector.SELF, SNBTUtil.toSNBT(testData));
+		} catch (IOException e) {
+			throw new AssertionError(e);
+		}
+	}
 }

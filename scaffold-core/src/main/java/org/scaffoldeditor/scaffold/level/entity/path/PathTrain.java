@@ -104,19 +104,7 @@ public class PathTrain extends LogicEntity implements KnownUUID, EntityProvider 
 		return new ExecuteCommandBuilder().as(node.getTargetSelector()).at(TargetSelector.SELF)
 				.run(new FunctionCommand(jumpHereFunction()));
 	}
-	
-	/**
-	 * Obtain a list of commands that will teleport this train to its next path
-	 * node, as indicated by its {@code NextPath} nbt value.
-	 * 
-	 * @return List of commands.
-	 */
-	public List<Command> jumpToNext() {
-		List<Command> commands = new ArrayList<>();
-		
-		
-		return commands;
-	}
+
 	
 	/**
 	 * Get how many blocks the train should move each tick;
@@ -136,10 +124,16 @@ public class PathTrain extends LogicEntity implements KnownUUID, EntityProvider 
 		}
 		jumpFunction.setVariable("this", getTargetSelector().compile());
 		
+		// Runs in the scope of the path node.
 		Function jump = new Function(jumpFunction.getID());
 		jump.commands.addAll(jumpFunction.getCommands());
-		// Runs in the scope of the path node.
 		jump.addExecuteBlock(new ExecuteCommandBuilder().at(TargetSelector.SELF), compileOutput("on_passed_node"));
+		
+		
+		for (PathNode node : getStartingPath().getPath()) {
+			ExecuteCommandBuilder builder = new ExecuteCommandBuilder().executeIf(LogicUtils.hasUUID(node.getUUID())).at(TargetSelector.SELF);
+			jump.addExecuteBlock(builder, node.compileOutput(PathNode.PASSED_OUTPUT, this));
+		}
 		
 		datapack.functions.add(jump);
 		

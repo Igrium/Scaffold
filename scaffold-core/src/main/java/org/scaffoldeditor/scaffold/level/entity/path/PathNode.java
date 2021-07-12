@@ -1,6 +1,9 @@
 package org.scaffoldeditor.scaffold.level.entity.path;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -15,6 +18,7 @@ import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.EntityAttribute;
 import org.scaffoldeditor.scaffold.level.entity.game.KnownUUID;
 import org.scaffoldeditor.scaffold.level.entity.logic.LogicEntity;
+import org.scaffoldeditor.scaffold.level.io.OutputDeclaration;
 import org.scaffoldeditor.scaffold.level.render.LineRenderEntity;
 import org.scaffoldeditor.scaffold.level.render.RenderEntity;
 import org.scaffoldeditor.scaffold.logic.LogicUtils;
@@ -43,6 +47,8 @@ public class PathNode extends LogicEntity implements KnownUUID, EntityProvider {
 		super(level, name);
 	}
 	
+	public static final String PASSED_OUTPUT = "on_passed";
+	
 	// for updating render entities
 	private Vector3f nextPos;
 
@@ -52,7 +58,18 @@ public class PathNode extends LogicEntity implements KnownUUID, EntityProvider {
 		map.put("next", new EntityAttribute(""));
  		return map;
 	}
-
+	
+	@Override
+	public Collection<OutputDeclaration> getDeclaredOutputs() {
+		Collection<OutputDeclaration> out = super.getDeclaredOutputs();
+		out.add(() -> PASSED_OUTPUT);
+		return out;
+	};
+	
+	/**
+	 * Get the next node in the path.
+	 * @return The next node, or {@code null} if there is no connection.
+	 */
 	public PathNode getNext() {
 		Entity ent = getLevel().getEntity(((EntityAttribute) getAttribute("next")).evaluate(this));
 		if (ent instanceof PathNode) {
@@ -62,6 +79,12 @@ public class PathNode extends LogicEntity implements KnownUUID, EntityProvider {
 		}
 	}
 	
+	/**
+	 * Get the previous node in the path.
+	 * <br>
+	 * <b>Warning:</b> Significantly more expensive that {@code getNext()}
+	 * @return The previous node, or {@code null} of no node has a connection to this.
+	 */
 	public PathNode getPrevious() {
 		for (Entity ent : getLevel().getLevelStack()) {
 			if (ent instanceof PathNode && ent.getAttribute("next").getValue().equals(getName())) {
@@ -69,6 +92,36 @@ public class PathNode extends LogicEntity implements KnownUUID, EntityProvider {
 			}
 		}
 		return null;
+	}
+	
+	/**
+	 * Get a list of all nodes in this path. If the path loops, the list starts at
+	 * this node. Otherwise, it starts at the first node.
+	 * 
+	 * @return Nodes in the path, in order.
+	 */
+	public List<PathNode> getPath() {
+		List<PathNode> next = new ArrayList<>();
+		PathNode current = this;
+		while (current != null) {
+			next.add(current);
+			current = current.getNext();
+			// Handle loops.
+			if (current == this) {
+				return next;
+			}
+		}
+		
+		PathNode first = getPrevious();
+		if (first == null) return next; // We're the first node.
+		
+		PathNode previousNode = first.getPrevious();
+		while (previousNode != null) {
+			first = previousNode;
+			previousNode = first.getPrevious();
+		}
+		
+		return first.getPath();
 	}
 	
 	/**
