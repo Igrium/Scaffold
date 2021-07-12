@@ -153,12 +153,14 @@ public class ExecuteCommand implements Command {
 	}
 	
 	public static class BlockConditional implements Conditional {
-		public final BlockArguement predicate;	
-		public BlockConditional(BlockArguement predicate) {
+		public final BlockArguement predicate;
+		public final CommandVector3i pos;
+		public BlockConditional(CommandVector3i pos, BlockArguement predicate) {
 			this.predicate = predicate;
+			this.pos = pos;
 		}
 		public String get() {
-			return "block "+predicate.compile();
+			return "block "+pos.getString()+" "+predicate.compile();
 		}
 	}
 	

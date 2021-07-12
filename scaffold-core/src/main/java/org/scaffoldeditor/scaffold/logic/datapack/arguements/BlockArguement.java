@@ -106,4 +106,49 @@ public class BlockArguement {
 		}
 		return map;
 	}
+	
+	public static BlockArguement fromString(String in) throws IllegalArgumentException {
+		int stateIndex = in.indexOf('[');
+		int tagIndex = in.indexOf('{');
+		
+		String name;
+		if (stateIndex >= 0) {
+			name = in.substring(0, stateIndex);
+		} else if (tagIndex >= 0) {
+			name = in.substring(0, tagIndex);
+		} else {
+			name = in;
+		}
+		
+		Map<String, String> blockState = null;
+		if (stateIndex >= 0) {
+			blockState = new HashMap<>();
+			int stateEnd = in.indexOf(']');
+			if (stateEnd < 0) {
+				throw new IllegalArgumentException("Unbalenced brackets in blockstate: " + in + "<--");
+			}
+			String stateString = in.substring(stateIndex + 1, in.indexOf(']'));
+			String[] state = stateString.split(",");
+			for (String entry : state) {
+				String[] entrySplit = entry.split("=");
+				if (entrySplit.length < 2) {
+					throw new IllegalArgumentException("Missing blockstate value: " + entry + "<--");
+				}
+				
+				blockState.put(entrySplit[0], entrySplit[1]);
+			}
+		}
+		
+		CompoundTag data = null;
+		if (tagIndex >= 0) {
+			int tagEnd = in.lastIndexOf('}');
+			try {
+				data = (CompoundTag) SNBTUtil.fromSNBT(in.substring(tagIndex, tagEnd + 1));
+			} catch (IOException e) {
+				throw new IllegalArgumentException(e.getMessage(), e);
+			}
+		}
+		
+		return new BlockArguement(name, blockState, data);
+	}
 }

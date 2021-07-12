@@ -70,11 +70,11 @@ public class FilterAttribute extends Attribute<ExecuteCommandBuilder> {
 					} else if (tagName.equals("rotated_as")) {
 						builder.rotatedAs(TargetSelector.fromString(child.getAttribute("val")));
 					} else if (tagName.equals("if")) {
-						NodeList children2 = element.getChildNodes();
+						NodeList children2 = child.getChildNodes();
 						for (int x = 0; x < children2.getLength(); x++) {
-							Node child2 = children.item(x);
+							Node child2 = children2.item(x);
 							if (child2 instanceof Element) {
-								builder.executeIf(readConditional((Element) child));
+								builder.executeIf(readConditional((Element) child2));
 							}
 						}
 					} else if (tagName.equals("unless")) {
@@ -176,6 +176,7 @@ public class FilterAttribute extends Attribute<ExecuteCommandBuilder> {
 			BlockArguement val = ((BlockConditional) conditional).predicate;
 			root.setAttribute("id", val.id);
 			root.setAttribute("blockstate", val.writeBlockstate());
+			root.setAttribute("pos", ((BlockConditional) conditional).pos.getString());
 			CompoundTag data = val.data;
 			if (data != null) {
 				try {
@@ -210,6 +211,10 @@ public class FilterAttribute extends Attribute<ExecuteCommandBuilder> {
 			root.setAttribute("source", val.source.toString());
 			root.setAttribute("path", val.path);
 			
+		} else if (conditional instanceof EntityConditional) {
+			root = document.createElement("entity");
+			root.setAttribute("val", ((EntityConditional) conditional).target.compile());
+			
 		} else if (conditional instanceof PredicateConditional) {
 			root = document.createElement("predicate");
 			root.setAttribute("val", ((PredicateConditional) conditional).predicate);
@@ -241,6 +246,7 @@ public class FilterAttribute extends Attribute<ExecuteCommandBuilder> {
 		String tagName = in.getTagName();
 		if (tagName.equals("block")) {
 			String id = in.getAttribute("id");
+			CommandVector3i pos = CommandVector3i.fromString(in.getAttribute("pos"));
 			Map<String, String> blockstate = BlockArguement.parseBlockStates(in.getAttribute("blockstate"));
 			String dataStr = in.getTextContent();
 			CompoundTag data = null;
@@ -251,7 +257,7 @@ public class FilterAttribute extends Attribute<ExecuteCommandBuilder> {
 					throw new IllegalArgumentException("Unable to parse data NBT", e);
 				}
 			}
-			return new BlockConditional(new BlockArguement(id, blockstate, data));
+			return new BlockConditional(pos, new BlockArguement(id, blockstate, data));
 			
 		} else if (tagName.equals("blocks")) {
 			CommandVector3i start = CommandVector3i.fromString(in.getAttribute("start"));
@@ -269,6 +275,9 @@ public class FilterAttribute extends Attribute<ExecuteCommandBuilder> {
 			TargetSelector target = TargetSelector.fromString(in.getAttribute("target"));
 			String path = in.getAttribute("path");
 			return new DataEntityConditional(target, path);
+			
+		} else if (tagName.equals("entity")) {
+			return new EntityConditional(TargetSelector.fromString(in.getAttribute("val")));
 			
 		} else if (tagName.equals("data_storage")) {
 			Identifier source = new Identifier(in.getAttribute("source"));
