@@ -18,6 +18,7 @@ import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.EntityAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.FloatAttribute;
 import org.scaffoldeditor.scaffold.level.entity.game.KnownUUID;
+import org.scaffoldeditor.scaffold.level.entity.logic.LogicEntity;
 import org.scaffoldeditor.scaffold.level.io.InputDeclaration;
 import org.scaffoldeditor.scaffold.level.io.OutputDeclaration;
 import org.scaffoldeditor.scaffold.logic.Datapack;
@@ -35,7 +36,7 @@ import net.querz.nbt.tag.CompoundTag;
 import net.querz.nbt.tag.FloatTag;
 import net.querz.nbt.tag.ListTag;
 
-public class PathTrain extends Entity implements KnownUUID, EntityProvider {
+public class PathTrain extends LogicEntity implements KnownUUID, EntityProvider {
 	
 	public static void register() {
 		EntityRegistry.registry.put("path_train", PathTrain::new);
@@ -234,5 +235,15 @@ public class PathTrain extends Entity implements KnownUUID, EntityProvider {
 	@Override
 	public SDoc getDocumentation() {
 		return SDoc.loadAsset(getAssetManager(), "doc/path_train.sdoc", super.getDocumentation());
+	}
+
+	@Override
+	public String getSprite() {
+		return "scaffold:textures/editor/minecart.png";
+	}
+	
+	@Override
+	public boolean isGridLocked() {
+		return false;
 	}
 }
