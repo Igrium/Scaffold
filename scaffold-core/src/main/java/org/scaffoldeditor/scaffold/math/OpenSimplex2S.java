@@ -1,16 +1,18 @@
 package org.scaffoldeditor.scaffold.math;
+
 /**
  * K.jpg's OpenSimplex 2, smooth variant ("SuperSimplex")
+ * 
+ * <ul>
+ * <li>2D is standard simplex, modified to support larger kernels. Implemented
+ * using a lookup table.</li>
+ * <li>3D is "Re-oriented 8-point BCC noise" which constructs a congruent BCC
+ * lattice in a much different way than usual.</li> <li>4D uses a pregenerated
+ * lookup table, and averages out to the expected performance.</li>
+ * </ul>
  *
- * - 2D is standard simplex, modified to support larger kernels.
- *   Implemented using a lookup table.
- * - 3D is "Re-oriented 8-point BCC noise" which constructs a
- *   congruent BCC lattice in a much different way than usual.
- * - 4D uses a naïve pregenerated lookup table, and averages out
- *   to the expected performance.
- *
- * Multiple versions of each function are provided. See the
- * documentation above each, for more info.
+ * Multiple versions of each function are provided. See the documentation above
+ * each, for more info.
  * 
  * @author K.jpg
  */
