@@ -1,4 +1,6 @@
-# Scaffold
+**Note: this is the repo for the core Scaffold code. For the editor itself, [click here.](https://github.com/Sam54123/scaffold-editor-mc)**
+
+# Scaffold Core
 Scaffold is a Minecraft mapmaking toolset based on similar concepts to Source engine. It is designed to streamline the mapmaking workflow and make it easier to manage your project by breaking it up into smaller files that can be individually worked with. It also improves compatibility with [Version Control](https://git-scm.com/book/en/v2/Getting-Started-About-Version-Control).
 
 NOTE: Because scaffold is in VERY early development, anything on this repo is subject to change or may not be functional yet. Do not use in a production envoirnment. (If you do use it in a production envoirnment, let me know how it goes!)
