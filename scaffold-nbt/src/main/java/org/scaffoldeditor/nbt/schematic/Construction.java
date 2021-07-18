@@ -28,7 +28,7 @@ public class Construction implements ChunkedBlockCollection {
 	
 	/**
 	 * A 16x16x16 section within the Construction format. Although sections in Construction can take up only
-	 * a section of the 16m³ voxel, this class abstracts all of that away. You only need to worry about block
+	 * a section of the 16m^3 voxel, this class abstracts all of that away. You only need to worry about block
 	 * coordinates relative to the on-grid root.
 	 * @author Igrium
 	 */
