@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.scaffoldeditor.nbt.block.BlockWorld;
@@ -616,9 +617,10 @@ public class Level {
 	public static Level loadFile(Project project, File file) {
 		try {
 			FileInputStream in = new FileInputStream(file);
-			return new LevelReader(in).read(project);
+			Level level = new LevelReader(in).read(project);
+			level.setName(FilenameUtils.getBaseName(level.getName()));
+			return level;
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
 			throw new AssertionError("Unable to load level "+file.getName(), e);
 		}
 	}

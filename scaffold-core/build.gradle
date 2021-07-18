@@ -7,9 +7,9 @@
  */
 
 plugins {
-    // Apply the java-library plugin to add support for Java Library
     id 'java-library'
     id 'maven-publish'
+    id 'application'
 }
 
 sourceCompatibility = JavaVersion.VERSION_1_8
@@ -27,10 +27,12 @@ dependencies {
     implementation group: 'net.lingala.zip4j', name: 'zip4j', version: '2.8.0'
 
     implementation group: 'commons-io', name: 'commons-io', version: '2.6'
+    api group: 'com.mojang', name: 'brigadier', version: '1.0.18'
 
     implementation 'org.json:json:20190722'
     // implementation 'org.python:jython:2.7.1b3'
     implementation 'org.reflections:reflections:0.9.11'
+    implementation 'org.fusesource.jansi:jansi:2.3.3'
     
     // Use JUnit test framework
     testImplementation 'junit:junit:4.12'
@@ -41,7 +43,9 @@ java {
     withSourcesJar()
 }
 
-
+application {
+    mainClass = 'org.scaffoldeditor.cmd.Terminal'
+}
 
 publishing {
     publications {
@@ -85,6 +89,11 @@ repositories {
     mavenCentral()
     mavenLocal()
     maven { url 'https://jitpack.io/' }
+    maven { url 'https://libraries.minecraft.net' }
+}
+
+run {
+    standardInput = System.in
 }
 
 // test.onlyIf { false }

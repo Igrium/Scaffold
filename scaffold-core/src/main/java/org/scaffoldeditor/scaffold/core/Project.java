@@ -70,7 +70,6 @@ public class Project implements AutoCloseable {
 				try {
 					Files.setAttribute(cache.toPath(), "dos:hidden", true);
 				} catch (IOException e) {
-					e.printStackTrace();
 				}
 			}
 		}
@@ -115,22 +114,21 @@ public class Project implements AutoCloseable {
 	 * Create a new Project from a project folder
 	 * @param folder Project folder
 	 * @return Loaded project (or null of load failed)
+	 * @throws IOException If there's an error loading the project.
 	 */
-	public static Project loadProject(String folder) {
+	public static Project loadProject(String folder) throws IOException {
 		if (folder == null) {
 			return null;
 		}
 		
 		// Make sure path exists
 		if (Files.notExists(Paths.get(folder))) {
-			LogManager.getLogger().error(folder+" does not exist!");
-			return null;
+			throw new FileNotFoundException(folder+" does not exist!");
 		}
 		
 		// Check for gameinfo file
 		if (Files.notExists(Paths.get(folder, Constants.GAMEINFONAME))) {
-			LogManager.getLogger().error(folder+" does not contain a gameinfo file!");
-			return null;
+			throw new FileNotFoundException(folder+" does not contain a gameinfo file!");
 		}
 		
 		Project project = new Project(Paths.get(folder));
@@ -138,10 +136,8 @@ public class Project implements AutoCloseable {
 		// Load the gameinfo
 		try {
 			project.gameInfo = GameInfo.fromFile(Paths.get(folder, Constants.GAMEINFONAME).toFile());
-		} catch (FileNotFoundException | JSONException e) {
-			e.printStackTrace();
-			LogManager.getLogger().error("Unable to load gameinfo file!");
-			return null;
+		} catch (JSONException e) {
+			throw new IOException("Unable to load gameinfo file!", e);
 		}
 		project.compiler = Compiler.getDefault(project); // The compiler needs info from the gameinfo.
 		project.loadPlugins();
@@ -153,8 +149,9 @@ public class Project implements AutoCloseable {
 	 * @param folder Folder to create project in
 	 * @param title Pretty title for the project (used as map name)
 	 * @return Newly created project (or null if creation failed)
+	 * @throws IOException If there's an error initializing the project.
 	 */
-	public static Project init(String folder, String title) {
+	public static Project init(String folder, String title) throws IOException {
 		// Check if file already exists
 		if (new File(folder,Constants.GAMEINFONAME).exists()) {
 			LogManager.getLogger().warn("Project already exists in "+folder+"!");
@@ -168,39 +165,20 @@ public class Project implements AutoCloseable {
 		project.gameInfo().setTitle(title);
 		project.gameInfo().getLoadedPaths().add("_projectfolder_");
 		
-		try {
-			project.gameInfo().saveJSON(Paths.get(folder,Constants.GAMEINFONAME).toFile());
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			return null;
-		}
+		project.gameInfo().saveJSON(Paths.get(folder,Constants.GAMEINFONAME).toFile());
 		
+		Files.createDirectories(Paths.get(folder, "assets"));
+		Files.createDirectories(Paths.get(folder, "data"));
+		Files.createDirectories(Paths.get(folder, "game"));
+		Files.createDirectories(Paths.get(folder, "maps"));
+		Files.createDirectories(Paths.get(folder, "schematics"));
+		Files.createDirectories(Paths.get(folder, CACHE_FOLDER_NAME));
+		Files.createDirectories(Paths.get(folder,"scripts"));
 		
-		// Create subfolders
-		try {
-			Files.createDirectories(Paths.get(folder, "assets"));
-			Files.createDirectories(Paths.get(folder, "data"));
-			Files.createDirectories(Paths.get(folder, "game"));
-			Files.createDirectories(Paths.get(folder, "maps"));
-			Files.createDirectories(Paths.get(folder, "schematics"));
-			Files.createDirectories(Paths.get(folder, CACHE_FOLDER_NAME));
-			Files.createDirectories(Paths.get(folder,"scripts"));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			LogManager.getLogger().error("Unable to create folder structure!");
-			return null;
-		}
-		
-		try {
-			File gitignore = Paths.get(folder, ".gitignore").toFile();
-			FileOutputStream out = new FileOutputStream(gitignore);
-			Project.class.getResourceAsStream("/template.gitignore").transferTo(out);
-			out.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-			LogManager.getLogger().error("Unable to create .gitignopre!");
-		}
+		File gitignore = Paths.get(folder, ".gitignore").toFile();
+		FileOutputStream out = new FileOutputStream(gitignore);
+		Project.class.getResourceAsStream("/template.gitignore").transferTo(out);
+		out.close();
 		
 		project.loadPlugins();
 		return project;
