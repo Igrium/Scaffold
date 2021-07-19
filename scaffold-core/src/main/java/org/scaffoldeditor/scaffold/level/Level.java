@@ -1,5 +1,6 @@
 package org.scaffoldeditor.scaffold.level;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -588,9 +589,12 @@ public class Level {
 	}
 
 	public void saveFile(File file) throws IOException {
-		FileOutputStream out = new FileOutputStream(file);
-		new LevelWriter(out).write(this);
-		out.close();
+		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+		new LevelWriter(buffer).write(this);
+		
+		FileOutputStream fileOut = new FileOutputStream(file);
+		buffer.writeTo(fileOut);
+		fileOut.close();
 		setHasUnsavedChanges(false);
 		LogManager.getLogger().info("Level saved to " + file);
 	}

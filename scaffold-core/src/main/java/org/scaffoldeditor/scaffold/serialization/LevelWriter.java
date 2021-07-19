@@ -1,5 +1,6 @@
 package org.scaffoldeditor.scaffold.serialization;
 
+import java.io.IOException;
 import java.io.OutputStream;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -8,6 +9,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -44,7 +46,7 @@ public class LevelWriter {
 		}
 	}
 	
-	public void write(Level level) {
+	public void write(Level level) throws IOException {
 		try {
 			Document doc = new LevelSerializer(level).createXMLDocument(dBuilder);
 			DOMSource source = new DOMSource(doc);
@@ -52,8 +54,8 @@ public class LevelWriter {
 			
 			transformer.transform(source, output);
 			
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (TransformerException | ParserConfigurationException e) {
+			throw new IOException(e);
 		}
 	}
 	
