@@ -12,7 +12,6 @@ import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.logic.Datapack;
 import org.scaffoldeditor.scaffold.logic.AbstractPack.OutputMode;
 import org.scaffoldeditor.scaffold.logic.datapack.Function;
-import org.scaffoldeditor.scaffold.logic.datapack.commands.Command;
 
 public class CompileLogicStep implements CompileStep {
 
@@ -33,10 +32,6 @@ public class CompileLogicStep implements CompileStep {
 		
 		datapack.loadFunctions.add(initFunction.getID());
 		datapack.tickFunctions.add(tickFunction.getID());
-		
-		// Respawn scoreboard entity.
-		initFunction.commands.add(Command.fromString("kill "+level.getScoreboardEntity().getTargetSelector().compile()));
-		initFunction.commands.add(level.summonScoreboardEntity());
 
 		// Compile entities
 		for (Entity ent : level.getLevelStack()) {

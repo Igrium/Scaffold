@@ -35,14 +35,11 @@ import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BooleanAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.VectorAttribute;
-import org.scaffoldeditor.scaffold.level.entity.game.TargetSelectable;
 import org.scaffoldeditor.scaffold.level.render.RenderEntity;
 import org.scaffoldeditor.scaffold.level.stack.StackGroup;
 import org.scaffoldeditor.scaffold.level.stack.StackItem;
 import org.scaffoldeditor.scaffold.logic.Datapack;
 import org.scaffoldeditor.scaffold.logic.datapack.Function;
-import org.scaffoldeditor.scaffold.logic.datapack.TargetSelector;
-import org.scaffoldeditor.scaffold.logic.datapack.commands.Command;
 import org.scaffoldeditor.scaffold.operation.AddGroupOperation;
 import org.scaffoldeditor.scaffold.operation.OperationManager;
 import org.scaffoldeditor.scaffold.serialization.LevelReader;
@@ -50,9 +47,6 @@ import org.scaffoldeditor.scaffold.serialization.LevelWriter;
 import org.scaffoldeditor.scaffold.util.LevelOperations;
 import org.scaffoldeditor.scaffold.util.event.EventDispatcher;
 import org.scaffoldeditor.scaffold.util.event.EventListener;
-
-import net.querz.nbt.io.SNBTUtil;
-import net.querz.nbt.tag.CompoundTag;
 
 /**
  * Represents a single level file
@@ -556,38 +550,6 @@ public class Level {
 		return updated.size();
 	}
 	
-	private TargetSelectable scoreboardEntity;
-	
-	/**
-	 * Get the Minecraft entity used to store the level scoreboard.
-	 * @return Scoreboard entity.
-	 */
-	public TargetSelectable getScoreboardEntity() {
-		if (scoreboardEntity == null) {
-			scoreboardEntity = new TargetSelectable() {
-				@Override
-				public TargetSelector getTargetSelector() {
-					return TargetSelector.fromString("@e[type="+SCOREBOARDTYPE+", name="+SCOREBOARDNAME+"]");
-				}
-			};
-		}
-		
-		return scoreboardEntity;
-	}
-	
-	
-	public Command summonScoreboardEntity() {
-		CompoundTag nbt = new CompoundTag();
-		nbt.putString("CustomName","\""+SCOREBOARDNAME+"\"");
-		nbt.putInt("Duration", 2000000000);
-		
-		try {
-			return Command.fromString("summon "+SCOREBOARDTYPE+" 0 0 0 "+SNBTUtil.toSNBT(nbt));
-		} catch (IOException e) {
-			throw new AssertionError("Unable to spawn scoreboard entity due to an NBT error.", e);
-		}
-	}
-
 	public void saveFile(File file) throws IOException {
 		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 		new LevelWriter(buffer).write(this);
