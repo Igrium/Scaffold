@@ -2,7 +2,6 @@ package org.scaffoldeditor.scaffold.level;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -587,25 +586,17 @@ public class Level {
 			throw new AssertionError("Unable to spawn scoreboard entity due to an NBT error.", e);
 		}
 	}
-	
-	public boolean saveFile(File file) {
-		try {
-			FileOutputStream out = new FileOutputStream(file);
-			new LevelWriter(out).write(this);
-			out.close();
-			setHasUnsavedChanges(false);
-		} catch (IOException e) {
-			e.printStackTrace();
-			return false;
-		} finally {
-			LogManager.getLogger().info("Level saved to "+file);
-		}
-		
-		return true;
+
+	public void saveFile(File file) throws IOException {
+		FileOutputStream out = new FileOutputStream(file);
+		new LevelWriter(out).write(this);
+		out.close();
+		setHasUnsavedChanges(false);
+		LogManager.getLogger().info("Level saved to " + file);
 	}
 	
-	public boolean saveFile(String file) {
-		return saveFile(project.assetManager().getAbsoluteFile(file));
+	public void saveFile(String file) throws IOException {
+		saveFile(project.assetManager().getAbsoluteFile(file));
 	}
 	
 	/**
@@ -613,16 +604,13 @@ public class Level {
 	 * @param project Project to load into
 	 * @param file File to load
 	 * @return Loaded level
+	 * @throws IOException If an IO Exception occurs while loading.
 	 */
-	public static Level loadFile(Project project, File file) {
-		try {
-			FileInputStream in = new FileInputStream(file);
-			Level level = new LevelReader(in).read(project);
-			level.setName(FilenameUtils.getBaseName(level.getName()));
-			return level;
-		} catch (FileNotFoundException e) {
-			throw new AssertionError("Unable to load level "+file.getName(), e);
-		}
+	public static Level loadFile(Project project, File file) throws IOException {
+		FileInputStream in = new FileInputStream(file);
+		Level level = new LevelReader(in).read(project);
+		level.setName(FilenameUtils.getBaseName(level.getName()));
+		return level;
 	}
 	
 	/**
@@ -630,8 +618,9 @@ public class Level {
 	 * @param project Project to load into
 	 * @param file File to load
 	 * @return Loaded level
+	 * @throws IOException If an IO Exception occurs while loading.
 	 */
-	public static Level loadFile(Project project, String file) {
+	public static Level loadFile(Project project, String file) throws IOException {
 		return loadFile(project, project.assetManager().getAbsoluteFile(file));
 	}
 	

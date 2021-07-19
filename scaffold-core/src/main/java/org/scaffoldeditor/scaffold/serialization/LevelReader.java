@@ -38,16 +38,16 @@ public class LevelReader {
 	 * Read the level file from this input stream.
 	 * @param project Project to assign the level to.
 	 * @return Deserialized level.
+	 * @throws IOException If an IO exception occurs while loading.
 	 */
-	public Level read(Project project) {
+	public Level read(Project project) throws IOException {
+		Document doc;
 		try {
-			Document doc = dBuilder.parse(in);
-			doc.getDocumentElement().normalize();
-			return LevelSerializer.deserialize(doc.getDocumentElement(), project);
-			
-		} catch (SAXException | IOException e) {
-			e.printStackTrace();
-			throw new AssertionError("Unable to read level.", e);
+			doc = dBuilder.parse(in);
+		} catch (SAXException e) {
+			throw new IOException(e);
 		}
+		doc.getDocumentElement().normalize();
+		return LevelSerializer.deserialize(doc.getDocumentElement(), project);
 	}
 }

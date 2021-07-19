@@ -45,14 +45,14 @@ public class ProjectCommand {
 					return 1;
 				})).build();
 		
-		LiteralCommandNode<ScaffoldCommandSource> print = literal("print")
+		LiteralCommandNode<ScaffoldCommandSource> get = literal("get")
 				.executes(command -> {
 					ScaffoldCommandSource source = command.getSource();
 					Project project = source.getContext().getProject();
 					if (project == null) {
 						source.getOut().println("There is no project currently loaded.");
 					} else {
-						source.getOut().println("Project folder: "+project.getProjectFolder());
+						source.getOut().println("Project Folder: '"+project.getProjectFolder()+"'");
 					}
 					
 					return 1;
@@ -99,9 +99,9 @@ public class ProjectCommand {
 				}))).build();
 		
 		root.addChild(open);
-		root.addChild(print);
 		root.addChild(close);
 		root.addChild(init);
+		root.addChild(get);
 	}
 	
 

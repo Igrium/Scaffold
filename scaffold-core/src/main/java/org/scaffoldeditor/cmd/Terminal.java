@@ -6,8 +6,11 @@ import java.util.List;
 import java.util.Scanner;
 
 import org.fusesource.jansi.AnsiConsole;
+import org.scaffoldeditor.cmd.commands.CompileCommand;
+import org.scaffoldeditor.cmd.commands.EntityCommand;
 import org.scaffoldeditor.cmd.commands.ExitCommand;
 import org.scaffoldeditor.cmd.commands.HelpCommand;
+import org.scaffoldeditor.cmd.commands.LevelCommand;
 import org.scaffoldeditor.cmd.commands.ProjectCommand;
 import org.scaffoldeditor.scaffold.core.Constants;
 
@@ -99,7 +102,7 @@ public class Terminal implements ScaffoldCommandSource {
 		}
 		
 		public void start() {
-			System.out.println("Scaffold version"+Constants.VERSION);
+			System.out.println("Scaffold v"+Constants.VERSION);
 			System.out.println("Type 'help' for a list of commands.");
 			
 			while (!Thread.interrupted() && !terminal.shouldExit) {
@@ -132,6 +135,9 @@ public class Terminal implements ScaffoldCommandSource {
 			}
 		}
 		
+		if (terminal.shouldExit) {
+			return;
+		}
 		
 		TerminalEntrypoint entry = new TerminalEntrypoint(terminal);
 		entry.start();
@@ -147,6 +153,9 @@ public class Terminal implements ScaffoldCommandSource {
 		ProjectCommand.register(dispatcher);
 		HelpCommand.register(dispatcher);
 		ExitCommand.register(dispatcher);
+		EntityCommand.register(dispatcher);
+		LevelCommand.register(dispatcher);
+		CompileCommand.register(dispatcher);
 	}
 	
 	static {
