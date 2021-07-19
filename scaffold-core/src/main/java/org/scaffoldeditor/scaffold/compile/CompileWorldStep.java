@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import org.apache.logging.log4j.LogManager;
 import org.scaffoldeditor.scaffold.compile.Compiler.CompileProgressListener;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
@@ -13,7 +14,7 @@ public class CompileWorldStep implements CompileStep {
 
 	@Override
 	public boolean execute(Level level, Path target, Map<String, Attribute<?>> args, CompileProgressListener listener) {
-		Future<Boolean> future = level.getProject().getLevelService().submit(() -> {
+		Future<Boolean> future = level.getProject().submit(() -> {
 			try {
 				level.compileBlockWorld(true);
 				return true;
@@ -25,7 +26,7 @@ public class CompileWorldStep implements CompileStep {
 		try {
 			return future.get();
 		} catch (InterruptedException | ExecutionException e) {
-			e.printStackTrace();
+			LogManager.getLogger().error("Error compiling world", e);
 			return false;
 		}
 	}

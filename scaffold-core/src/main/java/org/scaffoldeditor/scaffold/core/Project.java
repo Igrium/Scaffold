@@ -11,11 +11,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
-
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.json.JSONException;
@@ -33,7 +28,7 @@ import org.scaffoldeditor.scaffold.plugin_utils.PluginManager;
  * @author Igrium
  *
  */
-public class Project implements AutoCloseable {
+public class Project extends ServiceProvider implements AutoCloseable {
 	
 	public static final String CACHE_FOLDER_NAME = ".scaffold";
 	
@@ -50,7 +45,6 @@ public class Project implements AutoCloseable {
 	
 	private PluginManager pluginManager;
 	private PluginInitializer defaultPlugin;
-	private final ExecutorService levelService;
 	
 	/**
 	 * Create an empty project with an empty gameinfo
@@ -73,14 +67,6 @@ public class Project implements AutoCloseable {
 				}
 			}
 		}
-		
-		levelService = Executors.newSingleThreadExecutor(new ThreadFactory() {
-			
-			@Override
-			public Thread newThread(Runnable r) {
-				return new Thread(r, "Scaffold Level Thread");
-			}
-		});
 		
 		pluginManager = new PluginManager();
 		defaultPlugin = new DefaultPlugin();
@@ -251,30 +237,17 @@ public class Project implements AutoCloseable {
 		defaultPlugin.close();
 		pluginManager.closePlugins();
 		
-		try {
-			LogManager.getLogger().info("Shutting down level service.");
-			levelService.shutdown();
-			levelService.awaitTermination(5, TimeUnit.SECONDS);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} finally {
-			if (!levelService.isTerminated()) {
-				LogManager.getLogger().error("Level service failed to close in time!");
-			}
-			levelService.shutdownNow(); 
-		}
+		
 		
 		EntityRegistry.registry.clear();
 		AttributeRegistry.registry.clear();
 		AssetLoaderRegistry.registry.clear();
 		
 	}
-	
-	/**
-	 * Get the service that should be used for most level-modifying operations. 
-	 */
-	public ExecutorService getLevelService() {
-		return levelService;
+
+	@Override
+	protected String getThreadName() {
+		return "Scaffold Level Thread";
 	}
 }
 	
