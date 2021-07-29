@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Scanner;
 
 import org.fusesource.jansi.AnsiConsole;
+import org.scaffoldeditor.cmd.commands.AttributeCommand;
 import org.scaffoldeditor.cmd.commands.CompileCommand;
 import org.scaffoldeditor.cmd.commands.EntityCommand;
 import org.scaffoldeditor.cmd.commands.ExitCommand;
@@ -156,6 +157,7 @@ public class Terminal implements ScaffoldCommandSource {
 		EntityCommand.register(dispatcher);
 		LevelCommand.register(dispatcher);
 		CompileCommand.register(dispatcher);
+		AttributeCommand.register(dispatcher);
 	}
 	
 	static {

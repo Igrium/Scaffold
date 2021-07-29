@@ -2,6 +2,7 @@ package org.scaffoldeditor.cmd.commands;
 
 import org.scaffoldeditor.cmd.ScaffoldCommandSource;
 import org.scaffoldeditor.cmd.arguments.GamemodeArgumentType;
+import org.scaffoldeditor.cmd.arguments.PathArgumentType;
 import org.scaffoldeditor.scaffold.level.LevelData.GameType;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BooleanAttribute;
@@ -13,41 +14,39 @@ import org.scaffoldeditor.scaffold.compile.Compiler.*;
 import static org.scaffoldeditor.cmd.CommandUtil.*;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
-import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 
 public class CompileCommand {
 	public static void register(CommandDispatcher<ScaffoldCommandSource> dispatcher) {
 		LiteralCommandNode<ScaffoldCommandSource> compile = literal("compile")
-				.then(argument("targetPath", StringArgumentType.string())
+				.then(argument("targetPath", PathArgumentType.path())
 						.executes(command -> {
-							return compile(command.getSource(), StringArgumentType.getString(command, "targetPath"),
+							return compile(command.getSource(), PathArgumentType.getPath(command, "targetPath"),
 									GameType.ADVENTURE, false, true);
 						})
 						.then(argument("gamemode", GamemodeArgumentType.gamemode())
 								.executes(command -> {
 									GameType type = GamemodeArgumentType.getGameType(command, "gamemode");
 									return compile(command.getSource(),
-											StringArgumentType.getString(command, "targetPath"), type,
+										PathArgumentType.getPath(command, "targetPath"), type,
 											(type == GameType.CREATIVE || type == GameType.SPECTATOR), true);
 								})
 								.then(argument("cheats", BoolArgumentType.bool())
 										.executes(command -> {
 											return compile(command.getSource(),
-													StringArgumentType.getString(command, "targetPath"),
+													PathArgumentType.getPath(command, "targetPath"),
 													GamemodeArgumentType.getGameType(command, "gamemode"),
 													BoolArgumentType.getBool(command, "cheats"), true);
 										})
 										.then(argument("full", BoolArgumentType.bool())
 												.executes(command -> {
 													return compile(command.getSource(),
-															StringArgumentType.getString(command, "targetPath"),
+															PathArgumentType.getPath(command, "targetPath"),
 															GamemodeArgumentType.getGameType(command, "gamemode"),
 															BoolArgumentType.getBool(command, "cheats"),
 															BoolArgumentType.getBool(command, "full"));
@@ -56,7 +55,7 @@ public class CompileCommand {
 		dispatcher.getRoot().addChild(compile);
 	}
 	
-	private static int compile(ScaffoldCommandSource source, String path, GameType gameType, boolean cheats, boolean full) {
+	private static int compile(ScaffoldCommandSource source, Path target, GameType gameType, boolean cheats, boolean full) {
 		if (source.getContext().getLevel() == null) {
 			source.printError("No level loaded!");
 			return 0;
@@ -67,7 +66,6 @@ public class CompileCommand {
 		args.put("cheats", new BooleanAttribute(cheats));
 		args.put("full", new BooleanAttribute(full));
 		
-		Path target = Paths.get(path);
 		source.getOut().println("Compiling to '"+target+"' with settings: "+args);
 		
 		Compiler compiler = source.getContext().getProject().getCompiler();

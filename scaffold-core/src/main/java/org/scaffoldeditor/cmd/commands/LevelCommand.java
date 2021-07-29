@@ -3,6 +3,7 @@ package org.scaffoldeditor.cmd.commands;
 import org.fusesource.jansi.Ansi.Color;
 import org.scaffoldeditor.cmd.ScaffoldCommandSource;
 import org.scaffoldeditor.cmd.ScaffoldTerminalContext;
+import org.scaffoldeditor.cmd.arguments.PathArgumentType;
 import org.scaffoldeditor.scaffold.core.Project;
 import org.scaffoldeditor.scaffold.level.Level;
 
@@ -17,15 +18,12 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 
-import static com.mojang.brigadier.arguments.StringArgumentType.*;
-
-
 public class LevelCommand {
 	public static void register(CommandDispatcher<ScaffoldCommandSource> dispatcher) {
 		LiteralCommandNode<ScaffoldCommandSource> root = literal("level").build();
 		
 		LiteralCommandNode<ScaffoldCommandSource> open = literal("open")
-				.then(argument("path", StringArgumentType.greedyString())
+				.then(argument("path", PathArgumentType.path())
 						.executes(command -> {
 							ScaffoldTerminalContext context = command.getSource().getContext();
 							Project project = context.getProject();
@@ -33,8 +31,7 @@ public class LevelCommand {
 								command.getSource().printError("No project loaded!");
 								return 0;
 							}
-							
-							File levelFile = new File(getString(command, "path"));
+							File levelFile = PathArgumentType.getPath(command, "path").toFile();
 							
 							try {
 								context.openLevel(levelFile);
@@ -65,7 +62,7 @@ public class LevelCommand {
 				}).build();
 		
 		LiteralCommandNode<ScaffoldCommandSource> create = literal("create")
-				.then(argument("path", StringArgumentType.greedyString())
+				.then(argument("name", PathArgumentType.path())
 						.executes(command -> {
 							ScaffoldTerminalContext context = command.getSource().getContext();
 							Project project = context.getProject();
@@ -74,7 +71,10 @@ public class LevelCommand {
 								return 0;
 							}
 							
-							Path levelPath = Paths.get(getString(command, "path"));
+							Path levelPath = PathArgumentType.getPath(command, "path");
+							if (!levelPath.getFileName().endsWith(".mclevel")) {
+								levelPath = levelPath.getParent().resolve(levelPath);
+							}
 							if (!levelPath.isAbsolute()) {
 								levelPath = context.getProject().getProjectFolder().resolve(levelPath);
 							}

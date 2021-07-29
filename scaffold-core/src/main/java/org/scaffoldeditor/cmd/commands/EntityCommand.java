@@ -1,18 +1,26 @@
 package org.scaffoldeditor.cmd.commands;
 
+import java.util.Collections;
+
 import org.scaffoldeditor.cmd.ScaffoldCommandSource;
+import org.scaffoldeditor.nbt.math.Vector3f;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
+import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
 import org.scaffoldeditor.scaffold.level.stack.StackGroup;
 import org.scaffoldeditor.scaffold.level.stack.StackItem;
 import org.scaffoldeditor.scaffold.level.stack.StackItem.ItemType;
+import org.scaffoldeditor.scaffold.operation.AddEntityOperation;
+import org.scaffoldeditor.scaffold.operation.DeleteEntityOperation;
+
+import static org.scaffoldeditor.cmd.CommandUtil.*;
+
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 
 import java.io.PrintStream;
-
-import static org.scaffoldeditor.cmd.CommandUtil.*;
 
 public class EntityCommand {
 	public static void register(CommandDispatcher<ScaffoldCommandSource> dispatcher) {
@@ -31,7 +39,51 @@ public class EntityCommand {
 				.build();
 		
 		root.addChild(list);
-		
+
+		LiteralCommandNode<ScaffoldCommandSource> create = literal("create")
+				.then(argument("class", StringArgumentType.string())
+						.then(argument("name", StringArgumentType.string()).executes(command -> {
+							String registryName = StringArgumentType.getString(command, "class");
+							Level level = command.getSource().getContext().getLevel();
+							if (level == null) {
+								command.getSource().printError("No level loaded!");
+								return 0;
+							}
+
+							if (!EntityRegistry.registry.containsKey(registryName)) {
+								command.getSource().printError("Unknown entity class: " + registryName);
+								return 0;
+							}
+							String name = StringArgumentType.getString(command, "name");
+							level.getOperationManager()
+									.execute(new AddEntityOperation(level, registryName, name, new Vector3f(0, 0, 0)));
+							command.getSource().getOut().println("Created new "+registryName);
+							return 1;
+						})))
+				.build();
+
+		root.addChild(create);
+
+		LiteralCommandNode<ScaffoldCommandSource> remove = literal("remove")
+				.then(argument("name", StringArgumentType.string()).executes((command) -> {
+					Level level = command.getSource().getContext().getLevel();
+					if (level == null) {
+						command.getSource().printError("No level loaded!");
+						return 0;
+					}
+					String name = StringArgumentType.getString(command, "name");
+					Entity ent = level.getEntity(name);
+					if (ent == null) {
+						command.getSource().printError("No entity exists called '" + name + "'.");
+						return 0;
+					}
+
+					level.getOperationManager().execute(new DeleteEntityOperation(level, Collections.singleton(ent)));
+
+					return 0;
+				})).build();
+
+		root.addChild(remove);
 		dispatcher.getRoot().addChild(root);
 	}
 	

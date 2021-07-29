@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 import org.scaffoldeditor.cmd.CommandUtil;
 import org.scaffoldeditor.cmd.ScaffoldCommandSource;
 import org.scaffoldeditor.cmd.ScaffoldTerminalContext;
+import org.scaffoldeditor.cmd.arguments.PathArgumentType;
 import org.scaffoldeditor.scaffold.core.Constants;
 import org.scaffoldeditor.scaffold.core.Project;
 
@@ -30,18 +31,18 @@ public class ProjectCommand {
 	private static void build(LiteralCommandNode<ScaffoldCommandSource> root) {
 
 		LiteralCommandNode<ScaffoldCommandSource> open = literal("open")
-				.then(CommandUtil.argument("path", StringArgumentType.greedyString())
+				.then(CommandUtil.argument("path", PathArgumentType.path())
 				.executes(command -> {
-					String path = getString(command, "path");
+					Path path = PathArgumentType.getPath(command, "path");
 					command.getSource().getOut().println("Opening project...");
 					
 					try {
-						command.getSource().getContext().loadProject(path);
+						command.getSource().getContext().loadProject(path.toString());
 					} catch (IOException e) {
 						command.getSource().printError("Error opening project: " + e.getLocalizedMessage());
 						return 0;
 					}
-
+					command.getSource().getOut().println("Opened project at " + path);
 					return 1;
 				})).build();
 		
