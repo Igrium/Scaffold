@@ -1,5 +1,7 @@
 package org.scaffoldeditor.scaffold.level.entity.attribute;
 
+import java.io.IOException;
+
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.serialization.NBTSerializer;
 import org.w3c.dom.Document;
@@ -7,6 +9,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import net.querz.nbt.io.SNBTUtil;
 import net.querz.nbt.tag.CompoundTag;
 
 public class NBTAttribute extends Attribute<CompoundTag> {
@@ -66,5 +69,14 @@ public class NBTAttribute extends Attribute<CompoundTag> {
 		NBTAttribute update = new NBTAttribute(value.clone());
 		update.registryName = this.registryName;
 		return update;
+	}
+
+	@Override
+	public String toString() {
+		try {
+			return SNBTUtil.toSNBT(getValue());
+		} catch (IOException e) {
+			throw new RuntimeException("Error generating SNBT!", e);
+		}
 	}
 }

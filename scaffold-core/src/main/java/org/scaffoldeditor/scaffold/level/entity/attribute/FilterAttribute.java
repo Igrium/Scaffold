@@ -1,5 +1,6 @@
 package org.scaffoldeditor.scaffold.level.entity.attribute;
 
+import org.scaffoldeditor.scaffold.logic.datapack.commands.Command;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.ExecuteCommandBuilder;
 
 import java.io.IOException;
@@ -313,4 +314,8 @@ public class FilterAttribute extends Attribute<ExecuteCommandBuilder> {
 		return new FilterAttribute(other);
 	}
 
+	@Override
+	public String toString() {
+		return "filter: "+getValue().run(Command.fromString("...")).compile();
+	}
 }

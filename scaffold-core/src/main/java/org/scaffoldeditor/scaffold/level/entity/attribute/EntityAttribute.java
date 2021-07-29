@@ -59,4 +59,9 @@ public class EntityAttribute extends Attribute<String> {
 	public String evaluate(Entity owner) {
 		return owner.evaluateName(getValue());
 	}
+
+	@Override
+	public String toString() {
+		return "ref: "+getValue();
+	}
 }

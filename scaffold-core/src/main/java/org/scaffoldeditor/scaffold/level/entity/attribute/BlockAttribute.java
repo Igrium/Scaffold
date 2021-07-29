@@ -1,11 +1,19 @@
 package org.scaffoldeditor.scaffold.level.entity.attribute;
 
+import java.io.IOException;
+
+import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+
+import org.scaffoldeditor.cmd.CommandUtil;
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.scaffold.serialization.NBTSerializer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import net.querz.nbt.io.SNBTUtil;
 import net.querz.nbt.tag.CompoundTag;
 
 public class BlockAttribute extends Attribute<Block> {
@@ -26,6 +34,22 @@ public class BlockAttribute extends Attribute<Block> {
 				NodeList children = element.getElementsByTagName(NBTSerializer.TAG_NAME);
 				CompoundTag properties = (CompoundTag) NBTSerializer.deserialize((Element) children.item(0));
 				return new BlockAttribute(new Block(name, properties));
+			}
+
+			@Override
+			public BlockAttribute parse(StringReader reader)
+					throws CommandSyntaxException, UnsupportedOperationException {
+				String name = reader.readString();
+				String nbtString = CommandUtil.readStructuredString(reader);
+				
+				CompoundTag nbt;
+				try {
+					nbt = (CompoundTag) SNBTUtil.fromSNBT(nbtString);
+				} catch (IOException | ClassCastException e) {
+					throw new SimpleCommandExceptionType(() -> e.getLocalizedMessage()).createWithContext(reader);
+				}
+
+				return new BlockAttribute(new Block(name, nbt));
 			}
 		});
 	}
