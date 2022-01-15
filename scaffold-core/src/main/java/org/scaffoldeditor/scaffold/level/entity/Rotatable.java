@@ -1,10 +1,7 @@
 package org.scaffoldeditor.scaffold.level.entity;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import org.scaffoldeditor.scaffold.annotation.Attrib;
 import org.scaffoldeditor.scaffold.level.Level;
-import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.FloatAttribute;
 
 /**
@@ -17,21 +14,19 @@ public abstract class Rotatable extends Entity {
 	public Rotatable(Level level, String name) {
 		super(level, name);
 	}
-	
-	@Override
-	public Map<String, Attribute<?>> getDefaultAttributes() {
-		Map<String, Attribute<?>> map = new HashMap<>();
-		map.put("rotX", new FloatAttribute(0));
-		map.put("rotY", new FloatAttribute(0));
-		return map;
-	}
+
+	@Attrib
+	private FloatAttribute rotX = new FloatAttribute(0);
+
+	@Attrib
+	private FloatAttribute rotY = new FloatAttribute(0);
 	
 	/**
 	 * Get the entity's X rotation.
 	 * @return X Degrees
 	 */
 	public float rotX() {
-		return ((FloatAttribute) getAttribute("rotX")).getValue();
+		return rotX.getValue();
 	}
 	
 	/**
@@ -39,7 +34,7 @@ public abstract class Rotatable extends Entity {
 	 * @return Y Degrees
 	 */
 	public float rotY() {
-		return ((FloatAttribute) getAttribute("rotY")).getValue();
+		return rotY.getValue();
 	}
 	
 	/**

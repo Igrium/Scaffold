@@ -2,11 +2,10 @@ package org.scaffoldeditor.scaffold.level.entity.logic;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.scaffoldeditor.nbt.util.Identifier;
+import org.scaffoldeditor.scaffold.annotation.Attrib;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.EntityFactory;
@@ -46,15 +45,12 @@ public class Relay extends LogicEntity {
 	public Relay(Level level, String name) {
 		super(level, name);
 	}
-	
-	@Override
-	public Map<String, Attribute<?>> getDefaultAttributes() {
-		Map<String, Attribute<?>> attributes = new HashMap<>();
-		attributes.put("delay", new IntAttribute(0));
-		attributes.put("executorOverride", new StringAttribute(""));
-		
-		return attributes;
-	}
+
+	@Attrib
+	protected IntAttribute delay = new IntAttribute(0);
+
+	@Attrib
+	protected StringAttribute executorOverride = new StringAttribute("");
 	
 	@Override
 	public Collection<OutputDeclaration> getDeclaredOutputs() {

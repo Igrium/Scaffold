@@ -1,13 +1,11 @@
 package org.scaffoldeditor.scaffold.level.entity.logic;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.scaffoldeditor.nbt.util.Identifier;
+import org.scaffoldeditor.scaffold.annotation.Attrib;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
-import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.StringAttribute;
 import org.scaffoldeditor.scaffold.level.io.OutputDeclaration;
 import org.scaffoldeditor.scaffold.logic.Datapack;
@@ -33,12 +31,9 @@ public class LogicEntryPoint extends LogicEntity {
 		return "scaffold:textures/editor/entrypoint.png";
 	}
 
-	@Override
-	public Map<String, Attribute<?>> getDefaultAttributes() {
-		Map<String, Attribute<?>> map = new HashMap<>();
-		map.put("identifier", new StringAttribute(getLevel().getName()+":"+getName()));
-		return map;
-	}
+	@Attrib
+	private StringAttribute identifier = new StringAttribute(getLevel().getName()+":"+getName());
+
 	
 	@Override
 	public Collection<OutputDeclaration> getDeclaredOutputs() {
@@ -51,7 +46,7 @@ public class LogicEntryPoint extends LogicEntity {
 	 * Get the function that will be created.
 	 */
 	public Identifier getIdentifier() {
-		return new Identifier((String) getAttribute("identifier").getValue());
+		return new Identifier(identifier.getValue());
 	}
 	
 	@Override

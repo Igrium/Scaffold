@@ -1,12 +1,11 @@
 package org.scaffoldeditor.scaffold.level.entity.logic;
 
 import java.util.Collection;
-import java.util.Map;
 
 import org.scaffoldeditor.nbt.math.Vector3f;
+import org.scaffoldeditor.scaffold.annotation.Attrib;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
-import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BooleanAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.EnumAttribute;
 import org.scaffoldeditor.scaffold.level.entity.logic.TriggerMultiple.ActivatorScope;
@@ -20,8 +19,8 @@ import org.scaffoldeditor.scaffold.logic.datapack.commands.DataCommand;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.DataCommandBuilder;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.ExecuteCommand.Conditional;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.ExecuteCommand.DataStorageConditional;
-import org.scaffoldeditor.scaffold.sdoc.SDoc;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.ExecuteCommandBuilder;
+import org.scaffoldeditor.scaffold.sdoc.SDoc;
 
 import net.querz.nbt.tag.ByteTag;
 
@@ -34,15 +33,15 @@ public class TriggerIndividual extends ToolBrushEntity {
 	public TriggerIndividual(Level level, String name) {
 		super(level, name);
 	}
-	
-	@Override
-	public Map<String, Attribute<?>> getDefaultAttributes() {
-		Map<String, Attribute<?>> map = super.getDefaultAttributes();
-		map.put("scope", new EnumAttribute<>(ActivatorScope.PLAYERS));
-		map.put("start_disabled", new BooleanAttribute(false));
-		map.put("use_event_functions", new BooleanAttribute(true));
-		return map;
-	}
+
+	@Attrib
+	EnumAttribute<ActivatorScope> scope = new EnumAttribute<TriggerMultiple.ActivatorScope>(ActivatorScope.PLAYERS);
+
+	@Attrib(name = "start_disabled")
+	BooleanAttribute startDisabled = new BooleanAttribute(false);
+
+	@Attrib(name = "use_event_functions")
+	BooleanAttribute useEventFunctions = new BooleanAttribute(true);
 	
 	@Override
 	public Collection<OutputDeclaration> getDeclaredOutputs() {
@@ -89,7 +88,7 @@ public class TriggerIndividual extends ToolBrushEntity {
 	
 	
 	public ActivatorScope getScope() {
-		return (ActivatorScope) getAttribute("scope").getValue();
+		return scope.getValue();
 	}
 	
 	/**
@@ -123,7 +122,7 @@ public class TriggerIndividual extends ToolBrushEntity {
 	}
 	
 	public boolean useEventFunctions() {
-		return (Boolean) getAttribute("use_event_functions").getValue();
+		return useEventFunctions.getValue();
 	}
 
 	@Override

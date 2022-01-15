@@ -1,11 +1,10 @@
 package org.scaffoldeditor.scaffold.level.entity.logic;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.scaffoldeditor.nbt.math.Vector3f;
+import org.scaffoldeditor.scaffold.annotation.Attrib;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
@@ -32,6 +31,15 @@ public class LogicTeleport extends LogicEntity {
 		EntityRegistry.registry.put("logic_teleport", LogicTeleport::new);
 	}
 
+	@Attrib
+	StringAttribute target = new StringAttribute("@s");
+	
+	@Attrib
+	BooleanAttribute relative = new BooleanAttribute(false);
+
+	@Attrib
+	EntityAttribute landmark = new EntityAttribute("");
+
 	public LogicTeleport(Level level, String name) {
 		super(level, name);
 	}
@@ -39,15 +47,6 @@ public class LogicTeleport extends LogicEntity {
 	@Override
 	public String getSprite() {
 		return "scaffold:textures/editor/teleport.png";
-	}
-
-	@Override
-	public Map<String, Attribute<?>> getDefaultAttributes() {
-		Map<String, Attribute<?>> map = new HashMap<>();
-		map.put("target", new StringAttribute("@s"));
-		map.put("relative", new BooleanAttribute(false));
-		map.put("landmark", new EntityAttribute(""));
-		return map;
 	}
 	
 	@Override
@@ -88,15 +87,15 @@ public class LogicTeleport extends LogicEntity {
 	}
 	
 	public String getTarget() {
-		return (String) getAttribute("target").getValue();
+		return target.getValue();
 	}
 	
 	public boolean isRelative() {
-		return (Boolean) getAttribute("relative").getValue();
+		return relative.getValue();
 	}
 	
 	public Entity getLandmark() {
-		return getLevel().getEntity((String) getAttribute("landmark").getValue());
+		return getLevel().getEntity(landmark.getValue());
 	}
 	
 	@Override

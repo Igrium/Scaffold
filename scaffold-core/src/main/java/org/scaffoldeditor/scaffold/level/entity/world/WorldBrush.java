@@ -1,6 +1,5 @@
 package org.scaffoldeditor.scaffold.level.entity.world;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -12,6 +11,7 @@ import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
 import org.scaffoldeditor.nbt.math.Vector3d;
 import org.scaffoldeditor.nbt.math.Vector3f;
 import org.scaffoldeditor.nbt.math.Vector3i;
+import org.scaffoldeditor.scaffold.annotation.Attrib;
 import org.scaffoldeditor.scaffold.block_textures.BlockTexture;
 import org.scaffoldeditor.scaffold.block_textures.SingleBlockTexture;
 import org.scaffoldeditor.scaffold.level.Level;
@@ -37,20 +37,22 @@ public class WorldBrush extends BaseBlockEntity implements BrushEntity {
 		});
 	}
 
+	@Attrib(name = "end_point")
+	VectorAttribute endPoint = new VectorAttribute(4, 4, 4);
+
+	@Attrib
+	BlockTextureAttribute texture = new BlockTextureAttribute(new SingleBlockTexture(new Block("minecraft:stone")));
+
+	@Attrib(name = "texture_scale")
+	VectorAttribute textureScale = new VectorAttribute(1, 1, 1);
+
+	@Attrib(name = "texture_offset")
+	VectorAttribute textureOffset = new VectorAttribute(0, 0, 0);
+
 	public WorldBrush(Level level, String name) {
 		super(level, name);
 	}
-	
-	@Override
-	public Map<String, Attribute<?>> getDefaultAttributes() {
-		Map<String, Attribute<?>> map = new HashMap<>();
-		map.put("end_point", new VectorAttribute(new Vector3f(4,4,4)));
-		map.put("texture", new BlockTextureAttribute(new SingleBlockTexture(new Block("minecraft:stone"))));
-		map.put("texture_scale", new VectorAttribute(new Vector3f(1,1,1)));
-		map.put("texture_offset", new VectorAttribute(new Vector3f(0,0,0)));
-		
-		return map;
-	}
+
 
 	@Override
 	public boolean compileWorld(BlockWorld world, boolean full, Set<SectionCoordinate> sections) {
@@ -97,26 +99,26 @@ public class WorldBrush extends BaseBlockEntity implements BrushEntity {
 	 * Get the end point of this brush relative to it's start point. (AKA the root position)
 	 */
 	public Vector3f getEndPoint() {
-		return ((VectorAttribute) getAttribute("end_point")).getValue();
+		return endPoint.getValue();
 	}
 	
 	/**
 	 * Get the block texture which this brush uses to choose its blocks.
 	 */
 	public BlockTexture getTexture() {
-		return ((BlockTextureAttribute) getAttribute("texture")).getValue();
+		return texture.getValue();
 	}
 	
 	public void reloadTexture() {
-		((BlockTextureAttribute) getAttribute("texture")).reload();
+		texture.reload();
 	}
 	
 	public Vector3f getTextureScale() {
-		return ((VectorAttribute) getAttribute("texture_scale")).getValue();
+		return textureScale.getValue();
 	}
 	
 	public Vector3f getTextureOffset() {
-		return ((VectorAttribute) getAttribute("texture_offset")).getValue();
+		return textureOffset.getValue();
 	}
 
 	@Override
@@ -125,14 +127,16 @@ public class WorldBrush extends BaseBlockEntity implements BrushEntity {
 	}
 
 	@Override
-	public void onUpdateBlockAttributes() {
+	public void updateBlocks() {
 	}
 
 	@Override
 	public void setBrushBounds(Vector3f[] newBounds, boolean suppressUpdate) {
-		setAttribute("position", new VectorAttribute(newBounds[0]), true);
-		setAttribute("end_point", new VectorAttribute(newBounds[1].subtract(newBounds[0])));
-		if (!suppressUpdate) onUpdateAttributes(false);
+		Map<String, Attribute<?>> att = Map.of(
+			"position", new VectorAttribute(newBounds[0]),
+			"end_point", new VectorAttribute(newBounds[1].subtract(newBounds[0]))
+		);
+		setAttributes(att);
 	}
 	
 	@Override

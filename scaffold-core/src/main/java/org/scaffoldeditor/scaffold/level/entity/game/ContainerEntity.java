@@ -8,6 +8,7 @@ import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
 import org.scaffoldeditor.nbt.math.Vector3i;
+import org.scaffoldeditor.scaffold.annotation.Attrib;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.EntityFactory;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
@@ -45,17 +46,17 @@ public class ContainerEntity extends BaseSingleBlock {
 	
 	private Block oldBlock;
 	private Vector3i oldPos;
-	
-	@Override
-	public Map<String, Attribute<?>> getDefaultAttributes() {
-		Map<String, Attribute<?>> def = new HashMap<>();
-		def.put("contents", new ContainerAttribute());
-		def.put("block", new BlockAttribute(new Block("minecraft:chest")));
-		def.put("custom_name", new StringAttribute(""));
-		def.put("lock", new StringAttribute(""));
-		def.put("additional_nbt", new NBTAttribute(new CompoundTag()));
-		return def;
-	}
+
+	@Attrib
+	protected ContainerAttribute contents = new ContainerAttribute();
+	@Attrib
+	protected BlockAttribute block = new BlockAttribute(new Block("minecraft:chest"));
+	@Attrib(name = "custom_name")
+	protected StringAttribute customName = new StringAttribute("");
+	@Attrib
+	protected StringAttribute lock = new StringAttribute("");
+	@Attrib(name = "additional_nbt")
+	protected NBTAttribute additionalNBT = new NBTAttribute(new CompoundTag());
 
 	@Override
 	public boolean compileWorld(BlockWorld world, boolean full, Set<SectionCoordinate> sections) {
@@ -81,31 +82,31 @@ public class ContainerEntity extends BaseSingleBlock {
 	}
 	
 	public ContainerAttribute getContents() {
-		return (ContainerAttribute) getAttribute("contents");
+		return contents;
 	}
 	
 	public Block getBlock() {
-		return (Block) getAttribute("block").getValue();
+		return block.getValue();
 	}
 	
 	public CompoundTag getBaseNBT() {
-		return (CompoundTag) getAttribute("additional_nbt").getValue();
+		return additionalNBT.getValue();
 	}
 
 	@Override
 	protected boolean needsRecompiling() {
 		return (!getBlock().equals(oldBlock) || !getBlockPosition().equals(oldPos));
 	}
-	
+
 	@Override
-	public void onUpdateAttributes(boolean noRecompile) {
-		super.onUpdateAttributes(noRecompile);
+	protected void onSetAttributes(Map<String, Attribute<?>> updated) {
+		super.onSetAttributes(updated);
 		oldBlock = getBlock();
 		oldPos = getBlockPosition();
 	}
 
 	@Override
-	public void onUpdateBlockAttributes() {
+	public void updateBlocks() {
 	}
 	
 	@Override

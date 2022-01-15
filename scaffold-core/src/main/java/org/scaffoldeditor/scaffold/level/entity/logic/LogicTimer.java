@@ -2,11 +2,10 @@ package org.scaffoldeditor.scaffold.level.entity.logic;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.scaffoldeditor.nbt.util.Identifier;
+import org.scaffoldeditor.scaffold.annotation.Attrib;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
@@ -42,25 +41,25 @@ public class LogicTimer extends LogicEntity {
 		super(level, name);
 	}
 	
-	@Override
-	public Map<String, Attribute<?>> getDefaultAttributes() {
-		Map<String, Attribute<?>> def = new HashMap<>();
-		def.put("time", new IntAttribute(20));
-		def.put("start_active", new BooleanAttribute(true));
-		def.put("fire_on_activate", new BooleanAttribute(false));
-		return def;
-	}
+	@Attrib
+	IntAttribute time = new IntAttribute(20);
+
+	@Attrib(name = "start_active")
+	BooleanAttribute startActive = new BooleanAttribute(true);
+
+	@Attrib(name = "fire_on_activate")
+	BooleanAttribute fireOnActivate = new BooleanAttribute(false);
 	
 	public int getTime() {
-		return ((IntAttribute) getAttribute("time")).getValue();
+		return time.getValue();
 	}
 	
 	public boolean startActive() {
-		return ((BooleanAttribute) getAttribute("start_active")).getValue();
+		return startActive.getValue();
 	}
 	
 	public boolean fireOnActivate() {
-		return ((BooleanAttribute) getAttribute("fire_on_activate")).getValue();
+		return fireOnActivate.getValue();
 	}
 	
 	@Override

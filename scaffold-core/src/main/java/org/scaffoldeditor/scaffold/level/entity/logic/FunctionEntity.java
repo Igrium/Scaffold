@@ -2,11 +2,10 @@ package org.scaffoldeditor.scaffold.level.entity.logic;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.scaffoldeditor.nbt.util.Identifier;
+import org.scaffoldeditor.scaffold.annotation.Attrib;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.EntityFactory;
@@ -36,11 +35,15 @@ public class FunctionEntity extends LogicEntity {
 	public FunctionEntity(Level level, String name) {
 		super(level, name);
 	}
+
+	@Attrib
+	StringAttribute namespace = new StringAttribute(getProject().getName().toLowerCase());
+
+	@Attrib
+	StringAttribute function = new StringAttribute("");
 	
 	public Identifier getFunction() {
-		String namespace = (String) getAttribute("namespace").getValue();
-		String function = (String) getAttribute("function").getValue();
-		return new Identifier(namespace, function);
+		return new Identifier(namespace.getValue(), function.getValue());
 	}
 	
 	@Override
@@ -67,14 +70,6 @@ public class FunctionEntity extends LogicEntity {
 			return List.of(new FunctionCommand(getFunction()));
 		}
 		return super.compileInput(inputName, args, source, instigator);
-	}
-
-	@Override
-	public Map<String, Attribute<?>> getDefaultAttributes() {
-		Map<String, Attribute<?>> map = new HashMap<>();
-		map.put("namespace", new StringAttribute(getProject().getName().toLowerCase()));
-		map.put("function", new StringAttribute(""));
-		return map;
 	}
 
 	@Override

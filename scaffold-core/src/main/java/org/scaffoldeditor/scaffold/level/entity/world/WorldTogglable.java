@@ -3,7 +3,6 @@ package org.scaffoldeditor.scaffold.level.entity.world;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.scaffoldeditor.nbt.block.Block;
@@ -13,6 +12,7 @@ import org.scaffoldeditor.nbt.block.SizedBlockCollection;
 import org.scaffoldeditor.nbt.math.Vector3i;
 import org.scaffoldeditor.nbt.schematic.GenericSchematic;
 import org.scaffoldeditor.nbt.util.Identifier;
+import org.scaffoldeditor.scaffold.annotation.Attrib;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.EntityFactory;
@@ -51,16 +51,13 @@ public class WorldTogglable extends WorldStatic {
 	public WorldTogglable(Level level, String name) {
 		super(level, name);	
 	}
-	
-	@Override
-	public Map<String, Attribute<?>> getDefaultAttributes() {
-		Map<String, Attribute<?>> map = super.getDefaultAttributes();
-		map.put("start_enabled", new BooleanAttribute(true));
-		return map;
-	}
+
+	@Attrib(name = "start_enabled")
+	protected BooleanAttribute startEnabled = new BooleanAttribute(true);
+
 	
 	public boolean startEnabled() {
-		return (Boolean) getAttribute("start_enabled").getValue();
+		return startEnabled.getValue();
 	}
 	
 	private GenericSchematic underlayerCache;

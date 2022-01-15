@@ -2,12 +2,11 @@ package org.scaffoldeditor.scaffold.level.entity.game;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.util.Identifier;
+import org.scaffoldeditor.scaffold.annotation.Attrib;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
@@ -41,14 +40,12 @@ public class RedstoneTrigger extends BaseSingleBlock {
 	public RedstoneTrigger(Level level, String name) {
 		super(level, name);
 	}
-	
-	@Override
-	public Map<String, Attribute<?>> getDefaultAttributes() {
-		Map<String, Attribute<?>> map = new HashMap<>();
-		map.put("start_enabled", new BooleanAttribute(false));
-		map.put("pulse_length", new IntAttribute(20));
-		return map;
-	}
+
+	@Attrib(name = "start_enabled")
+	protected BooleanAttribute startEnabled = new BooleanAttribute(false);
+
+	@Attrib(name = "pulse_length")
+	protected IntAttribute pulseLength = new IntAttribute(20);
 	
 	@Override
 	public Collection<InputDeclaration> getDeclaredInputs() {
@@ -138,7 +135,7 @@ public class RedstoneTrigger extends BaseSingleBlock {
 	}
 
 	@Override
-	public void onUpdateBlockAttributes() {
+	public void updateBlocks() {
 	}
 	
 	@Override

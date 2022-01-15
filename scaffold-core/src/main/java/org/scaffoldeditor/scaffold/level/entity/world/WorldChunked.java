@@ -2,9 +2,7 @@ package org.scaffoldeditor.scaffold.level.entity.world;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.FilenameUtils;
@@ -13,17 +11,17 @@ import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.BlockCollection;
 import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.nbt.block.Chunk;
+import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
 import org.scaffoldeditor.nbt.block.ChunkedBlockCollection;
 import org.scaffoldeditor.nbt.block.SizedBlockCollection;
 import org.scaffoldeditor.nbt.math.Vector3f;
 import org.scaffoldeditor.nbt.math.Vector3i;
-import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
+import org.scaffoldeditor.scaffold.annotation.Attrib;
 import org.scaffoldeditor.scaffold.io.AssetLoaderRegistry;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.EntityFactory;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
-import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BooleanAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.StringAttribute;
 
@@ -32,7 +30,9 @@ import org.scaffoldeditor.scaffold.level.entity.attribute.StringAttribute;
  * potentially infinite in size.
  * 
  * @author Igrium
+ * @deprecated Doesn't work right now.
  */
+@Deprecated
 public class WorldChunked extends BaseBlockEntity {
 	
 	public static final String REGISTRY_NAME = "world_chunked";
@@ -47,7 +47,7 @@ public class WorldChunked extends BaseBlockEntity {
 		});
 	}
 	
-	private ChunkedBlockCollection model;
+	private ChunkedBlockCollection modelCache;
 	
 	// Keep track of the model path on our own for optimization.
 	private String modelpath;
@@ -56,33 +56,30 @@ public class WorldChunked extends BaseBlockEntity {
 	public WorldChunked(Level level, String name) {
 		super(level, name);
 	}
-	
-	@Override
-	public Map<String, Attribute<?>> getDefaultAttributes() {
-		Map<String, Attribute<?>> map = new HashMap<>();
-		map.put("model", new StringAttribute(""));
-		map.put("place_air", new BooleanAttribute(false));
-		return map;
-	}
+
+	@Attrib
+	private StringAttribute model = new StringAttribute("");
+
+	@Attrib(name = "place_air")
+	private BooleanAttribute placeAir = new BooleanAttribute(false);
 	
 	/**
 	 * Reload model from file.
 	 */
 	public void reload() {
 		
-		StringAttribute attribute = (StringAttribute) getAttribute("model");
-		String model = attribute.getValue();
+		String model = this.model.getValue();
 		LogManager.getLogger().info("Loading model " + model);
 		modelpath = model;
 		if (model.length() == 0) {
-			this.model = null;
+			this.modelCache = null;
 			return;
 		}
 		
 		if (AssetLoaderRegistry.isTypeAssignableTo(FilenameUtils.getExtension(model), ChunkedBlockCollection.class)) {
 			try {
 //				this.model = Structure.fromCompoundMap((CompoundTag) NBTUtil.read(modelFile).getTag());
-				this.model = (ChunkedBlockCollection) getProject().assetManager().loadAsset(model, false);
+				this.modelCache = (ChunkedBlockCollection) getProject().assetManager().loadAsset(model, false);
 				onLoadModel();
 			} catch (FileNotFoundException e) {
 				LogManager.getLogger().error(e.getMessage());
@@ -98,9 +95,9 @@ public class WorldChunked extends BaseBlockEntity {
 	
 	protected void onLoadModel() {
 		// Calculate the entity bounds
-		if (model == null || model.getSections().size() == 0) return;
+		if (modelCache == null || modelCache.getSections().size() == 0) return;
 		
-		Vector3i def = model.getSections().iterator().next();
+		Vector3i def = modelCache.getSections().iterator().next();
 		
 		int minX = def.x;
 		int minY = def.y;
@@ -110,11 +107,11 @@ public class WorldChunked extends BaseBlockEntity {
 		int maxY = def.y;
 		int maxZ = def.z;
 		
-		int width = model.getSectionWidth();
-		int height = model.getSectionHeight();
-		int length = model.getSectionLength();
+		int width = modelCache.getSectionWidth();
+		int height = modelCache.getSectionHeight();
+		int length = modelCache.getSectionLength();
 		
-		for (Vector3i section : model.getSections()) {
+		for (Vector3i section : modelCache.getSections()) {
 			if (section.x < minX) minX = section.x;
 			if (section.y < minY) minY = section.y;
 			if (section.z < minZ) minZ = section.z;
@@ -131,17 +128,17 @@ public class WorldChunked extends BaseBlockEntity {
 	@Override
 	public boolean compileWorld(BlockWorld world, boolean full, Set<SectionCoordinate> worldSections) {
 		if (full) reload();
-		if (model == null) return false;
+		if (modelCache == null) return false;
 		
-		int width = model.getSectionWidth();
-		int length = model.getSectionLength();
-		int height = model.getSectionHeight();
+		int width = modelCache.getSectionWidth();
+		int length = modelCache.getSectionLength();
+		int height = modelCache.getSectionHeight();
 		Vector3i position = getBlockPosition();
 		
 		if (worldSections == null) {
 			// Compile entire model
-			for (Vector3i coord : model.getSections()) {
-				SizedBlockCollection section = model.sectionAt(coord.x, coord.y, coord.z);
+			for (Vector3i coord : modelCache.getSections()) {
+				SizedBlockCollection section = modelCache.sectionAt(coord.x, coord.y, coord.z);
 				world.addBlockCollection(section, coord.x * width + position.x, coord.y * height + position.y,
 						coord.z * length + position.z, true, shouldPlaceAir(), this);
 			}
@@ -157,8 +154,8 @@ public class WorldChunked extends BaseBlockEntity {
 			} else {
 				// Identify the collection sections that the world sections overlap with.
 				for (SectionCoordinate coord : worldSections) {
-					Vector3i minModelSection = model.getSection(new Vector3i(coord.getStartX(), coord.getStartY(), coord.getStartZ()).subtract(position));
-					Vector3i maxModelSection = model.getSection(new Vector3i(coord.getEndX(), coord.getEndY(), coord.getEndZ()).subtract(position));
+					Vector3i minModelSection = modelCache.getSection(new Vector3i(coord.getStartX(), coord.getStartY(), coord.getStartZ()).subtract(position));
+					Vector3i maxModelSection = modelCache.getSection(new Vector3i(coord.getEndX(), coord.getEndY(), coord.getEndZ()).subtract(position));
 					
 					for (int x = minModelSection.x; x < maxModelSection.x; x++) {
 						for (int y = minModelSection.y; x < maxModelSection.y; y++) {
@@ -171,7 +168,7 @@ public class WorldChunked extends BaseBlockEntity {
 			}
 			
 			for (Vector3i coord : updatingModelSections) {
-				SizedBlockCollection section = model.sectionAt(coord.x, coord.y, coord.z);
+				SizedBlockCollection section = modelCache.sectionAt(coord.x, coord.y, coord.z);
 				world.addBlockCollection(section,
 						coord.x * width + position.x,
 						coord.y * height + position.y,
@@ -188,11 +185,11 @@ public class WorldChunked extends BaseBlockEntity {
 	 * overlap the volume, not the blocks themselves.
 	 */
 	public boolean overlapsVolume(Vector3f point1, Vector3f point2) {
-		if (model == null) return false;
+		if (modelCache == null) return false;
 		
-		Vector3i section1 = model.getSection(point1.floor());
-		Vector3i section2 = model.getSection(point2.floor());
-		Set<Vector3i> sections = model.getSections();
+		Vector3i section1 = modelCache.getSection(point1.floor());
+		Vector3i section2 = modelCache.getSection(point2.floor());
+		Set<Vector3i> sections = modelCache.getSections();
 		
 		if (sections.contains(section1) || sections.contains(section2)) {
 			return true;
@@ -219,36 +216,36 @@ public class WorldChunked extends BaseBlockEntity {
 	 * sections of the world. Used for optimization.
 	 */
 	public boolean isAligned() {
-		if (model == null) return false;
+		if (modelCache == null) return false;
 		
 		Vector3i position = getBlockPosition();
-		int sectionWidth = model.getSectionWidth();
-		int sectionHeight = model.getSectionHeight();
-		int sectionLength = model.getSectionLength();
+		int sectionWidth = modelCache.getSectionWidth();
+		int sectionHeight = modelCache.getSectionHeight();
+		int sectionLength = modelCache.getSectionLength();
 		return (position.x % 16 == 0 && position.y % 16 == 0 && position.z % 16 == 0 && sectionWidth == 16
 				&& sectionHeight == 16 && sectionLength == 16);
 	}
 
 	@Override
 	public Set<SectionCoordinate> getOverlappingSections() {
-		if (model == null) return new HashSet<>();
+		if (modelCache == null) return new HashSet<>();
 		
-		int sectionWidth = model.getSectionWidth();
-		int sectionHeight = model.getSectionHeight();
-		int sectionLength = model.getSectionLength();
+		int sectionWidth = modelCache.getSectionWidth();
+		int sectionHeight = modelCache.getSectionHeight();
+		int sectionLength = modelCache.getSectionLength();
 		Set<SectionCoordinate> overlapping = new HashSet<>();
 		Vector3i position = getPosition().floor();
 		
 		// If our sections are aligned, we can just return the sections from the collection.
 		if (isAligned()) {
-			for (Vector3i coord : model.getSections()) {
+			for (Vector3i coord : modelCache.getSections()) {
 				overlapping.add(new SectionCoordinate(coord.add(getWorld().getSection(position))));
 			}
 			return overlapping;
 		}
 		
 		// Identify the world sections that the collection sections overlap with.
-		for (Vector3i coord : model.getSections()) {
+		for (Vector3i coord : modelCache.getSections()) {
 			int minX = coord.x * sectionWidth + position.x;
 			int minY = coord.y * sectionHeight + position.y;
 			int minZ = coord.z * sectionLength + position.z;
@@ -275,7 +272,7 @@ public class WorldChunked extends BaseBlockEntity {
 	@Override
 	public Block blockAt(Vector3i coord) {
 		Vector3i local = coord.subtract(getBlockPosition());
-		return model.blockAt(local);
+		return modelCache.blockAt(local);
 	}
 	
 	protected boolean shouldPlaceAir() {
@@ -293,7 +290,7 @@ public class WorldChunked extends BaseBlockEntity {
 	}
 
 	@Override
-	public void onUpdateBlockAttributes() {
+	public void updateBlocks() {
 		if (!((StringAttribute) getAttribute("model")).getValue().equals(modelpath)) {
 			reload();	
 		};
@@ -301,6 +298,6 @@ public class WorldChunked extends BaseBlockEntity {
 
 	@Override
 	public BlockCollection getBlockCollection() {
-		return model;
+		return modelCache;
 	}
 }

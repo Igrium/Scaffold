@@ -2,9 +2,9 @@ package org.scaffoldeditor.scaffold.level.entity.logic;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import org.scaffoldeditor.nbt.math.Vector3f;
+import org.scaffoldeditor.scaffold.annotation.Attrib;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
@@ -42,15 +42,15 @@ public class TriggerMultiple extends ToolBrushEntity {
 	public TriggerMultiple(Level level, String name) {
 		super(level, name);
 	}
-	
-	@Override
-	public Map<String, Attribute<?>> getDefaultAttributes() {
-		Map<String, Attribute<?>> map = super.getDefaultAttributes();
-		map.put("scope", new EnumAttribute<ActivatorScope>(ActivatorScope.PLAYERS));
-		map.put("start_disabled", new BooleanAttribute(false));
-		map.put("trigger_once", new BooleanAttribute(false));
-		return map;
-	}
+
+	@Attrib
+	EnumAttribute<ActivatorScope> scope = new EnumAttribute<>(ActivatorScope.PLAYERS);
+
+	@Attrib(name = "start_disabled")
+	BooleanAttribute startDisabled = new BooleanAttribute(false);
+
+	@Attrib(name = "trigger_once")
+	BooleanAttribute triggerOnce = new BooleanAttribute(false);
 	
 	public ActivatorScope getScope() {
 		return (ActivatorScope) ((EnumAttribute<?>) getAttribute("scope")).getValue();

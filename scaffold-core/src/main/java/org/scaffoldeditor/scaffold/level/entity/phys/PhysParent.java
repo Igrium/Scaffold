@@ -1,13 +1,10 @@
 package org.scaffoldeditor.scaffold.level.entity.phys;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.logging.log4j.LogManager;
+import org.scaffoldeditor.scaffold.annotation.Attrib;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
-import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.EntityAttribute;
 import org.scaffoldeditor.scaffold.level.entity.game.TargetSelectable;
 import org.scaffoldeditor.scaffold.level.entity.logic.LogicEntity;
@@ -24,14 +21,12 @@ public class PhysParent extends LogicEntity {
 	public PhysParent(Level level, String name) {
 		super(level, name);
 	}
-	
-	@Override
-	public Map<String, Attribute<?>> getDefaultAttributes() {
-		Map<String, Attribute<?>> map = new HashMap<>();
-		map.put("parent", new EntityAttribute(""));
-		map.put("child", new EntityAttribute(""));
-		return map;
-	}
+
+	@Attrib
+	protected EntityAttribute parent = new EntityAttribute();
+
+	@Attrib
+	protected EntityAttribute child = new EntityAttribute();
 	
 	@Override
 	public boolean compileLogic(Datapack datapack) {

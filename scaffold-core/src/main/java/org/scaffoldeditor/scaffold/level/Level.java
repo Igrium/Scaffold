@@ -342,7 +342,7 @@ public class Level {
 		name = validateName(name, new String[] {});
 		
 		Entity entity = EntityRegistry.createEntity(typeName, this, name);
-		entity.setAttribute("position", new VectorAttribute(position), true);
+		entity.setAttribute("position", new VectorAttribute(position));
 		addEntity(entity);
 		
 		return entity;
@@ -540,13 +540,11 @@ public class Level {
 	public int refactorEntityName(String oldName, String newName, boolean supressUpdate) {
 		Set<Entity> updated = new HashSet<>();
 		for (Entity entity : levelStack) {
-			if (entity.refactorName(oldName, newName, true) > 0) {
+			if (entity.refactorName(oldName, newName) > 0) {
 				updated.add(entity);
-				if (!supressUpdate) entity.onUpdateAttributes(true);
 			}
 		}
 		
-		if (autoRecompile && updated.size() > 0) quickRecompile();
 		return updated.size();
 	}
 	

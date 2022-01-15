@@ -2,19 +2,17 @@ package org.scaffoldeditor.scaffold.level.entity.game;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
 import org.scaffoldeditor.nbt.util.Identifier;
+import org.scaffoldeditor.scaffold.annotation.Attrib;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.EntityFactory;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
-import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BooleanAttribute;
 import org.scaffoldeditor.scaffold.level.entity.world.BaseSingleBlock;
 import org.scaffoldeditor.scaffold.level.io.OutputDeclaration;
@@ -47,6 +45,9 @@ public class RedstoneListener extends BaseSingleBlock {
 	}
 		
 	private List<Command> commandCache;
+
+	@Attrib
+	private BooleanAttribute repeating = new BooleanAttribute(false);
 	
 	@Override
 	public Collection<OutputDeclaration> getDeclaredOutputs() {
@@ -120,18 +121,11 @@ public class RedstoneListener extends BaseSingleBlock {
 	}
 
 	@Override
-	public void onUpdateBlockAttributes() {
-	}
-
-	@Override
-	public Map<String, Attribute<?>> getDefaultAttributes() {
-		Map <String, Attribute<?>> def = new HashMap<>();
-		def.put("repeating", new BooleanAttribute(false));
-		return def;
+	public void updateBlocks() {
 	}
 	
 	public boolean isRepeating() {
-		return (Boolean) getAttribute("repeating").getValue();
+		return repeating.getValue();
 	}
 	
 	protected Identifier getTriggerFunction() {

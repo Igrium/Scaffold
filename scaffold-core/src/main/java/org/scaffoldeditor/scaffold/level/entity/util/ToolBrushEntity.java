@@ -1,14 +1,12 @@
 package org.scaffoldeditor.scaffold.level.entity.util;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 import org.scaffoldeditor.nbt.math.Vector3f;
+import org.scaffoldeditor.scaffold.annotation.Attrib;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.BrushEntity;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
-import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.VectorAttribute;
 import org.scaffoldeditor.scaffold.level.render.BrushRenderEntity;
 import org.scaffoldeditor.scaffold.level.render.RenderEntity;
@@ -25,19 +23,15 @@ public abstract class ToolBrushEntity extends Entity implements BrushEntity {
 		super(level, name);
 	}
 
-	@Override
-	public Map<String, Attribute<?>> getDefaultAttributes() {
-		Map<String, Attribute<?>> map = new HashMap<>();
-		map.put("end_point", new VectorAttribute(new Vector3f(1,1,1)));
-		return map;
-	}
+	@Attrib(name = "end_point")
+	private VectorAttribute endPoint = new VectorAttribute(1, 1, 1);
 	
 	/**
 	 * Get this brush's end point.
 	 * @return The end point, relative to the position.
 	 */
 	public Vector3f getEndPoint() {
-		return ((VectorAttribute) getAttribute("end_point")).getValue();
+		return endPoint.getValue();
 	}
 	
 	/**

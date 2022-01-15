@@ -1,12 +1,8 @@
 package org.scaffoldeditor.scaffold.level.entity.info;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.scaffoldeditor.nbt.math.Vector3f;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
-import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.logic.LogicEntity;
 import org.scaffoldeditor.scaffold.sdoc.SDoc;
 
@@ -23,11 +19,6 @@ public class PlayerStart extends LogicEntity {
 	@Override
 	public String getSprite() {
 		return "scaffold:textures/editor/start.png";
-	}
-
-	@Override
-	public Map<String, Attribute<?>> getDefaultAttributes() {
-		return new HashMap<>();
 	}
 	
 	@Override

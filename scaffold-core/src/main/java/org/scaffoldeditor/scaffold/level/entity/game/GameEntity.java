@@ -1,20 +1,19 @@
 package org.scaffoldeditor.scaffold.level.entity.game;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
 import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.nbt.math.Vector3f;
 import org.scaffoldeditor.nbt.util.MCEntity;
+import org.scaffoldeditor.scaffold.annotation.Attrib;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
-import org.scaffoldeditor.scaffold.level.entity.EntityProvider;
 import org.scaffoldeditor.scaffold.level.entity.EntityFactory;
+import org.scaffoldeditor.scaffold.level.entity.EntityProvider;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
 import org.scaffoldeditor.scaffold.level.entity.Rotatable;
-import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.NBTAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.StringAttribute;
 import org.scaffoldeditor.scaffold.level.render.MCRenderEntity;
@@ -47,14 +46,12 @@ public class GameEntity extends Rotatable implements KnownUUID, EntityProvider {
 	public GameEntity(Level level, String name) {
 		super(level, name);
 	}
-	
-	@Override
-		public Map<String, Attribute<?>> getDefaultAttributes() {
-			Map<String, Attribute<?>> map = super.getDefaultAttributes();
-			map.put("entityType", new StringAttribute("minecraft:marker"));
-			map.put("nbt", new NBTAttribute(new CompoundTag()));
-			return map;
-		}
+
+	@Attrib
+	protected StringAttribute entityType = new StringAttribute("minecraft:marker");
+
+	@Attrib
+	protected NBTAttribute nbt = new NBTAttribute();
 	
 	@Override
 	public Set<RenderEntity> getRenderEntities() {

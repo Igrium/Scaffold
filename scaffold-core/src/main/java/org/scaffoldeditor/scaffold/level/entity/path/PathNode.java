@@ -2,19 +2,17 @@ package org.scaffoldeditor.scaffold.level.entity.path;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
 import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.nbt.math.Vector3f;
+import org.scaffoldeditor.scaffold.annotation.Attrib;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.EntityProvider;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
-import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.EntityAttribute;
 import org.scaffoldeditor.scaffold.level.entity.game.KnownUUID;
 import org.scaffoldeditor.scaffold.level.entity.logic.LogicEntity;
@@ -52,12 +50,8 @@ public class PathNode extends LogicEntity implements KnownUUID, EntityProvider {
 	// for updating render entities
 	private Vector3f nextPos;
 
-	@Override
-	public Map<String, Attribute<?>> getDefaultAttributes() {
-		Map<String, Attribute<?>> map = new HashMap<>();
-		map.put("next", new EntityAttribute(""));
- 		return map;
-	}
+	@Attrib
+	protected EntityAttribute next = new EntityAttribute("");
 	
 	@Override
 	public Collection<OutputDeclaration> getDeclaredOutputs() {

@@ -2,10 +2,9 @@ package org.scaffoldeditor.scaffold.level.entity.logic;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import org.scaffoldeditor.scaffold.annotation.Attrib;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.EntityFactory;
@@ -37,13 +36,12 @@ public class CommandEntity extends LogicEntity {
 		super(level, name);
 	}
 
-	@Override
-	public Map<String, Attribute<?>> getDefaultAttributes() {
-		Map<String, Attribute<?>> def = new HashMap<>();
-		def.put("command", new StringAttribute(""));
-		def.put("executor_override", new StringAttribute(""));
-		return def;
-	}
+	@Attrib
+	protected StringAttribute command = new StringAttribute("");
+	
+	@Attrib(name = "executor_override")
+	protected StringAttribute executorOverride = new StringAttribute("");
+
 	
 	public Command getCommand() {
 		return Command.fromString((String) getAttribute("command").getValue());

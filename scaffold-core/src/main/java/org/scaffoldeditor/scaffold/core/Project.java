@@ -28,7 +28,7 @@ import org.scaffoldeditor.scaffold.plugin_utils.PluginManager;
  * @author Igrium
  *
  */
-public class Project extends ServiceProvider implements AutoCloseable {
+public class Project extends ServiceProvider {
 	
 	public static final String CACHE_FOLDER_NAME = ".scaffold";
 	

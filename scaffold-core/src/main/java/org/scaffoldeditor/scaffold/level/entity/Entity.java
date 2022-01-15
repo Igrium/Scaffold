@@ -12,11 +12,11 @@ import java.util.Set;
 import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.nbt.math.Vector3f;
 import org.scaffoldeditor.nbt.math.Vector3i;
+import org.scaffoldeditor.scaffold.annotation.Attrib;
 import org.scaffoldeditor.scaffold.core.Project;
 import org.scaffoldeditor.scaffold.io.AssetManager;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.WorldUpdates.UpdateRenderEntitiesEvent;
-import org.scaffoldeditor.scaffold.level.entity.Macro.Confirmation;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.EntityAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.VectorAttribute;
@@ -27,8 +27,8 @@ import org.scaffoldeditor.scaffold.level.io.OutputDeclaration;
 import org.scaffoldeditor.scaffold.level.render.RenderEntity;
 import org.scaffoldeditor.scaffold.logic.Datapack;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.Command;
-import org.scaffoldeditor.scaffold.operation.ChangeAttributesOperation;
 import org.scaffoldeditor.scaffold.sdoc.SDoc;
+import org.scaffoldeditor.scaffold.util.AttributeHolder;
 import org.scaffoldeditor.scaffold.util.event.EventListener;
 import org.w3c.dom.Element;
 
@@ -37,7 +37,7 @@ import org.w3c.dom.Element;
  * @author Igrium
  *
  */
-public abstract class Entity {
+public abstract class Entity extends AttributeHolder {
 	
 	/**
 	 * Special case used to declare file paths as attributes.
@@ -73,8 +73,8 @@ public abstract class Entity {
 	/* The level this entity belongs to */
 	private Level level;
 	
-	/* All this entity's attributes */
-	private Map<String, Attribute<?>> attributes = new HashMap<>();
+	@Attrib
+	protected VectorAttribute position = new VectorAttribute(new Vector3f(0, 0, 0));
 	
 	private List<Output> outputs = new ArrayList<>();
 		
@@ -86,15 +86,7 @@ public abstract class Entity {
 	public Entity(Level level, String name) {
 		this.name = name;
 		this.level = level;
-		attributes().put("position", new VectorAttribute(new Vector3f(0, 0, 0)));
-		attributes.putAll(getDefaultAttributes());
 	}
-	
-	/**
-	 * Get the attributes this entity should have when it spawns.
-	 * @return A map of the default attributes.
-	 */
-	public abstract Map<String, Attribute<?>> getDefaultAttributes();
 	
 	/**
 	 * Obtain the macros (small functions that can be called from the UI) that this
@@ -104,10 +96,10 @@ public abstract class Entity {
 	 */
 	public List<Macro> getMacros() {
 		List<Macro> macros = new ArrayList<>();
-		macros.add(new Macro("Reset", () -> {
-			level.getOperationManager()
-					.execute(new ChangeAttributesOperation(this, getDefaultAttributes(), new ArrayList<>()));
-		}, new Confirmation("Reset all attributes?", "This will reset all attributes to their default values.")));
+		// macros.add(new Macro("Reset", () -> {
+		// 	level.getOperationManager()
+		// 			.execute(new ChangeAttributesOperation(this, getDefaultAttributes(), new ArrayList<>()));
+		// }, new Confirmation("Reset all attributes?", "This will reset all attributes to their default values.")));
 		return macros;
 	}
 	
@@ -202,27 +194,24 @@ public abstract class Entity {
 	 * Replace all references to an entity name within this entity (attributes and outputs).
 	 * @param original Original name.
 	 * @param updated New name.
-	 * @param supressUpdate Don't call {@link #onUpdateAttributes(boolean)} afterward.
 	 * @return How many instances of the name were found.
 	 */
-	public int refactorName(String original, String updated, boolean supressUpdate) {
+	public int refactorName(String original, String updated) {
 		int found = 0;
-		for (String name : attributes.keySet()) {
+		Map<String, Attribute<?>> newNames = new HashMap<>();
+		for (String name : getAttributeNames()) {
 			Attribute<?> att = getAttribute(name);
 			if (att instanceof EntityAttribute && ((EntityAttribute) att).getValue().equals(original)) {
-				setAttribute(name, new EntityAttribute(updated), true);
+				newNames.put(name, new EntityAttribute(updated));
 				found++;
 			}
 		}
+		setAttributes(newNames);
 		for (Output output : getOutputs()) {
 			if (output.getTarget().equals(original)) {
 				output.setTarget(updated);
 				found++;
 			}
-		}
-		
-		if (found > 0 && !supressUpdate) {
-			onUpdateAttributes(true);
 		}
 		
 		return found;
@@ -266,7 +255,7 @@ public abstract class Entity {
 	 * @return Position
 	 */
 	public Vector3f getPosition() {
-		return ((VectorAttribute) getAttribute("position")).getValue();
+		return position.getValue();
 	}
 	
 	/**
@@ -285,6 +274,15 @@ public abstract class Entity {
 	public void setPosition(Vector3f position) {
 		if (isGridLocked()) position = position.floor().toFloat();
 		this.setAttribute("position", new VectorAttribute(position));
+	}
+
+	/**
+	 * Set the entity's position without triggering attribute updaters.
+	 * @param position New position.
+	 */
+	protected void setPositionNoUpdate(Vector3f position) {
+		if (isGridLocked()) position = position.floor().toFloat();
+		this.position = new VectorAttribute(position);
 	}
 	
 	
@@ -318,12 +316,14 @@ public abstract class Entity {
 		return getProject().assetManager();
 	}
 	
+	
 	/**
 	 * Get a map of this entity's attributes.
 	 * @return Attributes
 	 */
+	@Deprecated
 	protected Map<String, Attribute<?>> attributes() {
-		return attributes;
+		return getAllAttributes();
 	}
 	
 	/**
@@ -331,18 +331,9 @@ public abstract class Entity {
 	 * @return Attributes;
 	 */
 	public Set<String> getAttributes() {
-		return attributes.keySet();
+		return getAttributeNames();
 	}
 	
-	
-	/**
-	 * Set an attribute by name
-	 * @param name Attribute name.
-	 * @param value Attribute value.
-	 */
-	public void setAttribute(String name, Attribute<?> value) {
-		setAttribute(name, value, false);
-	}
 	
 	/**
 	 * Set an attribute by name
@@ -350,29 +341,20 @@ public abstract class Entity {
 	 * @param value Attribute value.
 	 * @param supressUpdate Don't call <code>onUpdateAttributes()</code>.
 	 * This should be set when calling from the constructor.
+	 * @deprecated <code>supressUpdate</code> doesn't do anything anymore.
 	 */
+	@Deprecated
 	public void setAttribute(String name, Attribute<?> value, boolean supressUpdate) {
-		attributes.put(name, value);
-		if (!supressUpdate) {
-			onUpdateAttributes(false);
-		}
-	}
-	
-	
-	/**
-	 * Get an attribute by name
-	 * @param name Attribute
-	 */
-	public Attribute<?> getAttribute(String name) {
-		return attributes.get(name);
+		setAttribute(name, value);
 	}
 	
 	/**
 	 * Remove an attribute from the entity.
 	 * @param name Attribute to remove.
+	 * @deprecated No difference between this and <code>setAttribute([name], null)</code>
 	 */
 	public void removeAttribute(String name) {
-		attributes.remove(name);
+		setAttribute(name, null);
 	}
 	
 	/**
@@ -381,12 +363,9 @@ public abstract class Entity {
 	 * @param supressUpdate If true, {@link #onUpdateAttributes(boolean)} is NOT
 	 *                      called.
 	 */
+	@Deprecated
 	public void reset(boolean supressUpdate) {
-		attributes.clear();
-		attributes.putAll(getDefaultAttributes());
-		if (!supressUpdate) {
-			onUpdateAttributes(false);
-		}
+		return;
 	}
 
 	/**
@@ -406,7 +385,10 @@ public abstract class Entity {
 	 * @param noRecompile If this is true, this entity shouldn't recompile the
 	 *                    world. Usually set when the calling function plans to
 	 *                    recompile the world later.
+	 * @deprecated <code>noRecompile</code> no-longer does anything as entities
+	 *             never recompile the world themselves.
 	 */
+	@Deprecated
 	public void onUpdateAttributes(boolean noRecompile) {
 		updateRenderEntities();
 	}

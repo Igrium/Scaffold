@@ -5,10 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.scaffoldeditor.nbt.math.Vector3f;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
-import org.scaffoldeditor.scaffold.level.entity.attribute.VectorAttribute;
 import org.scaffoldeditor.scaffold.level.io.Output;
 
 /**
@@ -20,13 +18,11 @@ public class ChangeAttributesOperation implements Operation {
 	private Entity target;
 	private Map<String, Attribute<?>> attributes = new HashMap<>();
 	private List<Output> outputs;
-	private Vector3f newPosition = null;
 	private String newName;
 	private boolean refactor;
 	
 	private Map<String, Attribute<?>> old = new HashMap<>();
 	private List<Output> oldOutputs;
-	private Vector3f oldPosition = null;
 	private String oldName;
 	
 	/**
@@ -72,18 +68,10 @@ public class ChangeAttributesOperation implements Operation {
 	public boolean execute() {
 		// Ensure position is properly set on entity.
 		if (attributes != null) {
-			if (attributes.containsKey("position")) {
-				newPosition = ((VectorAttribute) attributes.get("position")).getValue();
-				oldPosition = target.getPosition();
-				attributes.remove("position");
-				target.setPosition(newPosition);
-			}
-			
 			for (String name : attributes.keySet()) {		
 				old.put(name, target.getAttribute(name));
-				target.setAttribute(name, attributes.get(name), true);
 			}
-			target.onUpdateAttributes(false);
+			target.setAttributes(attributes);
 		}
 		
 		if (outputs != null) {
@@ -105,13 +93,7 @@ public class ChangeAttributesOperation implements Operation {
 	@Override
 	public void undo() {
 		if (old != null) {
-			for (String name : old.keySet()) {
-				target.setAttribute(name, old.get(name), true);
-			}
-			if (oldPosition != null) {
-				target.setPosition(oldPosition);
-			}
-			target.onUpdateAttributes(false);
+			target.setAttributes(old);
 		}
 		
 		if (oldOutputs != null) {
@@ -128,13 +110,7 @@ public class ChangeAttributesOperation implements Operation {
 	@Override
 	public void redo() {
 		if (attributes != null) {
-			if (newPosition != null) {
-				target.setPosition(newPosition);
-			}
-			for (String name : attributes.keySet()) {
-				target.setAttribute(name, attributes.get(name), true);
-			}
-			target.onUpdateAttributes(false);
+			target.setAttributes(attributes);
 		}
 		
 		if (outputs != null) {

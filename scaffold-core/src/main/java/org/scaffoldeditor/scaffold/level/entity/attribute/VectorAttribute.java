@@ -39,6 +39,10 @@ public class VectorAttribute extends Attribute<Vector3f> {
 		this(value.toFloat());
 	}
 
+	public VectorAttribute(float x, float y, float z) {
+		this(new Vector3f(x, y, z));
+	}
+
 	@Override
 	public Vector3f getValue() {
 		return value;

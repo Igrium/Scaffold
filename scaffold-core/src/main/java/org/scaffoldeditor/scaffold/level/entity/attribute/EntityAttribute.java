@@ -34,6 +34,10 @@ public class EntityAttribute extends Attribute<String> {
 		this(target.getName());
 	}
 
+	public EntityAttribute() {
+		this("");
+	}
+
 	@Override
 	public String getValue() {
 		return target;

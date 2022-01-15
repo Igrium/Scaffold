@@ -89,12 +89,12 @@ public class AttributeCommand {
 
         String attName = StringArgumentType.getString(command, "attribute_name");
         Attribute<?> attribute = AttributeArgumentType.getAttribute(command, "attribute");
-        Map<String, Attribute<?>> def = ent.getDefaultAttributes();
-        if (def.containsKey(attName) && def.get(attName).registryName != attribute.registryName) {
-            command.getSource().printError(
-                    "For stability reasons, attributes provided by the entity code cann't have their type changed.");
-            return 0;
-        }
+        // Map<String, Attribute<?>> def = ent.getDefaultAttributes();
+        // if (def.containsKey(attName) && def.get(attName).registryName != attribute.registryName) {
+        //     command.getSource().printError(
+        //             "For stability reasons, attributes provided by the entity code cann't have their type changed.");
+        //     return 0;
+        // }
 
         boolean modified = ent.getAttributes().contains(attName);
         level.getOperationManager().execute(new ChangeAttributesOperation(ent, Map.of(attName, attribute), null));

@@ -15,6 +15,7 @@ import org.scaffoldeditor.nbt.math.Vector3f;
 import org.scaffoldeditor.nbt.math.Vector3i;
 import org.scaffoldeditor.nbt.util.Identifier;
 import org.scaffoldeditor.nbt.util.MCEntity;
+import org.scaffoldeditor.scaffold.annotation.Attrib;
 import org.scaffoldeditor.scaffold.io.AssetLoader;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
@@ -73,16 +74,14 @@ public class WorldDynamic extends Entity implements EntityProvider, TargetSelect
 	
 	// Expected to remain persistant throughout compilation process.
 	private Map<Vector3i, MCEntity> entities;
-	private BlockCollection model;
+	private BlockCollection modelCache;
 	private String modelPath = "";
 
-	@Override
-	public Map<String, Attribute<?>> getDefaultAttributes() {
-		Map<String, Attribute<?>> map = new HashMap<>();
-		map.put("model", new AssetAttribute("schematic", ""));
-		map.put("start_enabled", new BooleanAttribute(true));
-		return map;
-	}
+	@Attrib
+	protected AssetAttribute model = new AssetAttribute("schematic", "");
+
+	@Attrib(name = "start_enabled")
+	protected BooleanAttribute startEnabled = new BooleanAttribute(true);
 	
 	@Override
 	public void onAdded() {
@@ -94,7 +93,7 @@ public class WorldDynamic extends Entity implements EntityProvider, TargetSelect
 		modelPath = (String) getAttribute("model").getValue();
 		
 		if (modelPath.length() == 0) {
-			model = null;
+			modelCache = null;
 			return;
 		}
 		
@@ -104,7 +103,7 @@ public class WorldDynamic extends Entity implements EntityProvider, TargetSelect
 		}
 		
 		try {
-			model = (BlockCollection) getProject().assetManager().loadAsset(modelPath, false);
+			modelCache = (BlockCollection) getProject().assetManager().loadAsset(modelPath, false);
 		} catch (IOException e) {
 			LogManager.getLogger().error("Unable to load model: "+modelPath, e);
 			return;
@@ -112,22 +111,22 @@ public class WorldDynamic extends Entity implements EntityProvider, TargetSelect
 		
 		entities = new HashMap<>();
 		
-		for (Vector3i coord : model) {
-			if (model.blockAt(coord).getName().equals("minecraft:air")) continue;
-			entities.put(coord, generateEntity(model.blockAt(coord)));
+		for (Vector3i coord : modelCache) {
+			if (modelCache.blockAt(coord).getName().equals("minecraft:air")) continue;
+			entities.put(coord, generateEntity(modelCache.blockAt(coord)));
 		}
 	}
-	
+
 	@Override
-	public void onUpdateAttributes(boolean noRecompile) {
-		super.onUpdateAttributes(noRecompile);
+	protected void onSetAttributes(Map<String, Attribute<?>> updated) {
+		super.onSetAttributes(updated);
 		if (!modelPath.equals(getAttribute("model").getValue())) reloadModel();
 	}
 	
 	@Override
 	public Set<RenderEntity> getRenderEntities() {
 		Set<RenderEntity> renderEnts = super.getRenderEntities();
-		if (model == null) return renderEnts;
+		if (modelCache == null) return renderEnts;
 		
 		for (Vector3i pos : entities.keySet()) {
 			renderEnts.add(new ModelRenderEntity(this, getPreviewPosition().add(pos.toFloat()), new Vector3f(0, 0, 0),
@@ -155,7 +154,7 @@ public class WorldDynamic extends Entity implements EntityProvider, TargetSelect
 	@Override
 	public boolean compileLogic(Datapack datapack) {		
 		
-		if (model == null) return super.compileLogic(datapack);
+		if (modelCache == null) return super.compileLogic(datapack);
 		
 		Function tickFunction = new Function(LogicUtils.getEntityFunction(this, "tick"));	
 		for (Vector3i coord : entities.keySet()) {
@@ -208,7 +207,7 @@ public class WorldDynamic extends Entity implements EntityProvider, TargetSelect
 	@Override
 	public boolean compileGameEntities(BlockWorld world) {
 		reloadModel();
-		if (model == null) return true;
+		if (modelCache == null) return true;
 		
 		if (startEnabled()) {
 			for (Vector3i coord : entities.keySet()) {
