@@ -3,14 +3,16 @@ package org.scaffoldeditor.scaffold.level.entity.world;
 import java.util.Map;
 import java.util.Set;
 
+import org.joml.Vector3d;
+import org.joml.Vector3dc;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.BlockCollection;
 import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.nbt.block.GenericBlockCollection;
-import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
-import org.scaffoldeditor.nbt.math.Vector3d;
-import org.scaffoldeditor.nbt.math.Vector3f;
-import org.scaffoldeditor.nbt.math.Vector3i;
+import org.scaffoldeditor.nbt.block.WorldMath.SectionCoordinate;
+import org.scaffoldeditor.nbt.math.MathUtils;
 import org.scaffoldeditor.scaffold.annotation.Attrib;
 import org.scaffoldeditor.scaffold.block_textures.BlockTexture;
 import org.scaffoldeditor.scaffold.block_textures.SingleBlockTexture;
@@ -57,11 +59,11 @@ public class WorldBrush extends BaseBlockEntity implements BrushEntity {
 	@Override
 	public boolean compileWorld(BlockWorld world, boolean full, Set<SectionCoordinate> sections) {
 		reloadTexture();
-		Vector3i endLocal = getEndPoint().floor();
-		for (int x = 0; x < endLocal.x; x++) {
-			for (int y = 0; y < endLocal.y; y++) {
-				for (int z = 0; z < endLocal.z; z++) {
-					Vector3i blockPos = getBlockPosition().add(new Vector3i(x,y,z));
+		Vector3ic endLocal = MathUtils.floorVector(getEndPoint());
+		for (int x = 0; x < endLocal.x(); x++) {
+			for (int y = 0; y < endLocal.y(); y++) {
+				for (int z = 0; z < endLocal.z(); z++) {
+					Vector3i blockPos = new Vector3i(x,y,z).add(getBlockPosition());
 					world.setBlock(blockPos.x, blockPos.y, blockPos.z,
 							blockAt(blockPos), this);
 				}
@@ -72,33 +74,35 @@ public class WorldBrush extends BaseBlockEntity implements BrushEntity {
 	}
 
 	@Override
-	public Block blockAt(Vector3i coord) {
+	public Block blockAt(Vector3ic coord) {
 		BlockTexture texture = getTexture();
-		Vector3d scale = new Vector3d(1,1,1);
+		Vector3dc scale;
 		if (texture.supportsScaling()) {
-			scale = getTextureScale().toDouble();
+			scale = getTextureScale();
+		} else {
+			scale = new Vector3d(1,1,1);
 		}
 		
-		Vector3f transformCoord = coord.toFloat().add(getTextureOffset());
-		return getTexture().blockAt(transformCoord.x / scale.x, transformCoord.y / scale.y, transformCoord.z / scale.z);
+		Vector3dc transformCoord = new Vector3d(coord).add(getTextureOffset());
+		return getTexture().blockAt(transformCoord.x() / scale.x(), transformCoord.y() / scale.y(), transformCoord.z() / scale.z());
 	}
 
 	@Override
-	public Vector3f[] getBrushBounds() {
-		Vector3f position = getPosition();
-		return new Vector3f[] { position, position.add(getEndPoint()) };
+	public Vector3dc[] getBrushBounds() {
+		Vector3dc position = getPosition();
+		return new Vector3dc[] { position, position.add(getEndPoint(), new Vector3d()) };
 	}
 	
 	@Override
-	public Vector3i[] getBounds() {
-		Vector3i position = getPosition().floor();
-		return new Vector3i[] { position, position.add(getEndPoint().floor()) };
+	public Vector3ic[] getBounds() {
+		Vector3ic position = getBlockPosition();
+		return new Vector3ic[] { position, position.add(MathUtils.floorVector(getEndPoint()), new Vector3i()) };
 	}
 	
 	/**
 	 * Get the end point of this brush relative to it's start point. (AKA the root position)
 	 */
-	public Vector3f getEndPoint() {
+	public Vector3dc getEndPoint() {
 		return endPoint.getValue();
 	}
 	
@@ -113,11 +117,11 @@ public class WorldBrush extends BaseBlockEntity implements BrushEntity {
 		texture.reload();
 	}
 	
-	public Vector3f getTextureScale() {
+	public Vector3dc getTextureScale() {
 		return textureScale.getValue();
 	}
 	
-	public Vector3f getTextureOffset() {
+	public Vector3dc getTextureOffset() {
 		return textureOffset.getValue();
 	}
 
@@ -131,10 +135,10 @@ public class WorldBrush extends BaseBlockEntity implements BrushEntity {
 	}
 
 	@Override
-	public void setBrushBounds(Vector3f[] newBounds, boolean suppressUpdate) {
+	public void setBrushBounds(Vector3dc[] newBounds, boolean suppressUpdate) {
 		Map<String, Attribute<?>> att = Map.of(
 			"position", new VectorAttribute(newBounds[0]),
-			"end_point", new VectorAttribute(newBounds[1].subtract(newBounds[0]))
+			"end_point", new VectorAttribute(newBounds[1].sub(newBounds[0], new Vector3d()))
 		);
 		setAttributes(att);
 	}
@@ -142,10 +146,10 @@ public class WorldBrush extends BaseBlockEntity implements BrushEntity {
 	@Override
 	public BlockCollection getBlockCollection() {
 		GenericBlockCollection blocks = new GenericBlockCollection();
-		Vector3i endPoint = getEndPoint().floor();
-		for (int x = 0; x < endPoint.x; x++) {
-			for (int y = 0; y < endPoint.y; y++) {
-				for (int z = 0; z < endPoint.z; z++) {
+		Vector3ic endPoint = MathUtils.floorVector(getEndPoint());
+		for (int x = 0; x < endPoint.x(); x++) {
+			for (int y = 0; y < endPoint.y(); y++) {
+				for (int z = 0; z < endPoint.z(); z++) {
 					Block block = blockAt(new Vector3i(x, y, z).add(getBlockPosition()));
 					if (block != null) blocks.setBlock(x, y, z, block);
 				}

@@ -5,8 +5,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
+import org.joml.Vector3d;
 import org.scaffoldeditor.nbt.block.BlockCollection;
-import org.scaffoldeditor.nbt.math.Vector3f;
 import org.scaffoldeditor.scaffold.annotation.Attrib;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
@@ -59,7 +59,7 @@ public class BlockModelTest extends Entity {
 	public Set<RenderEntity> getRenderEntities() {
 		Set<RenderEntity> set = super.getRenderEntities();
 		if (modelCache == null) return set;
-		set.add(new BlockRenderEntity(this, modelCache, getPreviewPosition(), new Vector3f(0, 0, 0), "model"));
+		set.add(new BlockRenderEntity(this, modelCache, getPreviewPosition(), new Vector3d(), "model"));
 		return set;
 	}
 }

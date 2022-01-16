@@ -3,16 +3,16 @@ package org.scaffoldeditor.scaffold.operation;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.scaffoldeditor.nbt.math.Vector3f;
+import org.joml.Vector3dc;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 
 public class MoveEntitiesOperation implements Operation {
-	private Map<Entity, Vector3f> targetPositions;
-	private Map<Entity, Vector3f> oldPositions;
+	private Map<Entity, Vector3dc> targetPositions;
+	private Map<Entity, Vector3dc> oldPositions;
 	private Level level;
 	
-	public MoveEntitiesOperation(Map<Entity, Vector3f> targetPositions, Level level) {
+	public MoveEntitiesOperation(Map<Entity, Vector3dc> targetPositions, Level level) {
 		this.targetPositions = Map.copyOf(targetPositions);
 		this.level = level;
 	}
@@ -38,7 +38,7 @@ public class MoveEntitiesOperation implements Operation {
 		move(targetPositions);
 	}
 	
-	private void move(Map<Entity, Vector3f> targets) {
+	private void move(Map<Entity, Vector3dc> targets) {
 		boolean recompileCache = level.autoRecompile;
 		level.autoRecompile = false; // We only need to recompile once, regardless of how many entities were moved.
 		for (Entity ent : targets.keySet()) {

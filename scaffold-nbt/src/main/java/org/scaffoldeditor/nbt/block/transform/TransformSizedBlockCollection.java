@@ -1,8 +1,10 @@
 package org.scaffoldeditor.nbt.block.transform;
 
+import org.joml.Matrix4dc;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.scaffoldeditor.nbt.block.SizedBlockCollection;
-import org.scaffoldeditor.nbt.math.Matrix;
-import org.scaffoldeditor.nbt.math.Vector3i;
+import org.scaffoldeditor.nbt.math.MathUtils;
 
 /**
  * Implements the {@link SizedBlockCollection} methods on {@link TransformBlockCollection}
@@ -15,7 +17,7 @@ public class TransformSizedBlockCollection extends TransformBlockCollection impl
 	
 	protected final SizedBlockCollection base;
 
-	public TransformSizedBlockCollection(SizedBlockCollection base, Matrix transformMatrix) {
+	public TransformSizedBlockCollection(SizedBlockCollection base, Matrix4dc transformMatrix) {
 		super(base, transformMatrix);
 		this.base = base;
 	}
@@ -26,32 +28,26 @@ public class TransformSizedBlockCollection extends TransformBlockCollection impl
 	}
 
 	@Override
-	public Vector3i getMin() {
-		Vector3i baseMin = getBaseMin();
-		Vector3i baseMax = getBaseMax();
-		return new Vector3i(Math.min(baseMin.x, baseMax.x), Math.min(baseMin.y, baseMax.y),
-				Math.min(baseMin.z, baseMax.z));
+	public Vector3ic getMin() {
+		return getBaseMin().min(getBaseMax());
 	}
 
 	@Override
 	public Vector3i getMax() {
-		Vector3i baseMin = getBaseMin();
-		Vector3i baseMax = getBaseMax();
-		return new Vector3i(Math.max(baseMin.x, baseMax.x), Math.max(baseMin.y, baseMax.y),
-				Math.max(baseMin.z, baseMax.z));
+		return getBaseMin().max(getBaseMax());
 	}
 	
 	/**
 	 * Get what the base determines to be the min point with the transform applied.
 	 */
 	private Vector3i getBaseMin() {
-		return transformVector(getBase().getMin().toDouble()).floor();
+		return MathUtils.floorVector(transformVector(getBase().getMin()));
 	}
 	
 	/**
 	 * Get what the base determines to be the max point with the transform applied.
 	 */
 	private Vector3i getBaseMax() {
-		return transformVector(getBase().getMax().toDouble()).floor();
+		return MathUtils.floorVector(transformVector(getBase().getMax()));
 	}
 }

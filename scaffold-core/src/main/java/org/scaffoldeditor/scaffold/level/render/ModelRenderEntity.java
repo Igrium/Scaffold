@@ -1,6 +1,6 @@
 package org.scaffoldeditor.scaffold.level.render;
 
-import org.scaffoldeditor.nbt.math.Vector3f;
+import org.joml.Vector3dc;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 
 /**
@@ -28,7 +28,7 @@ public class ModelRenderEntity extends RenderEntity {
 	 *                   Example:
 	 *                   <code>minecraft:cobblestone_stairs#inventory</code>
 	 */
-	public ModelRenderEntity(Entity entity, Vector3f position, Vector3f rotation, String identifier, String model) {
+	public ModelRenderEntity(Entity entity, Vector3dc position, Vector3dc rotation, String identifier, String model) {
 		super(entity, position, rotation, identifier);
 		this.model = model;
 	}

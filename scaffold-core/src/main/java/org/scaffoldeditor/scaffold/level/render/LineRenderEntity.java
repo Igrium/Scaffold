@@ -1,6 +1,6 @@
 package org.scaffoldeditor.scaffold.level.render;
 
-import org.scaffoldeditor.nbt.math.Vector3f;
+import org.joml.Vector3dc;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 
 /**
@@ -10,7 +10,7 @@ import org.scaffoldeditor.scaffold.level.entity.Entity;
  */
 public class LineRenderEntity extends RenderEntity {
 	
-	private Vector3f endPos;
+	private Vector3dc endPos;
 	private float red = 1;
 	private float green = 1;
 	private float blue = 1;
@@ -27,7 +27,7 @@ public class LineRenderEntity extends RenderEntity {
 	 *                   instance of this string may exist per Scaffold entity.
 	 *                   Different Scaffold entities may share identifiers.
 	 */
-	public LineRenderEntity(Entity entity, Vector3f position, Vector3f endPos, String identifier) {
+	public LineRenderEntity(Entity entity, Vector3dc position, Vector3dc endPos, String identifier) {
 		super(entity, position, identifier);
 		this.endPos = endPos;
 	}
@@ -47,7 +47,7 @@ public class LineRenderEntity extends RenderEntity {
 	 * @param blue       Amount of blue.
 	 * @param alpha      How solid the line should be.
 	 */
-	public LineRenderEntity(Entity entity, Vector3f position, Vector3f endPos, String identifier, float red, float green, float blue, float alpha) {
+	public LineRenderEntity(Entity entity, Vector3dc position, Vector3dc endPos, String identifier, float red, float green, float blue, float alpha) {
 		this(entity, position, endPos, identifier);
 		this.red = red;
 		this.green = green;
@@ -58,7 +58,7 @@ public class LineRenderEntity extends RenderEntity {
 	/**
 	 * Get the end position of the line.
 	 */
-	public Vector3f getEndPos() {
+	public Vector3dc getEndPos() {
 		return endPos;
 	}
 	

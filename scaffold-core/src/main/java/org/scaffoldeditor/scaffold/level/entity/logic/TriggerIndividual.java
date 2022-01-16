@@ -2,7 +2,7 @@ package org.scaffoldeditor.scaffold.level.entity.logic;
 
 import java.util.Collection;
 
-import org.scaffoldeditor.nbt.math.Vector3f;
+import org.joml.Vector3dc;
 import org.scaffoldeditor.scaffold.annotation.Attrib;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
@@ -96,11 +96,11 @@ public class TriggerIndividual extends ToolBrushEntity {
 	 */
 	public TargetSelector getSelector() {
 		String prefix = (getScope() == ActivatorScope.PLAYERS) ? "@a" : "@e";
-		Vector3f pos = getPosition();
-		Vector3f dPos = getEndPoint();
+		Vector3dc pos = getPosition();
+		Vector3dc dPos = getEndPoint();
 		
-		return TargetSelector.fromString(prefix + "[x=" + pos.x + ",y=" + pos.y + ",z=" + pos.z + ",dx=" + (dPos.x - 1)
-				+ ",dy=" + (dPos.y - 1) + ",dz=" + (dPos.z - 1) + "]");
+		return TargetSelector.fromString(prefix + "[x=" + pos.x() + ",y=" + pos.y() + ",z=" + pos.z() + ",dx=" + (dPos.x() - 1)
+				+ ",dy=" + (dPos.y() - 1) + ",dz=" + (dPos.z() - 1) + "]");
 	}
 	
 	/**

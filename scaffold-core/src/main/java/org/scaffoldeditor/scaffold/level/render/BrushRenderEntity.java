@@ -1,6 +1,6 @@
 package org.scaffoldeditor.scaffold.level.render;
 
-import org.scaffoldeditor.nbt.math.Vector3f;
+import org.joml.Vector3dc;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 
 /**
@@ -12,7 +12,7 @@ import org.scaffoldeditor.scaffold.level.entity.Entity;
  */
 public class BrushRenderEntity extends RenderEntity {
 	
-	private Vector3f endPos;
+	private Vector3dc endPos;
 	private String texture;
 	
 	/**
@@ -28,7 +28,7 @@ public class BrushRenderEntity extends RenderEntity {
 	 *                   instance of this string may exist per Scaffold entity.
 	 *                   Different Scaffold entities may share identifiers.
 	 */
-	public BrushRenderEntity(Entity entity, Vector3f position, Vector3f endPos, String texture, String identifier) {
+	public BrushRenderEntity(Entity entity, Vector3dc position, Vector3dc endPos, String texture, String identifier) {
 		super(entity, position, identifier);
 		this.endPos = endPos;
 		this.texture = texture;
@@ -38,7 +38,7 @@ public class BrushRenderEntity extends RenderEntity {
 		return texture;
 	}
 	
-	public Vector3f getEndPos() {
+	public Vector3dc getEndPos() {
 		return endPos;
 	}
 

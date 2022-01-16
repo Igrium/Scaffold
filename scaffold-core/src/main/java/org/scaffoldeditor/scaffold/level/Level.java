@@ -17,11 +17,14 @@ import java.util.UUID;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.joml.Vector3d;
+import org.joml.Vector3dc;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.nbt.block.Chunk;
-import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
-import org.scaffoldeditor.nbt.math.Vector3f;
-import org.scaffoldeditor.nbt.math.Vector3i;
+import org.scaffoldeditor.nbt.block.WorldMath.SectionCoordinate;
+import org.scaffoldeditor.nbt.math.MathUtils;
 import org.scaffoldeditor.scaffold.compile.Compiler.CompileEndStatus;
 import org.scaffoldeditor.scaffold.compile.Compiler.CompileResult;
 import org.scaffoldeditor.scaffold.core.Project;
@@ -337,7 +340,7 @@ public class Level {
 	 * @param position Position of entity.
 	 * @return Newly created entity.
 	 */
-	public Entity newEntity(String typeName, String name, Vector3f position) {
+	public Entity newEntity(String typeName, String name, Vector3dc position) {
 		// Make sure entity with name doesn't already exist
 		name = validateName(name, new String[] {});
 		
@@ -660,9 +663,9 @@ public class Level {
 		for (Entity entity : levelStack) {
 			if (entity instanceof BlockEntity) {
 				BlockEntity blockEntity = (BlockEntity) entity;
-				Vector3i[] bounds = blockEntity.getBounds();
-				Vector3i minSection = bounds[0].toFloat().divide(16).floor();
-				Vector3i maxSection = bounds[1].toFloat().divide(16).floor();
+				Vector3ic[] bounds = blockEntity.getBounds();
+				Vector3i minSection = MathUtils.floorVector(new Vector3d(bounds[0]).div(16));
+				Vector3i maxSection = MathUtils.floorVector(new Vector3d(bounds[1]).div(16));
 				// See if entity is within chunkList.
 				for (SectionCoordinate section : sections) {
 					if (minSection.x <= section.x && section.x <= maxSection.x

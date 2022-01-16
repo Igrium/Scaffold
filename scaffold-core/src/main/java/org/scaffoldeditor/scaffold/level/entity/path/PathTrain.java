@@ -215,9 +215,9 @@ public class PathTrain extends LogicEntity implements KnownUUID, EntityProvider 
 			rotation.addFloat((float) rot[1]);
 			ent.put("Rotation", rotation);
 			
-			world.addEntity(ent, startingPath.getPosition().toDouble());
+			world.addEntity(ent, startingPath.getPosition());
 		} else {
-			world.addEntity(ent, getPosition().toDouble());
+			world.addEntity(ent, getPosition());
 		}
 		
 		return true;

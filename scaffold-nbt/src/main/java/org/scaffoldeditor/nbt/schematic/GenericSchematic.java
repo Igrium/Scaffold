@@ -4,13 +4,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.joml.Vector3i;
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.SizedBlockCollection;
-import org.scaffoldeditor.nbt.math.Vector3i;
 
 /**
  * Represents a generic block collection (not representing any file format) that
- * can be easily written to at runtime.
+ * can be easily written to at runtime. Contrary to
+ * {@link org.scaffoldeditor.nbt.block.GenericBlockCollection
+ * GenericBlockCollection}, this is sized.
  * 
  * @author Igrium
  */

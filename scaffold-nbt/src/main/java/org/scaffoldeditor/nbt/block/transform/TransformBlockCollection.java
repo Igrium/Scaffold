@@ -2,11 +2,14 @@ package org.scaffoldeditor.nbt.block.transform;
 
 import java.util.Iterator;
 
+import org.joml.Matrix4d;
+import org.joml.Matrix4dc;
+import org.joml.Vector3d;
+import org.joml.Vector3dc;
+import org.joml.Vector3ic;
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.BlockCollection;
-import org.scaffoldeditor.nbt.math.Matrix;
-import org.scaffoldeditor.nbt.math.Vector3d;
-import org.scaffoldeditor.nbt.math.Vector3i;
+import org.scaffoldeditor.nbt.math.MathUtils;
 
 /**
  * A block collection that represents another block collection offset by a certian transform.
@@ -17,7 +20,7 @@ import org.scaffoldeditor.nbt.math.Vector3i;
 public class TransformBlockCollection implements BlockCollection {
 	
 	private final BlockCollection base;
-	protected final Matrix transformMatrix;
+	protected final Matrix4dc transformMatrix;
 	
 	/**
 	 * Create a transform block collection.
@@ -25,11 +28,11 @@ public class TransformBlockCollection implements BlockCollection {
 	 * the base of this one will be used and the matrix multiplied by the given transform matrix.
 	 * @param transformMatrix Transformation matrix to use.
 	 */
-	public TransformBlockCollection(BlockCollection base, Matrix transformMatrix) {
+	public TransformBlockCollection(BlockCollection base, Matrix4dc transformMatrix) {
 		// Don't overload memory with a bunch of nested transform block collections. Just generate a new matrix.
 		if (base instanceof TransformBlockCollection) {
 			this.base = ((TransformBlockCollection) base).base;
-			this.transformMatrix = ((TransformBlockCollection) base).transformMatrix.times(transformMatrix);
+			this.transformMatrix = transformMatrix.mul(((TransformBlockCollection) base).transformMatrix, new Matrix4d());
 		} else {
 			this.base = base;
 			this.transformMatrix = transformMatrix;
@@ -39,13 +42,13 @@ public class TransformBlockCollection implements BlockCollection {
 	@Override
 	public Block blockAt(int x, int y, int z) {
 		Vector3d inVector = new Vector3d(x, y, z);
-		return getBase().blockAt(transformVector(inVector).floor());
+		return getBase().blockAt(MathUtils.floorVector(transformVector(inVector)));
 	}
 	
 	@Override
 	public boolean hasBlock(int x, int y, int z) {
 		Vector3d inVector = new Vector3d(x, y, z);
-		return getBase().hasBlock(transformVector(inVector).floor());
+		return getBase().hasBlock(MathUtils.floorVector(transformVector(inVector)));
 	}
 	
 	/**
@@ -53,10 +56,18 @@ public class TransformBlockCollection implements BlockCollection {
 	 * @param in Coordinates in relation to this block collection.
 	 * @return Coordinates in relation to the base block collection.
 	 */
-	public Vector3d transformVector(Vector3d in) {
-		Matrix inMatrix = Matrix.fromVector(in);
-		Matrix outMatrix = transformMatrix.times(inMatrix);
-		return outMatrix.toVector();
+	public Vector3d transformVector(Vector3dc in) {
+		return transformVector(in, new Vector3d());
+	}
+
+	/**
+	 * Transform a vector according to the transform matrix.
+	 * @param in Coordinates in relation to this block collection.
+	 * @param dest Will hold the result.
+	 * @return dest
+	 */
+	public Vector3d transformVector(Vector3dc in, Vector3d dest) {
+		return transformMatrix.transformPosition(in, dest);
 	}
 	
 	/**
@@ -64,8 +75,8 @@ public class TransformBlockCollection implements BlockCollection {
 	 * @param in Coordinates in relation to this block collection.
 	 * @return Coordinates in relation to the base block collection.
 	 */
-	public Vector3d transformVector(Vector3i in) {
-		return transformVector(in.toDouble());
+	public Vector3d transformVector(Vector3ic in) {
+		return transformMatrix.transformPosition(new Vector3d(in.x(), in.y(), in.z()));
 	}
 	
 	/**
@@ -79,19 +90,19 @@ public class TransformBlockCollection implements BlockCollection {
 	 * Get the transform matrix in use.
 	 * @return
 	 */
-	public Matrix getMatrix() {
+	public Matrix4dc getMatrix() {
 		return transformMatrix;
 	}
 
 	@Override
-	public Iterator<Vector3i> iterator() {
-		return new Iterator<Vector3i>() {
+	public Iterator<Vector3ic> iterator() {
+		return new Iterator<Vector3ic>() {
 			
-			Iterator<Vector3i> baseIterator = base.iterator();
+			Iterator<Vector3ic> baseIterator = base.iterator();
 			
 			@Override
-			public Vector3i next() {
-				return transformVector(baseIterator.next()).floor();
+			public Vector3ic next() {
+				return MathUtils.floorVector(transformVector(baseIterator.next()));
 			}
 			
 			@Override

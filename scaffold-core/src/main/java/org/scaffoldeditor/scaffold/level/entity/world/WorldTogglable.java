@@ -5,11 +5,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.BlockWorld;
-import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
+import org.scaffoldeditor.nbt.block.WorldMath.SectionCoordinate;
 import org.scaffoldeditor.nbt.block.SizedBlockCollection;
-import org.scaffoldeditor.nbt.math.Vector3i;
 import org.scaffoldeditor.nbt.schematic.GenericSchematic;
 import org.scaffoldeditor.nbt.util.Identifier;
 import org.scaffoldeditor.scaffold.annotation.Attrib;
@@ -70,15 +71,15 @@ public class WorldTogglable extends WorldStatic {
 			SizedBlockCollection model = getFinalModel();
 			
 			if (model != null) {
-				Vector3i offset = model.getMin();
-				Vector3i max = model.getMax();
+				Vector3ic offset = model.getMin();
+				Vector3ic max = model.getMax();
 				
-				underlayerCache = new GenericSchematic(max.x - offset.x, max.y - offset.y, max.z - offset.z);
-				for (Vector3i block : model) {
+				underlayerCache = new GenericSchematic(max.x() - offset.x(), max.y() - offset.y(), max.z() - offset.z());
+				for (Vector3ic block : model) {
 					if (shouldPlaceAir() || !model.blockAt(block).getName().equals("minecraft:air")) {
-						Block worldBlock = world.blockAt(getBlockPosition().add(block));
+						Block worldBlock = world.blockAt(getBlockPosition().add(block, new Vector3i()));
 						if (worldBlock == null) worldBlock = new Block("minecraft:air");
-						underlayerCache.setBlock(worldBlock, block.add(offset));
+						underlayerCache.setBlock(worldBlock, block.add(offset, new Vector3i()));
 					}
 				}
 			}

@@ -14,11 +14,11 @@ plugins {
 }
 
 mainClassName = 'org.scaffoldeditor.nbt.test.NBTTester'
-version = '0.5.0-SNAPSHOT'
+version = '0.6.0-SNAPSHOT'
 group = 'org.scaffoldeditor'
 
-sourceCompatibility = JavaVersion.VERSION_17
-targetCompatibility = JavaVersion.VERSION_17
+sourceCompatibility = JavaVersion.VERSION_16
+targetCompatibility = JavaVersion.VERSION_16
 
 dependencies {
 
@@ -27,8 +27,7 @@ dependencies {
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.14.1'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.14.1'
 
-    //implementation 'com.github.mryurihi:tbnbt:0.1.3'
-    // api name: "tbnbt-0.1.4"
+    api 'org.joml:joml:1.10.2'
 
     // Use JUnit test framework
     testImplementation 'junit:junit:4.12'

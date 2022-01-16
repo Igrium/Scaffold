@@ -1,21 +1,21 @@
 package org.scaffoldeditor.scaffold.operation;
 
-import org.scaffoldeditor.nbt.math.Vector3f;
+import org.joml.Vector3dc;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 
 @Deprecated
 public class MoveEntityOperation implements Operation {
 	private Entity target;
-	private Vector3f newPosition;
+	private Vector3dc newPosition;
 	
-	private Vector3f oldPosition;
+	private Vector3dc oldPosition;
 	
-	public MoveEntityOperation(Entity target, Vector3f newPosition) {
+	public MoveEntityOperation(Entity target, Vector3dc newPosition) {
 		this.target = target;
 		this.newPosition = newPosition;
 	}
 	
-	public MoveEntityOperation(Entity target, Vector3f oldPosition, Vector3f newPosition) {
+	public MoveEntityOperation(Entity target, Vector3dc oldPosition, Vector3dc newPosition) {
 		this.target = target;
 		this.oldPosition = oldPosition;
 		this.newPosition = newPosition;

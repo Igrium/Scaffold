@@ -9,9 +9,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.joml.Vector3d;
+import org.joml.Vector3dc;
+import org.joml.Vector3ic;
 import org.scaffoldeditor.nbt.block.BlockWorld;
-import org.scaffoldeditor.nbt.math.Vector3f;
-import org.scaffoldeditor.nbt.math.Vector3i;
+import org.scaffoldeditor.nbt.math.MathUtils;
 import org.scaffoldeditor.scaffold.annotation.Attrib;
 import org.scaffoldeditor.scaffold.core.Project;
 import org.scaffoldeditor.scaffold.io.AssetManager;
@@ -74,7 +76,7 @@ public abstract class Entity extends AttributeHolder {
 	private Level level;
 	
 	@Attrib
-	protected VectorAttribute position = new VectorAttribute(new Vector3f(0, 0, 0));
+	protected VectorAttribute position = new VectorAttribute();
 	
 	private List<Output> outputs = new ArrayList<>();
 		
@@ -254,7 +256,7 @@ public abstract class Entity extends AttributeHolder {
 	 * Get this entity's world position.
 	 * @return Position
 	 */
-	public Vector3f getPosition() {
+	public Vector3dc getPosition() {
 		return position.getValue();
 	}
 	
@@ -262,8 +264,8 @@ public abstract class Entity extends AttributeHolder {
 	 * Get the position of this entity on the block grid.
 	 * @return Block position.
 	 */
-	public Vector3i getBlockPosition() {
-		return getPosition().floor();
+	public Vector3ic getBlockPosition() {
+		return MathUtils.floorVector(getPosition());
 	}
 	
 	/**
@@ -271,8 +273,8 @@ public abstract class Entity extends AttributeHolder {
 	 * Called on entity creation.
 	 * @param position New position
 	 */
-	public void setPosition(Vector3f position) {
-		if (isGridLocked()) position = position.floor().toFloat();
+	public void setPosition(Vector3dc position) {
+		if (isGridLocked()) position = position.floor(new Vector3d());
 		this.setAttribute("position", new VectorAttribute(position));
 	}
 
@@ -280,8 +282,8 @@ public abstract class Entity extends AttributeHolder {
 	 * Set the entity's position without triggering attribute updaters.
 	 * @param position New position.
 	 */
-	protected void setPositionNoUpdate(Vector3f position) {
-		if (isGridLocked()) position = position.floor().toFloat();
+	protected void setPositionNoUpdate(Vector3dc position) {
+		if (isGridLocked()) position = position.floor(new Vector3d());
 		this.position = new VectorAttribute(position);
 	}
 	
@@ -469,7 +471,7 @@ public abstract class Entity extends AttributeHolder {
 	/**
 	 * The current preview position.
 	 */
-	protected Vector3f previewPosition = new Vector3f(0,0,0);
+	protected Vector3dc previewPosition = new Vector3d();
 	
 	/**
 	 * Get the position at which this entity should render in the editor. This is
@@ -478,7 +480,7 @@ public abstract class Entity extends AttributeHolder {
 	 * @return The preview position if the transform preview is enabled, and the
 	 *         standard position if it's not.
 	 */
-	public Vector3f getPreviewPosition() {
+	public Vector3dc getPreviewPosition() {
 		if (transformPreview) return previewPosition;
 		else return getPosition();
 	}
@@ -490,7 +492,7 @@ public abstract class Entity extends AttributeHolder {
 	 * 
 	 * @param pos New preview position.
 	 */
-	public void setPreviewPosition(Vector3f pos) {
+	public void setPreviewPosition(Vector3dc pos) {
 		transformPreview = true;
 		previewPosition = pos;
 		updateRenderEntities();

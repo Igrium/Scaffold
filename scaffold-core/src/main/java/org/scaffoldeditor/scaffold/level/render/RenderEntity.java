@@ -1,6 +1,7 @@
 package org.scaffoldeditor.scaffold.level.render;
 
-import org.scaffoldeditor.nbt.math.Vector3f;
+import org.joml.Vector3d;
+import org.joml.Vector3dc;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 
 /**
@@ -11,8 +12,8 @@ import org.scaffoldeditor.scaffold.level.entity.Entity;
  */
 public abstract class RenderEntity {
 	private Entity entity;
-	private Vector3f position;
-	private Vector3f rotation;
+	private Vector3dc position;
+	private Vector3dc rotation;
 	private String identifier;
 	
 	/**
@@ -25,8 +26,8 @@ public abstract class RenderEntity {
 	 *                   instance of this string may exist per Scaffold entity.
 	 *                   Different Scaffold entities may share identifiers.
 	 */
-	public RenderEntity(Entity entity, Vector3f position, String identifier) {
-		this(entity, position, new Vector3f(0, 0, 0), identifier);
+	public RenderEntity(Entity entity, Vector3dc position, String identifier) {
+		this(entity, position, new Vector3d(), identifier);
 	}
 	
 	
@@ -43,7 +44,7 @@ public abstract class RenderEntity {
 	 *                   instance of this string may exist per Scaffold entity.
 	 *                   Different Scaffold entities may share identifiers.
 	 */
-	public RenderEntity(Entity entity, Vector3f position, Vector3f rotation, String identifier) {
+	public RenderEntity(Entity entity, Vector3dc position, Vector3dc rotation, String identifier) {
 		this.entity = entity;
 		this.position = position;
 		this.rotation = rotation;
@@ -61,7 +62,7 @@ public abstract class RenderEntity {
 	 * Get the position of this render entity.
 	 * @return Position in global space.
 	 */
-	public  Vector3f getPosition() {
+	public  Vector3dc getPosition() {
 		return position;
 	};
 	
@@ -72,7 +73,7 @@ public abstract class RenderEntity {
 	 *         implementations only support pitch and yaw. In these cases, roll will
 	 *         always be zero.
 	 */
-	public Vector3f getRotation() {
+	public Vector3dc getRotation() {
 		return rotation;
 	}
 	

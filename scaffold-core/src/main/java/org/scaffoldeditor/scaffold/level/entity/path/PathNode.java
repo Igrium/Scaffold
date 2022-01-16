@@ -6,8 +6,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.joml.Vector3d;
+import org.joml.Vector3dc;
 import org.scaffoldeditor.nbt.block.BlockWorld;
-import org.scaffoldeditor.nbt.math.Vector3f;
 import org.scaffoldeditor.scaffold.annotation.Attrib;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
@@ -48,7 +49,7 @@ public class PathNode extends LogicEntity implements KnownUUID, EntityProvider {
 	public static final String PASSED_OUTPUT = "on_passed";
 	
 	// for updating render entities
-	private Vector3f nextPos;
+	private Vector3dc nextPos;
 
 	@Attrib
 	protected EntityAttribute next = new EntityAttribute("");
@@ -147,7 +148,7 @@ public class PathNode extends LogicEntity implements KnownUUID, EntityProvider {
 		PathNode target = getNext();
 		if (target == null) return new double[] { 0, 0 };
 		
-		return MathUtils.getFacingAngle(target.getPosition().subtract(getPosition()).toDouble());
+		return MathUtils.getFacingAngle(target.getPosition().sub(getPosition(), new Vector3d()));
 	}
 
 	@Override
@@ -167,7 +168,7 @@ public class PathNode extends LogicEntity implements KnownUUID, EntityProvider {
 
 	@Override
 	public boolean compileGameEntities(BlockWorld world) {
-		world.addEntity(getEntity(), getPosition().toDouble());
+		world.addEntity(getEntity(), getPosition());
 		return true;
 	}
 	

@@ -1,6 +1,7 @@
 package org.scaffoldeditor.scaffold.level.entity.phys;
 
 import org.apache.logging.log4j.LogManager;
+import org.joml.Vector3d;
 import org.scaffoldeditor.scaffold.annotation.Attrib;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
@@ -38,7 +39,7 @@ public class PhysParent extends LogicEntity {
 			return false;
 		}
 		
-		ParentConstraint constraint = new ParentConstraint((TargetSelectable) parent, (TargetSelectable) child, child.getPosition().subtract(parent.getPosition()));
+		ParentConstraint constraint = new ParentConstraint((TargetSelectable) parent, (TargetSelectable) child, child.getPosition().sub(parent.getPosition(), new Vector3d()));
 		getLevel().tickFunction().commands.addAll(constraint.getCommands());
 		
 		return super.compileLogic(datapack);

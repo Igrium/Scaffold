@@ -8,18 +8,18 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+
 import org.apache.commons.io.IOUtils;
+import org.joml.Vector3d;
+import org.joml.Vector3i;
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.BlockReader;
 import org.scaffoldeditor.nbt.block.SizedBlockCollection;
-import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
-import org.scaffoldeditor.nbt.math.Vector3d;
-import org.scaffoldeditor.nbt.math.Vector3i;
+import org.scaffoldeditor.nbt.block.WorldMath.SectionCoordinate;
 import org.scaffoldeditor.nbt.schematic.Construction;
 import org.scaffoldeditor.nbt.schematic.Construction.ConstructionSegment;
 import org.scaffoldeditor.nbt.schematic.Construction.Section;
 import org.scaffoldeditor.nbt.schematic.Construction.SelectionBox;
-import org.scaffoldeditor.nbt.util.Pair;
 
 import net.querz.nbt.io.NBTDeserializer;
 import net.querz.nbt.tag.ArrayTag;
@@ -155,10 +155,10 @@ public class ConstructionFormat implements BlockReader<ConstructionSegment> {
 		if (sectionTag.getListTag("entities").size() > 0) {
 			for (CompoundTag entity : sectionTag.getListTag("entities").asCompoundTagList()) {
 				Vector3d localPos = new Vector3d(entity.getDouble("x"), entity.getDouble("y"), entity.getDouble("z"));
-				localPos = localPos.subtract(sectionPos.getStartPos().toDouble());
+				localPos.sub(new Vector3d(sectionPos.getStartPos()));
 				CompoundTag nbt = entity.getCompoundTag("nbt").clone();
 				nbt.putString("id", entity.getString("namespace")+":"+entity.getString("base_name"));
-				section.entities.add(new Pair<>(nbt, localPos));
+				section.entities.put(nbt, localPos);
 			}
 		}
 		if (sectionTag.getListTag("block_entities").size() > 0) {

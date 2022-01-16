@@ -1,6 +1,6 @@
 package org.scaffoldeditor.scaffold.level.entity.info;
 
-import org.scaffoldeditor.nbt.math.Vector3f;
+import org.joml.Vector3d;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
 import org.scaffoldeditor.scaffold.level.entity.logic.LogicEntity;
@@ -22,8 +22,8 @@ public class PlayerStart extends LogicEntity {
 	}
 	
 	@Override
-	protected Vector3f getRenderOffset() {
-		return new Vector3f(.5f, 0, .5f);
+	protected Vector3d getRenderOffset() {
+		return new Vector3d(.5f, 0, .5f);
 	}
 	
 	@Override

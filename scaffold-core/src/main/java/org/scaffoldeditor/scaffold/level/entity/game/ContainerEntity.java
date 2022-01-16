@@ -4,10 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.joml.Vector3ic;
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.BlockWorld;
-import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
-import org.scaffoldeditor.nbt.math.Vector3i;
+import org.scaffoldeditor.nbt.block.WorldMath.SectionCoordinate;
 import org.scaffoldeditor.scaffold.annotation.Attrib;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.EntityFactory;
@@ -45,7 +45,7 @@ public class ContainerEntity extends BaseSingleBlock {
 	}
 	
 	private Block oldBlock;
-	private Vector3i oldPos;
+	private Vector3ic oldPos;
 
 	@Attrib
 	protected ContainerAttribute contents = new ContainerAttribute();

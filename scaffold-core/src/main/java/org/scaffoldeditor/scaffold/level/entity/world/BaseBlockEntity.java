@@ -3,8 +3,9 @@ package org.scaffoldeditor.scaffold.level.entity.world;
 import java.util.Map;
 import java.util.Set;
 
+import org.joml.Vector3d;
+import org.joml.Vector3dc;
 import org.scaffoldeditor.nbt.block.BlockCollection;
-import org.scaffoldeditor.nbt.math.Vector3f;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.BlockEntity;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
@@ -25,7 +26,7 @@ public abstract class BaseBlockEntity extends Entity implements BlockEntity {
 	/**
 	 * Cache the position of the entity so we can use the old position when attributes are updated.
 	 */
-	protected Vector3f positionCache;
+	protected Vector3dc positionCache;
 	
 	/**
 	 * <p>
@@ -46,7 +47,7 @@ public abstract class BaseBlockEntity extends Entity implements BlockEntity {
 	protected void onSetAttributes(Map<String, Attribute<?>> updated) {
 		if (positionCache != null && updated.containsKey("position")) {
 			// Temporarily set the position back so we can capture the bounds.
-			Vector3f newPosition = getPosition();
+			Vector3dc newPosition = getPosition();
 			setPositionNoUpdate(positionCache);
 			getLevel().dirtySections.addAll(getOverlappingSections());
 			setPositionNoUpdate(newPosition);
@@ -85,7 +86,7 @@ public abstract class BaseBlockEntity extends Entity implements BlockEntity {
 	public Set<RenderEntity> getRenderEntities() {
 		Set<RenderEntity> set = super.getRenderEntities();
 		if (isTransformPreviewEnabled()) {
-			set.add(new BlockRenderEntity(this, getBlockCollection(), getPreviewPosition(), new Vector3f(0, 0, 0), "model"));
+			set.add(new BlockRenderEntity(this, getBlockCollection(), getPreviewPosition(), new Vector3d(), "model"));
 		}
 		return set;
 	}

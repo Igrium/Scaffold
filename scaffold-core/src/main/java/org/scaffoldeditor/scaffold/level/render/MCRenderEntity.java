@@ -1,6 +1,6 @@
 package org.scaffoldeditor.scaffold.level.render;
 
-import org.scaffoldeditor.nbt.math.Vector3f;
+import org.joml.Vector3dc;
 import org.scaffoldeditor.nbt.util.MCEntity;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 
@@ -28,7 +28,7 @@ public class MCRenderEntity extends RenderEntity {
 	 *                   Only one instance of this string may exist per Scaffold
 	 *                   entity. Different Scaffold entities may share identifiers.
 	 */
-	public MCRenderEntity(Entity entity, Vector3f position, Vector3f rotation, MCEntity mcEntity, String identifier) {
+	public MCRenderEntity(Entity entity, Vector3dc position, Vector3dc rotation, MCEntity mcEntity, String identifier) {
 		super(entity, position, rotation, identifier);
 		this.mcEntity = mcEntity;
 	}

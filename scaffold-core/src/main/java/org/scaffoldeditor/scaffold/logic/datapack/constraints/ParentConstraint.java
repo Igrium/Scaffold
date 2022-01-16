@@ -3,7 +3,7 @@ package org.scaffoldeditor.scaffold.logic.datapack.constraints;
 import java.util.Arrays;
 import java.util.List;
 
-import org.scaffoldeditor.nbt.math.Vector3f;
+import org.joml.Vector3dc;
 import org.scaffoldeditor.scaffold.level.entity.game.TargetSelectable;
 import org.scaffoldeditor.scaffold.logic.datapack.arguements.CommandVector.Mode;
 import org.scaffoldeditor.scaffold.logic.datapack.arguements.CommandVector3f;
@@ -17,7 +17,7 @@ import org.scaffoldeditor.scaffold.logic.datapack.commands.ExecuteCommandBuilder
  */
 public class ParentConstraint extends Constraint {
 	
-	public final Vector3f offset;
+	public final Vector3dc offset;
 	
 	/**
 	 * Create a parent constraint.
@@ -25,7 +25,7 @@ public class ParentConstraint extends Constraint {
 	 * @param entity2 Child entity.
 	 * @param offset Offset of parent, in local space to parent entity.
 	 */
-	public ParentConstraint(TargetSelectable entity1, TargetSelectable entity2, Vector3f offset) {
+	public ParentConstraint(TargetSelectable entity1, TargetSelectable entity2, Vector3dc offset) {
 		super(entity1, entity2);
 		this.offset = offset;
 	}

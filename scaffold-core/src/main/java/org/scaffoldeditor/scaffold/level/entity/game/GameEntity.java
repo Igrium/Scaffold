@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.util.Set;
 import java.util.UUID;
 
+import org.joml.Vector3d;
 import org.scaffoldeditor.nbt.block.BlockWorld;
-import org.scaffoldeditor.nbt.math.Vector3f;
 import org.scaffoldeditor.nbt.util.MCEntity;
 import org.scaffoldeditor.scaffold.annotation.Attrib;
 import org.scaffoldeditor.scaffold.level.Level;
@@ -56,7 +56,7 @@ public class GameEntity extends Rotatable implements KnownUUID, EntityProvider {
 	@Override
 	public Set<RenderEntity> getRenderEntities() {
 		Set<RenderEntity> set = super.getRenderEntities();
-		set.add(new MCRenderEntity(this, getPreviewPosition(), new Vector3f(0, 0, 0),
+		set.add(new MCRenderEntity(this, getPreviewPosition(), new Vector3d(0, 0, 0),
 				new MCEntity(getEntityType(), getNBT()), "entity"));
 		return set;
 	}
@@ -111,7 +111,7 @@ public class GameEntity extends Rotatable implements KnownUUID, EntityProvider {
 		nbt.put("Rotation", rotArray);
 		nbt.putIntArray("UUID", UUIDUtils.toIntArray(getUUID()));
 		
-		world.addEntity(nbt, this.getPosition().toDouble());
+		world.addEntity(nbt, this.getPosition());
 		return true;
 	}
 	

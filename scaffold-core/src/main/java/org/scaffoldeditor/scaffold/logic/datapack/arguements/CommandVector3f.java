@@ -1,6 +1,8 @@
 package org.scaffoldeditor.scaffold.logic.datapack.arguements;
 
-import org.scaffoldeditor.nbt.math.Vector3f;
+import org.joml.Vector3dc;
+import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.scaffoldeditor.scaffold.logic.datapack.arguements.CommandVector.Mode;
 
 /**
@@ -27,13 +29,19 @@ public class CommandVector3f extends Vector3f {
 		this.mode = mode;
 	}
 	
-	public CommandVector3f(Vector3f vec, Mode mode) {
-		super(vec.x, vec.y, vec.z);
+	public CommandVector3f(Vector3fc vec, Mode mode) {
+		super(vec);
 		this.mode = mode;
 	}
 	
-	public CommandVector3f(Vector3f vec) {
-		this(vec, Mode.GLOBAL);
+	public CommandVector3f(Vector3dc vec) {
+		super((float) vec.x(), (float) vec.y(), (float) vec.z());
+		this.mode = Mode.GLOBAL;
+	}
+
+	public CommandVector3f(Vector3dc vec, Mode mode) {
+		super((float) vec.x(), (float) vec.y(), (float) vec.z());
+		this.mode = mode;
 	}
 	
 	public static CommandVector3f fromString(String in) {

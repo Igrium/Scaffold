@@ -3,17 +3,17 @@ package org.scaffoldeditor.scaffold.operation;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.scaffoldeditor.nbt.math.Vector3f;
+import org.joml.Vector3dc;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.BrushEntity;
 
 public class ResizeBrushesOperation implements Operation {
 	
-	protected Map<BrushEntity, Vector3f[]> newSizes;
-	protected Map<BrushEntity, Vector3f[]> oldSizes = new HashMap<>();
+	protected Map<BrushEntity, Vector3dc[]> newSizes;
+	protected Map<BrushEntity, Vector3dc[]> oldSizes = new HashMap<>();
 	protected Level level;
 	
-	public ResizeBrushesOperation(Map<BrushEntity, Vector3f[]> newSizes, Level level) {
+	public ResizeBrushesOperation(Map<BrushEntity, Vector3dc[]> newSizes, Level level) {
 		this.newSizes = newSizes;
 		this.level = level;
 	}

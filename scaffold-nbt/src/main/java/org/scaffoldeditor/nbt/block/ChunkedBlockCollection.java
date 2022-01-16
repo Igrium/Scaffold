@@ -2,7 +2,8 @@ package org.scaffoldeditor.nbt.block;
 
 import java.util.Set;
 
-import org.scaffoldeditor.nbt.math.Vector3i;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 
 /**
  * Represents a block collection that is broken into 3-dimensional sections.
@@ -48,7 +49,7 @@ public interface ChunkedBlockCollection extends BlockCollection {
 	 * Get a set of all the collection's sections. Although all of the sections are loaded,
 	 * they may or may not be occupied.
 	 */
-	public Set<Vector3i> getSections();
+	public Set<Vector3ic> getSections();
 	
 	/**
 	 * Get the section coordinate that the passed vector lands in.
@@ -63,7 +64,7 @@ public interface ChunkedBlockCollection extends BlockCollection {
 	/**
 	 * Get the section coordinate that the passed vector lands in.
 	 */
-	default Vector3i getSection(Vector3i block) {
-		return getSection(block.x, block.y, block.getZ());
+	default Vector3i getSection(Vector3ic block) {
+		return getSection(block.x(), block.y(), block.z());
 	}
 }

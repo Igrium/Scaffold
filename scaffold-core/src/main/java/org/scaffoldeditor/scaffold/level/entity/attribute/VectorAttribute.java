@@ -1,11 +1,13 @@
 package org.scaffoldeditor.scaffold.level.entity.attribute;
 
-import org.scaffoldeditor.nbt.math.Vector3f;
-import org.scaffoldeditor.nbt.math.Vector3i;
+import org.joml.Vector3d;
+import org.joml.Vector3dc;
+import org.joml.Vector3fc;
+import org.joml.Vector3ic;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class VectorAttribute extends Attribute<Vector3f> {
+public class VectorAttribute extends Attribute<Vector3dc> {
 	
 	public static final String REGISTRY_NAME = "vector_attribute";
 	
@@ -14,46 +16,54 @@ public class VectorAttribute extends Attribute<Vector3f> {
 
 			@Override
 			public VectorAttribute create() {
-				return new VectorAttribute(new Vector3f(0, 0, 0));
+				return new VectorAttribute(new Vector3d(0, 0, 0));
 			}
 
 			@Override
 			public VectorAttribute deserialize(Element element) {
-				float x = Float.valueOf(element.getAttribute("x"));
-				float y = Float.valueOf(element.getAttribute("y"));
-				float z = Float.valueOf(element.getAttribute("z"));
+				double x = Double.valueOf(element.getAttribute("x"));
+				double y = Double.valueOf(element.getAttribute("y"));
+				double z = Double.valueOf(element.getAttribute("z"));
 				
-				return new VectorAttribute(new Vector3f(x, y, z));
+				return new VectorAttribute(new Vector3d(x, y, z));
 			}
 		});
 	}
 	
-	private Vector3f value;
+	private Vector3dc value;
 	
-	public VectorAttribute(Vector3f value) {
+	public VectorAttribute(Vector3dc value) {
 		this.value = value;
 		this.registryName = REGISTRY_NAME;
 	}
 	
-	public VectorAttribute(Vector3i value) {
-		this(value.toFloat());
+	public VectorAttribute(Vector3ic value) {
+		this(new Vector3d(value));
 	}
 
-	public VectorAttribute(float x, float y, float z) {
-		this(new Vector3f(x, y, z));
+	public VectorAttribute(Vector3fc value) {
+		this(new Vector3d(value));
+	}
+
+	public VectorAttribute(double x, double y, double z) {
+		this(new Vector3d(x, y, z));
+	}
+
+	public VectorAttribute() {
+		this(new Vector3d());
 	}
 
 	@Override
-	public Vector3f getValue() {
+	public Vector3dc getValue() {
 		return value;
 	}
 
 	@Override
 	public Element serialize(Document document) {
 		Element element = document.createElement(registryName);
-		element.setAttribute("x", String.valueOf(value.x));
-		element.setAttribute("y", String.valueOf(value.y));
-		element.setAttribute("z", String.valueOf(value.z));
+		element.setAttribute("x", String.valueOf(value.x()));
+		element.setAttribute("y", String.valueOf(value.y()));
+		element.setAttribute("z", String.valueOf(value.z()));
 		return element;
 	}
 	

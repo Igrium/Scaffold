@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.zip.*;
 
-import org.scaffoldeditor.nbt.block.BlockWorld.ChunkCoordinate;
+import org.scaffoldeditor.nbt.block.WorldMath.ChunkCoordinate;
 
 import net.querz.nbt.io.NBTOutputStream;
 import net.querz.nbt.io.NamedTag;

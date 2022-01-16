@@ -1,6 +1,7 @@
 package org.scaffoldeditor.scaffold.logic.datapack.arguements;
 
-import org.scaffoldeditor.nbt.math.Vector3i;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.scaffoldeditor.scaffold.logic.datapack.arguements.CommandVector.Mode;
 
 /**
@@ -27,12 +28,12 @@ public class CommandVector3i extends Vector3i {
 		this.mode = mode;
 	}
 	
-	public CommandVector3i(Vector3i vec, Mode mode) {
-		super(vec.x, vec.y, vec.z);
+	public CommandVector3i(Vector3ic vec, Mode mode) {
+		super(vec);
 		this.mode = mode;
 	}
 	
-	public CommandVector3i(Vector3i vec) {
+	public CommandVector3i(Vector3ic vec) {
 		this(vec, Mode.GLOBAL);
 	}
 	

@@ -3,7 +3,7 @@ package org.scaffoldeditor.scaffold.level.entity.logic;
 import java.util.Collection;
 import java.util.List;
 
-import org.scaffoldeditor.nbt.math.Vector3f;
+import org.joml.Vector3d;
 import org.scaffoldeditor.scaffold.annotation.Attrib;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
@@ -77,10 +77,9 @@ public class LogicTeleport extends LogicEntity {
 	public Command getCommand() {
 		if (isRelative() && getLandmark() != null) {
 			Entity landmark = getLandmark();
-			Vector3f relative = getPosition().subtract(landmark.getPosition());
+			Vector3d relative = new Vector3d(getPosition()).sub(landmark.getPosition());
 			Command relativeCommand = Command.fromString("teleport @s "+new CommandVector3f(relative, CommandVector.Mode.RELATIVE));
 			return new ExecuteCommandBuilder().as(TargetSelector.fromString(getTarget())).at(TargetSelector.SELF).run(relativeCommand);
-			
 		} else {
 			return Command.fromString("teleport "+getTarget()+" "+new CommandVector3f(getPosition()));
 		}		

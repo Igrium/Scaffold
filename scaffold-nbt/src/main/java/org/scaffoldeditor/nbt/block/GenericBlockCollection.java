@@ -5,23 +5,24 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.scaffoldeditor.nbt.math.Vector3i;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 
 import net.querz.nbt.tag.CompoundTag;
 
 /**
- * Represents a generic block collection intended for easy writing to from code.
+ * Represents a generic, unsized block collection intended for easy writing to from code.
  * Does not represent a file format and cannot be serialized.
  * 
  * @author Igrium
  */
 public class GenericBlockCollection implements BlockCollection {
 	
-	private Map<Vector3i, Block> placedBlocks = new HashMap<>();
-	private Map<Vector3i, CompoundTag> blockEntities = new HashMap<>();
+	private Map<Vector3ic, Block> placedBlocks = new HashMap<>();
+	private Map<Vector3ic, CompoundTag> blockEntities = new HashMap<>();
 
 	@Override
-	public Iterator<Vector3i> iterator() {
+	public Iterator<Vector3ic> iterator() {
 		return placedBlocks.keySet().iterator();
 	}
 
@@ -51,7 +52,7 @@ public class GenericBlockCollection implements BlockCollection {
 	}
 	
 	@Override
-	public CompoundTag blockEntityAt(Vector3i vec) {
+	public CompoundTag blockEntityAt(Vector3ic vec) {
 		return blockEntities.get(vec);
 	}
 	
@@ -65,7 +66,7 @@ public class GenericBlockCollection implements BlockCollection {
 	}
 	
 	@Override
-	public Set<Vector3i> getBlockEntities() {
+	public Set<Vector3ic> getBlockEntities() {
 		return blockEntities.keySet();
 	}
 }

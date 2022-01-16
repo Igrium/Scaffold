@@ -8,11 +8,12 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
+import org.joml.Vector3d;
+import org.joml.Vector3f;
+import org.joml.Vector3ic;
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.BlockCollection;
 import org.scaffoldeditor.nbt.block.BlockWorld;
-import org.scaffoldeditor.nbt.math.Vector3f;
-import org.scaffoldeditor.nbt.math.Vector3i;
 import org.scaffoldeditor.nbt.util.Identifier;
 import org.scaffoldeditor.nbt.util.MCEntity;
 import org.scaffoldeditor.scaffold.annotation.Attrib;
@@ -73,7 +74,7 @@ public class WorldDynamic extends Entity implements EntityProvider, TargetSelect
 	}
 	
 	// Expected to remain persistant throughout compilation process.
-	private Map<Vector3i, MCEntity> entities;
+	private Map<Vector3ic, MCEntity> entities;
 	private BlockCollection modelCache;
 	private String modelPath = "";
 
@@ -111,7 +112,7 @@ public class WorldDynamic extends Entity implements EntityProvider, TargetSelect
 		
 		entities = new HashMap<>();
 		
-		for (Vector3i coord : modelCache) {
+		for (Vector3ic coord : modelCache) {
 			if (modelCache.blockAt(coord).getName().equals("minecraft:air")) continue;
 			entities.put(coord, generateEntity(modelCache.blockAt(coord)));
 		}
@@ -128,8 +129,8 @@ public class WorldDynamic extends Entity implements EntityProvider, TargetSelect
 		Set<RenderEntity> renderEnts = super.getRenderEntities();
 		if (modelCache == null) return renderEnts;
 		
-		for (Vector3i pos : entities.keySet()) {
-			renderEnts.add(new ModelRenderEntity(this, getPreviewPosition().add(pos.toFloat()), new Vector3f(0, 0, 0),
+		for (Vector3ic pos : entities.keySet()) {
+			renderEnts.add(new ModelRenderEntity(this, new Vector3d(pos).add(getPreviewPosition()), new Vector3d(0, 0, 0),
 					"ent" + pos.toString(),
 					entities.get(pos).getNBT().getCompoundTag("BlockState").getString("Name") + "#Inventory"));
 		}
@@ -157,9 +158,9 @@ public class WorldDynamic extends Entity implements EntityProvider, TargetSelect
 		if (modelCache == null) return super.compileLogic(datapack);
 		
 		Function tickFunction = new Function(LogicUtils.getEntityFunction(this, "tick"));	
-		for (Vector3i coord : entities.keySet()) {
+		for (Vector3ic coord : entities.keySet()) {
 			TargetSelectable ent = KnownUUID.fromEntity(entities.get(coord).getNBT());
-			ParentConstraint constraint = new ParentConstraint(TargetSelectable.wrap(getRoot()), ent, coord.toFloat());
+			ParentConstraint constraint = new ParentConstraint(TargetSelectable.wrap(getRoot()), ent, new Vector3d(coord));
 			tickFunction.commands.addAll(constraint.getCommands());
 			try {
 				tickFunction.commands.add(new DataCommandBuilder().merge().entity(ent.getTargetSelector()).nbt((CompoundTag) SNBTUtil.fromSNBT("{Time:1}")).build());
@@ -172,12 +173,12 @@ public class WorldDynamic extends Entity implements EntityProvider, TargetSelect
 		datapack.tickFunctions.add(tickFunction.getID());
 		
 		Function enableFunction = new Function(enableFunction());
-		for (Vector3i coord : entities.keySet()) {
+		for (Vector3ic coord : entities.keySet()) {
 			MCEntity ent = entities.get(coord);
 			try {
 				enableFunction.addExecuteBlock(new ExecuteCommandBuilder().at(getRoot()).executeUnless(isEnabled()), Arrays.asList(new Command[] {
 						Command.fromString("summon minecraft:falling_block "
-								+ new CommandVector3f(coord.toFloat().subtract(new Vector3f(.5f, 0f, .5f)), Mode.LOCAL)
+								+ new CommandVector3f(new Vector3f(coord).sub(new Vector3f(.5f, 0f, .5f)), Mode.LOCAL)
 								+ " " + SNBTUtil.toSNBT(ent.getNBT()))				}));
 			} catch (IOException e) {
 				throw new AssertionError("Error writing falling block NBT!", e);
@@ -210,13 +211,13 @@ public class WorldDynamic extends Entity implements EntityProvider, TargetSelect
 		if (modelCache == null) return true;
 		
 		if (startEnabled()) {
-			for (Vector3i coord : entities.keySet()) {
-				world.addEntity(entities.get(coord).getNBT(), coord.toFloat().add(getPosition()).subtract(new Vector3f(.5f, 0f, .5f)).toDouble());
+			for (Vector3ic coord : entities.keySet()) {
+				world.addEntity(entities.get(coord).getNBT(), new Vector3d(coord).add(getPosition()).sub(.5, 0, .5));
 			}
 		}
 		CompoundTag ent = LogicUtils.getCompanionEntity(this);
 		ent.getCompoundTag("data").putBoolean("enabled", startEnabled());
-		world.addEntity(ent, getPosition().toDouble());
+		world.addEntity(ent, getPosition());
 		
 		return true;
 	}

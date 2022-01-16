@@ -2,12 +2,12 @@ package org.scaffoldeditor.scaffold.level.entity.world;
 
 import java.util.Set;
 
+import org.joml.Vector3ic;
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.BlockCollection;
 import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.nbt.block.SizedBlockCollection;
-import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
-import org.scaffoldeditor.nbt.math.Vector3i;
+import org.scaffoldeditor.nbt.block.WorldMath.SectionCoordinate;
 import org.scaffoldeditor.scaffold.level.Level;
 
 /**
@@ -28,20 +28,20 @@ public abstract class BaseSingleBlock extends BaseBlockEntity {
 
 	@Override
 	public boolean compileWorld(BlockWorld world, boolean full, Set<SectionCoordinate> sections) {
-		Vector3i blockPos = getBlockPosition();
-		world.setBlock(blockPos.x, blockPos.y, blockPos.z, getBlock(), this);
+		Vector3ic blockPos = getBlockPosition();
+		world.setBlock(blockPos.x(), blockPos.y(), blockPos.z(), getBlock(), this);
 		return true;
 	}
 
 	@Override
-	public Block blockAt(Vector3i coord) {
+	public Block blockAt(Vector3ic coord) {
 		if (coord.equals(getBlockPosition())) return getBlock();
 		else return null;
 	}
 
 	@Override
-	public Vector3i[] getBounds() {
-		return new Vector3i[] { getBlockPosition(), getBlockPosition() };
+	public Vector3ic[] getBounds() {
+		return new Vector3ic[] { getBlockPosition(), getBlockPosition() };
 	}
 
 	@Override

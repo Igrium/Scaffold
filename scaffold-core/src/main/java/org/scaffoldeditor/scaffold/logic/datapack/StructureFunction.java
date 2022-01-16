@@ -3,9 +3,10 @@ package org.scaffoldeditor.scaffold.logic.datapack;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.BlockCollection;
-import org.scaffoldeditor.nbt.math.Vector3i;
 import org.scaffoldeditor.nbt.util.Identifier;
 import org.scaffoldeditor.scaffold.logic.datapack.arguements.BlockArguement;
 import org.scaffoldeditor.scaffold.logic.datapack.arguements.CommandVector.Mode;
@@ -49,12 +50,12 @@ public class StructureFunction extends AbstractFunction {
 	@Override
 	public List<Command> getCommands() {
 		List<Command> commands = new ArrayList<>();
-		for (Vector3i pos : structure) {
+		for (Vector3ic pos : structure) {
 			Block block = structure.blockAt(pos);
 			if (block == null || (!placeAir && block.getName().equals("minecraft:air"))) {
 				continue;
 			}
-			CommandVector3i finalPos = new CommandVector3i(pos.add(offset), Mode.RELATIVE);
+			CommandVector3i finalPos = new CommandVector3i(pos.add(offset, new Vector3i()), Mode.RELATIVE);
 			commands.add(new SetBlockCommand(finalPos, new BlockArguement(block, structure.blockEntityAt(pos)), SetBlockCommand.Mode.REPLACE));
 		}
 		

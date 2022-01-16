@@ -2,7 +2,7 @@ package org.scaffoldeditor.scaffold.level.entity.test;
 
 import java.util.Set;
 
-import org.scaffoldeditor.nbt.math.Vector3f;
+import org.joml.Vector3d;
 import org.scaffoldeditor.scaffold.annotation.Attrib;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
@@ -37,7 +37,7 @@ public class ModelTest extends Entity {
 	public Set<RenderEntity> getRenderEntities() {
 		Set<RenderEntity> set = super.getRenderEntities();
 		String model = this.model.getValue();
-		set.add(new ModelRenderEntity(this, getPreviewPosition(), new Vector3f(0,0,0), "model", model));
+		set.add(new ModelRenderEntity(this, getPreviewPosition(), new Vector3d(0,0,0), "model", model));
 		return set;
 	}
 

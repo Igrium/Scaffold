@@ -2,7 +2,8 @@ package org.scaffoldeditor.nbt.block;
 
 import java.util.Iterator;
 
-import org.scaffoldeditor.nbt.math.Vector3i;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 
 /**
  * Represents an immutable block collection that has a finite amount of blocks and size
@@ -13,19 +14,19 @@ public interface SizedBlockCollection extends BlockCollection {
 	/**
 	 * Get the minimum point of the block collection (in local space)
 	 */
-	public Vector3i getMin();
+	public Vector3ic getMin();
 	
 	/**
 	 * Get the non-inclusive maximim point of the block collection (in local space)
 	 */
-	public Vector3i getMax();
+	public Vector3ic getMax();
 	
 	/**
 	 * Get the width (x) of the block collection.
 	 * @return Width.
 	 */
 	default int getWidth() {
-		return getMax().x - getMin().x;
+		return getMax().x() - getMin().x();
 	}
 	
 	/**
@@ -33,7 +34,7 @@ public interface SizedBlockCollection extends BlockCollection {
 	 * @return Height.
 	 */
 	default int getHeight() {
-		return getMax().y - getMin().y;
+		return getMax().y() - getMin().y();
 	}
 	
 	/**
@@ -41,39 +42,34 @@ public interface SizedBlockCollection extends BlockCollection {
 	 * @return Length.
 	 */
 	default int getLength() {
-		return getMax().z - getMin().z;
+		return getMax().z() - getMin().z();
 	}
 	
 	@Override
-	default Iterator<Vector3i> iterator() {
-		return new Iterator<Vector3i>() {
-			Vector3i min = getMin();
-			Vector3i max = getMax();
-			
-			private int headX = min.x;
-			private int headY = min.y;
-			private int headZ = min.z;
+	default Iterator<Vector3ic> iterator() {
+		return new Iterator<Vector3ic>() {
+			Vector3ic min = getMin();
+			Vector3ic max = getMax();
+
+			private Vector3i head = new Vector3i(min);
+		
 
 			@Override
 			public boolean hasNext() {
-				// Backup the heads.
-				int oldHeadX = this.headX;
-				int oldHeadY = this.headY;
-				int oldHeadZ = this.headZ;
+				// Copy the head for forward iteration
+				Vector3i oldHead = head;
+				head = new Vector3i(oldHead);
 
 				// Search for additional values
 				boolean success = false;
-				while (headX < max.x && headY < max.y && headZ < max.z) {
-					if (hasBlock(headX, headY, headZ)) {
+				while (head.x() < max.x() && head.y() < max.y() && head.z() < max.z()) {
+					if (hasBlock(head)) {
 						success = true;
 						break;
-					}
+					} 
 					iterate();
 				}
-
-				headX = oldHeadX;
-				headY = oldHeadY;
-				headZ = oldHeadZ;
+				head = oldHead;
 
 				return success;
 			}
@@ -81,15 +77,13 @@ public interface SizedBlockCollection extends BlockCollection {
 			@Override
 			public Vector3i next() {
 				boolean hasBlock = false;
-				Vector3i out = null;
 				// Iterate until we find a non-void block
 				while (!hasBlock && hasNext()) {
-					hasBlock = hasBlock(headX, headY, headZ);
-					out = new Vector3i(headX, headY, headZ);
+					hasBlock = hasBlock(head);
 					iterate();
 				}
 				
-				return out;
+				return head;
 			}
 			
 			/**
@@ -97,15 +91,15 @@ public interface SizedBlockCollection extends BlockCollection {
 			 * Scans in an X -> Z -> Y order
 			 */
 			private void iterate() {
-				if (headX+1 < max.x) {
-					headX++;
-				} else if (headZ+1 < max.z) {
-					headX = min.x;
-					headZ++;
-				} else if (headY < max.y) {
-					headX = min.x;
-					headZ = min.z;
-					headY++;
+				if (head.x+1 < max.x()) {
+					head.x++;
+				} else if (head.z+1 < max.z()) {
+					head.x = min.x();
+					head.z++;
+				} else if (head.y < max.y()) {
+					head.x = min.x();
+					head.z = min.z();
+					head.y++;
 				}
 			}
 		};

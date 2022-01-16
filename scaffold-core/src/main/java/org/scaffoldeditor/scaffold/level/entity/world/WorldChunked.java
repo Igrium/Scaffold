@@ -7,15 +7,18 @@ import java.util.Set;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
+import org.joml.Vector3d;
+import org.joml.Vector3dc;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.BlockCollection;
 import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.nbt.block.Chunk;
-import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
+import org.scaffoldeditor.nbt.block.WorldMath.SectionCoordinate;
+import org.scaffoldeditor.nbt.math.MathUtils;
 import org.scaffoldeditor.nbt.block.ChunkedBlockCollection;
 import org.scaffoldeditor.nbt.block.SizedBlockCollection;
-import org.scaffoldeditor.nbt.math.Vector3f;
-import org.scaffoldeditor.nbt.math.Vector3i;
 import org.scaffoldeditor.scaffold.annotation.Attrib;
 import org.scaffoldeditor.scaffold.io.AssetLoaderRegistry;
 import org.scaffoldeditor.scaffold.level.Level;
@@ -51,7 +54,7 @@ public class WorldChunked extends BaseBlockEntity {
 	
 	// Keep track of the model path on our own for optimization.
 	private String modelpath;
-	private Vector3i[] boundsCache = new Vector3i[] {new Vector3i(0,0,0), new Vector3i(0,0,0)};
+	private Vector3ic[] boundsCache = new Vector3ic[] {new Vector3i(0,0,0), new Vector3i(0,0,0)};
 
 	public WorldChunked(Level level, String name) {
 		super(level, name);
@@ -97,28 +100,28 @@ public class WorldChunked extends BaseBlockEntity {
 		// Calculate the entity bounds
 		if (modelCache == null || modelCache.getSections().size() == 0) return;
 		
-		Vector3i def = modelCache.getSections().iterator().next();
+		Vector3ic def = modelCache.getSections().iterator().next();
 		
-		int minX = def.x;
-		int minY = def.y;
-		int minZ = def.z;
+		int minX = def.x();
+		int minY = def.y();
+		int minZ = def.z();
 		
-		int maxX = def.x;
-		int maxY = def.y;
-		int maxZ = def.z;
+		int maxX = def.x();
+		int maxY = def.y();
+		int maxZ = def.z();
 		
 		int width = modelCache.getSectionWidth();
 		int height = modelCache.getSectionHeight();
 		int length = modelCache.getSectionLength();
 		
-		for (Vector3i section : modelCache.getSections()) {
-			if (section.x < minX) minX = section.x;
-			if (section.y < minY) minY = section.y;
-			if (section.z < minZ) minZ = section.z;
+		for (Vector3ic section : modelCache.getSections()) {
+			if (section.x() < minX) minX = section.x();
+			if (section.y() < minY) minY = section.y();
+			if (section.z() < minZ) minZ = section.z();
 			
-			if (section.x > maxX) maxX = section.x;
-			if (section.y > maxY) maxY = section.y;
-			if (section.z > maxZ) maxZ = section.z;
+			if (section.x() > maxX) maxX = section.x();
+			if (section.y() > maxY) maxY = section.y();
+			if (section.z() > maxZ) maxZ = section.z();
 		}
 		
 		boundsCache[0] = new Vector3i(minX * width, minY * height, minZ * length);
@@ -133,14 +136,14 @@ public class WorldChunked extends BaseBlockEntity {
 		int width = modelCache.getSectionWidth();
 		int length = modelCache.getSectionLength();
 		int height = modelCache.getSectionHeight();
-		Vector3i position = getBlockPosition();
+		Vector3ic position = getBlockPosition();
 		
 		if (worldSections == null) {
 			// Compile entire model
-			for (Vector3i coord : modelCache.getSections()) {
-				SizedBlockCollection section = modelCache.sectionAt(coord.x, coord.y, coord.z);
-				world.addBlockCollection(section, coord.x * width + position.x, coord.y * height + position.y,
-						coord.z * length + position.z, true, shouldPlaceAir(), this);
+			for (Vector3ic coord : modelCache.getSections()) {
+				SizedBlockCollection section = modelCache.sectionAt(coord.x(), coord.y(), coord.z());
+				world.addBlockCollection(section, coord.x() * width + position.x(), coord.y() * height + position.y(),
+						coord.z() * length + position.z(), true, shouldPlaceAir(), this);
 			}
 			return true;
 		} else {
@@ -149,17 +152,17 @@ public class WorldChunked extends BaseBlockEntity {
 			if (isAligned()) {
 				for (SectionCoordinate coord : worldSections) {
 					updatingModelSections
-							.add(coord.subtract(world.getSection(position)));
+							.add(coord.sub(world.getSection(position), new Vector3i()));
 				}
 			} else {
 				// Identify the collection sections that the world sections overlap with.
 				for (SectionCoordinate coord : worldSections) {
-					Vector3i minModelSection = modelCache.getSection(new Vector3i(coord.getStartX(), coord.getStartY(), coord.getStartZ()).subtract(position));
-					Vector3i maxModelSection = modelCache.getSection(new Vector3i(coord.getEndX(), coord.getEndY(), coord.getEndZ()).subtract(position));
+					Vector3ic minModelSection = modelCache.getSection(new Vector3i(coord.getStartX(), coord.getStartY(), coord.getStartZ()).sub(position));
+					Vector3ic maxModelSection = modelCache.getSection(new Vector3i(coord.getEndX(), coord.getEndY(), coord.getEndZ()).sub(position));
 					
-					for (int x = minModelSection.x; x < maxModelSection.x; x++) {
-						for (int y = minModelSection.y; x < maxModelSection.y; y++) {
-							for (int z = minModelSection.z; x < maxModelSection.z; z++) {
+					for (int x = minModelSection.x(); x < maxModelSection.x(); x++) {
+						for (int y = minModelSection.y(); x < maxModelSection.y(); y++) {
+							for (int z = minModelSection.z(); x < maxModelSection.z(); z++) {
 								updatingModelSections.add(new Vector3i(x, y, z));
 							}
 						}
@@ -170,9 +173,9 @@ public class WorldChunked extends BaseBlockEntity {
 			for (Vector3i coord : updatingModelSections) {
 				SizedBlockCollection section = modelCache.sectionAt(coord.x, coord.y, coord.z);
 				world.addBlockCollection(section,
-						coord.x * width + position.x,
-						coord.y * height + position.y,
-						coord.z * length + position.z, true, shouldPlaceAir(), this);
+						coord.x * width + position.x(),
+						coord.y * height + position.y(),
+						coord.z * length + position.z(), true, shouldPlaceAir(), this);
 			}
 		}
 		
@@ -184,21 +187,21 @@ public class WorldChunked extends BaseBlockEntity {
 	 * <b>Note:</b> <code>WorldChunked</code> only checks if any of its sections
 	 * overlap the volume, not the blocks themselves.
 	 */
-	public boolean overlapsVolume(Vector3f point1, Vector3f point2) {
+	public boolean overlapsVolume(Vector3dc point1, Vector3dc point2) {
 		if (modelCache == null) return false;
 		
-		Vector3i section1 = modelCache.getSection(point1.floor());
-		Vector3i section2 = modelCache.getSection(point2.floor());
-		Set<Vector3i> sections = modelCache.getSections();
+		Vector3ic section1 = modelCache.getSection(MathUtils.floorVector(point1));
+		Vector3ic section2 = modelCache.getSection(MathUtils.floorVector(point2));
+		Set<Vector3ic> sections = modelCache.getSections();
 		
 		if (sections.contains(section1) || sections.contains(section2)) {
 			return true;
 		}
 		// See if any of our sections are within the volume.
-		for (Vector3i section : sections) {
-			if (section1.x <= section.x && section.x <= section2.x
-					&& section1.y <= section.y && section.y <= section2.y
-					&& section1.z <= section.z && section.z <= section2.z) {
+		for (Vector3ic section : sections) {
+			if (section1.x() <= section.x() && section.x() <= section2.x()
+					&& section1.y() <= section.y() && section.y() <= section2.y()
+					&& section1.z() <= section.z() && section.z() <= section2.z()) {
 				return true;
 			}
 		}
@@ -207,8 +210,8 @@ public class WorldChunked extends BaseBlockEntity {
 	}
 	
 	@Override
-	public boolean overlapsArea(float[] point1, float[] point2) {
-		return overlapsVolume(new Vector3f(point1[0], 0, point2[0]), new Vector3f(point2[0], Chunk.HEIGHT, point2[1]));
+	public boolean overlapsArea(double[] point1, double[] point2) {
+		return overlapsVolume(new Vector3d(point1[0], 0, point2[0]), new Vector3d(point2[0], Chunk.HEIGHT, point2[1]));
 	}
 
 	/**
@@ -218,11 +221,11 @@ public class WorldChunked extends BaseBlockEntity {
 	public boolean isAligned() {
 		if (modelCache == null) return false;
 		
-		Vector3i position = getBlockPosition();
+		Vector3ic position = getBlockPosition();
 		int sectionWidth = modelCache.getSectionWidth();
 		int sectionHeight = modelCache.getSectionHeight();
 		int sectionLength = modelCache.getSectionLength();
-		return (position.x % 16 == 0 && position.y % 16 == 0 && position.z % 16 == 0 && sectionWidth == 16
+		return (position.x() % 16 == 0 && position.y() % 16 == 0 && position.z() % 16 == 0 && sectionWidth == 16
 				&& sectionHeight == 16 && sectionLength == 16);
 	}
 
@@ -234,21 +237,21 @@ public class WorldChunked extends BaseBlockEntity {
 		int sectionHeight = modelCache.getSectionHeight();
 		int sectionLength = modelCache.getSectionLength();
 		Set<SectionCoordinate> overlapping = new HashSet<>();
-		Vector3i position = getPosition().floor();
+		Vector3ic position = getBlockPosition();
 		
 		// If our sections are aligned, we can just return the sections from the collection.
 		if (isAligned()) {
-			for (Vector3i coord : modelCache.getSections()) {
-				overlapping.add(new SectionCoordinate(coord.add(getWorld().getSection(position))));
+			for (Vector3ic coord : modelCache.getSections()) {
+				overlapping.add(new SectionCoordinate(coord.add(getWorld().getSection(position), new Vector3i())));
 			}
 			return overlapping;
 		}
 		
 		// Identify the world sections that the collection sections overlap with.
-		for (Vector3i coord : modelCache.getSections()) {
-			int minX = coord.x * sectionWidth + position.x;
-			int minY = coord.y * sectionHeight + position.y;
-			int minZ = coord.z * sectionLength + position.z;
+		for (Vector3ic coord : modelCache.getSections()) {
+			int minX = coord.x() * sectionWidth + position.x();
+			int minY = coord.y() * sectionHeight + position.y();
+			int minZ = coord.z() * sectionLength + position.z();
 			
 			int maxX = minX + sectionWidth;
 			int maxY = minY + sectionHeight;
@@ -270,8 +273,8 @@ public class WorldChunked extends BaseBlockEntity {
 	}
 
 	@Override
-	public Block blockAt(Vector3i coord) {
-		Vector3i local = coord.subtract(getBlockPosition());
+	public Block blockAt(Vector3ic coord) {
+		Vector3i local = coord.sub(getBlockPosition(), new Vector3i());
 		return modelCache.blockAt(local);
 	}
 	
@@ -280,7 +283,7 @@ public class WorldChunked extends BaseBlockEntity {
 	}
 
 	@Override
-	public Vector3i[] getBounds() {
+	public Vector3ic[] getBounds() {
 		return boundsCache;
 	}
 

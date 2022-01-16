@@ -5,9 +5,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
-import org.scaffoldeditor.nbt.math.Vector3f;
-import org.scaffoldeditor.nbt.math.Vector3i;
+import org.joml.Vector3d;
+import org.joml.Vector3ic;
+import org.scaffoldeditor.nbt.block.WorldMath.SectionCoordinate;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.BlockEntity;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
@@ -79,21 +79,21 @@ public final class LevelOperations {
 	 * Mark all the sections where these two entities overlap as dirty.
 	 */
 	private static void addOverlap(Level level, BlockEntity ent1, BlockEntity ent2) {
-		Vector3i[] ent1Bounds = ent1.getBounds();
-		Vector3i[] ent2Bounds = ent2.getBounds();
+		Vector3ic[] ent1Bounds = ent1.getBounds();
+		Vector3ic[] ent2Bounds = ent2.getBounds();
 		
 		// We want to iterate over as few sections of possible; target the entity with the smallest volume.
-		boolean bool = MathUtils.calculateVolume(ent1Bounds[0].toFloat(), ent1Bounds[1].toFloat()) < MathUtils
-				.calculateVolume(ent2Bounds[0].toFloat(), ent2Bounds[1].toFloat());
+		boolean bool = MathUtils.calculateVolume(ent1Bounds[0], ent1Bounds[1]) < MathUtils
+				.calculateVolume(ent2Bounds[0], ent2Bounds[1]);
 		BlockEntity target = bool ? ent1 : ent2;
 		BlockEntity subject = bool ? ent2 : ent1;
-		Vector3i[] subjectBounds = subject.getBounds();
+		Vector3ic[] subjectBounds = subject.getBounds();
 		
 		for (SectionCoordinate c : target.getOverlappingSections()) {
-			Vector3f sectionStart = new Vector3f(c.getStartX(), c.getStartY(), c.getStartZ());
-			Vector3f sectionEnd = new Vector3f(c.getEndX() - 1, c.getEndY() - 1, c.getEndZ() - 1);
+			Vector3d sectionStart = new Vector3d(c.getStartX(), c.getStartY(), c.getStartZ());
+			Vector3d sectionEnd = new Vector3d(c.getEndX() - 1, c.getEndY() - 1, c.getEndZ() - 1);
 			
-			if (MathUtils.detectCollision(sectionStart, sectionEnd, subjectBounds[0].toFloat(), subjectBounds[1].toFloat())) {
+			if (MathUtils.detectCollision(sectionStart, sectionEnd, new Vector3d(subjectBounds[0]), new Vector3d(subjectBounds[1]))) {
 				level.dirtySections.add(c);
 			}
 		}

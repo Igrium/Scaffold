@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
-import org.scaffoldeditor.nbt.math.Vector3i;
+import org.joml.Vector3i;
 
 /**
  * Represents a subchunk
