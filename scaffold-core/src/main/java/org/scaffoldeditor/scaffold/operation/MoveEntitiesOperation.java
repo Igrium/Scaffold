@@ -10,11 +10,14 @@ import org.scaffoldeditor.scaffold.level.entity.Entity;
 public class MoveEntitiesOperation implements Operation {
 	private Map<Entity, Vector3dc> targetPositions;
 	private Map<Entity, Vector3dc> oldPositions;
-	private Level level;
 	
-	public MoveEntitiesOperation(Map<Entity, Vector3dc> targetPositions, Level level) {
+	public MoveEntitiesOperation(Map<Entity, Vector3dc> targetPositions) {
 		this.targetPositions = Map.copyOf(targetPositions);
-		this.level = level;
+	}
+
+	@Deprecated
+	public MoveEntitiesOperation(Map<Entity, Vector3dc> targetPositions, Level level) {
+		this(targetPositions);
 	}
 
 	@Override
@@ -39,14 +42,8 @@ public class MoveEntitiesOperation implements Operation {
 	}
 	
 	private void move(Map<Entity, Vector3dc> targets) {
-		boolean recompileCache = level.autoRecompile;
-		level.autoRecompile = false; // We only need to recompile once, regardless of how many entities were moved.
 		for (Entity ent : targets.keySet()) {
 			ent.setPosition(targets.get(ent));
-		}
-		level.autoRecompile = recompileCache;
-		if (level.autoRecompile) {
-			level.quickRecompile();
 		}
 	}
 

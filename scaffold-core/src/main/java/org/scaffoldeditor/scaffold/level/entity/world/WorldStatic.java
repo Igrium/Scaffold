@@ -80,9 +80,6 @@ public class WorldStatic extends BaseBlockEntity implements Faceable {
 			getLevel().dirtySections.addAll(getOverlappingSections());
 			reload();
 			getLevel().dirtySections.addAll(getOverlappingSections());
-			if (getLevel().autoRecompile) {
-				getLevel().quickRecompile();
-			}
 		}));
 		return macros;
 	}

@@ -78,11 +78,15 @@ public class OperationManager {
 	
 	/**
 	 * Undo the last operation.
+	 * @return A future that completes after th undo is complete.
 	 */
-	public void undo() {
+	public CompletableFuture<Void> undo() {
+		CompletableFuture<Void> future = new CompletableFuture<>();
 		level.getProject().execute(() -> {
 			undoImpl();
+			future.complete(null);
 		});
+		return future;
 	}
 	
 	/**
@@ -113,11 +117,15 @@ public class OperationManager {
 	
 	/**
 	 * Redo the last undone operation.
+	 * @return A future that completes after th undo is complete.
 	 */
-	public void redo() {
+	public CompletableFuture<Void> redo() {
+		CompletableFuture<Void> future = new CompletableFuture<>();
 		level.getProject().execute(() -> {
 			redoImpl();
+			future.complete(null);
 		});
+		return future;
 	}
 	
 	/**

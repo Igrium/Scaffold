@@ -28,28 +28,19 @@ public class ModifyStackOperation implements Operation {
 		oldStack = level.getLevelStack().copy();
 		LevelOperations.modifyLevelStack(level, newStack, false);
 		
-		if (level.autoRecompile) {
-			level.quickRecompile();
-		}
-		
 		return true;
 	}
+	
 	@Override
 	public void undo() {
 		LevelOperations.modifyLevelStack(level, oldStack, false);
-		
-		if (level.autoRecompile) {
-			level.quickRecompile();
-		}
 	}
+
 	@Override
 	public void redo() {
 		LevelOperations.modifyLevelStack(level, newStack, false);
-		
-		if (level.autoRecompile) {
-			level.quickRecompile();
-		}
 	}
+
 	@Override
 	public String getName() {
 		return "Update level stack";

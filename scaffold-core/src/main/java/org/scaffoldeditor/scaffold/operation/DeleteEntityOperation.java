@@ -6,7 +6,6 @@ import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.scaffoldeditor.scaffold.level.Level;
-import org.scaffoldeditor.scaffold.level.entity.BlockEntity;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.stack.StackGroup;
 
@@ -14,7 +13,6 @@ public class DeleteEntityOperation implements Operation {
 	
 	private Level level;
 	private Set<Entity> entities;
-	private boolean recompile = false;
 	
 	private Map<Entity, StackGroup> groupCache = new HashMap<>();
 	private Map<Entity, Integer> indexCache = new HashMap<>();
@@ -34,11 +32,7 @@ public class DeleteEntityOperation implements Operation {
 			}
 			groupCache.put(ent, owner);
 			indexCache.put(ent, owner.indexOf(ent));
-			level.removeEntity(ent, true);
-			if (ent instanceof BlockEntity) recompile = true;
-		}
-		if (recompile && level.autoRecompile) {
-			level.quickRecompile();
+			level.removeEntity(ent);
 		}
 		return true;
 	}
@@ -46,10 +40,7 @@ public class DeleteEntityOperation implements Operation {
 	@Override
 	public void undo() {
 		for (Entity ent : entities) {
-			level.addEntity(ent, groupCache.get(ent), indexCache.get(ent), true);
-		}
-		if (recompile && level.autoRecompile) {
-			level.quickRecompile();
+			level.addEntity(ent, groupCache.get(ent), indexCache.get(ent));
 		}
 	}
 
@@ -57,9 +48,6 @@ public class DeleteEntityOperation implements Operation {
 	public void redo() {
 		for (Entity ent : entities) {
 			level.removeEntity(ent);
-		}
-		if (recompile && level.autoRecompile) {
-			level.quickRecompile();
 		}
 	}
 

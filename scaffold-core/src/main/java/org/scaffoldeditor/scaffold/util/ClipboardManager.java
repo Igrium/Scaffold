@@ -193,9 +193,7 @@ public class ClipboardManager {
 			}
 			parent.items.addAll(parsed);
 			level.updateLevelStack();
-			if (level.autoRecompile) {
-				level.quickRecompile();
-			}
+
 			return parsed;
 		} else {
 			return Collections.emptyList();

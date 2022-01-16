@@ -6,6 +6,7 @@ import org.joml.Vector2i;
 import org.joml.Vector2ic;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
+import org.scaffoldeditor.nbt.math.AbstractVector3i;
 
 public final class WorldMath {
     /**
@@ -109,21 +110,46 @@ public final class WorldMath {
 		}
 	}
 
-    public static class SectionCoordinate extends Vector3i {
+	/**
+	 * Represents a 3D section coordinate in section space (each unit is 16 blocks).
+	 */
+    public static class SectionCoordinate extends AbstractVector3i {
+
+		private int x;
+		private int y;
+		private int z;
 		
 		public SectionCoordinate(int x, int y, int z) {
-			super(x, y, z);
+			this.x = x;
+			this.y = y;
+			this.z = z;
 		}
 		
 		
 		public SectionCoordinate(Vector3ic vec) {
-			super(vec);
+			this.x = vec.x();
+			this.y = vec.y();
+			this.z = vec.z();
 		}
 		
 		public SectionCoordinate(ChunkCoordinate c, int i) {
-            super(c.x(), i, c.z());
+            this(c.x(), i, c.z());
         }
 
+		@Override
+		public int x() {
+			return x;
+		}
+
+		@Override
+		public int y() {
+			return y;
+		}
+
+		@Override
+		public int z() {
+			return z;
+		}
 
         public ChunkCoordinate getChunk() {
 			return new ChunkCoordinate(x, z);

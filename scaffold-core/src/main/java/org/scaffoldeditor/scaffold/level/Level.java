@@ -92,6 +92,7 @@ public class Level {
 	public final Set<SectionCoordinate> dirtySections = new HashSet<>();
 	
 	/** Whether the level should automatically recompile the relevent chunks when a block entity is updated. */
+	@Deprecated
 	public boolean autoRecompile = true;
 	
 	private boolean hasUnsavedChanges = false;
@@ -359,7 +360,7 @@ public class Level {
 	 * @param entity Entity to add.
 	 */
 	public void addEntity(Entity entity) {
-		addEntity(entity, false);
+		addEntity(entity);
 	}
 	
 	/**
@@ -369,23 +370,10 @@ public class Level {
 	 * <code>newEntity</code> should be used most of the time.
 	 * @param entity Entity to add.
 	 * @param stackIndex Index to add it to in the entity stack.
-	 * @param noRecompile Don't recompile the level afterward.
 	 * @deprecated Entities can no-longer be simply inserted into the stack.
 	 */
-	public void addEntity(Entity entity, int stackIndex, boolean noRecompile) {
-		addEntity(entity, noRecompile);
-	}
-	
-	/**
-	 * Add an existing entity object to the level.
-	 * <br>
-	 * <b>Warning: </b> Only call if you know what you're doing! Can lead to illegal states!
-	 * <code>newEntity</code> should be used most of the time.
-	 * @param entity Entity to add.
-	 * @param noRecompile Don't recompile the level afterward.
-	 */
-	public void addEntity(Entity entity, boolean noRecompile) {
-		addEntity(entity, levelStack, levelStack.items.size(), noRecompile);
+	public void addEntity(Entity entity, int stackIndex) {
+		addEntity(entity);
 	}
 	
 	/**
@@ -396,10 +384,9 @@ public class Level {
 	 * @param entity      Entity to add.
 	 * @param group       Stack group to add to.
 	 * @param index       Index within group to add at.
-	 * @param noRecompile Don't recompile the level afterward.
 	 */
 	@SuppressWarnings("deprecation")
-	public void addEntity(Entity entity, StackGroup group, int index, boolean noRecompile) {
+	public void addEntity(Entity entity, StackGroup group, int index) {
 		if (!levelStack.containsGroup(group)) {
 			throw new IllegalArgumentException("Entity can only be added to a group within the level!");
 		}
@@ -411,9 +398,6 @@ public class Level {
 		
 		if (entity instanceof BlockEntity) {
 			dirtySections.addAll(((BlockEntity) entity).getOverlappingSections());
-			if (!noRecompile && autoRecompile) {
-				quickRecompile();
-			}
 		}
 	}
 	
@@ -425,26 +409,19 @@ public class Level {
 	 * @param group       Group to add.
 	 * @param parent      Group to add to.
 	 * @param index       Index within group to add at.
-	 * @param noRecompile Don't recompile the level afterward.
 	 */
 	@SuppressWarnings("deprecation")
-	public void addGroup(StackGroup group, StackGroup parent, int index, boolean noRecompile) {
+	public void addGroup(StackGroup group, StackGroup parent, int index) {
 		if (!levelStack.containsGroup(parent)) {
 			throw new IllegalArgumentException("Parent group is not within the level!");
 		}
-		boolean recompile = false;
 		parent.items.add(index, new StackItem(group));
 		for (Entity entity : group) {
 			entity.setName(validateName(entity.getName(), new String[] {}));
 			if (entity instanceof BlockEntity) {
 				dirtySections.addAll(((BlockEntity) entity).getOverlappingSections());
-				recompile = true;
 			}
 			entity.onAdded();
-		}
-		
-		if (!noRecompile && autoRecompile && recompile) {
-			quickRecompile();
 		}
 	}
 	
@@ -452,10 +429,9 @@ public class Level {
 	 * Remove a stack group from the level.
 	 * 
 	 * @param group       Group to remove.
-	 * @param noRecompile Don't recompile the level afterward.
 	 * @return If the group was found in the level.
 	 */
-	public boolean removeGroup(StackGroup group, boolean noRecompile) {
+	public boolean removeGroup(StackGroup group) {
 		if (group.equals(getLevelStack())) {
 			throw new IllegalArgumentException("Level stack root cannot be removed!");
 		}
@@ -463,19 +439,13 @@ public class Level {
 		StackGroup parent = levelStack.getOwningGroup(new StackItem(group));
 		if (parent == null) return false;
 		
-		boolean recompile = false;
 		parent.items.remove(new StackItem(group));
 
 		for (Entity entity : group) {
 			if (entity instanceof BlockEntity) {
 				dirtySections.addAll(((BlockEntity) entity).getOverlappingSections());
-				recompile = true;
 			}
 			entity.onRemoved();
-		}
-		
-		if (!noRecompile && autoRecompile && recompile) {
-			quickRecompile();
 		}
 		
 		return true;
@@ -486,15 +456,6 @@ public class Level {
 	 * @param entity Entity to remove.
 	 */
 	public void removeEntity(Entity entity) {
-		removeEntity(entity, false);
-	}
-	
-	/**
-	 * Remove an entity from the level.
-	 * @param entity Entity to remove.
-	 * @param noRecompile Don't recompile the level after removal.
-	 */
-	public void removeEntity(Entity entity, boolean noRecompile) {
 		if (entity instanceof BlockEntity) {
 			dirtySections.addAll(((BlockEntity) entity).getOverlappingSections());
 		}
@@ -502,10 +463,6 @@ public class Level {
 		levelStack.remove(entity);
 		updateLevelStack();
 		entity.onRemoved();
-		
-		if (!noRecompile && autoRecompile) {
-			quickRecompile();
-		}
 	}
 	
 	/**
@@ -668,9 +625,9 @@ public class Level {
 				Vector3i maxSection = MathUtils.floorVector(new Vector3d(bounds[1]).div(16));
 				// See if entity is within chunkList.
 				for (SectionCoordinate section : sections) {
-					if (minSection.x <= section.x && section.x <= maxSection.x
-							&& minSection.y <= section.y && section.y <= maxSection.y
-							&& minSection.z <= section.z && section.z <= maxSection.z) {
+					if (minSection.x() <= section.x() && section.x() <= maxSection.x()
+							&& minSection.y() <= section.y() && section.y() <= maxSection.y()
+							&& minSection.z() <= section.z() && section.z() <= maxSection.z()) {
 						updatingEntities.add(blockEntity);
 						break;
 					}
@@ -691,26 +648,24 @@ public class Level {
 		}
 		
 		for (SectionCoordinate coord : sections) {
-			Chunk chunk = blockWorld.chunkAt(coord.x, coord.z);
+			Chunk chunk = blockWorld.chunkAt(coord.x(), coord.z());
 			if (chunk == null) {
 				chunk = new Chunk();
 				blockWorld.getChunks().put(coord.getChunk(), chunk);
 			}
-			Chunk tempChunk = tempWorld.chunkAt(coord.x, coord.z);
+			Chunk tempChunk = tempWorld.chunkAt(coord.x(), coord.z());
 			if (tempChunk == null) {
 				tempChunk = new Chunk();
 			}
 
-			chunk.sections[coord.y] = tempChunk.sections[coord.y];
+			chunk.sections[coord.y()] = tempChunk.sections[coord.y()];
 		}
 		LogManager.getLogger().info("Finished compiling world.");
 		return;
 	}
 	
 	/**
-	 * Compile all the chunks marked as dirty. <br>
-	 * Note: {@link #autoRecompile} should be checked before calling unless you
-	 * explicitly want to bypass it.
+	 * Compile all the chunks marked as dirty.
 	 */
 	public void quickRecompile() {
 		if (dirtySections.isEmpty()) return;

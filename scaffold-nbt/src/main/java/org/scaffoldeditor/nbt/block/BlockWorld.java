@@ -150,9 +150,9 @@ public class BlockWorld implements ChunkedBlockCollection {
 	 * @param coord Section to remove.
 	 */
 	public void clearSection(SectionCoordinate coord) {
-		Chunk chunk = chunkAt(coord.x, coord.z);
+		Chunk chunk = chunkAt(coord.x(), coord.z());
 		if (chunk == null) return;
-		chunk.clearSection(coord.y);
+		chunk.clearSection(coord.y());
 	}
 	
 	/**

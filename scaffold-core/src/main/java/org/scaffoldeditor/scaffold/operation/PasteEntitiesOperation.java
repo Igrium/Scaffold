@@ -39,10 +39,6 @@ public class PasteEntitiesOperation implements Operation {
 		}
 		
 		level.updateLevelStack();
-		
-		if (level.autoRecompile) {
-			level.quickRecompile();
-		}
 	}
 
 	@Override
@@ -54,10 +50,6 @@ public class PasteEntitiesOperation implements Operation {
 		}
 		
 		level.updateLevelStack();
-		
-		if (level.autoRecompile) {
-			level.quickRecompile();
-		}
 	}
 
 	@Override

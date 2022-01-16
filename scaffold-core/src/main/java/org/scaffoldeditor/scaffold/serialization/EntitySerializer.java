@@ -104,7 +104,7 @@ public class EntitySerializer implements XMLSerializable {
 	public static Entity deserialize(Element xml, Level level) {
 		Entity entity = loadEntity(xml, level);
 		if (entity == null) return null;
-		level.addEntity(entity, true);
+		level.addEntity(entity);
 		
 		return entity;
 	}

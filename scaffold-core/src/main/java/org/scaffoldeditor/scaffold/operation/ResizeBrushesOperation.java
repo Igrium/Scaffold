@@ -20,42 +20,25 @@ public class ResizeBrushesOperation implements Operation {
 
 	@Override
 	public boolean execute() {
-		boolean recompile = level.autoRecompile;
-		level.autoRecompile = false;
 		for (BrushEntity ent : newSizes.keySet()) {
 			oldSizes.put(ent, ent.getBrushBounds());
 			ent.setBrushBounds(newSizes.get(ent), false);
 		}
-		if (recompile) {
-			level.quickRecompile();
-			level.autoRecompile = true;
-		}
+
 		return true;
 	}
 
 	@Override
 	public void undo() {
-		boolean recompile = level.autoRecompile;
-		level.autoRecompile = false;
 		for (BrushEntity ent : oldSizes.keySet()) {
 			ent.setBrushBounds(oldSizes.get(ent), false);
-		}
-		if (recompile) {
-			level.quickRecompile();
-			level.autoRecompile = true;
 		}
 	}
 
 	@Override
 	public void redo() {
-		boolean recompile = level.autoRecompile;
-		level.autoRecompile = false;
 		for (BrushEntity ent : newSizes.keySet()) {
 			ent.setBrushBounds(newSizes.get(ent), false);
-		}
-		if (recompile) {
-			level.quickRecompile();
-			level.autoRecompile = true;
 		}
 	}
 
