@@ -3,12 +3,13 @@ package org.scaffoldeditor.scaffold.operation;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.stack.StackGroup;
 import org.scaffoldeditor.scaffold.util.LevelOperations;
+import org.scaffoldeditor.scaffold.util.ProgressListener;
 
 /**
  * Updates the entity stack.
  * @author Igrium
  */
-public class ModifyStackOperation implements Operation {
+public class ModifyStackOperation implements Operation<StackGroup> {
 	private Level level;
 	private StackGroup newStack;
 	private StackGroup oldStack;
@@ -24,11 +25,11 @@ public class ModifyStackOperation implements Operation {
 	}
 	
 	@Override
-	public boolean execute() {
+	public StackGroup execute(ProgressListener listener) {
 		oldStack = level.getLevelStack().copy();
 		LevelOperations.modifyLevelStack(level, newStack, false);
 		
-		return true;
+		return newStack;
 	}
 	
 	@Override

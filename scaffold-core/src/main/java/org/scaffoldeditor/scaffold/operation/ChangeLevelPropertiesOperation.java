@@ -1,10 +1,11 @@
 package org.scaffoldeditor.scaffold.operation;
 
 import org.scaffoldeditor.scaffold.level.Level;
+import org.scaffoldeditor.scaffold.util.ProgressListener;
 
 import net.querz.nbt.tag.CompoundTag;
 
-public class ChangeLevelPropertiesOperation implements Operation {
+public class ChangeLevelPropertiesOperation implements Operation<CompoundTag> {
 	
 	private Level level;
 	
@@ -21,12 +22,12 @@ public class ChangeLevelPropertiesOperation implements Operation {
 	}
 
 	@Override
-	public boolean execute() {
+	public CompoundTag execute(ProgressListener listener) {
 		oldName = level.getPrettyName();
 		oldData = level.levelData().getData();
 		
 		redo();
-		return true;
+		return data;
 	}
 
 	@Override

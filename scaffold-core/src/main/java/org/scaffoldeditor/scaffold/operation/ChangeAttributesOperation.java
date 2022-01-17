@@ -8,12 +8,13 @@ import java.util.stream.Collectors;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.io.Output;
+import org.scaffoldeditor.scaffold.util.ProgressListener;
 
 /**
  * Update the attributes and/or outputs of an entity.
  * @author Igrium
  */
-public class ChangeAttributesOperation implements Operation {
+public class ChangeAttributesOperation implements Operation<Void> {
 	
 	private Entity target;
 	private Map<String, Attribute<?>> attributes = new HashMap<>();
@@ -65,7 +66,7 @@ public class ChangeAttributesOperation implements Operation {
 	}
 	
 	@Override
-	public boolean execute() {
+	public Void execute(ProgressListener listener) {
 		// Ensure position is properly set on entity.
 		if (attributes != null) {
 			for (String name : attributes.keySet()) {		
@@ -87,7 +88,7 @@ public class ChangeAttributesOperation implements Operation {
 			target.getLevel().renameEntity(target, newName, !refactor);
 		}
 
-		return true;
+		return null;
 	}
 
 	@Override

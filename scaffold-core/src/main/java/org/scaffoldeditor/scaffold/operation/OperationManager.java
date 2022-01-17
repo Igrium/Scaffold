@@ -3,11 +3,10 @@ package org.scaffoldeditor.scaffold.operation;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 
-import org.apache.logging.log4j.LogManager;
 import org.scaffoldeditor.scaffold.level.Level;
+import org.scaffoldeditor.scaffold.util.ProgressListener;
 
 /**
  * Manages the performing and undoing of operations.
@@ -19,13 +18,13 @@ public class OperationManager {
 	 * The operations that have been performed in order of operation.
 	 * Greater index = more recent.
 	 */
-	public final List<Operation> undoStack = new ArrayList<>();
+	public final List<Operation<?>> undoStack = new ArrayList<>();
 	
 	/**
 	 * The operations that have been undone and are queued for redo.
 	 * Greater index = more recent undo. (reverse chronology)
 	 */
-	public final List<Operation> redoStack = new ArrayList<>();
+	public final List<Operation<?>> redoStack = new ArrayList<>();
 	
 	public final Level level;
 	
@@ -36,15 +35,35 @@ public class OperationManager {
 	/**
 	 * Perform an operation and add it to the undo stack.
 	 * If there are values in the redo stack, it gets cleared.
+	 * 
 	 * @param operation Operation to perform.
-	 * @return Operation success.
+	 * @param listener  A progress listener that will recieve updates about this
+	 *                  operation.
+	 * @return A future that completes when the operation if finished and completes
+	 *         exceptionally if the operation fails.
 	 */
-	public CompletableFuture<Boolean> execute(Operation operation) {
-		CompletableFuture<Boolean> future = new CompletableFuture<>();
+	public <T> CompletableFuture<T> execute(Operation<T> operation, ProgressListener listener) {
+		CompletableFuture<T> future = new CompletableFuture<>();
 		level.getProject().execute(() -> {
-			future.complete(executeImpl(operation));
+			try {
+				future.complete(executeImpl(operation, listener));
+			} catch (Throwable e) {
+				future.completeExceptionally(e);
+			}
 		});
 		return future;
+	}
+
+	/**
+	 * Perform an operation and add it to the undo stack.
+	 * If there are values in the redo stack, it gets cleared.
+	 * 
+	 * @param operation Operation to perform.
+	 * @return A future that completes when the operation if finished and completes
+	 *         exceptionally if the operation fails.
+	 */
+	public <T> CompletableFuture<T> execute(Operation<T> operation) {
+		return execute(operation, ProgressListener.DUMMY);
 	}
 
 	/**
@@ -56,24 +75,19 @@ public class OperationManager {
 	 * @return Operation success.
 	 * @throws InterruptedException If the current thread was interrupted while
 	 *                              waiting.
+	 * @throws ExecutionException   If the operation fails.
 	 */
-	public boolean executeAndWait(Operation operation) throws InterruptedException {
-		try {
-			return execute(operation).get();
-		} catch (ExecutionException e) {
-			LogManager.getLogger().error(e);
-			return false;
-		}
+	public <T> T executeAndWait(Operation<T> operation) throws InterruptedException, ExecutionException {
+		return execute(operation).get();
 	}
 	
-	private boolean executeImpl(Operation operation) {
-		if (operation.execute()) {
-			redoStack.clear();
-			undoStack.add(operation);
-			level.setHasUnsavedChanges(true);
-			return true;
-		}
-		return false;
+	private <T> T executeImpl(Operation<T> operation, ProgressListener listener) throws Exception {
+		T val = operation.execute(listener);
+		// If the operation throws, execution will be stopped here.
+		redoStack.clear();
+		undoStack.add(operation);
+		level.setHasUnsavedChanges(true);
+		return val;
 	}
 	
 	/**
@@ -83,8 +97,12 @@ public class OperationManager {
 	public CompletableFuture<Void> undo() {
 		CompletableFuture<Void> future = new CompletableFuture<>();
 		level.getProject().execute(() -> {
-			undoImpl();
-			future.complete(null);
+			try {
+				undoImpl();
+				future.complete(null);
+			} catch (Throwable e) {
+				future.completeExceptionally(e);
+			}
 		});
 		return future;
 	}
@@ -94,20 +112,15 @@ public class OperationManager {
 	 * 
 	 * @throws InterruptedException If the current thread was interrupted while
 	 *                              waiting.
+	 * @throws ExecutionException   If the undo code fails.
 	 */
-	public void undoAndWait() throws InterruptedException {
-		CountDownLatch latch = new CountDownLatch(1);
-		level.getProject().execute(() -> {
-			undoImpl();
-			latch.countDown();
-		});
-		
-		latch.await();
+	public void undoAndWait() throws InterruptedException, ExecutionException {
+		undo().get();
 	}
 	
-	private void undoImpl() {
+	private void undoImpl() throws Exception {
 		if (undoStack.size() > 0) {
-			Operation operation = undoStack.get(undoStack.size() - 1);
+			Operation<?> operation = undoStack.get(undoStack.size() - 1);
 			operation.undo();
 			undoStack.remove(undoStack.size() - 1);
 			redoStack.add(operation);
@@ -122,8 +135,12 @@ public class OperationManager {
 	public CompletableFuture<Void> redo() {
 		CompletableFuture<Void> future = new CompletableFuture<>();
 		level.getProject().execute(() -> {
-			redoImpl();
-			future.complete(null);
+			try {
+				redoImpl();
+				future.complete(null);
+			} catch (Throwable e) {
+				future.completeExceptionally(e);
+			}
 		});
 		return future;
 	}
@@ -134,19 +151,15 @@ public class OperationManager {
 	 * 
 	 * @throws InterruptedException If the current thread was interrupted while
 	 *                              waiting.
+	 * @throws ExecutionException   If the redo code fails.
 	 */
-	public void redoAndWait() throws InterruptedException {
-		CountDownLatch latch = new CountDownLatch(1);
-		level.getProject().execute(() -> {
-			redoImpl();
-			latch.countDown();
-		});
-		latch.await();
+	public void redoAndWait() throws InterruptedException, ExecutionException {
+		redo().get();
 	}
 	
-	private void redoImpl() {
+	private void redoImpl() throws Exception {
 		if (redoStack.size() > 0) {
-			Operation operation = redoStack.get(redoStack.size() - 1);
+			Operation<?> operation = redoStack.get(redoStack.size() - 1);
 			operation.redo();
 			redoStack.remove(redoStack.size() - 1);
 			undoStack.add(operation);

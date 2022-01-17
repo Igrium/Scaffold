@@ -2,9 +2,10 @@ package org.scaffoldeditor.scaffold.operation;
 
 import org.joml.Vector3dc;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
+import org.scaffoldeditor.scaffold.util.ProgressListener;
 
 @Deprecated
-public class MoveEntityOperation implements Operation {
+public class MoveEntityOperation implements Operation<Void> {
 	private Entity target;
 	private Vector3dc newPosition;
 	
@@ -22,12 +23,12 @@ public class MoveEntityOperation implements Operation {
 	}
 
 	@Override
-	public boolean execute() {
+	public Void execute(ProgressListener listener) {
 		if (oldPosition == null) {
 			oldPosition = target.getPosition();	
 		}
 		target.setPosition(newPosition);
-		return true;
+		return null;
 	}
 
 	@Override

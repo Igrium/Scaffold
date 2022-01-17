@@ -6,8 +6,9 @@ import java.util.Map;
 import org.joml.Vector3dc;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
+import org.scaffoldeditor.scaffold.util.ProgressListener;
 
-public class MoveEntitiesOperation implements Operation {
+public class MoveEntitiesOperation implements Operation<Void> {
 	private Map<Entity, Vector3dc> targetPositions;
 	private Map<Entity, Vector3dc> oldPositions;
 	
@@ -21,14 +22,14 @@ public class MoveEntitiesOperation implements Operation {
 	}
 
 	@Override
-	public boolean execute() {
+	public Void execute(ProgressListener listener) {
 		oldPositions = new HashMap<>();
 		targetPositions.keySet().stream().forEach(ent -> {
 			oldPositions.put(ent, ent.getPosition());
 		});
 		
 		move(targetPositions);
-		return true;
+		return null;
 	}
 
 	@Override

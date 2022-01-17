@@ -6,8 +6,9 @@ import java.util.Map;
 import org.joml.Vector3dc;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.BrushEntity;
+import org.scaffoldeditor.scaffold.util.ProgressListener;
 
-public class ResizeBrushesOperation implements Operation {
+public class ResizeBrushesOperation implements Operation<Void> {
 	
 	protected Map<BrushEntity, Vector3dc[]> newSizes;
 	protected Map<BrushEntity, Vector3dc[]> oldSizes = new HashMap<>();
@@ -19,13 +20,13 @@ public class ResizeBrushesOperation implements Operation {
 	}
 
 	@Override
-	public boolean execute() {
+	public Void execute(ProgressListener listener) {
 		for (BrushEntity ent : newSizes.keySet()) {
 			oldSizes.put(ent, ent.getBrushBounds());
 			ent.setBrushBounds(newSizes.get(ent), false);
 		}
 
-		return true;
+		return null;
 	}
 
 	@Override

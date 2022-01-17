@@ -2,8 +2,9 @@ package org.scaffoldeditor.scaffold.operation;
 
 import org.joml.Vector3dc;
 import org.scaffoldeditor.scaffold.level.entity.BrushEntity;
+import org.scaffoldeditor.scaffold.util.ProgressListener;
 
-public class ResizeBrushOperation implements Operation {
+public class ResizeBrushOperation implements Operation<Void> {
 	
 	private BrushEntity brush;
 	private Vector3dc[] oldSize;
@@ -15,10 +16,10 @@ public class ResizeBrushOperation implements Operation {
 	}
 	
 	@Override
-	public boolean execute() {
+	public Void execute(ProgressListener listener) {
 		oldSize = brush.getBrushBounds();
 		brush.setBrushBounds(newSize, false);
-		return true;
+		return null;
 	}
 
 	@Override

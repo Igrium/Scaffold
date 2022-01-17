@@ -48,6 +48,7 @@ import org.scaffoldeditor.scaffold.operation.OperationManager;
 import org.scaffoldeditor.scaffold.serialization.LevelReader;
 import org.scaffoldeditor.scaffold.serialization.LevelWriter;
 import org.scaffoldeditor.scaffold.util.LevelOperations;
+import org.scaffoldeditor.scaffold.util.ProgressListener;
 import org.scaffoldeditor.scaffold.util.event.EventDispatcher;
 import org.scaffoldeditor.scaffold.util.event.EventListener;
 
@@ -360,7 +361,7 @@ public class Level {
 	 * @param entity Entity to add.
 	 */
 	public void addEntity(Entity entity) {
-		addEntity(entity);
+		addEntity(entity, getLevelStack(), getLevelStack().items.size());
 	}
 	
 	/**
@@ -373,7 +374,7 @@ public class Level {
 	 * @deprecated Entities can no-longer be simply inserted into the stack.
 	 */
 	public void addEntity(Entity entity, int stackIndex) {
-		addEntity(entity);
+		addEntity(entity, getLevelStack(), stackIndex);
 	}
 	
 	/**
@@ -547,22 +548,48 @@ public class Level {
 	public static Level loadFile(Project project, String file) throws IOException {
 		return loadFile(project, project.assetManager().getAbsoluteFile(file));
 	}
+
+	/**
+	 * Compile the entire blockworld (and game entities within the blockworld).
+	 * 
+	 * @param full Should this be a full compile? If true, entities may run more
+	 *             complex algorithems.
+	 */
+	public void compileBlockWorld(boolean full) {
+		compileBlockWorld(full, ProgressListener.DUMMY);
+	}
 	
 	/**
 	 * Compile the entire blockworld (and game entities within the blockworld).
-	 * @param full Should this be a full compile? If true, entities may run more complex algorithems.
+	 * 
+	 * @param full     Should this be a full compile? If true, entities may run more
+	 *                 complex algorithems.
+	 * @param listener Progress listener that will recieve updates about world
+	 *                 compilation.
 	 */
-	public void compileBlockWorld(boolean full) {		
+	public void compileBlockWorld(boolean full, ProgressListener listener) {		
 		blockWorld.clear(); // Clear the blockworld of previous compiles.
 		LogManager.getLogger().info("Compiling world...");
-		
-		for (Entity entity: levelStack) {
+
+		List<Entity> eligible = new ArrayList<>();
+
+		for (Entity ent : levelStack) {
+			if (ent instanceof BlockEntity || ent instanceof EntityProvider)
+			eligible.add(ent);
+		}
+
+		int i = 0;
+		for (Entity entity : eligible) {
+			i++;
+			listener.progress(((float) i) / levelStack.size(), "Compiling entity: "+entity.getName());
+
 			if (entity instanceof BlockEntity) {
 				BlockEntity blockEntity = (BlockEntity) entity;
 				try {
 					blockEntity.compileWorld(blockWorld, full);
 				} catch (Throwable e) {
 					LOGGER.error("Unable to compile world entity: "+name, e);
+					listener.error(e, "Error compiling world entity: "+name);
 				}
 			}
 			if (entity instanceof EntityProvider) {
@@ -571,6 +598,7 @@ public class Level {
 					adder.compileGameEntities(blockWorld);
 				} catch (Throwable e) {
 					LOGGER.error("Unable to compile game entities for: "+name, e);
+					listener.error(e, "Error compiling game entities for: "+name);
 				}
 			}
 		}
