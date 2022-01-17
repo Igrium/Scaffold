@@ -3,8 +3,8 @@ package org.scaffoldeditor.scaffold.operation;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
+import org.scaffoldeditor.scaffold.core.ServiceProvider;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.util.ProgressListener;
 
@@ -27,14 +27,37 @@ public class OperationManager {
 	public final List<Operation<?>> redoStack = new ArrayList<>();
 	
 	public final Level level;
+	private ServiceProvider serviceProvider;
 	
 	public OperationManager(Level level) {
 		this.level = level;
 	}
 	
 	/**
-	 * Perform an operation and add it to the undo stack.
-	 * If there are values in the redo stack, it gets cleared.
+	 * Get the current service provider.
+	 * @return The service provider, or <code>null</code> if there is none.
+	 */
+	public ServiceProvider getServiceProvider() {
+		return serviceProvider;
+	}
+
+	/**
+	 * Set a service provider to execute all operations.
+	 * @param serviceProvider Service provider to use.
+	 */
+	public void setServiceProvider(ServiceProvider serviceProvider) {
+		this.serviceProvider = serviceProvider;
+	}
+	
+	/**
+	 * <p>
+	 * Perform an operation and add it to the undo stack, clearing the redo stack in
+	 * the process
+	 * </p>
+	 * <p>
+	 * If there is a registered service provider, the operation is run with said
+	 * provider. If not, it is run on the current thread.
+	 * </p>
 	 * 
 	 * @param operation Operation to perform.
 	 * @param listener  A progress listener that will recieve updates about this
@@ -44,19 +67,32 @@ public class OperationManager {
 	 */
 	public <T> CompletableFuture<T> execute(Operation<T> operation, ProgressListener listener) {
 		CompletableFuture<T> future = new CompletableFuture<>();
-		level.getProject().execute(() -> {
+		Runnable exec = () -> {
 			try {
 				future.complete(executeImpl(operation, listener));
 			} catch (Throwable e) {
 				future.completeExceptionally(e);
 			}
-		});
+		};
+
+		if (serviceProvider != null) {
+			serviceProvider.execute(exec);
+		} else {
+			exec.run();
+		}
+
 		return future;
 	}
 
 	/**
-	 * Perform an operation and add it to the undo stack.
-	 * If there are values in the redo stack, it gets cleared.
+	 * <p>
+	 * Perform an operation and add it to the undo stack, clearing the redo stack in
+	 * the process
+	 * </p>
+	 * <p>
+	 * If there is a registered service provider, the operation is run with said
+	 * provider. If not, it is run on the current thread.
+	 * </p>
 	 * 
 	 * @param operation Operation to perform.
 	 * @return A future that completes when the operation if finished and completes
@@ -64,21 +100,6 @@ public class OperationManager {
 	 */
 	public <T> CompletableFuture<T> execute(Operation<T> operation) {
 		return execute(operation, ProgressListener.DUMMY);
-	}
-
-	/**
-	 * Perform an operation and add it to the undo stack. Holds the current thread
-	 * untill the operation is complete. If there are values in the redo stack, it
-	 * gets cleared.
-	 * 
-	 * @param operation Operation to perform.
-	 * @return Operation success.
-	 * @throws InterruptedException If the current thread was interrupted while
-	 *                              waiting.
-	 * @throws ExecutionException   If the operation fails.
-	 */
-	public <T> T executeAndWait(Operation<T> operation) throws InterruptedException, ExecutionException {
-		return execute(operation).get();
 	}
 	
 	private <T> T executeImpl(Operation<T> operation, ProgressListener listener) throws Exception {
@@ -91,32 +112,34 @@ public class OperationManager {
 	}
 	
 	/**
+	 * <p>
 	 * Undo the last operation.
+	 * </p>
+	 * <p>
+	 * If there is a registered service provider, the undo operation is run with
+	 * said provider. If not, it is run on the current thread.
+	 * </p>
+	 * 
 	 * @return A future that completes after th undo is complete.
 	 */
 	public CompletableFuture<Void> undo() {
 		CompletableFuture<Void> future = new CompletableFuture<>();
-		level.getProject().execute(() -> {
+		Runnable exec = () -> {
 			try {
 				undoImpl();
 				future.complete(null);
 			} catch (Throwable e) {
 				future.completeExceptionally(e);
 			}
-		});
+		};
+		if (serviceProvider != null) {
+			serviceProvider.execute(exec);
+		} else {
+			exec.run();
+		}
 		return future;
 	}
-	
-	/**
-	 * Undo the last operation and hold the current thread until it's complete.
-	 * 
-	 * @throws InterruptedException If the current thread was interrupted while
-	 *                              waiting.
-	 * @throws ExecutionException   If the undo code fails.
-	 */
-	public void undoAndWait() throws InterruptedException, ExecutionException {
-		undo().get();
-	}
+
 	
 	private void undoImpl() throws Exception {
 		if (undoStack.size() > 0) {
@@ -129,32 +152,32 @@ public class OperationManager {
 	}
 	
 	/**
-	 * Redo the last undone operation.
-	 * @return A future that completes after th undo is complete.
+	 * <p>
+	 * Redo the last operation.
+	 * </p>
+	 * <p>
+	 * If there is a registered service provider, the redo operation is run with
+	 * said provider. If not, it is run on the current thread.
+	 * </p>
+	 * 
+	 * @return A future that completes after th redo is complete.
 	 */
 	public CompletableFuture<Void> redo() {
 		CompletableFuture<Void> future = new CompletableFuture<>();
-		level.getProject().execute(() -> {
+		Runnable exec = () -> {
 			try {
 				redoImpl();
 				future.complete(null);
 			} catch (Throwable e) {
 				future.completeExceptionally(e);
 			}
-		});
+		};
+		if (serviceProvider != null) {
+			serviceProvider.execute(exec);
+		} else {
+			exec.run();
+		}
 		return future;
-	}
-	
-	/**
-	 * Redo the last undone operation and hold the current thread until it's
-	 * complete.
-	 * 
-	 * @throws InterruptedException If the current thread was interrupted while
-	 *                              waiting.
-	 * @throws ExecutionException   If the redo code fails.
-	 */
-	public void redoAndWait() throws InterruptedException, ExecutionException {
-		redo().get();
 	}
 	
 	private void redoImpl() throws Exception {

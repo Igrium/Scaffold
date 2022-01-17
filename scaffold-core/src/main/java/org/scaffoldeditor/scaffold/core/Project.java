@@ -28,7 +28,7 @@ import org.scaffoldeditor.scaffold.plugin_utils.PluginManager;
  * @author Igrium
  *
  */
-public class Project extends ServiceProvider {
+public class Project {
 	
 	public static final String CACHE_FOLDER_NAME = ".scaffold";
 	
@@ -243,11 +243,6 @@ public class Project extends ServiceProvider {
 		AttributeRegistry.registry.clear();
 		AssetLoaderRegistry.registry.clear();
 		
-	}
-
-	@Override
-	protected String getThreadName() {
-		return "Scaffold Level Thread";
 	}
 }
 	

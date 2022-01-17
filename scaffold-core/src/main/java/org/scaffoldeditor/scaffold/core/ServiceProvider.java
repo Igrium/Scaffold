@@ -9,11 +9,20 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 
-public abstract class ServiceProvider implements AutoCloseable {
+/**
+ * An object that provides a thread service.
+ */
+public class ServiceProvider implements AutoCloseable {
 	private final ExecutorService executor;
 	private Thread thread;
+	private String threadName;
 	
-	public ServiceProvider() {
+	/**
+	 * Create a new service provider.
+	 * @param threadName Name to assign to the service thread.
+	 */
+	public ServiceProvider(String threadName) {
+		this.threadName = threadName;
 		executor = Executors.newSingleThreadExecutor(runnable -> {
 			thread = new Thread(runnable, getThreadName());
 			return thread;
@@ -58,7 +67,7 @@ public abstract class ServiceProvider implements AutoCloseable {
 				future.complete(r.call());
 			} catch (Exception e) {
 				LogManager.getLogger().error(e);
-				future.complete(null);
+				future.completeExceptionally(e);
 			}
 			return future;
 		} else {
@@ -81,12 +90,15 @@ public abstract class ServiceProvider implements AutoCloseable {
 	}
 	
 	/**
-	 * Get the name to assign to the service's thread.
+	 * Get the name of the service's thread.
+	 * @return Service thread name.
 	 */
-	protected abstract String getThreadName();
+	public String getThreadName() {
+		return threadName;
+	}
 	
 	@Override
-	public void close() throws Exception {
+	public void close() {
 		try {
 			LogManager.getLogger().info("Shutting down executor service.");
 			executor.shutdown();

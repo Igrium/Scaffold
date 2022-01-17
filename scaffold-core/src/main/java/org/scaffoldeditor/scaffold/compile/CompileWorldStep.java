@@ -2,8 +2,6 @@ package org.scaffoldeditor.scaffold.compile;
 
 import java.nio.file.Path;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 import org.apache.logging.log4j.LogManager;
 import org.scaffoldeditor.scaffold.compile.Compiler.CompileProgressListener;
@@ -14,19 +12,11 @@ public class CompileWorldStep implements CompileStep {
 
 	@Override
 	public boolean execute(Level level, Path target, Map<String, Attribute<?>> args, CompileProgressListener listener) {
-		Future<Boolean> future = level.getProject().submit(() -> {
-			try {
-				level.compileBlockWorld(true);
-				return true;
-			} catch (Exception e) {
-				e.printStackTrace();
-				return false;
-			}
-		});
 		try {
-			return future.get();
-		} catch (InterruptedException | ExecutionException e) {
-			LogManager.getLogger().error("Error compiling world", e);
+			level.compileBlockWorld(true);
+			return true;
+		} catch (Throwable e) {
+			LogManager.getLogger().error("Unable to compile block world.", e);
 			return false;
 		}
 	}
