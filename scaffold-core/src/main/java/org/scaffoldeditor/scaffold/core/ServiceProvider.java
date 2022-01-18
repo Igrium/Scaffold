@@ -1,21 +1,27 @@
 package org.scaffoldeditor.scaffold.core;
 
+import java.util.Queue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.LockSupport;
 
 import org.apache.logging.log4j.LogManager;
 
 /**
  * An object that provides a thread service.
  */
-public class ServiceProvider implements AutoCloseable {
-	private final ExecutorService executor;
+public class ServiceProvider implements AutoCloseable, Executor {
 	private Thread thread;
 	private String threadName;
+	private boolean isRunning = true;
+	private Queue<Runnable> queue = new ConcurrentLinkedQueue<>();
+
+	CountDownLatch stopLatch = new CountDownLatch(1);
 	
 	/**
 	 * Create a new service provider.
@@ -23,17 +29,36 @@ public class ServiceProvider implements AutoCloseable {
 	 */
 	public ServiceProvider(String threadName) {
 		this.threadName = threadName;
-		executor = Executors.newSingleThreadExecutor(runnable -> {
-			thread = new Thread(runnable, getThreadName());
-			return thread;
-		});
+		thread = new Thread(this::threadLoop, getThreadName());
+		thread.start();
 	}
+
+	private void threadLoop() {
+		while (isRunning) {
+			while (queue.size() > 0) {
+				Runnable task = this.queue.remove();
+				try {
+					task.run();
+				} catch (Throwable e) {
+					except(e);
+				}
+			}
+			if (isRunning) LockSupport.park(thread);
+		}
+
+		stopLatch.countDown();
+	}
+
 	
 	/**
 	 * Check if we're currently on the service thread.
 	 */
 	public boolean isOnThread() {
 		return Thread.currentThread().equals(thread);
+	}
+
+	public boolean isRunning() {
+		return isRunning;
 	}
 	
 	/**
@@ -44,42 +69,36 @@ public class ServiceProvider implements AutoCloseable {
 	 * @see ExecutorService#execute(Runnable)
 	 */
 	public void execute(Runnable r) {
+		if (r == null) throw new NullPointerException("Service provider can't execute null.");
+		if (!isRunning) throw new IllegalStateException("Can't execute on stopped service provider!");
+
 		if (isOnThread()) {
 			r.run();
 		} else {
-			executor.execute(r);
+			queue.add(r);
+			LockSupport.unpark(thread);
 		}
 	}
 
 	/**
-	 * Submits a value-returning task for execution on the service thread and returns a Future representing
-	 * the pending results of the task. TheFuture's get method will return the
-	 * task's result uponsuccessful completion.
+	 * Submits a value-returning task for execution on the service thread and
+	 * returns a completable future representing the pending results of the task.
 	 * 
-	 * If we're already on the service thread, executes it now and returns a Future that has already been completed.
+	 * If we're already on the service thread, executes it now and returns a future
+	 * that has already been completed.
 	 * 
-	 * @see ExecutorService#submit(Callable)
+	 * @param r The task to run.
 	 */
-	public <T> Future<T> submit(Callable<T> r) {
-		if (isOnThread()) {
-			CompletableFuture<T> future = new CompletableFuture<T>();
+	public <T> CompletableFuture<T> submit(Callable<T> r) {
+		CompletableFuture<T> future = new CompletableFuture<>();
+		execute(() -> {
 			try {
 				future.complete(r.call());
-			} catch (Exception e) {
-				LogManager.getLogger().error(e);
+			} catch (Throwable e) {
 				future.completeExceptionally(e);
 			}
-			return future;
-		} else {
-			return executor.submit(r);
-		}
-	}
-	
-	/**
-	 * Get the executor behind this service.
-	 */
-	public ExecutorService getExecutor() {
-		return executor;
+		});
+		return future;
 	}
 	
 	/**
@@ -96,20 +115,29 @@ public class ServiceProvider implements AutoCloseable {
 	public String getThreadName() {
 		return threadName;
 	}
+
+	/**
+	 * Called when an uncaught exception is thrown in the executor thread.
+	 * @param e The exception.
+	 */
+	protected void except(Throwable e) {
+		LogManager.getLogger().fatal("Uncaught error in "+getThreadName(), e);
+	}
 	
 	@Override
 	public void close() {
+		LogManager.getLogger().info("Shutting down executor service.");
+		isRunning = false;
 		try {
-			LogManager.getLogger().info("Shutting down executor service.");
-			executor.shutdown();
-			executor.awaitTermination(5, TimeUnit.SECONDS);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} finally {
-			if (!executor.isTerminated()) {
-				LogManager.getLogger().error("Executor service failed to close in time!");
+			boolean timeout = stopLatch.await(5, TimeUnit.SECONDS);
+
+			if (!timeout) {
+				LogManager.getLogger().error("Service provider thread failed to stop in time!");
+				thread.interrupt();
 			}
-			executor.shutdownNow(); 
+
+		} catch (InterruptedException e) {
+			LogManager.getLogger().error("Error awaiting service provider shutdown.", e);
 		}
 	}
 }
