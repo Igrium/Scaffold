@@ -19,10 +19,21 @@ import org.scaffoldeditor.scaffold.math.MathUtils;
 public interface BlockEntity {
 	
 	/**
+	 * <p>
 	 * Compile this entity's blocks into the world.
+	 * </p>
+	 * <p>
+	 * <b>Note about multithreading</b> In order to prevent race conditions, only
+	 * one entity will be asked to compile into any given <code>BlockWorld</code> at
+	 * a time. However, this might not happen on the primary Scaffold thread, and
+	 * multiple entities may compile into <i>different</i> <code>BlockWorld</code>
+	 * instances at once. Additionally, within their <code>compileWorld</code>
+	 * function, entity implementations <i>may</i> utilize multithreading at their
+	 * own discretion; however, no blocks may be placed in the world after this
+	 * method has returned.
 	 * 
-	 * @param world    The world to compile into. Note: this may be different than
-	 *                 the primary world the entity belongs to.
+	 * @param world    The world to compile into. <b>This may be different than
+	 *                 the primary world the entity belongs to.</b>
 	 * @param full     Whether or not this is a full compile. Long operations are
 	 *                 only allowed to run if this is true.
 	 * @param sections Limit compilation to these sections. This is an optimization
