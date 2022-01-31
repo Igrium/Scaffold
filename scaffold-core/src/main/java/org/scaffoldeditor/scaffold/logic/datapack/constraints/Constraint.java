@@ -2,7 +2,7 @@ package org.scaffoldeditor.scaffold.logic.datapack.constraints;
 
 import java.util.List;
 
-import org.scaffoldeditor.scaffold.level.entity.game.TargetSelectable;
+import org.scaffoldeditor.scaffold.entity.game.TargetSelectable;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.Command;
 
 /**

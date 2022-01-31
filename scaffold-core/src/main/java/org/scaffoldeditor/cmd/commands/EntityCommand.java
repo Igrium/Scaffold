@@ -4,9 +4,9 @@ import java.util.Collections;
 
 import org.joml.Vector3d;
 import org.scaffoldeditor.cmd.ScaffoldCommandSource;
+import org.scaffoldeditor.scaffold.entity.Entity;
+import org.scaffoldeditor.scaffold.entity.EntityRegistry;
 import org.scaffoldeditor.scaffold.level.Level;
-import org.scaffoldeditor.scaffold.level.entity.Entity;
-import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
 import org.scaffoldeditor.scaffold.level.stack.StackGroup;
 import org.scaffoldeditor.scaffold.level.stack.StackItem;
 import org.scaffoldeditor.scaffold.level.stack.StackItem.ItemType;

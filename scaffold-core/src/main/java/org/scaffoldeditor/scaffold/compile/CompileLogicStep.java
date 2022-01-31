@@ -6,9 +6,9 @@ import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.scaffoldeditor.scaffold.compile.Compiler.CompileProgressListener;
+import org.scaffoldeditor.scaffold.entity.Entity;
+import org.scaffoldeditor.scaffold.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.Level;
-import org.scaffoldeditor.scaffold.level.entity.Entity;
-import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.logic.Datapack;
 import org.scaffoldeditor.scaffold.logic.AbstractPack.OutputMode;
 import org.scaffoldeditor.scaffold.logic.datapack.Function;

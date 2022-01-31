@@ -5,8 +5,8 @@ import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.scaffoldeditor.scaffold.compile.Compiler.CompileProgressListener;
+import org.scaffoldeditor.scaffold.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.Level;
-import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 
 public class CompileWorldStep implements CompileStep {
 

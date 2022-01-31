@@ -8,7 +8,7 @@ import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
 import org.scaffoldeditor.scaffold.annotation.Attrib;
-import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
+import org.scaffoldeditor.scaffold.entity.attribute.Attribute;
 
 /**
  * <p>
@@ -59,7 +59,7 @@ public class AttributeHolder {
      * @param name The name of the attribute to check.
      * @return Is this attribute field-defined?
      */
-    public boolean hasFieldAttribute(String name) {
+    public boolean isFieldAttribute(String name) {
         return attributeFields.containsKey(name);
     }
     
@@ -117,9 +117,9 @@ public class AttributeHolder {
      * 
      * @param name  The name of the attribute to set.
      * @param value The value to set it to.
-     * @throws IllegalArgumentException If you attempt to assign an attribute to a
-     *                                  typed field that doesn't support said
-     *                                  attribute.
+     * @throws ClassCastException If you attempt to assign an attribute to a
+     *                            typed field that doesn't support said
+     *                            attribute.
      */
     public void setAttribute(String name, Attribute<?> value) {
         setAttributeInternal(name, value);
@@ -134,7 +134,8 @@ public class AttributeHolder {
         }
 
         if (!field.getType().isAssignableFrom(value.getClass())) {
-            throw new IllegalArgumentException("Attribute of type "+value.getClass().getSimpleName()+" is not assignable to a field of type "+field.getType().getSimpleName());
+            throw new ClassCastException("Attribute of type " + value.getClass().getSimpleName()
+                    + " is not assignable to a field of type " + field.getType().getSimpleName());
         }
         
         try {
@@ -159,6 +160,26 @@ public class AttributeHolder {
             setAttributeInternal(name, values.get(name));
         }
         onSetAttributes(values);
+    }
+
+    /**
+     * Get a <code>Class</code> object identifying the declared type for an
+     * attribute by this name.
+     * 
+     * @param name Name of the attribute to check.
+     * @return The attribute's type. Simply <code>Attribute</code> if this attribute
+     *         is not a field attribute (i.e. defined at runtime)
+     * @throws NullPointerException If no attribute is found by that name.
+     */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public Class<? extends Attribute> getAttributeType(String name) {
+        if (attributeFields.containsKey(name)) {
+            return (Class<Attribute>) attributeFields.get(name).getType();
+        } else if (additionalAttributes.containsKey(name)) {
+            return Attribute.class;
+        } else {
+            throw new NullPointerException("Unknown attribute: "+name);
+        }
     }
 
     /**

@@ -4,12 +4,11 @@ import org.scaffoldeditor.cmd.ScaffoldCommandSource;
 import org.scaffoldeditor.cmd.arguments.GamemodeArgumentType;
 import org.scaffoldeditor.cmd.arguments.PathArgumentType;
 import org.scaffoldeditor.scaffold.level.LevelData.GameType;
-import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
-import org.scaffoldeditor.scaffold.level.entity.attribute.BooleanAttribute;
-import org.scaffoldeditor.scaffold.level.entity.attribute.EnumAttribute;
 import org.scaffoldeditor.scaffold.compile.Compiler;
 import org.scaffoldeditor.scaffold.compile.Compiler.*;
-
+import org.scaffoldeditor.scaffold.entity.attribute.Attribute;
+import org.scaffoldeditor.scaffold.entity.attribute.BooleanAttribute;
+import org.scaffoldeditor.scaffold.entity.attribute.EnumAttribute;
 
 import static org.scaffoldeditor.cmd.CommandUtil.*;
 

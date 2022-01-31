@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.joml.Vector3dc;
+import org.scaffoldeditor.scaffold.entity.BrushEntity;
 import org.scaffoldeditor.scaffold.level.Level;
-import org.scaffoldeditor.scaffold.level.entity.BrushEntity;
 import org.scaffoldeditor.scaffold.util.ProgressListener;
 
 public class ResizeBrushesOperation implements Operation<Void> {

@@ -7,9 +7,9 @@ import org.apache.logging.log4j.LogManager;
 import org.joml.Vector3ic;
 import org.scaffoldeditor.nbt.util.NBTMerger;
 import org.scaffoldeditor.nbt.util.NBTMerger.ListMergeMode;
+import org.scaffoldeditor.scaffold.entity.Entity;
+import org.scaffoldeditor.scaffold.entity.info.PlayerStart;
 import org.scaffoldeditor.scaffold.io.AssetManager;
-import org.scaffoldeditor.scaffold.level.entity.Entity;
-import org.scaffoldeditor.scaffold.level.entity.info.PlayerStart;
 
 import net.querz.nbt.io.NBTDeserializer;
 import net.querz.nbt.io.NBTUtil;

@@ -4,8 +4,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.joml.Vector3dc;
-import org.scaffoldeditor.scaffold.level.entity.game.TargetSelectable;
 import org.scaffoldeditor.scaffold.logic.datapack.arguements.CommandVector.Mode;
+import org.scaffoldeditor.scaffold.entity.game.TargetSelectable;
 import org.scaffoldeditor.scaffold.logic.datapack.arguements.CommandVector3f;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.Command;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.ExecuteCommandBuilder;

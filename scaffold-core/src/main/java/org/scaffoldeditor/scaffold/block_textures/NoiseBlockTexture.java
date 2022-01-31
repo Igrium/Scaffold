@@ -7,11 +7,11 @@ import java.util.List;
 import java.util.Set;
 
 import org.scaffoldeditor.nbt.block.Block;
-import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
-import org.scaffoldeditor.scaffold.level.entity.attribute.BlockAttribute;
-import org.scaffoldeditor.scaffold.level.entity.attribute.DoubleAttribute;
-import org.scaffoldeditor.scaffold.level.entity.attribute.ListAttribute;
-import org.scaffoldeditor.scaffold.level.entity.attribute.LongAttribute;
+import org.scaffoldeditor.scaffold.entity.attribute.Attribute;
+import org.scaffoldeditor.scaffold.entity.attribute.BlockAttribute;
+import org.scaffoldeditor.scaffold.entity.attribute.DoubleAttribute;
+import org.scaffoldeditor.scaffold.entity.attribute.ListAttribute;
+import org.scaffoldeditor.scaffold.entity.attribute.LongAttribute;
 import org.scaffoldeditor.scaffold.math.OpenSimplex2S;
 
 public class NoiseBlockTexture extends SerializableBlockTexture {

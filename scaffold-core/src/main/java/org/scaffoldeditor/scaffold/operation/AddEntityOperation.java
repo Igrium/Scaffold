@@ -1,8 +1,8 @@
 package org.scaffoldeditor.scaffold.operation;
 
 import org.joml.Vector3dc;
+import org.scaffoldeditor.scaffold.entity.Entity;
 import org.scaffoldeditor.scaffold.level.Level;
-import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.util.ProgressListener;
 
 public class AddEntityOperation implements Operation<Entity> {

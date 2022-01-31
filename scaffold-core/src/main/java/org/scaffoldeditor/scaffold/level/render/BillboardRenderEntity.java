@@ -1,7 +1,7 @@
 package org.scaffoldeditor.scaffold.level.render;
 
 import org.joml.Vector3dc;
-import org.scaffoldeditor.scaffold.level.entity.Entity;
+import org.scaffoldeditor.scaffold.entity.Entity;
 
 /**
  * Tells the editor to render a "billboard". A billboard is a 2d texture that

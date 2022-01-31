@@ -2,7 +2,7 @@ package org.scaffoldeditor.scaffold.level.render;
 
 import org.joml.Vector3dc;
 import org.scaffoldeditor.nbt.util.MCEntity;
-import org.scaffoldeditor.scaffold.level.entity.Entity;
+import org.scaffoldeditor.scaffold.entity.Entity;
 
 /**
  * Represents an entity that can be simply rendered as a Minecraft entity.

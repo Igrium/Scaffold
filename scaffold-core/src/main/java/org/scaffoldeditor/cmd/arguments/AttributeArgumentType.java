@@ -6,9 +6,9 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 
-import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
-import org.scaffoldeditor.scaffold.level.entity.attribute.AttributeFactory;
-import org.scaffoldeditor.scaffold.level.entity.attribute.AttributeRegistry;
+import org.scaffoldeditor.scaffold.entity.attribute.Attribute;
+import org.scaffoldeditor.scaffold.entity.attribute.AttributeFactory;
+import org.scaffoldeditor.scaffold.entity.attribute.AttributeRegistry;
 
 public class AttributeArgumentType implements ArgumentType<Attribute<?>> {
 

@@ -6,7 +6,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.scaffoldeditor.nbt.block.Block;
-import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
+import org.scaffoldeditor.scaffold.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.serialization.XMLSerializable;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

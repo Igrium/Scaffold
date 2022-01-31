@@ -1,7 +1,7 @@
 package org.scaffoldeditor.scaffold.operation;
 
 import org.joml.Vector3dc;
-import org.scaffoldeditor.scaffold.level.entity.BrushEntity;
+import org.scaffoldeditor.scaffold.entity.BrushEntity;
 import org.scaffoldeditor.scaffold.util.ProgressListener;
 
 public class ResizeBrushOperation implements Operation<Void> {

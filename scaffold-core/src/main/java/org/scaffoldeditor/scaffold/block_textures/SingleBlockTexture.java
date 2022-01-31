@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.Set;
 
 import org.scaffoldeditor.nbt.block.Block;
-import org.scaffoldeditor.scaffold.level.entity.attribute.BlockAttribute;
+import org.scaffoldeditor.scaffold.entity.attribute.BlockAttribute;
 
 /**
  * A block texture representing a single block.

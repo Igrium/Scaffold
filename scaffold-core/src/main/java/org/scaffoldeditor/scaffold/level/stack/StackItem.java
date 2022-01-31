@@ -2,7 +2,7 @@ package org.scaffoldeditor.scaffold.level.stack;
 
 import java.util.Objects;
 
-import org.scaffoldeditor.scaffold.level.entity.Entity;
+import org.scaffoldeditor.scaffold.entity.Entity;
 import org.scaffoldeditor.scaffold.serialization.EntitySerializer;
 import org.scaffoldeditor.scaffold.serialization.XMLSerializable;
 import org.w3c.dom.Document;

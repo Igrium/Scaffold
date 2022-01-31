@@ -2,8 +2,9 @@ package org.scaffoldeditor.scaffold.operation;
 
 import java.io.IOException;
 import java.util.List;
+
+import org.scaffoldeditor.scaffold.entity.Entity;
 import org.scaffoldeditor.scaffold.level.Level;
-import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.stack.StackGroup;
 import org.scaffoldeditor.scaffold.level.stack.StackItem;
 import org.scaffoldeditor.scaffold.util.ClipboardManager;

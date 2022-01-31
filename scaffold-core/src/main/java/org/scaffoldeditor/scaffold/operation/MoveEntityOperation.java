@@ -1,7 +1,7 @@
 package org.scaffoldeditor.scaffold.operation;
 
 import org.joml.Vector3dc;
-import org.scaffoldeditor.scaffold.level.entity.Entity;
+import org.scaffoldeditor.scaffold.entity.Entity;
 import org.scaffoldeditor.scaffold.util.ProgressListener;
 
 @Deprecated

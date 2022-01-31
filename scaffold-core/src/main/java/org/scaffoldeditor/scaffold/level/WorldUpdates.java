@@ -5,7 +5,7 @@ import java.util.EventObject;
 import java.util.Set;
 
 import org.scaffoldeditor.nbt.block.WorldMath.SectionCoordinate;
-import org.scaffoldeditor.scaffold.level.entity.Entity;
+import org.scaffoldeditor.scaffold.entity.Entity;
 import org.scaffoldeditor.scaffold.level.render.RenderEntity;
 
 

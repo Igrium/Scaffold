@@ -2,7 +2,7 @@ package org.scaffoldeditor.scaffold.level.render;
 
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
-import org.scaffoldeditor.scaffold.level.entity.Entity;
+import org.scaffoldeditor.scaffold.entity.Entity;
 
 /**
  * An abstraction allowing Scaffold entities to tell the editor how they should

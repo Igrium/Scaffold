@@ -7,10 +7,10 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 
 import org.scaffoldeditor.cmd.ScaffoldCommandSource;
 import org.scaffoldeditor.cmd.arguments.AttributeArgumentType;
+import org.scaffoldeditor.scaffold.entity.Entity;
+import org.scaffoldeditor.scaffold.entity.attribute.Attribute;
+import org.scaffoldeditor.scaffold.entity.attribute.AttributeRegistry;
 import org.scaffoldeditor.scaffold.level.Level;
-import org.scaffoldeditor.scaffold.level.entity.Entity;
-import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
-import org.scaffoldeditor.scaffold.level.entity.attribute.AttributeRegistry;
 import org.scaffoldeditor.scaffold.operation.ChangeAttributesOperation;
 
 import static org.scaffoldeditor.cmd.CommandUtil.*;

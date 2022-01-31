@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.util.UUID;
 
 import org.scaffoldeditor.nbt.util.Identifier;
-import org.scaffoldeditor.scaffold.level.entity.Entity;
-import org.scaffoldeditor.scaffold.level.entity.game.KnownUUID;
+import org.scaffoldeditor.scaffold.entity.Entity;
+import org.scaffoldeditor.scaffold.entity.game.KnownUUID;
 import org.scaffoldeditor.scaffold.logic.datapack.TargetSelector;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.Command;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.DataCommandBuilder;

@@ -8,9 +8,9 @@ import java.util.Set;
 import org.joml.Vector3d;
 import org.joml.Vector3ic;
 import org.scaffoldeditor.nbt.block.WorldMath.SectionCoordinate;
+import org.scaffoldeditor.scaffold.entity.BlockEntity;
+import org.scaffoldeditor.scaffold.entity.Entity;
 import org.scaffoldeditor.scaffold.level.Level;
-import org.scaffoldeditor.scaffold.level.entity.BlockEntity;
-import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.stack.StackGroup;
 import org.scaffoldeditor.scaffold.math.MathUtils;
 

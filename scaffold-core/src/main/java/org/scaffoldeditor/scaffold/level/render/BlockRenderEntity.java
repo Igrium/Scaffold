@@ -2,7 +2,7 @@ package org.scaffoldeditor.scaffold.level.render;
 
 import org.joml.Vector3dc;
 import org.scaffoldeditor.nbt.block.BlockCollection;
-import org.scaffoldeditor.scaffold.level.entity.Entity;
+import org.scaffoldeditor.scaffold.entity.Entity;
 
 /**
  * Renders a collection of blocks as a holographic projection in the world. Does

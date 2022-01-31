@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
-import org.scaffoldeditor.scaffold.level.entity.attribute.AttributeRegistry;
+import org.scaffoldeditor.scaffold.entity.attribute.AttributeRegistry;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

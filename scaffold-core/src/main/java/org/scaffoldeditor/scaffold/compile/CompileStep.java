@@ -4,8 +4,8 @@ import java.nio.file.Path;
 import java.util.Map;
 
 import org.scaffoldeditor.scaffold.compile.Compiler.CompileProgressListener;
+import org.scaffoldeditor.scaffold.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.Level;
-import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 
 /**
  * A single step of the compilation process (ex. compiling entity logic)
