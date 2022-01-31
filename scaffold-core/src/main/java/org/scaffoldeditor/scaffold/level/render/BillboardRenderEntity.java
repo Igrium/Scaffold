@@ -1,6 +1,6 @@
 package org.scaffoldeditor.scaffold.level.render;
 
-import org.scaffoldeditor.nbt.math.Vector3f;
+import org.joml.Vector3dc;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 
 /**
@@ -28,7 +28,7 @@ public class BillboardRenderEntity extends RenderEntity {
 	 *                   (<code>[namespace]:textures/[texture].png</code>)
 	 * @param scale      Scale to render the billboard at, where 1.0 = 1 block.
 	 */
-	public BillboardRenderEntity(Entity entity, Vector3f position, String identifier, String texture, float scale) {
+	public BillboardRenderEntity(Entity entity, Vector3dc position, String identifier, String texture, float scale) {
 		super(entity, position, identifier);
 		this.texture = texture;
 		this.scale = scale;
@@ -46,7 +46,7 @@ public class BillboardRenderEntity extends RenderEntity {
 	 * @param texture    Namespaced texture to display on the billboard
 	 *                   (<code>[namespace]:textures/[texture].png</code>)
 	 */
-	public BillboardRenderEntity(Entity entity, Vector3f position, String identifier, String texture) {
+	public BillboardRenderEntity(Entity entity, Vector3dc position, String identifier, String texture) {
 		this(entity, position, identifier, texture, 1);
 	}
 

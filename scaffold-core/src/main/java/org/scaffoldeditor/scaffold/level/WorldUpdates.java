@@ -4,7 +4,7 @@ import java.util.EventListener;
 import java.util.EventObject;
 import java.util.Set;
 
-import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
+import org.scaffoldeditor.nbt.block.WorldMath.SectionCoordinate;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.render.RenderEntity;
 

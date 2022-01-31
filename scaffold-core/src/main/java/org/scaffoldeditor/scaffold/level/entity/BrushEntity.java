@@ -1,6 +1,6 @@
 package org.scaffoldeditor.scaffold.level.entity;
 
-import org.scaffoldeditor.nbt.math.Vector3f;
+import org.joml.Vector3dc;
 
 /**
  * Represents a box-shaped entity where the bounds can be manually resized.
@@ -13,13 +13,13 @@ public interface BrushEntity {
 	 * @param newBounds A two-element array denoting the opposite corners of the brush's bounding box.
 	 * @param suppressUpdate If true, block update listeners (compilers, etc) are not triggered.
 	 */
-	public void setBrushBounds(Vector3f[] newBounds, boolean suppressUpdate);
+	public void setBrushBounds(Vector3dc[] newBounds, boolean suppressUpdate);
 	
 	/**
 	 * Get the bounds of this brush in world space.
 	 * @return A two-element array denoting the opposite corners of the brush's bounding box.
 	 */
-	Vector3f[] getBrushBounds();
+	Vector3dc[] getBrushBounds();
 	
 	/**
 	 * Determine whether this entity is grid-locked. Being grid-locked means it's a

@@ -2,8 +2,8 @@ package org.scaffoldeditor.cmd.commands;
 
 import java.util.Collections;
 
+import org.joml.Vector3d;
 import org.scaffoldeditor.cmd.ScaffoldCommandSource;
-import org.scaffoldeditor.nbt.math.Vector3f;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
@@ -56,7 +56,7 @@ public class EntityCommand {
 							}
 							String name = StringArgumentType.getString(command, "name");
 							level.getOperationManager()
-									.execute(new AddEntityOperation(level, registryName, name, new Vector3f(0, 0, 0)));
+									.execute(new AddEntityOperation(level, registryName, name, new Vector3d(0, 0, 0)));
 							command.getSource().getOut().println("Created new "+registryName);
 							return 1;
 						})))

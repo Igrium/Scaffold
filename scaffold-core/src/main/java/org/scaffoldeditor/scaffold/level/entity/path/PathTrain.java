@@ -3,13 +3,12 @@ package org.scaffoldeditor.scaffold.level.entity.path;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.nbt.util.Identifier;
+import org.scaffoldeditor.scaffold.annotation.Attrib;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.EntityProvider;
@@ -50,13 +49,11 @@ public class PathTrain extends LogicEntity implements KnownUUID, EntityProvider 
 		super(level, name);	
 	}
 
-	@Override
-	public Map<String, Attribute<?>> getDefaultAttributes() {
-		Map<String, Attribute<?>> map = new HashMap<>();
-		map.put("starting_path_node", new EntityAttribute(""));
-		map.put("speed", new FloatAttribute(1));
-		return map;
-	}
+	@Attrib(name = "starting_path_node")
+	protected EntityAttribute startingPathNode = new EntityAttribute("");
+
+	@Attrib
+	protected FloatAttribute speed = new FloatAttribute(1f);
 	
 	@Override
 	public Collection<OutputDeclaration> getDeclaredOutputs() {
@@ -218,9 +215,9 @@ public class PathTrain extends LogicEntity implements KnownUUID, EntityProvider 
 			rotation.addFloat((float) rot[1]);
 			ent.put("Rotation", rotation);
 			
-			world.addEntity(ent, startingPath.getPosition().toDouble());
+			world.addEntity(ent, startingPath.getPosition());
 		} else {
-			world.addEntity(ent, getPosition().toDouble());
+			world.addEntity(ent, getPosition());
 		}
 		
 		return true;

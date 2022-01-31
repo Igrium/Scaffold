@@ -52,7 +52,7 @@ import org.scaffoldeditor.scaffold.level.entity.world.WorldStatic;
 import org.scaffoldeditor.scaffold.level.entity.world.WorldTogglable;
 import org.scaffoldeditor.scaffold.level.entity.world.SingleBlock;
 import org.scaffoldeditor.scaffold.level.entity.world.WorldBrush;
-import org.scaffoldeditor.scaffold.level.entity.world.WorldChunked;
+// import org.scaffoldeditor.scaffold.level.entity.world.WorldChunked;
 import org.scaffoldeditor.scaffold.level.entity.world.WorldDynamic;
 
 public class DefaultPlugin implements PluginInitializer {
@@ -64,7 +64,7 @@ public class DefaultPlugin implements PluginInitializer {
 		
 		/* ENTITIES */
 		WorldStatic.register();
-		WorldChunked.register();
+		// WorldChunked.register();
 		WorldBrush.register();
 		SingleBlock.register();
 		Auto.register();

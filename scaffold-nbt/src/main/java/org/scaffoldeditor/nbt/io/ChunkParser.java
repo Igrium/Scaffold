@@ -4,13 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
+import org.joml.Vector3d;
+import org.joml.Vector3ic;
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.Chunk;
-import org.scaffoldeditor.nbt.math.Vector3d;
-import org.scaffoldeditor.nbt.math.Vector3i;
+import org.scaffoldeditor.nbt.block.WorldMath.ChunkCoordinate;
 import org.scaffoldeditor.nbt.util.BlockEntityUtils;
-import org.scaffoldeditor.nbt.util.Pair;
-import org.scaffoldeditor.nbt.block.BlockWorld.ChunkCoordinate;
 
 import net.querz.nbt.tag.CompoundTag;
 import net.querz.nbt.tag.DoubleTag;
@@ -229,7 +228,7 @@ public class ChunkParser {
 		
 		// Write tile entities.
 		ListTag<CompoundTag> tileEntities = new ListTag<>(CompoundTag.class);
-		for (Vector3i coord : chunk.blockEntities.keySet()) {
+		for (Vector3ic coord : chunk.blockEntities.keySet()) {
 			CompoundTag nbt = chunk.blockEntities.get(coord).clone();
 			BlockEntityUtils.injectCoordinates(nbt, new ChunkCoordinate(x, z).resolve(coord));
 			tileEntities.add(nbt);
@@ -268,9 +267,8 @@ public class ChunkParser {
 		CompoundTag data = new CompoundTag();
 		ChunkCoordinate coord = new ChunkCoordinate(x, z);
 		ListTag<CompoundTag> entities = new ListTag<>(CompoundTag.class);
-		for (Pair<CompoundTag, Vector3d> ent : chunk.entities) {
-			CompoundTag nbt = ent.getFirst().clone();
-			nbt.put("Pos", writeEntPos(ent.getSecond().add(coord.getStartPos().toDouble())));
+		for (CompoundTag nbt : chunk.entities.keySet()) {
+			nbt.put("Pos", writeEntPos(new Vector3d(coord.getStartPos()).add(chunk.entities.get(nbt))));
 			entities.add(nbt);
 		}
 		

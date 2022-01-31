@@ -3,11 +3,13 @@ package org.scaffoldeditor.scaffold.level.entity;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.joml.Vector3d;
+import org.joml.Vector3dc;
+import org.joml.Vector3ic;
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.BlockWorld;
-import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
-import org.scaffoldeditor.nbt.math.Vector3f;
-import org.scaffoldeditor.nbt.math.Vector3i;
+import org.scaffoldeditor.nbt.block.WorldMath.SectionCoordinate;
+
 import org.scaffoldeditor.scaffold.math.MathUtils;
 
 /**
@@ -17,10 +19,21 @@ import org.scaffoldeditor.scaffold.math.MathUtils;
 public interface BlockEntity {
 	
 	/**
+	 * <p>
 	 * Compile this entity's blocks into the world.
+	 * </p>
+	 * <p>
+	 * <b>Note about multithreading</b> In order to prevent race conditions, only
+	 * one entity will be asked to compile into any given <code>BlockWorld</code> at
+	 * a time. However, this might not happen on the primary Scaffold thread, and
+	 * multiple entities may compile into <i>different</i> <code>BlockWorld</code>
+	 * instances at once. Additionally, within their <code>compileWorld</code>
+	 * function, entity implementations <i>may</i> utilize multithreading at their
+	 * own discretion; however, no blocks may be placed in the world after this
+	 * method has returned.
 	 * 
-	 * @param world    The world to compile into. Note: this may be different than
-	 *                 the primary world the entity belongs to.
+	 * @param world    The world to compile into. <b>This may be different than
+	 *                 the primary world the entity belongs to.</b>
 	 * @param full     Whether or not this is a full compile. Long operations are
 	 *                 only allowed to run if this is true.
 	 * @param sections Limit compilation to these sections. This is an optimization
@@ -49,14 +62,14 @@ public interface BlockEntity {
 	 * @param coord Location to check, in local space.
 	 * @return The block at the requested location. Null if the entity doesn't care what's in this location.
 	 */
-	Block blockAt(Vector3i coord);
+	Block blockAt(Vector3ic coord);
 	
 	/**
 	 * Get the bounds of this block entity in world space. Used for determining when it has to be recompiled.
 	 * @return A two-element array denoting the opposite corners of the entity's bounding box. The first 
 	 * element should be the minimum coordinate and the second element should be the maximum coordinate.
 	 */
-	Vector3i[] getBounds();
+	Vector3ic[] getBounds();
 	
 	/**
 	 * Check if this block entity overlaps a certian area.
@@ -64,14 +77,14 @@ public interface BlockEntity {
 	 * @param point2 x2, z2
 	 * @return Is overlapping?
 	 */
-	default boolean overlapsArea(float[] point1, float[] point2) {
+	default boolean overlapsArea(double[] point1, double[] point2) {
 		// Math reference: https://developer.mozilla.org/en-US/docs/Games/Techniques/3D_collision_detection
-		Vector3i[] bounds = getBounds();
-		boolean x = (Math.min(bounds[0].x, bounds[1].x) <= Math.max(point1[0], point2[0]) &&
-				Math.max(bounds[0].x, bounds[1].x) >= Math.min(point1[0], point2[0]));
+		Vector3ic[] bounds = getBounds();
+		boolean x = (Math.min(bounds[0].x(), bounds[1].x()) <= Math.max(point1[0], point2[0]) &&
+				Math.max(bounds[0].x(), bounds[1].x()) >= Math.min(point1[0], point2[0]));
 		
-		boolean z = (Math.min(bounds[0].z, bounds[1].z) <= Math.max(point1[1], point2[1]) &&
-				Math.max(bounds[0].z, bounds[1].z) >= Math.min(point1[1], point2[1]));
+		boolean z = (Math.min(bounds[0].z(), bounds[1].z()) <= Math.max(point1[1], point2[1]) &&
+				Math.max(bounds[0].z(), bounds[1].z()) >= Math.min(point1[1], point2[1]));
 		
 		return (x && z);
 	}
@@ -81,11 +94,11 @@ public interface BlockEntity {
 	 * @param point1 Min point of the volume.
 	 * @param point2 Max point of the volume.
 	 */
-	default boolean overlapsVolume(Vector3f point1, Vector3f point2) {
+	default boolean overlapsVolume(Vector3dc point1, Vector3dc point2) {
 		// Math reference:
 		// https://developer.mozilla.org/en-US/docs/Games/Techniques/3D_collision_detection
-		Vector3i[] bounds = getBounds();
-		return MathUtils.detectCollision(bounds[0].toFloat(), bounds[1].toFloat(), point1, point2);
+		Vector3ic[] bounds = getBounds();
+		return MathUtils.detectCollision(new Vector3d(bounds[0]), new Vector3d(bounds[1]), point1, point2);
 	}
 	
 	/**
@@ -93,13 +106,13 @@ public interface BlockEntity {
 	 * @return A set of all overlapping sections.
 	 */
 	default Set<SectionCoordinate> getOverlappingSections() {
-		Vector3i[] bounds = getBounds();
+		Vector3ic[] bounds = getBounds();
 		Set<SectionCoordinate> overlapping = new HashSet<>();
-		Vector3i min = bounds[0].toFloat().divide(16).floor();
-		Vector3i max = bounds[1].toFloat().divide(16).floor();
-		for (int x = min.x; x <= max.x; x++) {
-			for (int y = min.y; y <= max.y; y++) {
-				for (int z = min.z; z <= max.z; z++) {
+		Vector3ic min = MathUtils.floorVector(new Vector3d(bounds[0]).div(16));
+		Vector3ic max = MathUtils.floorVector(new Vector3d(bounds[1]).div(16));
+		for (int x = min.x(); x <= max.x(); x++) {
+			for (int y = min.y(); y <= max.y(); y++) {
+				for (int z = min.z(); z <= max.z(); z++) {
 					overlapping.add(new SectionCoordinate(x, y, z));
 				}
 			}

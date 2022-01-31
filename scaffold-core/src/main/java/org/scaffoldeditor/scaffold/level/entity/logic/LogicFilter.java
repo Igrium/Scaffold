@@ -1,10 +1,9 @@
 package org.scaffoldeditor.scaffold.level.entity.logic;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import org.scaffoldeditor.scaffold.annotation.Attrib;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
@@ -25,6 +24,9 @@ public class LogicFilter extends LogicEntity {
 	public LogicFilter(Level level, String name) {
 		super(level, name);
 	}
+
+	@Attrib
+	FilterAttribute filter = new FilterAttribute();
 	
 	@Override
 	public Collection<OutputDeclaration> getDeclaredOutputs() {
@@ -57,13 +59,6 @@ public class LogicFilter extends LogicEntity {
 	
 	public ExecuteCommandBuilder getFilter() {
 		return ((FilterAttribute) getAttribute("filter")).getValue();
-	}
-
-	@Override
-	public Map<String, Attribute<?>> getDefaultAttributes() {
-		Map<String, Attribute<?>> map = new HashMap<>();
-		map.put("filter", new FilterAttribute());
-		return map;
 	}
 	
 	@Override

@@ -9,8 +9,8 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.BlockWorld;
-import org.scaffoldeditor.nbt.block.BlockWorld.ChunkCoordinate;
 import org.scaffoldeditor.nbt.block.Chunk;
+import org.scaffoldeditor.nbt.block.WorldMath.ChunkCoordinate;
 
 import net.querz.mca.MCAFile;
 import net.querz.mca.MCAUtil;

@@ -4,22 +4,18 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.logging.log4j.LogManager;
 import org.scaffoldeditor.scaffold.level.Level;
-import org.scaffoldeditor.scaffold.level.entity.BlockEntity;
-import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.stack.StackGroup;
 import org.scaffoldeditor.scaffold.level.stack.StackItem;
+import org.scaffoldeditor.scaffold.util.ProgressListener;
 
-public class DeleteGroupOperation implements Operation {
+public class DeleteGroupOperation implements Operation<Void> {
 	
 	Level level;
 	Set<StackGroup> groups;
-	private boolean recompile = false;
 	
 	private Map<StackGroup, StackGroup> groupCache = new HashMap<>();
 	private Map<StackGroup, Integer> indexCache = new HashMap<>();
-	private boolean success = false;
 	
 	public DeleteGroupOperation(Level level, Set<StackGroup> groups) {
 		this.level = level;
@@ -27,51 +23,34 @@ public class DeleteGroupOperation implements Operation {
 	}
 
 	@Override
-	public boolean execute() {
+	public Void execute(ProgressListener listener) {
 		for (StackGroup group : groups) {
 			StackGroup owner = level.getLevelStack().getOwningGroup(new StackItem(group));
 			if (owner == null) {
-				LogManager.getLogger().error("Unable to delete group: "+group+" because it is not in the level!");
-				return false;
+				throw new IllegalStateException("Unable to delete group: "+group+" because it is not in the level!");
 			}
 			
 			groupCache.put(group, owner);
 			indexCache.put(group, owner.items.indexOf(new StackItem(group)));
-			
-			for (Entity entity : group) {
-				if (entity instanceof BlockEntity) recompile = true;
-			}
-			
-			if (level.removeGroup(group, true)) success = true;
 		}
 		level.updateLevelStack();
-		
-		if (success && recompile && level.autoRecompile) {
-			level.quickRecompile();
-		}
-		return success;
+		return null;
 	}
 
 	@Override
 	public void undo() {
 		for (StackGroup group : groups) {
-			level.addGroup(group, groupCache.get(group), indexCache.get(group), true);
+			level.addGroup(group, groupCache.get(group), indexCache.get(group));
 		}
 		level.updateLevelStack();
-		if (recompile && level.autoRecompile) {
-			level.quickRecompile();
-		}
 	}
 
 	@Override
 	public void redo() {
 		for (StackGroup group : groups) {
-			level.removeGroup(group, true);
+			level.removeGroup(group);
 		}
 		level.updateLevelStack();
-		if (recompile && level.autoRecompile) {
-			level.quickRecompile();
-		}
 	}
 
 	@Override

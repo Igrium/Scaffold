@@ -5,18 +5,28 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
+import org.joml.Vector3d;
+import org.joml.Vector3dc;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
+import org.scaffoldeditor.nbt.block.WorldMath.ChunkCoordinate;
+import org.scaffoldeditor.nbt.block.WorldMath.SectionCoordinate;
 import org.scaffoldeditor.nbt.io.ChunkParser;
 import org.scaffoldeditor.nbt.io.WorldInputStream;
 import org.scaffoldeditor.nbt.io.WorldOutputStream;
-import org.scaffoldeditor.nbt.math.Vector3d;
-import org.scaffoldeditor.nbt.math.Vector3i;
-import org.scaffoldeditor.nbt.util.Pair;
+import org.scaffoldeditor.nbt.math.MathUtils;
 
 import net.querz.nbt.tag.CompoundTag;
 import net.querz.nbt.tag.DoubleTag;
@@ -29,93 +39,6 @@ import net.querz.nbt.tag.ListTag;
 public class BlockWorld implements ChunkedBlockCollection {
 	
 	private static Logger LOGGER = LogManager.getLogger();
-	
-	/**
-	 * Class to represent chunk coordinate pairs.
-	 * @author Igrium
-	 */
-	public static class ChunkCoordinate implements Comparable<ChunkCoordinate> {
-		public final int x;
-		public final int z;
-		
-		public ChunkCoordinate(int x, int z) {
-			this.x = x;
-			this.z = z;
-		}
-		
-		public ChunkCoordinate(SectionCoordinate c) {
-			this.x = c.x;
-			this.z = c.z;
-		}
-		
-		public int x() {
-			return x;
-		}
-		
-		public int z() {
-			return z;
-		}
-		
-		public int getStartX() {
-			return x * Chunk.WIDTH;
-		}
-		
-		public int getStartZ() {
-			return z * Chunk.LENGTH;
-		}
-		
-		public int getEndX() {
-			return getStartX() + Chunk.WIDTH;
-		}
-		
-		public int getEndZ() {
-			return getStartZ() + Chunk.LENGTH;
-		}
-		
-		public Vector3i getStartPos() {
-			return new Vector3i(getStartX(), 0, getStartZ());
-		}
-		
-		public Vector3i getEndPos() {
-			return new Vector3i(getEndX(), Chunk.HEIGHT, getEndZ());
-		}
-		
-		public Vector3i relativize(Vector3i vec) {
-			return new Vector3i(vec.x - getStartX(), vec.y, vec.z - getStartZ());
-		}
-		
-		public Vector3i resolve(Vector3i vec) {
-			return new Vector3i(vec.x + getStartX(), vec.y, vec.z + getStartZ());
-		}
-		
-		@Override
-		public boolean equals(Object obj) {
-			if (!(obj instanceof ChunkCoordinate)) {
-				return false;
-			}
-			ChunkCoordinate chunkCoordinate = (ChunkCoordinate) obj;
-			return chunkCoordinate.x() == x && chunkCoordinate.z() == z;
-		}
-		
-		@Override
-		public int hashCode() {
-			return Objects.hash(x, z);
-		}
-
-		@Override
-		public int compareTo(ChunkCoordinate o) {
-			if (z == o.z) {
-				return x - o.x;
-			} else {
-				return z - o.z;
-			}
-		}
-		
-		@Override
-		public String toString() {
-			return "["+x+", "+z+"]";
-		}
-	}
 
 	// Chunks are stored in a map with a 2 index long array of their coordinates
 	private Map<ChunkCoordinate, Chunk> chunks = new HashMap<ChunkCoordinate, Chunk>();
@@ -227,9 +150,9 @@ public class BlockWorld implements ChunkedBlockCollection {
 	 * @param coord Section to remove.
 	 */
 	public void clearSection(SectionCoordinate coord) {
-		Chunk chunk = chunkAt(coord.x, coord.z);
+		Chunk chunk = chunkAt(coord.x(), coord.z());
 		if (chunk == null) return;
-		chunk.clearSection(coord.y);
+		chunk.clearSection(coord.y());
 	}
 	
 	/**
@@ -252,10 +175,10 @@ public class BlockWorld implements ChunkedBlockCollection {
 	public void addBlockCollection(BlockCollection collection, int x, int y, int z, boolean override, boolean placeAir, Object owner) {
 		Vector3i targetCoord = new Vector3i(x, y, z);
 		LogManager.getLogger().debug("Adding block collection...");
-		for (Vector3i coord : collection) {
-			int globalX = x + coord.x;
-			int globalY = y + coord.y;
-			int globalZ = z + coord.z;
+		for (Vector3ic coord : collection) {
+			int globalX = x + coord.x();
+			int globalY = y + coord.y();
+			int globalZ = z + coord.z();
 			
 			Block oldBlock = blockAt(globalX, globalY, globalZ); // For if override is disabled.
 			Block newBlock = collection.blockAt(coord);
@@ -268,7 +191,7 @@ public class BlockWorld implements ChunkedBlockCollection {
 		}
 		
 		// Block entities
-		for (Vector3i ent : collection.getBlockEntities()) {
+		for (Vector3ic ent : collection.getBlockEntities()) {
 			addBlockEntity(targetCoord.add(ent), collection.blockEntityAt(ent));
 		}
 	}
@@ -350,31 +273,30 @@ public class BlockWorld implements ChunkedBlockCollection {
 	}
 
 	
-	public void addEntity(CompoundTag entity, Vector3d pos) {
-		ChunkCoordinate chunkKey = chunkAtCoord((int) pos.x, (int) pos.z);
+	public void addEntity(CompoundTag entity, Vector3dc pos) {
+		ChunkCoordinate chunkKey = chunkAtCoord((int) pos.x(), (int) pos.z());
 		Chunk chunk = chunks.get(chunkKey);
 		if (chunk == null) {
 			chunk = new Chunk();
 			chunks.put(chunkKey, chunk);
 		}
-		chunk.entities.add(new Pair<CompoundTag, Vector3d>(entity, new Vector3d(pos.x - chunkKey.getStartX(), pos.y, pos.z - chunkKey.getStartZ())));
+		chunk.entities.put(entity, new Vector3d(pos.x() - chunkKey.getStartX(), pos.y(), pos.z() - chunkKey.getStartZ()));
 	}
 	
 	public void removeEntity(CompoundTag entity) {
 		ListTag<DoubleTag> posList = entity.getListTag("Pos").asDoubleTagList();
-		Vector3i pos = new Vector3d(posList.get(0).asDouble(), posList.get(1).asDouble(), posList.get(2).asDouble()).floor();
+		Vector3i pos = MathUtils.floorVector(new Vector3d(posList.get(0).asDouble(), posList.get(1).asDouble(), posList.get(2).asDouble()));
 		
 		Chunk chunk = chunks.get(chunkAtCoord(pos.x, pos.z));
-		Pair<CompoundTag, Vector3d> removal = null;
+		CompoundTag remove = null;
 		if (chunk != null) {
-			for (Pair<CompoundTag, Vector3d> p : chunk.entities) {
-				if (p.getFirst().equals(entity)) {
-					removal = p;
-					break;
+			for (CompoundTag nbt : chunk.entities.keySet()) {
+				if (nbt.equals(entity)) {
+					remove = nbt;
 				}
 			}
-			if (removal != null) chunk.entities.remove(removal);
 		}
+		if (remove != null) chunk.entities.remove(remove);
 
 	}
 	
@@ -385,14 +307,14 @@ public class BlockWorld implements ChunkedBlockCollection {
 	 * @param pos Global position.
 	 * @param nbt NBT of block entity.
 	 */
-	public void addBlockEntity(Vector3i pos, CompoundTag nbt) {
-		ChunkCoordinate chunkCoord = chunkAtCoord(pos.x, pos.z);
+	public void addBlockEntity(Vector3ic pos, CompoundTag nbt) {
+		ChunkCoordinate chunkCoord = chunkAtCoord(pos.x(), pos.z());
 		Chunk chunk = chunks.get(chunkCoord);
 		if (chunk == null) {
 			chunk = new Chunk();
 			chunks.put(chunkCoord, chunk);
 		}
-		chunk.blockEntities.put(new Vector3i(pos.x - chunkCoord.getStartX(), pos.y, pos.z - chunkCoord.getStartZ()),
+		chunk.blockEntities.put(new Vector3i(pos.x() - chunkCoord.getStartX(), pos.y(), pos.z() - chunkCoord.getStartZ()),
 				nbt);
 	}
 
@@ -602,8 +524,8 @@ public class BlockWorld implements ChunkedBlockCollection {
 	}
 
 	@Override
-	public Iterator<Vector3i> iterator() {
-		return null;
+	public Iterator<Vector3ic> iterator() {
+		throw new UnsupportedOperationException("Iterating over entire block world hasn't been implemented yet.");
 	}
 
 	@Override
@@ -622,8 +544,8 @@ public class BlockWorld implements ChunkedBlockCollection {
 	}
 
 	@Override
-	public Set<Vector3i> getSections() {
-		Set<Vector3i> sections = new HashSet<>();
+	public Set<Vector3ic> getSections() {
+		Set<Vector3ic> sections = new HashSet<>();
 		for (ChunkCoordinate c : chunks.keySet()) {
 			for (int i = 0; i < Chunk.HEIGHT / Section.HEIGHT; i++) {
 				sections.add(new SectionCoordinate(c, i));

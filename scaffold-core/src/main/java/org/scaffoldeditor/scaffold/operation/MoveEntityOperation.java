@@ -1,33 +1,34 @@
 package org.scaffoldeditor.scaffold.operation;
 
-import org.scaffoldeditor.nbt.math.Vector3f;
+import org.joml.Vector3dc;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
+import org.scaffoldeditor.scaffold.util.ProgressListener;
 
 @Deprecated
-public class MoveEntityOperation implements Operation {
+public class MoveEntityOperation implements Operation<Void> {
 	private Entity target;
-	private Vector3f newPosition;
+	private Vector3dc newPosition;
 	
-	private Vector3f oldPosition;
+	private Vector3dc oldPosition;
 	
-	public MoveEntityOperation(Entity target, Vector3f newPosition) {
+	public MoveEntityOperation(Entity target, Vector3dc newPosition) {
 		this.target = target;
 		this.newPosition = newPosition;
 	}
 	
-	public MoveEntityOperation(Entity target, Vector3f oldPosition, Vector3f newPosition) {
+	public MoveEntityOperation(Entity target, Vector3dc oldPosition, Vector3dc newPosition) {
 		this.target = target;
 		this.oldPosition = oldPosition;
 		this.newPosition = newPosition;
 	}
 
 	@Override
-	public boolean execute() {
+	public Void execute(ProgressListener listener) {
 		if (oldPosition == null) {
 			oldPosition = target.getPosition();	
 		}
 		target.setPosition(newPosition);
-		return true;
+		return null;
 	}
 
 	@Override

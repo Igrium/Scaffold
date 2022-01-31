@@ -1,5 +1,6 @@
 package org.scaffoldeditor.scaffold.serialization;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.scaffoldeditor.scaffold.level.Level;
@@ -34,11 +35,11 @@ public class EntitySerializer implements XMLSerializable {
 		Element root = document.createElement(entity.registryName);
 		root.setAttribute("name", entity.getName());
 		
-		Map<String, Attribute<?>> defaults = entity.getDefaultAttributes();
+		// Map<String, Attribute<?>> defaults = entity.getDefaultAttributes();
 		Element attributes = document.createElement("attributes");
 		for (String name : entity.getAttributes()) {
 			Attribute<?> att = entity.getAttribute(name);
-			if (att.equals(defaults.get(name))) continue;
+			// if (att.equals(defaults.get(name))) continue;
 			
 			try {
 				Element attribute = att.serialize(document);
@@ -87,7 +88,7 @@ public class EntitySerializer implements XMLSerializable {
 			}
 		}
 		entity.onUnserialized(xml);
-		entity.onUpdateAttributes(true);
+		// entity.onUpdateAttributes(true);
 		return entity;
 	}
 	
@@ -103,21 +104,23 @@ public class EntitySerializer implements XMLSerializable {
 	public static Entity deserialize(Element xml, Level level) {
 		Entity entity = loadEntity(xml, level);
 		if (entity == null) return null;
-		level.addEntity(entity, true);
+		level.addEntity(entity);
 		
 		return entity;
 	}
 	
 	private static void loadAttributes(Element xml, Entity entity) {
 		NodeList children = xml.getChildNodes();
+		Map<String, Attribute<?>> attributes = new HashMap<>();
 		for (int i = 0; i < children.getLength(); i++) {
 			Node child = children.item(i);
 			if (child.getNodeType() == Node.ELEMENT_NODE) {
 				Element element = (Element) child;
 				Attribute<?> attribute = AttributeRegistry.deserializeAttribute(element);
-				entity.setAttribute(element.getAttribute("name"), attribute, true);
+				attributes.put(element.getAttribute("name"), attribute);
 			}
 		}
+		entity.setAttributes(attributes);
 	}
 	
 	private static void loadOutputs(Element xml, Entity entity) {

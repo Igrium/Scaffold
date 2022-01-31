@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.logging.log4j.LogManager;
-import org.scaffoldeditor.nbt.math.Vector3i;
+import org.joml.Vector3ic;
 import org.scaffoldeditor.nbt.util.NBTMerger;
 import org.scaffoldeditor.nbt.util.NBTMerger.ListMergeMode;
 import org.scaffoldeditor.scaffold.io.AssetManager;
@@ -132,10 +132,10 @@ public class LevelData {
 		}
 		
 		if (start != null) {
-			Vector3i startPos = start.getBlockPosition();
-			data.putInt("SpawnX", startPos.x);
-			data.putInt("SpawnY", startPos.y);
-			data.putInt("SpawnZ", startPos.z);
+			Vector3ic startPos = start.getBlockPosition();
+			data.putInt("SpawnX", startPos.x());
+			data.putInt("SpawnY", startPos.y());
+			data.putInt("SpawnZ", startPos.z());
 		}
 		
 		data.putBoolean("allowCommands", cheats);

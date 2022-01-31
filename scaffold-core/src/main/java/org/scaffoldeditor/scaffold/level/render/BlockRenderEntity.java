@@ -1,7 +1,7 @@
 package org.scaffoldeditor.scaffold.level.render;
 
+import org.joml.Vector3dc;
 import org.scaffoldeditor.nbt.block.BlockCollection;
-import org.scaffoldeditor.nbt.math.Vector3f;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 
 /**
@@ -28,7 +28,7 @@ public class BlockRenderEntity extends RenderEntity {
 	 *                   Only one instance of this string may exist per Scaffold
 	 *                   entity. Different Scaffold entities may share identifiers.
 	 */
-	public BlockRenderEntity(Entity entity, BlockCollection blocks, Vector3f position, Vector3f rotation, String identifier) {
+	public BlockRenderEntity(Entity entity, BlockCollection blocks, Vector3dc position, Vector3dc rotation, String identifier) {
 		super(entity, position, rotation, identifier);
 		this.blocks = blocks;
 	}

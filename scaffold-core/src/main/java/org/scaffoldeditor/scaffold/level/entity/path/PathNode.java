@@ -2,19 +2,18 @@ package org.scaffoldeditor.scaffold.level.entity.path;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import org.joml.Vector3d;
+import org.joml.Vector3dc;
 import org.scaffoldeditor.nbt.block.BlockWorld;
-import org.scaffoldeditor.nbt.math.Vector3f;
+import org.scaffoldeditor.scaffold.annotation.Attrib;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.EntityProvider;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
-import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.EntityAttribute;
 import org.scaffoldeditor.scaffold.level.entity.game.KnownUUID;
 import org.scaffoldeditor.scaffold.level.entity.logic.LogicEntity;
@@ -50,14 +49,10 @@ public class PathNode extends LogicEntity implements KnownUUID, EntityProvider {
 	public static final String PASSED_OUTPUT = "on_passed";
 	
 	// for updating render entities
-	private Vector3f nextPos;
+	private Vector3dc nextPos;
 
-	@Override
-	public Map<String, Attribute<?>> getDefaultAttributes() {
-		Map<String, Attribute<?>> map = new HashMap<>();
-		map.put("next", new EntityAttribute(""));
- 		return map;
-	}
+	@Attrib
+	protected EntityAttribute next = new EntityAttribute("");
 	
 	@Override
 	public Collection<OutputDeclaration> getDeclaredOutputs() {
@@ -153,7 +148,7 @@ public class PathNode extends LogicEntity implements KnownUUID, EntityProvider {
 		PathNode target = getNext();
 		if (target == null) return new double[] { 0, 0 };
 		
-		return MathUtils.getFacingAngle(target.getPosition().subtract(getPosition()).toDouble());
+		return MathUtils.getFacingAngle(target.getPosition().sub(getPosition(), new Vector3d()));
 	}
 
 	@Override
@@ -173,7 +168,7 @@ public class PathNode extends LogicEntity implements KnownUUID, EntityProvider {
 
 	@Override
 	public boolean compileGameEntities(BlockWorld world) {
-		world.addEntity(getEntity(), getPosition().toDouble());
+		world.addEntity(getEntity(), getPosition());
 		return true;
 	}
 	

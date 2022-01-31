@@ -1,14 +1,15 @@
 package org.scaffoldeditor.scaffold.operation;
 
+import java.io.IOException;
 import java.util.List;
-import org.apache.logging.log4j.LogManager;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.stack.StackGroup;
 import org.scaffoldeditor.scaffold.level.stack.StackItem;
 import org.scaffoldeditor.scaffold.util.ClipboardManager;
+import org.scaffoldeditor.scaffold.util.ProgressListener;
 
-public class PasteEntitiesOperation implements Operation {
+public class PasteEntitiesOperation implements Operation<List<StackItem>> {
 	
 	private Level level;
 	private List<StackItem> pastedItems;
@@ -20,14 +21,9 @@ public class PasteEntitiesOperation implements Operation {
 	}
 
 	@Override
-	public boolean execute() {
-		try {
-			pastedItems = ClipboardManager.getInstance().paste(level, parent);
-			return true;
-		} catch (Throwable e) {
-			LogManager.getLogger().error(e);
-			return false;
-		}
+	public List<StackItem> execute(ProgressListener listener) throws IOException {
+		pastedItems = ClipboardManager.getInstance().paste(level, parent);
+		return pastedItems;
 	}
 
 	@Override
@@ -39,10 +35,6 @@ public class PasteEntitiesOperation implements Operation {
 		}
 		
 		level.updateLevelStack();
-		
-		if (level.autoRecompile) {
-			level.quickRecompile();
-		}
 	}
 
 	@Override
@@ -54,10 +46,6 @@ public class PasteEntitiesOperation implements Operation {
 		}
 		
 		level.updateLevelStack();
-		
-		if (level.autoRecompile) {
-			level.quickRecompile();
-		}
 	}
 
 	@Override

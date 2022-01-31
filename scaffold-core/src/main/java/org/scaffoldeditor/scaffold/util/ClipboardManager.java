@@ -151,9 +151,7 @@ public class ClipboardManager {
 				if (!oldName.equals(newName)) {
 					entity.setName(newName);
 					for (Entity ent : group) {
-						// We don't want to recompile because they haven't been added to the world yet.
-						ent.refactorName(oldName, newName, true);
-						ent.onUpdateAttributes(true);
+						ent.refactorName(oldName, newName);
 					}
 				}
 				
@@ -195,9 +193,7 @@ public class ClipboardManager {
 			}
 			parent.items.addAll(parsed);
 			level.updateLevelStack();
-			if (level.autoRecompile) {
-				level.quickRecompile();
-			}
+
 			return parsed;
 		} else {
 			return Collections.emptyList();

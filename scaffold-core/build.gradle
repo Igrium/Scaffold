@@ -12,10 +12,10 @@ plugins {
     id 'application'
 }
 
-sourceCompatibility = JavaVersion.VERSION_17
-targetCompatibility = JavaVersion.VERSION_17
+sourceCompatibility = JavaVersion.VERSION_16
+targetCompatibility = JavaVersion.VERSION_16
 
-version = '0.5.0-SNAPSHOT'
+version = '0.6.0-SNAPSHOT'
 group = 'org.scaffoldeditor'
 
 dependencies {
@@ -28,6 +28,7 @@ dependencies {
 
     implementation group: 'commons-io', name: 'commons-io', version: '2.6'
     api group: 'com.mojang', name: 'brigadier', version: '1.0.18'
+    
 
     implementation 'org.json:json:20190722'
     // implementation 'org.python:jython:2.7.1b3'
@@ -72,6 +73,15 @@ publishing {
         mavenLocal()
     }
 }
+
+if (JavaVersion.current().isJava8Compatible()) {
+    allprojects {
+        tasks.withType(Javadoc) {
+            options.addStringOption('Xdoclint:none', '-quiet')
+        }
+    }
+}
+
 
 test {
 	useJUnit()

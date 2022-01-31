@@ -3,23 +3,24 @@ package org.scaffoldeditor.nbt.schematic;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import org.joml.Vector3d;
+import org.joml.Vector3dc;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.BlockReader;
 import org.scaffoldeditor.nbt.block.SizedBlockCollection;
-import org.scaffoldeditor.nbt.math.Vector3d;
-import org.scaffoldeditor.nbt.math.Vector3i;
-import org.scaffoldeditor.nbt.util.Pair;
 
 import net.querz.nbt.io.NBTDeserializer;
 import net.querz.nbt.tag.CompoundTag;
 import net.querz.nbt.tag.DoubleTag;
 import net.querz.nbt.tag.IntTag;
 import net.querz.nbt.tag.ListTag;
-import java.util.Set;
 
 /**
  * Represents a Minecraft structure schematic (.nbt)
@@ -29,8 +30,8 @@ public class Structure implements SizedBlockCollection, BlockReader<Structure> {
 	
 	private CompoundTag[] palette;
 	private List<CompoundTag> blocks;
-	private List<Pair<CompoundTag, Vector3d>> entities = new ArrayList<>();
-	private Map<Vector3i, CompoundTag> blockEntities = new HashMap<>();
+	private Map<CompoundTag, Vector3dc> entities = new HashMap<>();
+	private Map<Vector3ic, CompoundTag> blockEntities = new HashMap<>();
 	
 	private int sizeX;
 	private int sizeY;
@@ -132,17 +133,17 @@ public class Structure implements SizedBlockCollection, BlockReader<Structure> {
 	}
 	
 	@Override
-	public Set<Vector3i> getBlockEntities() {
+	public Set<Vector3ic> getBlockEntities() {
 		return blockEntities.keySet();
 	}
 	
 	@Override
-	public CompoundTag blockEntityAt(Vector3i vec) {
+	public CompoundTag blockEntityAt(Vector3ic vec) {
 		return blockEntities.get(vec);
 	}
 	
 	@Override
-	public Collection<Pair<CompoundTag, Vector3d>> getEntities() {
+	public Map<CompoundTag, Vector3dc> getEntities() {
 		return entities;
 	}
 	
@@ -197,8 +198,7 @@ public class Structure implements SizedBlockCollection, BlockReader<Structure> {
 		ListTag<CompoundTag> entitiesTag = map.getListTag("entities").asCompoundTagList();
 		if (entitiesTag != null) {
 			for (CompoundTag entTag : entitiesTag) {
-				structure.entities.add(new Pair<>(entTag.getCompoundTag("nbt"),
-						readPosTag(entTag.getListTag("pos").asDoubleTagList())));
+				structure.entities.put(entTag.getCompoundTag("nbt"), readPosTag(entTag.getListTag("pos").asDoubleTagList()));
 			}
 		}
 		

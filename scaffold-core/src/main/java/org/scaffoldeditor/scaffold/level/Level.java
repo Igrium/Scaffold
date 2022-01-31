@@ -17,11 +17,14 @@ import java.util.UUID;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.joml.Vector3d;
+import org.joml.Vector3dc;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.nbt.block.Chunk;
-import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
-import org.scaffoldeditor.nbt.math.Vector3f;
-import org.scaffoldeditor.nbt.math.Vector3i;
+import org.scaffoldeditor.nbt.block.WorldMath.SectionCoordinate;
+import org.scaffoldeditor.nbt.math.MathUtils;
 import org.scaffoldeditor.scaffold.compile.Compiler.CompileEndStatus;
 import org.scaffoldeditor.scaffold.compile.Compiler.CompileResult;
 import org.scaffoldeditor.scaffold.core.Project;
@@ -45,6 +48,7 @@ import org.scaffoldeditor.scaffold.operation.OperationManager;
 import org.scaffoldeditor.scaffold.serialization.LevelReader;
 import org.scaffoldeditor.scaffold.serialization.LevelWriter;
 import org.scaffoldeditor.scaffold.util.LevelOperations;
+import org.scaffoldeditor.scaffold.util.ProgressListener;
 import org.scaffoldeditor.scaffold.util.event.EventDispatcher;
 import org.scaffoldeditor.scaffold.util.event.EventListener;
 
@@ -89,6 +93,7 @@ public class Level {
 	public final Set<SectionCoordinate> dirtySections = new HashSet<>();
 	
 	/** Whether the level should automatically recompile the relevent chunks when a block entity is updated. */
+	@Deprecated
 	public boolean autoRecompile = true;
 	
 	private boolean hasUnsavedChanges = false;
@@ -337,12 +342,12 @@ public class Level {
 	 * @param position Position of entity.
 	 * @return Newly created entity.
 	 */
-	public Entity newEntity(String typeName, String name, Vector3f position) {
+	public Entity newEntity(String typeName, String name, Vector3dc position) {
 		// Make sure entity with name doesn't already exist
 		name = validateName(name, new String[] {});
 		
 		Entity entity = EntityRegistry.createEntity(typeName, this, name);
-		entity.setAttribute("position", new VectorAttribute(position), true);
+		entity.setAttribute("position", new VectorAttribute(position));
 		addEntity(entity);
 		
 		return entity;
@@ -356,7 +361,7 @@ public class Level {
 	 * @param entity Entity to add.
 	 */
 	public void addEntity(Entity entity) {
-		addEntity(entity, false);
+		addEntity(entity, getLevelStack(), getLevelStack().items.size());
 	}
 	
 	/**
@@ -366,23 +371,10 @@ public class Level {
 	 * <code>newEntity</code> should be used most of the time.
 	 * @param entity Entity to add.
 	 * @param stackIndex Index to add it to in the entity stack.
-	 * @param noRecompile Don't recompile the level afterward.
 	 * @deprecated Entities can no-longer be simply inserted into the stack.
 	 */
-	public void addEntity(Entity entity, int stackIndex, boolean noRecompile) {
-		addEntity(entity, noRecompile);
-	}
-	
-	/**
-	 * Add an existing entity object to the level.
-	 * <br>
-	 * <b>Warning: </b> Only call if you know what you're doing! Can lead to illegal states!
-	 * <code>newEntity</code> should be used most of the time.
-	 * @param entity Entity to add.
-	 * @param noRecompile Don't recompile the level afterward.
-	 */
-	public void addEntity(Entity entity, boolean noRecompile) {
-		addEntity(entity, levelStack, levelStack.items.size(), noRecompile);
+	public void addEntity(Entity entity, int stackIndex) {
+		addEntity(entity, getLevelStack(), stackIndex);
 	}
 	
 	/**
@@ -393,10 +385,9 @@ public class Level {
 	 * @param entity      Entity to add.
 	 * @param group       Stack group to add to.
 	 * @param index       Index within group to add at.
-	 * @param noRecompile Don't recompile the level afterward.
 	 */
 	@SuppressWarnings("deprecation")
-	public void addEntity(Entity entity, StackGroup group, int index, boolean noRecompile) {
+	public void addEntity(Entity entity, StackGroup group, int index) {
 		if (!levelStack.containsGroup(group)) {
 			throw new IllegalArgumentException("Entity can only be added to a group within the level!");
 		}
@@ -408,9 +399,6 @@ public class Level {
 		
 		if (entity instanceof BlockEntity) {
 			dirtySections.addAll(((BlockEntity) entity).getOverlappingSections());
-			if (!noRecompile && autoRecompile) {
-				quickRecompile();
-			}
 		}
 	}
 	
@@ -422,26 +410,19 @@ public class Level {
 	 * @param group       Group to add.
 	 * @param parent      Group to add to.
 	 * @param index       Index within group to add at.
-	 * @param noRecompile Don't recompile the level afterward.
 	 */
 	@SuppressWarnings("deprecation")
-	public void addGroup(StackGroup group, StackGroup parent, int index, boolean noRecompile) {
+	public void addGroup(StackGroup group, StackGroup parent, int index) {
 		if (!levelStack.containsGroup(parent)) {
 			throw new IllegalArgumentException("Parent group is not within the level!");
 		}
-		boolean recompile = false;
 		parent.items.add(index, new StackItem(group));
 		for (Entity entity : group) {
 			entity.setName(validateName(entity.getName(), new String[] {}));
 			if (entity instanceof BlockEntity) {
 				dirtySections.addAll(((BlockEntity) entity).getOverlappingSections());
-				recompile = true;
 			}
 			entity.onAdded();
-		}
-		
-		if (!noRecompile && autoRecompile && recompile) {
-			quickRecompile();
 		}
 	}
 	
@@ -449,10 +430,9 @@ public class Level {
 	 * Remove a stack group from the level.
 	 * 
 	 * @param group       Group to remove.
-	 * @param noRecompile Don't recompile the level afterward.
 	 * @return If the group was found in the level.
 	 */
-	public boolean removeGroup(StackGroup group, boolean noRecompile) {
+	public boolean removeGroup(StackGroup group) {
 		if (group.equals(getLevelStack())) {
 			throw new IllegalArgumentException("Level stack root cannot be removed!");
 		}
@@ -460,19 +440,13 @@ public class Level {
 		StackGroup parent = levelStack.getOwningGroup(new StackItem(group));
 		if (parent == null) return false;
 		
-		boolean recompile = false;
 		parent.items.remove(new StackItem(group));
 
 		for (Entity entity : group) {
 			if (entity instanceof BlockEntity) {
 				dirtySections.addAll(((BlockEntity) entity).getOverlappingSections());
-				recompile = true;
 			}
 			entity.onRemoved();
-		}
-		
-		if (!noRecompile && autoRecompile && recompile) {
-			quickRecompile();
 		}
 		
 		return true;
@@ -483,15 +457,6 @@ public class Level {
 	 * @param entity Entity to remove.
 	 */
 	public void removeEntity(Entity entity) {
-		removeEntity(entity, false);
-	}
-	
-	/**
-	 * Remove an entity from the level.
-	 * @param entity Entity to remove.
-	 * @param noRecompile Don't recompile the level after removal.
-	 */
-	public void removeEntity(Entity entity, boolean noRecompile) {
 		if (entity instanceof BlockEntity) {
 			dirtySections.addAll(((BlockEntity) entity).getOverlappingSections());
 		}
@@ -499,10 +464,6 @@ public class Level {
 		levelStack.remove(entity);
 		updateLevelStack();
 		entity.onRemoved();
-		
-		if (!noRecompile && autoRecompile) {
-			quickRecompile();
-		}
 	}
 	
 	/**
@@ -540,13 +501,11 @@ public class Level {
 	public int refactorEntityName(String oldName, String newName, boolean supressUpdate) {
 		Set<Entity> updated = new HashSet<>();
 		for (Entity entity : levelStack) {
-			if (entity.refactorName(oldName, newName, true) > 0) {
+			if (entity.refactorName(oldName, newName) > 0) {
 				updated.add(entity);
-				if (!supressUpdate) entity.onUpdateAttributes(true);
 			}
 		}
 		
-		if (autoRecompile && updated.size() > 0) quickRecompile();
 		return updated.size();
 	}
 	
@@ -589,22 +548,48 @@ public class Level {
 	public static Level loadFile(Project project, String file) throws IOException {
 		return loadFile(project, project.assetManager().getAbsoluteFile(file));
 	}
+
+	/**
+	 * Compile the entire blockworld (and game entities within the blockworld).
+	 * 
+	 * @param full Should this be a full compile? If true, entities may run more
+	 *             complex algorithems.
+	 */
+	public void compileBlockWorld(boolean full) {
+		compileBlockWorld(full, ProgressListener.DUMMY);
+	}
 	
 	/**
 	 * Compile the entire blockworld (and game entities within the blockworld).
-	 * @param full Should this be a full compile? If true, entities may run more complex algorithems.
+	 * 
+	 * @param full     Should this be a full compile? If true, entities may run more
+	 *                 complex algorithems.
+	 * @param listener Progress listener that will recieve updates about world
+	 *                 compilation.
 	 */
-	public void compileBlockWorld(boolean full) {		
+	public void compileBlockWorld(boolean full, ProgressListener listener) {		
 		blockWorld.clear(); // Clear the blockworld of previous compiles.
 		LogManager.getLogger().info("Compiling world...");
-		
-		for (Entity entity: levelStack) {
+
+		List<Entity> eligible = new ArrayList<>();
+
+		for (Entity ent : levelStack) {
+			if (ent instanceof BlockEntity || ent instanceof EntityProvider)
+			eligible.add(ent);
+		}
+
+		int i = 0;
+		for (Entity entity : eligible) {
+			i++;
+			listener.progress(((float) i) / levelStack.size(), "Compiling entity: "+entity.getName());
+
 			if (entity instanceof BlockEntity) {
 				BlockEntity blockEntity = (BlockEntity) entity;
 				try {
 					blockEntity.compileWorld(blockWorld, full);
 				} catch (Throwable e) {
 					LOGGER.error("Unable to compile world entity: "+name, e);
+					listener.error(e, "Error compiling world entity: "+name);
 				}
 			}
 			if (entity instanceof EntityProvider) {
@@ -613,6 +598,7 @@ public class Level {
 					adder.compileGameEntities(blockWorld);
 				} catch (Throwable e) {
 					LOGGER.error("Unable to compile game entities for: "+name, e);
+					listener.error(e, "Error compiling game entities for: "+name);
 				}
 			}
 		}
@@ -662,14 +648,14 @@ public class Level {
 		for (Entity entity : levelStack) {
 			if (entity instanceof BlockEntity) {
 				BlockEntity blockEntity = (BlockEntity) entity;
-				Vector3i[] bounds = blockEntity.getBounds();
-				Vector3i minSection = bounds[0].toFloat().divide(16).floor();
-				Vector3i maxSection = bounds[1].toFloat().divide(16).floor();
+				Vector3ic[] bounds = blockEntity.getBounds();
+				Vector3i minSection = MathUtils.floorVector(new Vector3d(bounds[0]).div(16));
+				Vector3i maxSection = MathUtils.floorVector(new Vector3d(bounds[1]).div(16));
 				// See if entity is within chunkList.
 				for (SectionCoordinate section : sections) {
-					if (minSection.x <= section.x && section.x <= maxSection.x
-							&& minSection.y <= section.y && section.y <= maxSection.y
-							&& minSection.z <= section.z && section.z <= maxSection.z) {
+					if (minSection.x() <= section.x() && section.x() <= maxSection.x()
+							&& minSection.y() <= section.y() && section.y() <= maxSection.y()
+							&& minSection.z() <= section.z() && section.z() <= maxSection.z()) {
 						updatingEntities.add(blockEntity);
 						break;
 					}
@@ -690,26 +676,24 @@ public class Level {
 		}
 		
 		for (SectionCoordinate coord : sections) {
-			Chunk chunk = blockWorld.chunkAt(coord.x, coord.z);
+			Chunk chunk = blockWorld.chunkAt(coord.x(), coord.z());
 			if (chunk == null) {
 				chunk = new Chunk();
 				blockWorld.getChunks().put(coord.getChunk(), chunk);
 			}
-			Chunk tempChunk = tempWorld.chunkAt(coord.x, coord.z);
+			Chunk tempChunk = tempWorld.chunkAt(coord.x(), coord.z());
 			if (tempChunk == null) {
 				tempChunk = new Chunk();
 			}
 
-			chunk.sections[coord.y] = tempChunk.sections[coord.y];
+			chunk.sections[coord.y()] = tempChunk.sections[coord.y()];
 		}
 		LogManager.getLogger().info("Finished compiling world.");
 		return;
 	}
 	
 	/**
-	 * Compile all the chunks marked as dirty. <br>
-	 * Note: {@link #autoRecompile} should be checked before calling unless you
-	 * explicitly want to bypass it.
+	 * Compile all the chunks marked as dirty.
 	 */
 	public void quickRecompile() {
 		if (dirtySections.isEmpty()) return;

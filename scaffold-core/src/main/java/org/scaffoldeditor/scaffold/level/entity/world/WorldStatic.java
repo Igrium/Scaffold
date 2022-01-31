@@ -2,50 +2,48 @@ package org.scaffoldeditor.scaffold.level.entity.world;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.scaffoldeditor.nbt.block.Block;
 import org.scaffoldeditor.nbt.block.BlockCollection;
 import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.nbt.block.SizedBlockCollection;
-import org.scaffoldeditor.nbt.block.Chunk.SectionCoordinate;
+import org.scaffoldeditor.nbt.block.WorldMath.SectionCoordinate;
 import org.scaffoldeditor.nbt.block.transform.TransformSizedBlockCollection;
-import org.scaffoldeditor.nbt.math.Matrix;
-import org.scaffoldeditor.nbt.math.Vector3i;
+import org.scaffoldeditor.scaffold.annotation.Attrib;
 import org.scaffoldeditor.scaffold.block_textures.SerializableBlockTexture;
 import org.scaffoldeditor.scaffold.block_textures.SingleBlockTexture;
 import org.scaffoldeditor.scaffold.io.AssetLoaderRegistry;
 import org.scaffoldeditor.scaffold.level.Level;
-import org.scaffoldeditor.scaffold.level.entity.BlockEntity;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.EntityFactory;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
 import org.scaffoldeditor.scaffold.level.entity.Faceable;
 import org.scaffoldeditor.scaffold.level.entity.Macro;
 import org.scaffoldeditor.scaffold.level.entity.attribute.AssetAttribute;
-import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BlockTextureAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.BooleanAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.EnumAttribute;
 import org.scaffoldeditor.scaffold.level.entity.attribute.EnumAttribute.DefaultEnums.Direction;
+import org.scaffoldeditor.scaffold.math.MathUtils;
 import org.scaffoldeditor.scaffold.sdoc.SDoc;
 
 /**
  * This entity compiles a standard block collection into the world.
  * @author Igrium
  */
-public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntity {
+public class WorldStatic extends BaseBlockEntity implements Faceable {
 	
 	private SizedBlockCollection baseModel;
 	private SizedBlockCollection finalModel;
 	
 	// Keep track of the model path, location, and directoin on our own for optimization.
 	private String modelpath;
-	private Direction direction = Direction.NORTH;
+	private Direction directionCache = Direction.NORTH;
 	
 	public static void register() {
 		EntityRegistry.registry.put("world_static", new EntityFactory<Entity>() {		
@@ -56,21 +54,23 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 		});
 	}
 
+	@Attrib
+	protected AssetAttribute model = new AssetAttribute("schematic", "");
+
+	@Attrib
+	protected EnumAttribute<Direction> direction = new EnumAttribute<>(Direction.NORTH);
+
+	@Attrib(name = "place_air")
+	protected BooleanAttribute placeAir = new BooleanAttribute(false);
+
+	@Attrib(name = "texture_override")
+	protected BooleanAttribute textureOverride = new BooleanAttribute(false);
+
+	@Attrib
+	protected BlockTextureAttribute texture = new BlockTextureAttribute(new SingleBlockTexture(new Block("minecraft:stone")));
 
 	public WorldStatic(Level level, String name) {
 		super(level, name);
-	}
-	
-	@Override
-	public Map<String, Attribute<?>> getDefaultAttributes() {
-		Map<String, Attribute<?>> map = new HashMap<>();
-		map.put("model", new AssetAttribute("schematic", ""));
-		map.put("direction", new EnumAttribute<>(Direction.NORTH));
-		map.put("place_air", new BooleanAttribute(false));
-		map.put("texture_override", new BooleanAttribute(false));
-		map.put("texture", new BlockTextureAttribute(new SingleBlockTexture(new Block("minecraft:stone"))));
-		
-		return map;
 	}
 	
 	@Override
@@ -80,9 +80,6 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 			getLevel().dirtySections.addAll(getOverlappingSections());
 			reload();
 			getLevel().dirtySections.addAll(getOverlappingSections());
-			if (getLevel().autoRecompile) {
-				getLevel().quickRecompile();
-			}
 		}));
 		return macros;
 	}
@@ -92,8 +89,7 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 	 */
 	public void reload() {
 		
-		AssetAttribute attribute = (AssetAttribute) getAttribute("model");
-		String model = attribute.getValue();
+		String model = this.model.getValue();
 		LogManager.getLogger().info("Loading model " + model);
 		modelpath = model;
 		if (model.length() == 0) {
@@ -119,12 +115,7 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 	}
 	
 	public Direction getDirection() {
-		if (getAttribute("direction") instanceof EnumAttribute
-				&& ((EnumAttribute<?>) getAttribute("direction")).getValue() instanceof Direction) {
-			return (Direction) ((EnumAttribute<?>) getAttribute("direction")).getValue();
-		} else {
-			return Direction.NORTH;
-		}
+		return this.direction.getValue();
 	}
 	
 	protected void updateDirection() {
@@ -135,16 +126,16 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 			finalModel = baseModel;
 			break;
 		case WEST:
-			finalModel = new TransformSizedBlockCollection(baseModel, Matrix.Direction.WEST);
+			finalModel = new TransformSizedBlockCollection(baseModel, MathUtils.WEST);
 			break;
 		case SOUTH:
-			finalModel = new TransformSizedBlockCollection(baseModel, Matrix.Direction.SOUTH);
+			finalModel = new TransformSizedBlockCollection(baseModel, MathUtils.SOUTH);
 			break;
 		case EAST:
-			finalModel = new TransformSizedBlockCollection(baseModel, Matrix.Direction.EAST);
+			finalModel = new TransformSizedBlockCollection(baseModel, MathUtils.EAST);
 		}
 
-		this.direction = direction;
+		this.directionCache = direction;
 	}
 
 	@Override
@@ -157,21 +148,21 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 			return true;
 		}
 		
-		if (((EnumAttribute<?>) getAttribute("direction")).getValue() != direction) {
+		if (direction.getValue()!= directionCache) {
 			updateDirection();
 		}
 		
-		Vector3i gridPos = getPosition().floor();
+		Vector3ic gridPos = getBlockPosition();
 		if (sections == null) { // TODO: Smarter algorithm to determine which compilation method we should use.
 			if (textureOverrideEnabled()) {
-				for (Vector3i local : finalModel) {
-					Vector3i global = local.add(getBlockPosition());
+				for (Vector3ic local : finalModel) {
+					Vector3ic global = local.add(getBlockPosition(), new Vector3i());
 					if (!finalModel.blockAt(local).getName().equals("minecraft:air")) {
-						world.setBlock(global.x, global.y, global.z, getTexture().blockAt(global.x, global.y, global.z), this);
+						world.setBlock(global.x(), global.y(), global.z(), getTexture().blockAt(global.x(), global.y(), global.z()), this);
 					}
 				}
 			} else {
-				world.addBlockCollection(finalModel, gridPos.x , gridPos.y, gridPos.z, true, shouldPlaceAir(), this);
+				world.addBlockCollection(finalModel, gridPos.x() , gridPos.y(), gridPos.z(), true, shouldPlaceAir(), this);
 			}
 		} else {
 			for (SectionCoordinate coord : sections) {
@@ -188,12 +179,12 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 	 * @param coord Global section coordinates.
 	 */
 	public void compileSection(BlockWorld world, SectionCoordinate coord) {
-		Vector3i gridPos = getPosition().floor();
+		Vector3ic gridPos = getBlockPosition();
 		boolean placeAir = shouldPlaceAir();
 		for (int x = coord.getStartX(); x < coord.getEndX(); x++) {
 			for (int y = coord.getStartY(); y < coord.getEndY(); y++) {
 				for (int z = coord.getStartZ(); z < coord.getEndZ(); z++) {
-					 Block block = finalModel.blockAt(x - gridPos.x, y - gridPos.y, z - gridPos.z);
+					 Block block = finalModel.blockAt(x - gridPos.x(), y - gridPos.y(), z - gridPos.z());
 					 if (textureOverrideEnabled()) {
 						 if (block != null && !block.getName().equals("minecraft:air")) {
 							 world.setBlock(x, y, z, getTexture().blockAt(x, y, z));
@@ -209,20 +200,20 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 	}
 	
 	protected boolean shouldPlaceAir() {
-		return ((BooleanAttribute) getAttribute("place_air")).getValue();
+		return placeAir.getValue();
 	}
 
 	@Override
-	public Block blockAt(Vector3i coord) {
-		Vector3i localCoord = coord.subtract(getBlockPosition());
+	public Block blockAt(Vector3ic coord) {
+		Vector3i localCoord = coord.sub(getBlockPosition(), new Vector3i());
 		return finalModel.blockAt(localCoord);
 	}
 
 	@Override
-	public Vector3i[] getBounds() {
-		Vector3i position = getBlockPosition();
-		if (finalModel == null) return new Vector3i[] { position, position };
-		return new Vector3i[] { position.add(finalModel.getMin()),position.add(finalModel.getMax()) };
+	public Vector3ic[] getBounds() {
+		Vector3ic position = getBlockPosition();
+		if (finalModel == null) return new Vector3ic[] { position, position };
+		return new Vector3i[] { position.add(finalModel.getMin(), new Vector3i()),position.add(finalModel.getMax(), new Vector3i()) };
 	}
 
 	@Override
@@ -232,10 +223,10 @@ public class WorldStatic extends BaseBlockEntity implements Faceable, BlockEntit
 
 
 	@Override
-	public void onUpdateBlockAttributes() {
-		if (!((AssetAttribute) getAttribute("model")).getValue().equals(modelpath)) {
+	public void updateBlocks() {
+		if (!model.getValue().equals(modelpath)) {
 			reload();	
-		} else if (!getDirection().equals(direction)) {
+		} else if (!getDirection().equals(directionCache)) {
 			updateDirection();
 		}
 	}

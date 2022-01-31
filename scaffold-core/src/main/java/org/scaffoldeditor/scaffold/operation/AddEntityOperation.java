@@ -1,18 +1,19 @@
 package org.scaffoldeditor.scaffold.operation;
 
-import org.scaffoldeditor.nbt.math.Vector3f;
+import org.joml.Vector3dc;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
+import org.scaffoldeditor.scaffold.util.ProgressListener;
 
-public class AddEntityOperation implements Operation {
+public class AddEntityOperation implements Operation<Entity> {
 
 	private String registryName;
 	private Level level;
 	private String name;
-	private Vector3f position;
+	private Vector3dc position;
 	private Entity entity;
 	
-	public AddEntityOperation(Level level, String registryName, String name, Vector3f position) {
+	public AddEntityOperation(Level level, String registryName, String name, Vector3dc position) {
 		this.registryName = registryName;
 		this.level = level;
 		this.name = name;
@@ -20,15 +21,9 @@ public class AddEntityOperation implements Operation {
 	}
 	
 	@Override
-	public boolean execute() {
-		try {
-			entity = level.newEntity(registryName, name, position);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-		
-		return true;
+	public Entity execute(ProgressListener listener) {
+		entity = level.newEntity(registryName, name, position);
+		return entity;
 	}
 
 	@Override

@@ -1,6 +1,7 @@
 package org.scaffoldeditor.nbt.util;
 
-import org.scaffoldeditor.nbt.math.Vector3i;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 
 import net.querz.nbt.tag.CompoundTag;
 
@@ -22,10 +23,10 @@ public final class BlockEntityUtils {
 	 * @param coord Coordinates to inject.
 	 * @see #extractCoordinates
 	 */
-	public static void injectCoordinates(CompoundTag ent, Vector3i coord) {
-		ent.putInt("x", coord.x);
-		ent.putInt("y", coord.y);
-		ent.putInt("z", coord.z);
+	public static void injectCoordinates(CompoundTag ent, Vector3ic coord) {
+		ent.putInt("x", coord.x());
+		ent.putInt("y", coord.y());
+		ent.putInt("z", coord.z());
 		ent.putBoolean("keepPacked", false);
 	}
 	

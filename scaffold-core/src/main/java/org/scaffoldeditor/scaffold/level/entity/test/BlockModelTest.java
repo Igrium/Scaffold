@@ -1,13 +1,13 @@
 package org.scaffoldeditor.scaffold.level.entity.test;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.logging.log4j.LogManager;
+import org.joml.Vector3d;
 import org.scaffoldeditor.nbt.block.BlockCollection;
-import org.scaffoldeditor.nbt.math.Vector3f;
+import org.scaffoldeditor.scaffold.annotation.Attrib;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.entity.EntityRegistry;
@@ -26,47 +26,40 @@ public class BlockModelTest extends Entity {
 		super(level, name);
 	}
 	
-	private String oldModelPath = "";
-	private BlockCollection model = null;
+	private BlockCollection modelCache = null;
 
-	@Override
-	public Map<String, Attribute<?>> getDefaultAttributes() {
-		Map<String, Attribute<?>> def = new HashMap<>();
-		def.put("model", new AssetAttribute("schematic", ""));
-		return def;
-	}
+	@Attrib
+	protected AssetAttribute model = new AssetAttribute("schematic", "");
 	
 	public String getModelPath() {
-		return (String) getAttribute("model").getValue();
+		return model.getValue();
 	}
 	
 	public AssetAttribute getModelAttribute() {
-		return (AssetAttribute) getAttribute("model");
+		return model;
 	}
 	
 	public void reload() {
 		try {
-			if (getModelPath().length() == 0) model = null;
+			if (getModelPath().length() == 0) modelCache = null;
 			else
-				model = (BlockCollection) getLevel().getProject().assetManager().loadAsset(getModelPath(), false);
+				modelCache = (BlockCollection) getLevel().getProject().assetManager().loadAsset(getModelPath(), false);
 		} catch (IOException e) {
 			LogManager.getLogger().error("Unable to load asset: "+getModelPath(), e);
 		}
 	}
-	
+
 	@Override
-	public void onUpdateAttributes(boolean noRecompile) {
-		super.onUpdateAttributes(noRecompile);
-		if (!getModelPath().equals(oldModelPath)) {
-			reload();
-		}
+	protected void onSetAttributes(Map<String, Attribute<?>> updated) {
+		super.onSetAttributes(updated);
+		if (updated.containsKey("model")) reload();
 	}
 	
 	@Override
 	public Set<RenderEntity> getRenderEntities() {
 		Set<RenderEntity> set = super.getRenderEntities();
-		if (model == null) return set;
-		set.add(new BlockRenderEntity(this, model, getPreviewPosition(), new Vector3f(0, 0, 0), "model"));
+		if (modelCache == null) return set;
+		set.add(new BlockRenderEntity(this, modelCache, getPreviewPosition(), new Vector3d(), "model"));
 		return set;
 	}
 }

@@ -4,17 +4,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.logging.log4j.LogManager;
 import org.scaffoldeditor.scaffold.level.Level;
-import org.scaffoldeditor.scaffold.level.entity.BlockEntity;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
 import org.scaffoldeditor.scaffold.level.stack.StackGroup;
+import org.scaffoldeditor.scaffold.util.ProgressListener;
 
-public class DeleteEntityOperation implements Operation {
+public class DeleteEntityOperation implements Operation<Void> {
 	
 	private Level level;
 	private Set<Entity> entities;
-	private boolean recompile = false;
 	
 	private Map<Entity, StackGroup> groupCache = new HashMap<>();
 	private Map<Entity, Integer> indexCache = new HashMap<>();
@@ -25,31 +23,23 @@ public class DeleteEntityOperation implements Operation {
 	}
 
 	@Override
-	public boolean execute() {
+	public Void execute(ProgressListener listener) {
 		for (Entity ent : entities) {
 			StackGroup owner = level.getLevelStack().getOwningGroup(ent);
 			if (owner == null) {
-				LogManager.getLogger().error("Unable to delete entity: "+ent+" because it is not in the level!");
-				return false;
+				throw new IllegalStateException("Unable to delete entity: "+ent+" because it is not in the level!");
 			}
 			groupCache.put(ent, owner);
 			indexCache.put(ent, owner.indexOf(ent));
-			level.removeEntity(ent, true);
-			if (ent instanceof BlockEntity) recompile = true;
+			level.removeEntity(ent);
 		}
-		if (recompile && level.autoRecompile) {
-			level.quickRecompile();
-		}
-		return true;
+		return null;
 	}
 
 	@Override
 	public void undo() {
 		for (Entity ent : entities) {
-			level.addEntity(ent, groupCache.get(ent), indexCache.get(ent), true);
-		}
-		if (recompile && level.autoRecompile) {
-			level.quickRecompile();
+			level.addEntity(ent, groupCache.get(ent), indexCache.get(ent));
 		}
 	}
 
@@ -58,13 +48,10 @@ public class DeleteEntityOperation implements Operation {
 		for (Entity ent : entities) {
 			level.removeEntity(ent);
 		}
-		if (recompile && level.autoRecompile) {
-			level.quickRecompile();
-		}
 	}
 
 	@Override
 	public String getName() {
-		return null;
+		return "Delete Entity";
 	}
 }

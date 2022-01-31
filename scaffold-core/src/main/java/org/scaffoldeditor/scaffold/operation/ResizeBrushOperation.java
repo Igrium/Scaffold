@@ -1,24 +1,25 @@
 package org.scaffoldeditor.scaffold.operation;
 
-import org.scaffoldeditor.nbt.math.Vector3f;
+import org.joml.Vector3dc;
 import org.scaffoldeditor.scaffold.level.entity.BrushEntity;
+import org.scaffoldeditor.scaffold.util.ProgressListener;
 
-public class ResizeBrushOperation implements Operation {
+public class ResizeBrushOperation implements Operation<Void> {
 	
 	private BrushEntity brush;
-	private Vector3f[] oldSize;
-	private Vector3f[] newSize;
+	private Vector3dc[] oldSize;
+	private Vector3dc[] newSize;
 	
-	public ResizeBrushOperation(BrushEntity brush, Vector3f[] newSize) {
+	public ResizeBrushOperation(BrushEntity brush, Vector3dc[] newSize) {
 		this.brush = brush;
 		this.newSize = newSize;
 	}
 	
 	@Override
-	public boolean execute() {
+	public Void execute(ProgressListener listener) {
 		oldSize = brush.getBrushBounds();
 		brush.setBrushBounds(newSize, false);
-		return true;
+		return null;
 	}
 
 	@Override

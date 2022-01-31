@@ -1,13 +1,15 @@
 package org.scaffoldeditor.scaffold.level.entity.world;
 
+import java.util.Map;
 import java.util.Set;
 
+import org.joml.Vector3d;
+import org.joml.Vector3dc;
 import org.scaffoldeditor.nbt.block.BlockCollection;
-import org.scaffoldeditor.nbt.math.Vector3f;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.entity.BlockEntity;
 import org.scaffoldeditor.scaffold.level.entity.Entity;
-import org.scaffoldeditor.scaffold.level.entity.attribute.VectorAttribute;
+import org.scaffoldeditor.scaffold.level.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.render.BlockRenderEntity;
 import org.scaffoldeditor.scaffold.level.render.RenderEntity;
 
@@ -24,7 +26,7 @@ public abstract class BaseBlockEntity extends Entity implements BlockEntity {
 	/**
 	 * Cache the position of the entity so we can use the old position when attributes are updated.
 	 */
-	protected Vector3f positionCache;
+	protected Vector3dc positionCache;
 	
 	/**
 	 * <p>
@@ -42,25 +44,23 @@ public abstract class BaseBlockEntity extends Entity implements BlockEntity {
 	protected abstract boolean needsRecompiling();
 	
 	@Override
-	public void onUpdateAttributes(boolean noRecompile) {
-		// Changing the attributes
-		Vector3f newPosition = getPosition();
-		if (positionCache != null && !newPosition.equals(positionCache)) {
+	protected void onSetAttributes(Map<String, Attribute<?>> updated) {
+		if (positionCache != null && updated.containsKey("position")) {
 			// Temporarily set the position back so we can capture the bounds.
-			setAttribute("position", new VectorAttribute(positionCache), true);
+			Vector3dc newPosition = getPosition();
+			setPositionNoUpdate(positionCache);
 			getLevel().dirtySections.addAll(getOverlappingSections());
-			setAttribute("position", new VectorAttribute(newPosition), true);
+			setPositionNoUpdate(newPosition);
 		} else {
 			getLevel().dirtySections.addAll(getOverlappingSections());
 		}
-		super.onUpdateAttributes(true);
-		onUpdateBlockAttributes();
+		updateBlocks();
 		getLevel().dirtySections.addAll(getOverlappingSections());
-		positionCache = newPosition;
-		if (getLevel().autoRecompile && !noRecompile) {
-			getLevel().quickRecompile();
-		}
-	};
+		super.onSetAttributes(updated);
+		updateBlocks();
+		getLevel().dirtySections.addAll(getOverlappingSections());
+		positionCache = getPosition();
+	}
 
 	/**
 	 * Called when it's time to update variables that determine the placed blocks
@@ -72,7 +72,7 @@ public abstract class BaseBlockEntity extends Entity implements BlockEntity {
 	 * <b>Note:</b> the entity may have moved without calling
 	 * <code>setPosition()</code> when this is called.
 	 */
-	public abstract void onUpdateBlockAttributes();
+	public abstract void updateBlocks();
 
 	/**
 	 * Obtain a block collection with all of the blocks in this entity. Used for
@@ -86,7 +86,7 @@ public abstract class BaseBlockEntity extends Entity implements BlockEntity {
 	public Set<RenderEntity> getRenderEntities() {
 		Set<RenderEntity> set = super.getRenderEntities();
 		if (isTransformPreviewEnabled()) {
-			set.add(new BlockRenderEntity(this, getBlockCollection(), getPreviewPosition(), new Vector3f(0, 0, 0), "model"));
+			set.add(new BlockRenderEntity(this, getBlockCollection(), getPreviewPosition(), new Vector3d(), "model"));
 		}
 		return set;
 	}

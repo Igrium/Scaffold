@@ -1,12 +1,11 @@
 package org.scaffoldeditor.nbt.block;
 
-import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 
-import org.scaffoldeditor.nbt.math.Vector3d;
-import org.scaffoldeditor.nbt.math.Vector3i;
-import org.scaffoldeditor.nbt.util.Pair;
+import org.joml.Vector3dc;
+import org.joml.Vector3ic;
 
 import net.querz.nbt.tag.CompoundTag;
 
@@ -15,7 +14,7 @@ import net.querz.nbt.tag.CompoundTag;
  * like a schematic or structure file.
  * @author Igrium
  */
-public interface BlockCollection extends Iterable<Vector3i> {
+public interface BlockCollection extends Iterable<Vector3ic> {
 	
 	/**
 	 * Get the the block at a particular location.
@@ -40,12 +39,12 @@ public interface BlockCollection extends Iterable<Vector3i> {
 	 * <br>
 	 * <b>Implementers should override {@link BlockCollection#hasBlock(int, int, int)}; not this function!</b>
 	 */
-	default boolean hasBlock(Vector3i vec) {
-		return hasBlock(vec.x, vec.y, vec.z);
+	default boolean hasBlock(Vector3ic vec) {
+		return hasBlock(vec.x(), vec.y(), vec.z());
 	}
 	
-	public default Block blockAt(Vector3i vec) {
-		return blockAt(vec.x, vec.y, vec.z);
+	public default Block blockAt(Vector3ic vec) {
+		return blockAt(vec.x(), vec.y(), vec.z());
 	}
 	
 	/**
@@ -54,7 +53,7 @@ public interface BlockCollection extends Iterable<Vector3i> {
 	 * 
 	 * @return Locations with a block entity.
 	 */
-	default Set<Vector3i> getBlockEntities() {
+	default Set<Vector3ic> getBlockEntities() {
 		return Collections.emptySet();
 	}
 	
@@ -62,14 +61,14 @@ public interface BlockCollection extends Iterable<Vector3i> {
 	 * Obtain all of this collection's entities. THIS COLLECTION IS NOT GUARANTEED
 	 * TO BE MUTABLE!
 	 * 
-	 * @return A collection of pairs, where the first entry is the entity's NBT, and
-	 *         the second entry is its position in local space relative to this
+	 * @return A map where the key is the entity's NBT, and
+	 *         the value is its position in local space relative to this
 	 *         block collection. We keep them seperately because entity positions
 	 *         are stored relative to their parent block collection, and it would be
 	 *         too difficult to try and keep the NBT data updated.
 	 */
-	default Collection<Pair<CompoundTag, Vector3d>> getEntities() {
-		return Collections.emptySet();
+	default Map<CompoundTag, Vector3dc> getEntities() {
+		return Collections.emptyMap();
 	}
 	
 	/**
@@ -79,7 +78,7 @@ public interface BlockCollection extends Iterable<Vector3i> {
 	 * @return The block entity's nbt, or <code>null</code> if no entity exists at
 	 *         this location.
 	 */
-	default CompoundTag blockEntityAt(Vector3i vec) {
+	default CompoundTag blockEntityAt(Vector3ic vec) {
 		return null;
 	}
 }

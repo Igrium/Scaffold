@@ -46,6 +46,10 @@ public class NBTAttribute extends Attribute<CompoundTag> {
 		this.value = value;
 		this.registryName = REGISTRY_NAME;
 	}
+
+	public NBTAttribute() {
+		this(new CompoundTag());
+	}
 	
 	/**
 	 * Get the compound tag backing this attribute. <br>
