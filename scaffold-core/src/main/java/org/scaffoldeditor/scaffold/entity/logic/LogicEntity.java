@@ -6,8 +6,9 @@ import org.joml.Vector3d;
 import org.joml.Vector3dc;
 import org.scaffoldeditor.scaffold.entity.Entity;
 import org.scaffoldeditor.scaffold.level.Level;
-import org.scaffoldeditor.scaffold.level.render.BillboardRenderEntity;
-import org.scaffoldeditor.scaffold.level.render.RenderEntity;
+import org.scaffoldeditor.scaffold.render.BillboardRenderEntity;
+import org.scaffoldeditor.scaffold.render.RenderEntityManager;
+
 
 /**
  * A base class implementing some of the common functions found in logic entities.
@@ -19,15 +20,29 @@ public abstract class LogicEntity extends Entity {
 	public LogicEntity(Level level, String name) {
 		super(level, name);
 	}
+
+	protected BillboardRenderEntity sprite;
 	
+	// @Override
+	// public Set<RenderEntity> getRenderEntities() {
+	// 	Set<RenderEntity> set = super.getRenderEntities();
+	// 	set.add(new BillboardRenderEntity(this, getPreviewPosition().add(getRenderOffset(), new Vector3d()), "sprite", getSprite(),
+	// 			getRenderScale()));
+	// 	return set;
+	// }
+
 	@Override
-	public Set<RenderEntity> getRenderEntities() {
-		Set<RenderEntity> set = super.getRenderEntities();
-		set.add(new BillboardRenderEntity(this, getPreviewPosition().add(getRenderOffset(), new Vector3d()), "sprite", getSprite(),
-				getRenderScale()));
-		return set;
+	public void updateRenderEntities() {
+		super.updateRenderEntities();
+		if (sprite == null) {
+			sprite = RenderEntityManager.getInstance().createBillboard();
+			managedRenderEntities.add(sprite);
+		}
+
+		sprite.setTexture(getSprite());
+		sprite.setPosition(getPreviewPosition());
 	}
-	
+		
 	/**
 	 * Get the sprite texture that this entity should use on its billboard.
 	 * @return Texture ID in the form <code>[namespace]:textures/[texture].png</code>

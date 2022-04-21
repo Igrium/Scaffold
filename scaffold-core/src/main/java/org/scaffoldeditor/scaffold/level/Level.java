@@ -38,7 +38,6 @@ import org.scaffoldeditor.scaffold.entity.attribute.VectorAttribute;
 import org.scaffoldeditor.scaffold.level.WorldUpdates.UpdateRenderEntitiesEvent;
 import org.scaffoldeditor.scaffold.level.WorldUpdates.WorldUpdateEvent;
 import org.scaffoldeditor.scaffold.level.WorldUpdates.WorldUpdateListener;
-import org.scaffoldeditor.scaffold.level.render.RenderEntity;
 import org.scaffoldeditor.scaffold.level.stack.StackGroup;
 import org.scaffoldeditor.scaffold.level.stack.StackItem;
 import org.scaffoldeditor.scaffold.logic.Datapack;
@@ -100,6 +99,7 @@ public class Level {
 	
 	private List<WorldUpdateListener> worldUpdateListeners = new ArrayList<>();
 	private List<Runnable> updateStackListeners = new ArrayList<>();
+	@Deprecated
 	private EventDispatcher<UpdateRenderEntitiesEvent> updateRenderEntitiesDispatcher = new EventDispatcher<>();
 	
 	private static final Logger LOGGER = LogManager.getLogger();
@@ -744,10 +744,12 @@ public class Level {
 	 * 
 	 * @param listener Event listener.
 	 */
+	@Deprecated
 	public void onUpdateRenderEntities(EventListener<UpdateRenderEntitiesEvent> listener) {
 		updateRenderEntitiesDispatcher.addListener(listener);
 	}
 	
+	@Deprecated
 	public void fireUpdateRenderEntitiesEvent(UpdateRenderEntitiesEvent event) {
 		updateRenderEntitiesDispatcher.fire(event);
 	}

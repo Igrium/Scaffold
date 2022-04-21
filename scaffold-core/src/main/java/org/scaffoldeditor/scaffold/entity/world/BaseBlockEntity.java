@@ -1,17 +1,15 @@
 package org.scaffoldeditor.scaffold.entity.world;
 
 import java.util.Map;
-import java.util.Set;
 
-import org.joml.Vector3d;
 import org.joml.Vector3dc;
 import org.scaffoldeditor.nbt.block.BlockCollection;
 import org.scaffoldeditor.scaffold.entity.BlockEntity;
 import org.scaffoldeditor.scaffold.entity.Entity;
 import org.scaffoldeditor.scaffold.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.Level;
-import org.scaffoldeditor.scaffold.level.render.BlockRenderEntity;
-import org.scaffoldeditor.scaffold.level.render.RenderEntity;
+import org.scaffoldeditor.scaffold.render.BlockRenderEntity;
+import org.scaffoldeditor.scaffold.render.RenderEntityManager;
 
 /**
  * Implements many of the common features of block entities.
@@ -22,6 +20,11 @@ public abstract class BaseBlockEntity extends Entity implements BlockEntity {
 	public BaseBlockEntity(Level level, String name) {
 		super(level, name);	
 	}
+
+	/**
+	 * The current transform preview.
+	 */
+	protected BlockRenderEntity preview;
 	
 	/**
 	 * Cache the position of the entity so we can use the old position when attributes are updated.
@@ -82,13 +85,30 @@ public abstract class BaseBlockEntity extends Entity implements BlockEntity {
 	 */
 	public abstract BlockCollection getBlockCollection();
 	
+	// @Override
+	// public Set<RenderEntity> getRenderEntities() {
+	// 	Set<RenderEntity> set = super.getRenderEntities();
+	// 	if (isTransformPreviewEnabled()) {
+	// 		set.add(new BlockRenderEntity(this, getBlockCollection(), getPreviewPosition(), new Vector3d(), "model"));
+	// 	}
+	// 	return set;
+	// }
+
 	@Override
-	public Set<RenderEntity> getRenderEntities() {
-		Set<RenderEntity> set = super.getRenderEntities();
+	public void updateRenderEntities() {
+		super.updateRenderEntities();
 		if (isTransformPreviewEnabled()) {
-			set.add(new BlockRenderEntity(this, getBlockCollection(), getPreviewPosition(), new Vector3d(), "model"));
+			if (preview == null) {
+				preview = RenderEntityManager.getInstance().createBlock();
+				preview.setBlocks(getBlockCollection());
+				managedRenderEntities.add(preview);
+			}
+			preview.setPosition(getPreviewPosition());
+		} else {
+			if (preview != null) {
+				preview.kill();
+			}
 		}
-		return set;
 	}
 	
 	@Override

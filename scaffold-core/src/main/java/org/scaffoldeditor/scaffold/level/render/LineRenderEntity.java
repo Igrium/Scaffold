@@ -8,6 +8,7 @@ import org.scaffoldeditor.scaffold.entity.Entity;
  * @author Igrium
  *
  */
+@Deprecated
 public class LineRenderEntity extends RenderEntity {
 	
 	private Vector3dc endPos;

@@ -10,6 +10,7 @@ import org.scaffoldeditor.scaffold.entity.Entity;
  * 
  * @author Igrium
  */
+@Deprecated
 public class MCRenderEntity extends RenderEntity {
 	
 	private MCEntity mcEntity;

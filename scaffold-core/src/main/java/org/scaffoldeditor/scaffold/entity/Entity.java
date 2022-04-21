@@ -26,9 +26,9 @@ import org.scaffoldeditor.scaffold.level.WorldUpdates.UpdateRenderEntitiesEvent;
 import org.scaffoldeditor.scaffold.level.io.InputDeclaration;
 import org.scaffoldeditor.scaffold.level.io.Output;
 import org.scaffoldeditor.scaffold.level.io.OutputDeclaration;
-import org.scaffoldeditor.scaffold.level.render.RenderEntity;
 import org.scaffoldeditor.scaffold.logic.Datapack;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.Command;
+import org.scaffoldeditor.scaffold.render.RenderEntity;
 import org.scaffoldeditor.scaffold.sdoc.SDoc;
 import org.scaffoldeditor.scaffold.util.AttributeHolder;
 import org.scaffoldeditor.scaffold.util.event.EventListener;
@@ -398,7 +398,7 @@ public abstract class Entity extends AttributeHolder {
 	/**
 	 * <p>
 	 * Called when the entity has finished initialization and is added (or re-added)
-	 * to the level. This is when you should update your render entities.
+	 * to the level. Any render entities that may have been disabled are re-enabled.
 	 * </p>
 	 * <p>
 	 * Note: if name refactoring has taken place during deserialization, this is
@@ -406,16 +406,10 @@ public abstract class Entity extends AttributeHolder {
 	 * </p>
 	 */
 	public void onAdded() {
+		showRenderEntities();
 		updateRenderEntities();
 	}
 	
-	/**
-	 * Get a set of all this entity's render entities. Called whenever they need to be updated.
-	 * @return Render entities.
-	 */
-	public Set<RenderEntity> getRenderEntities() {
-		return new HashSet<>();
-	};
 	
 	
 	/**
@@ -425,20 +419,32 @@ public abstract class Entity extends AttributeHolder {
 	 * <b>Note:</b> The entity may be re-added at any time, for instance, if the
 	 * operation that removed it is undone.
 	 * </p>
-	 * <p>
-	 * The default implementation fires the <code>onUpdateRenderEntities</code> event,
-	 * causing the editor to remove its render entities.
 	 */
 	public void onRemoved() {
-		updateRenderEntities(Collections.emptySet());
+		hideRenderEntities();
+	}
+
+	/**
+	 * A set of render entities that automatically get hidden with this entity.
+	 */
+	protected Set<RenderEntity> managedRenderEntities = new HashSet<>();
+
+	/**
+	 * Hide all managed render entities.
+	 */
+	public void hideRenderEntities() {
+		for (RenderEntity ent : managedRenderEntities) {
+			ent.disable();
+		}
 	}
 	
 	/**
-	 * Tell the editor to update this entity's (non-block) visual representation.
-	 * @param newRenderEntities New set of render entities.
+	 * Show all managed render entities. If called when entity is not in the level, can lead to unwanted behavior.
 	 */
-	protected void updateRenderEntities(Set<RenderEntity> newRenderEntities) {
-		level.fireUpdateRenderEntitiesEvent(new UpdateRenderEntitiesEvent(newRenderEntities, this));
+	public void showRenderEntities() {
+		for (RenderEntity ent : managedRenderEntities) {
+			ent.enable();
+		}
 	}
 	
 	/**
@@ -448,6 +454,7 @@ public abstract class Entity extends AttributeHolder {
 	 * 
 	 * @param listener Event listener.
 	 */
+	@Deprecated
 	public void onUpdateRenderEntities(EventListener<UpdateRenderEntitiesEvent> listener) {
 		level.onUpdateRenderEntities(event -> {
 			if (event.subject == this) {
@@ -455,12 +462,13 @@ public abstract class Entity extends AttributeHolder {
 			}
 		});
 	}
+
 	
 	/**
-	 * Force-update this entity's visual representation in the editor.
+	 * Update this entity's visual representation in the editor.
 	 */
 	public void updateRenderEntities() {
-		updateRenderEntities(getRenderEntities());
+		// updateRenderEntities(getRenderEntities());
 	}
 	
 	/**

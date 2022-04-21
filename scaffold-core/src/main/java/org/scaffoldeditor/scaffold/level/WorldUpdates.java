@@ -28,6 +28,7 @@ public final class WorldUpdates {
 		void onWorldUpdated(WorldUpdateEvent e);
 	}
 	
+	@Deprecated
 	public static class UpdateRenderEntitiesEvent {
 		public final Set<RenderEntity> renderEntities;
 		public final Entity subject;

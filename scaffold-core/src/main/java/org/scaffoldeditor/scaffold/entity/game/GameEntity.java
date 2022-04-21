@@ -16,9 +16,9 @@ import org.scaffoldeditor.scaffold.entity.Rotatable;
 import org.scaffoldeditor.scaffold.entity.attribute.NBTAttribute;
 import org.scaffoldeditor.scaffold.entity.attribute.StringAttribute;
 import org.scaffoldeditor.scaffold.level.Level;
-import org.scaffoldeditor.scaffold.level.render.MCRenderEntity;
-import org.scaffoldeditor.scaffold.level.render.RenderEntity;
 import org.scaffoldeditor.scaffold.logic.Datapack;
+import org.scaffoldeditor.scaffold.render.EntityRenderEntity;
+import org.scaffoldeditor.scaffold.render.RenderEntityManager;
 import org.scaffoldeditor.scaffold.sdoc.SDoc;
 import org.scaffoldeditor.scaffold.util.UUIDUtils;
 
@@ -47,18 +47,23 @@ public class GameEntity extends Rotatable implements KnownUUID, EntityProvider {
 		super(level, name);
 	}
 
+	protected EntityRenderEntity preview;
+
 	@Attrib
 	protected StringAttribute entityType = new StringAttribute("minecraft:marker");
 
 	@Attrib
 	protected NBTAttribute nbt = new NBTAttribute();
-	
+
 	@Override
-	public Set<RenderEntity> getRenderEntities() {
-		Set<RenderEntity> set = super.getRenderEntities();
-		set.add(new MCRenderEntity(this, getPreviewPosition(), new Vector3d(0, 0, 0),
-				new MCEntity(getEntityType(), getNBT()), "entity"));
-		return set;
+	public void updateRenderEntities() {
+		super.updateRenderEntities();
+		if (preview == null) {
+			preview = RenderEntityManager.getInstance().createMC();
+			managedRenderEntities.add(preview);
+		}
+		preview.setMCEntity(new MCEntity(getEntityType(), getNBT()));
+		preview.setPosition(getPosition());
 	}
 	
 	/**

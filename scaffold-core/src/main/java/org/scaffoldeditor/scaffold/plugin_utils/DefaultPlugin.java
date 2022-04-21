@@ -39,8 +39,7 @@ import org.scaffoldeditor.scaffold.entity.logic.TriggerMultiple;
 import org.scaffoldeditor.scaffold.entity.path.PathNode;
 import org.scaffoldeditor.scaffold.entity.path.PathTrain;
 import org.scaffoldeditor.scaffold.entity.phys.PhysParent;
-import org.scaffoldeditor.scaffold.entity.test.BlockModelTest;
-import org.scaffoldeditor.scaffold.entity.test.ModelTest;
+
 import org.scaffoldeditor.scaffold.entity.world.SingleBlock;
 import org.scaffoldeditor.scaffold.entity.world.WorldBrush;
 import org.scaffoldeditor.scaffold.entity.world.WorldDynamic;
@@ -70,7 +69,6 @@ public class DefaultPlugin implements PluginInitializer {
 		FunctionEntity.register();
 		Relay.register();
 		GameEntity.register();
-		ModelTest.register();
 		CommandEntity.register();
 		RedstoneListener.register();
 		RedstoneTrigger.register();
@@ -79,7 +77,6 @@ public class DefaultPlugin implements PluginInitializer {
 		ContainerAttribute.register();
 		TriggerMultiple.register();
 		TriggerIndividual.register();
-		BlockModelTest.register();
 		PlayerStart.register();
 		InfoTarget.register();
 		LogicTeleport.register();

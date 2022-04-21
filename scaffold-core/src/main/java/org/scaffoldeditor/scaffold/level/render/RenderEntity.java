@@ -10,6 +10,7 @@ import org.scaffoldeditor.scaffold.entity.Entity;
  * 
  * @author Igrium
  */
+@Deprecated
 public abstract class RenderEntity {
 	private Entity entity;
 	private Vector3dc position;

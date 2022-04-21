@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
@@ -28,8 +27,7 @@ import org.scaffoldeditor.scaffold.entity.game.KnownUUID;
 import org.scaffoldeditor.scaffold.entity.game.TargetSelectable;
 import org.scaffoldeditor.scaffold.io.AssetLoader;
 import org.scaffoldeditor.scaffold.level.Level;
-import org.scaffoldeditor.scaffold.level.render.ModelRenderEntity;
-import org.scaffoldeditor.scaffold.level.render.RenderEntity;
+
 import org.scaffoldeditor.scaffold.logic.Datapack;
 import org.scaffoldeditor.scaffold.logic.LogicUtils;
 import org.scaffoldeditor.scaffold.logic.datapack.Function;
@@ -42,6 +40,8 @@ import org.scaffoldeditor.scaffold.logic.datapack.commands.ExecuteCommand.Condit
 import org.scaffoldeditor.scaffold.logic.datapack.commands.ExecuteCommand.DataEntityConditional;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.ExecuteCommandBuilder;
 import org.scaffoldeditor.scaffold.logic.datapack.constraints.ParentConstraint;
+import org.scaffoldeditor.scaffold.render.ModelRenderEntity;
+import org.scaffoldeditor.scaffold.render.RenderEntityManager;
 import org.scaffoldeditor.scaffold.sdoc.SDoc;
 import org.scaffoldeditor.scaffold.util.UUIDUtils;
 
@@ -77,6 +77,10 @@ public class WorldDynamic extends Entity implements EntityProvider, TargetSelect
 	private Map<Vector3ic, MCEntity> entities;
 	private BlockCollection modelCache;
 	private String modelPath = "";
+
+	int previewHash; // Used for checking if the entity map has changed.
+	
+	private Map<MCEntity, ModelRenderEntity> previewModels;
 
 	@Attrib
 	protected AssetAttribute model = new AssetAttribute("schematic", "");
@@ -123,19 +127,33 @@ public class WorldDynamic extends Entity implements EntityProvider, TargetSelect
 		super.onSetAttributes(updated);
 		if (!modelPath.equals(getAttribute("model").getValue())) reloadModel();
 	}
-	
+
+
 	@Override
-	public Set<RenderEntity> getRenderEntities() {
-		Set<RenderEntity> renderEnts = super.getRenderEntities();
-		if (modelCache == null) return renderEnts;
-		
-		for (Vector3ic pos : entities.keySet()) {
-			renderEnts.add(new ModelRenderEntity(this, new Vector3d(pos).add(getPreviewPosition()), new Vector3d(0, 0, 0),
-					"ent" + pos.toString(),
-					entities.get(pos).getNBT().getCompoundTag("BlockState").getString("Name") + "#Inventory"));
+	public void updateRenderEntities() {
+		super.updateRenderEntities();
+		int currentHash = entities.hashCode();
+		if (previewModels == null || currentHash != previewHash) {
+			for (ModelRenderEntity model : previewModels.values()) {
+				model.kill();
+				managedRenderEntities.remove(model);
+			}
+
+			previewModels = new HashMap<>();
+			for (MCEntity ent : entities.values()) {
+				ModelRenderEntity model = RenderEntityManager.getInstance().createModel();
+				model.setModel(ent.getNBT().getCompoundTag("BlockState").getString("Name") + "#Inventory");
+				managedRenderEntities.add(model);
+			}
+			previewHash = currentHash;
 		}
-		
-		return renderEnts;
+
+		for (Vector3ic pos : entities.keySet()) {
+			MCEntity ent = entities.get(pos);
+			Vector3d position = new Vector3d(pos);
+			position.add(this.getPreviewPosition());
+			previewModels.get(ent).setPosition(position);
+		}
 	}
 	
 	private MCEntity generateEntity(Block block) {

@@ -11,6 +11,7 @@ import org.scaffoldeditor.scaffold.entity.Entity;
  * 
  * @author Igrium
  */
+@Deprecated
 public class BlockRenderEntity extends RenderEntity {
 	
 	private final BlockCollection blocks;

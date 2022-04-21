@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
+import org.joml.Vector4f;
 import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.scaffold.annotation.Attrib;
 import org.scaffoldeditor.scaffold.entity.Entity;
@@ -18,10 +19,11 @@ import org.scaffoldeditor.scaffold.entity.game.KnownUUID;
 import org.scaffoldeditor.scaffold.entity.logic.LogicEntity;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.level.io.OutputDeclaration;
-import org.scaffoldeditor.scaffold.level.render.LineRenderEntity;
-import org.scaffoldeditor.scaffold.level.render.RenderEntity;
+
 import org.scaffoldeditor.scaffold.logic.LogicUtils;
 import org.scaffoldeditor.scaffold.math.MathUtils;
+import org.scaffoldeditor.scaffold.render.LineRenderEntity;
+import org.scaffoldeditor.scaffold.render.RenderEntityManager;
 import org.scaffoldeditor.scaffold.sdoc.SDoc;
 import org.scaffoldeditor.scaffold.util.UUIDUtils;
 
@@ -47,6 +49,8 @@ public class PathNode extends LogicEntity implements KnownUUID, EntityProvider {
 	}
 	
 	public static final String PASSED_OUTPUT = "on_passed";
+
+	protected LineRenderEntity linePreview;
 	
 	// for updating render entities
 	private Vector3dc nextPos;
@@ -172,19 +176,50 @@ public class PathNode extends LogicEntity implements KnownUUID, EntityProvider {
 		return true;
 	}
 	
+	// @Override
+	// public Set<RenderEntity> getRenderEntities() {
+	// 	Set<RenderEntity> ents = super.getRenderEntities();
+	// 	PathNode next = getNext();
+	// 	if (next != null) {
+	// 		ents.add(new LineRenderEntity(this, getPreviewPosition(), next.getPreviewPosition(), "line", .72f, .48f, .09f, .82f));
+	// 		nextPos = next.getPreviewPosition();
+	// 	}
+	// 	PathNode previous = getPrevious();
+	// 	if (previous != null && !getPreviewPosition().equals(previous.nextPos)) {
+	// 		previous.updateRenderEntities();
+	// 	}
+	// 	return ents;
+	// }
+
 	@Override
-	public Set<RenderEntity> getRenderEntities() {
-		Set<RenderEntity> ents = super.getRenderEntities();
+	public void updateRenderEntities() {
+		super.updateRenderEntities();
+
 		PathNode next = getNext();
 		if (next != null) {
-			ents.add(new LineRenderEntity(this, getPreviewPosition(), next.getPreviewPosition(), "line", .72f, .48f, .09f, .82f));
-			nextPos = next.getPreviewPosition();
+			updateNextLine(next.getPreviewPosition());
+		} else {
+			linePreview.kill();
+			managedRenderEntities.remove(linePreview);
+			linePreview = null;
 		}
+
 		PathNode previous = getPrevious();
 		if (previous != null && !getPreviewPosition().equals(previous.nextPos)) {
 			previous.updateRenderEntities();
 		}
-		return ents;
+	}
+
+	private void updateNextLine(Vector3dc pos) {
+		if (linePreview == null) {
+			linePreview = RenderEntityManager.getInstance().createLine();
+			linePreview.setColor(new Vector4f(.72f, .48f, .09f, .82f));
+			managedRenderEntities.add(linePreview);
+		}
+
+		linePreview.setStartPos(getPreviewPosition());
+		linePreview.setEndPos(pos);
+		nextPos = pos;
 	}
 	
 	@Override

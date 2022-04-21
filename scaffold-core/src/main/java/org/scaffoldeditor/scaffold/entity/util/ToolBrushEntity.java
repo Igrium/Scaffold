@@ -9,8 +9,9 @@ import org.scaffoldeditor.scaffold.entity.BrushEntity;
 import org.scaffoldeditor.scaffold.entity.Entity;
 import org.scaffoldeditor.scaffold.entity.attribute.VectorAttribute;
 import org.scaffoldeditor.scaffold.level.Level;
-import org.scaffoldeditor.scaffold.level.render.BrushRenderEntity;
-import org.scaffoldeditor.scaffold.level.render.RenderEntity;
+import org.scaffoldeditor.scaffold.render.BrushRenderEntity;
+import org.scaffoldeditor.scaffold.render.RenderEntityManager;
+
 
 /**
  * Base class for brush entities that have no physical manifestation in the
@@ -26,6 +27,8 @@ public abstract class ToolBrushEntity extends Entity implements BrushEntity {
 
 	@Attrib(name = "end_point")
 	private VectorAttribute endPoint = new VectorAttribute(1, 1, 1);
+	
+	protected BrushRenderEntity visualiser;
 	
 	/**
 	 * Get this brush's end point.
@@ -65,12 +68,27 @@ public abstract class ToolBrushEntity extends Entity implements BrushEntity {
 	 *         <code>[namespace]:textures/[texture_name].png</code>
 	 */
 	public abstract String getTexture();
-	
+
 	@Override
-	public Set<RenderEntity> getRenderEntities() {
-		Set<RenderEntity> set = super.getRenderEntities();
-		Vector3dc position = getPreviewPosition();
-		set.add(new BrushRenderEntity(this, position, position.add(getEndPoint(), new Vector3d()), getTexture(), "brush_entity"));
-		return set;
+	public void updateRenderEntities() {
+		super.updateRenderEntities();
+
+		if (visualiser == null) {
+			visualiser = RenderEntityManager.getInstance().createBrush();
+			visualiser.setTexture(getTexture());
+			managedRenderEntities.add(visualiser);
+		}
+
+		visualiser.setStartPos(getPreviewPosition());
+		visualiser.setEndPos(getEndPoint());
 	}
+
+	
+	// @Override
+	// public Set<RenderEntity> getRenderEntities() {
+	// 	Set<RenderEntity> set = super.getRenderEntities();
+	// 	Vector3dc position = getPreviewPosition();
+	// 	set.add(new BrushRenderEntity(this, position, position.add(getEndPoint(), new Vector3d()), getTexture(), "brush_entity"));
+	// 	return set;
+	// }
 }
