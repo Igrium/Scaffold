@@ -129,6 +129,7 @@ public class ServiceProvider implements AutoCloseable, Executor {
 		LogManager.getLogger().info("Shutting down executor service.");
 		isRunning = false;
 		try {
+			LockSupport.unpark(thread);
 			boolean timeout = stopLatch.await(5, TimeUnit.SECONDS);
 
 			if (!timeout) {

@@ -1,7 +1,5 @@
 package org.scaffoldeditor.scaffold.entity.util;
 
-import java.util.Set;
-
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
 import org.scaffoldeditor.scaffold.annotation.Attrib;
@@ -10,6 +8,7 @@ import org.scaffoldeditor.scaffold.entity.Entity;
 import org.scaffoldeditor.scaffold.entity.attribute.VectorAttribute;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.render.BrushRenderEntity;
+import org.scaffoldeditor.scaffold.render.RenderEntity;
 import org.scaffoldeditor.scaffold.render.RenderEntityManager;
 
 
@@ -73,10 +72,9 @@ public abstract class ToolBrushEntity extends Entity implements BrushEntity {
 	public void updateRenderEntities() {
 		super.updateRenderEntities();
 
-		if (visualiser == null) {
-			visualiser = RenderEntityManager.getInstance().createBrush();
+		if (!RenderEntity.isValid(visualiser)) {
+			visualiser = RenderEntityManager.getInstance().createBrush(this);
 			visualiser.setTexture(getTexture());
-			managedRenderEntities.add(visualiser);
 		}
 
 		visualiser.setStartPos(getPreviewPosition());

@@ -35,7 +35,6 @@ import org.scaffoldeditor.scaffold.entity.EntityRegistry;
 import org.scaffoldeditor.scaffold.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.entity.attribute.BooleanAttribute;
 import org.scaffoldeditor.scaffold.entity.attribute.VectorAttribute;
-import org.scaffoldeditor.scaffold.level.WorldUpdates.UpdateRenderEntitiesEvent;
 import org.scaffoldeditor.scaffold.level.WorldUpdates.WorldUpdateEvent;
 import org.scaffoldeditor.scaffold.level.WorldUpdates.WorldUpdateListener;
 import org.scaffoldeditor.scaffold.level.stack.StackGroup;
@@ -48,8 +47,6 @@ import org.scaffoldeditor.scaffold.serialization.LevelReader;
 import org.scaffoldeditor.scaffold.serialization.LevelWriter;
 import org.scaffoldeditor.scaffold.util.LevelOperations;
 import org.scaffoldeditor.scaffold.util.ProgressListener;
-import org.scaffoldeditor.scaffold.util.event.EventDispatcher;
-import org.scaffoldeditor.scaffold.util.event.EventListener;
 
 /**
  * Represents a single level file
@@ -99,8 +96,6 @@ public class Level {
 	
 	private List<WorldUpdateListener> worldUpdateListeners = new ArrayList<>();
 	private List<Runnable> updateStackListeners = new ArrayList<>();
-	@Deprecated
-	private EventDispatcher<UpdateRenderEntitiesEvent> updateRenderEntitiesDispatcher = new EventDispatcher<>();
 	
 	private static final Logger LOGGER = LogManager.getLogger();
 	
@@ -735,23 +730,6 @@ public class Level {
 		for (Runnable listener : updateStackListeners) {
 			listener.run();
 		}
-	}
-	
-	/**
-	 * Register a listener to be called when one {@link RenderEntity} or more have
-	 * updated. If a render entity that previously existed isn't present in the
-	 * list, it should be removed.
-	 * 
-	 * @param listener Event listener.
-	 */
-	@Deprecated
-	public void onUpdateRenderEntities(EventListener<UpdateRenderEntitiesEvent> listener) {
-		updateRenderEntitiesDispatcher.addListener(listener);
-	}
-	
-	@Deprecated
-	public void fireUpdateRenderEntitiesEvent(UpdateRenderEntitiesEvent event) {
-		updateRenderEntitiesDispatcher.fire(event);
 	}
 	
 	/**

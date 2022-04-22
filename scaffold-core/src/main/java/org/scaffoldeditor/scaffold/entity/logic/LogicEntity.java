@@ -1,12 +1,11 @@
 package org.scaffoldeditor.scaffold.entity.logic;
 
-import java.util.Set;
-
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
 import org.scaffoldeditor.scaffold.entity.Entity;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.render.BillboardRenderEntity;
+import org.scaffoldeditor.scaffold.render.RenderEntity;
 import org.scaffoldeditor.scaffold.render.RenderEntityManager;
 
 
@@ -34,9 +33,8 @@ public abstract class LogicEntity extends Entity {
 	@Override
 	public void updateRenderEntities() {
 		super.updateRenderEntities();
-		if (sprite == null) {
-			sprite = RenderEntityManager.getInstance().createBillboard();
-			managedRenderEntities.add(sprite);
+		if (!RenderEntity.isValid(sprite)) {
+			sprite = RenderEntityManager.getInstance().createBillboard(this);
 		}
 
 		sprite.setTexture(getSprite());

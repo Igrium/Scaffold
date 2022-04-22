@@ -9,6 +9,7 @@ import org.scaffoldeditor.scaffold.entity.Entity;
 import org.scaffoldeditor.scaffold.entity.attribute.Attribute;
 import org.scaffoldeditor.scaffold.level.Level;
 import org.scaffoldeditor.scaffold.render.BlockRenderEntity;
+import org.scaffoldeditor.scaffold.render.RenderEntity;
 import org.scaffoldeditor.scaffold.render.RenderEntityManager;
 
 /**
@@ -98,10 +99,9 @@ public abstract class BaseBlockEntity extends Entity implements BlockEntity {
 	public void updateRenderEntities() {
 		super.updateRenderEntities();
 		if (isTransformPreviewEnabled()) {
-			if (preview == null) {
-				preview = RenderEntityManager.getInstance().createBlock();
+			if (!RenderEntity.isValid(preview)) {
+				preview = RenderEntityManager.getInstance().createBlock(this);
 				preview.setBlocks(getBlockCollection());
-				managedRenderEntities.add(preview);
 			}
 			preview.setPosition(getPreviewPosition());
 		} else {

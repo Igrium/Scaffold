@@ -5,8 +5,6 @@ import java.util.EventObject;
 import java.util.Set;
 
 import org.scaffoldeditor.nbt.block.WorldMath.SectionCoordinate;
-import org.scaffoldeditor.scaffold.entity.Entity;
-import org.scaffoldeditor.scaffold.level.render.RenderEntity;
 
 
 public final class WorldUpdates {
@@ -26,16 +24,5 @@ public final class WorldUpdates {
 	
 	public interface WorldUpdateListener extends EventListener {
 		void onWorldUpdated(WorldUpdateEvent e);
-	}
-	
-	@Deprecated
-	public static class UpdateRenderEntitiesEvent {
-		public final Set<RenderEntity> renderEntities;
-		public final Entity subject;
-		
-		public UpdateRenderEntitiesEvent(Set<RenderEntity> renderEntities, Entity subject) {
-			this.renderEntities = renderEntities;
-			this.subject = subject;
-		}
 	}
 }

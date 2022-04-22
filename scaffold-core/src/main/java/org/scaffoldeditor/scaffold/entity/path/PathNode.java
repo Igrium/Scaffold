@@ -3,7 +3,6 @@ package org.scaffoldeditor.scaffold.entity.path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import org.joml.Vector3d;
@@ -23,6 +22,7 @@ import org.scaffoldeditor.scaffold.level.io.OutputDeclaration;
 import org.scaffoldeditor.scaffold.logic.LogicUtils;
 import org.scaffoldeditor.scaffold.math.MathUtils;
 import org.scaffoldeditor.scaffold.render.LineRenderEntity;
+import org.scaffoldeditor.scaffold.render.RenderEntity;
 import org.scaffoldeditor.scaffold.render.RenderEntityManager;
 import org.scaffoldeditor.scaffold.sdoc.SDoc;
 import org.scaffoldeditor.scaffold.util.UUIDUtils;
@@ -200,7 +200,6 @@ public class PathNode extends LogicEntity implements KnownUUID, EntityProvider {
 			updateNextLine(next.getPreviewPosition());
 		} else {
 			linePreview.kill();
-			managedRenderEntities.remove(linePreview);
 			linePreview = null;
 		}
 
@@ -211,10 +210,9 @@ public class PathNode extends LogicEntity implements KnownUUID, EntityProvider {
 	}
 
 	private void updateNextLine(Vector3dc pos) {
-		if (linePreview == null) {
-			linePreview = RenderEntityManager.getInstance().createLine();
+		if (!RenderEntity.isValid(linePreview)) {
+			linePreview = RenderEntityManager.getInstance().createLine(this);
 			linePreview.setColor(new Vector4f(.72f, .48f, .09f, .82f));
-			managedRenderEntities.add(linePreview);
 		}
 
 		linePreview.setStartPos(getPreviewPosition());

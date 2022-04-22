@@ -10,12 +10,19 @@ public interface RenderEntity {
     public void kill();
 
     /**
-     * Stop this render entity from rendering.
+     * Check whether this render entity has been killed.
+     * @return Is this render entity alive?
      */
-    public void disable();
+    public boolean isAlive();
 
     /**
-     * Restore this render entity to rendering.
+     * Utility function to make sure a render entity reference is not null and the
+     * entity is alive.
+     * 
+     * @param ent Entity reference to check.
+     * @return Is this entity valid?
      */
-    public void enable();
+    public static boolean isValid(RenderEntity ent) {
+        return (ent != null && ent.isAlive());
+    }
 }

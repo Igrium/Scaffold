@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,16 +21,13 @@ import org.scaffoldeditor.scaffold.entity.attribute.VectorAttribute;
 import org.scaffoldeditor.scaffold.entity.game.RedstoneListener;
 import org.scaffoldeditor.scaffold.io.AssetManager;
 import org.scaffoldeditor.scaffold.level.Level;
-import org.scaffoldeditor.scaffold.level.WorldUpdates.UpdateRenderEntitiesEvent;
 import org.scaffoldeditor.scaffold.level.io.InputDeclaration;
 import org.scaffoldeditor.scaffold.level.io.Output;
 import org.scaffoldeditor.scaffold.level.io.OutputDeclaration;
 import org.scaffoldeditor.scaffold.logic.Datapack;
 import org.scaffoldeditor.scaffold.logic.datapack.commands.Command;
-import org.scaffoldeditor.scaffold.render.RenderEntity;
 import org.scaffoldeditor.scaffold.sdoc.SDoc;
 import org.scaffoldeditor.scaffold.util.AttributeHolder;
-import org.scaffoldeditor.scaffold.util.event.EventListener;
 import org.w3c.dom.Element;
 
 /**
@@ -398,7 +394,7 @@ public abstract class Entity extends AttributeHolder {
 	/**
 	 * <p>
 	 * Called when the entity has finished initialization and is added (or re-added)
-	 * to the level. Any render entities that may have been disabled are re-enabled.
+	 * to the level.
 	 * </p>
 	 * <p>
 	 * Note: if name refactoring has taken place during deserialization, this is
@@ -406,8 +402,7 @@ public abstract class Entity extends AttributeHolder {
 	 * </p>
 	 */
 	public void onAdded() {
-		showRenderEntities();
-		updateRenderEntities();
+		// showRenderEntities();
 	}
 	
 	
@@ -421,51 +416,33 @@ public abstract class Entity extends AttributeHolder {
 	 * </p>
 	 */
 	public void onRemoved() {
-		hideRenderEntities();
+		// hideRenderEntities();
 	}
 
-	/**
-	 * A set of render entities that automatically get hidden with this entity.
-	 */
-	protected Set<RenderEntity> managedRenderEntities = new HashSet<>();
-
-	/**
-	 * Hide all managed render entities.
-	 */
-	public void hideRenderEntities() {
-		for (RenderEntity ent : managedRenderEntities) {
-			ent.disable();
-		}
-	}
+	// /**
+	//  * Hide all managed render entities.
+	//  */
+	// public void hideRenderEntities() {
+	// 	for (RenderEntity ent : managedRenderEntities) {
+	// 		ent.disable();
+	// 	}
+	// }
 	
-	/**
-	 * Show all managed render entities. If called when entity is not in the level, can lead to unwanted behavior.
-	 */
-	public void showRenderEntities() {
-		for (RenderEntity ent : managedRenderEntities) {
-			ent.enable();
-		}
-	}
-	
-	/**
-	 * Register a listener to be called when one {@link RenderEntity} or more have
-	 * updated. If a render entity that previously existed isn't present in the
-	 * list, it should be removed.
-	 * 
-	 * @param listener Event listener.
-	 */
-	@Deprecated
-	public void onUpdateRenderEntities(EventListener<UpdateRenderEntitiesEvent> listener) {
-		level.onUpdateRenderEntities(event -> {
-			if (event.subject == this) {
-				listener.eventFired(event);
-			}
-		});
-	}
-
+	// /**
+	//  * Show all managed render entities. If called when entity is not in the level, can lead to unwanted behavior.
+	//  */
+	// public void showRenderEntities() {
+	// 	for (RenderEntity ent : managedRenderEntities) {
+	// 		ent.enable();
+	// 	}
+	// }
 	
 	/**
 	 * Update this entity's visual representation in the editor.
+	 * <p>In previous versions, this was automatically called when entities were added
+	 * to the level. This caused issues with the render entity manager and entities
+	 * attempting render when their level wasn't loaded, so it now must be called
+	 * manually.</p>
 	 */
 	public void updateRenderEntities() {
 		// updateRenderEntities(getRenderEntities());

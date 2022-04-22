@@ -136,14 +136,12 @@ public class WorldDynamic extends Entity implements EntityProvider, TargetSelect
 		if (previewModels == null || currentHash != previewHash) {
 			for (ModelRenderEntity model : previewModels.values()) {
 				model.kill();
-				managedRenderEntities.remove(model);
 			}
 
 			previewModels = new HashMap<>();
 			for (MCEntity ent : entities.values()) {
-				ModelRenderEntity model = RenderEntityManager.getInstance().createModel();
+				ModelRenderEntity model = RenderEntityManager.getInstance().createModel(this);
 				model.setModel(ent.getNBT().getCompoundTag("BlockState").getString("Name") + "#Inventory");
-				managedRenderEntities.add(model);
 			}
 			previewHash = currentHash;
 		}

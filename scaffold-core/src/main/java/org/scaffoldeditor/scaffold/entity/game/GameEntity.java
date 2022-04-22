@@ -1,10 +1,8 @@
 package org.scaffoldeditor.scaffold.entity.game;
 
 import java.io.IOException;
-import java.util.Set;
 import java.util.UUID;
 
-import org.joml.Vector3d;
 import org.scaffoldeditor.nbt.block.BlockWorld;
 import org.scaffoldeditor.nbt.util.MCEntity;
 import org.scaffoldeditor.scaffold.annotation.Attrib;
@@ -60,7 +58,6 @@ public class GameEntity extends Rotatable implements KnownUUID, EntityProvider {
 		super.updateRenderEntities();
 		if (preview == null) {
 			preview = RenderEntityManager.getInstance().createMC();
-			managedRenderEntities.add(preview);
 		}
 		preview.setMCEntity(new MCEntity(getEntityType(), getNBT()));
 		preview.setPosition(getPosition());
